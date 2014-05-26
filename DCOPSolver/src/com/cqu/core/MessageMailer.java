@@ -11,8 +11,10 @@ public class MessageMailer extends Thread{
 	
 	private boolean isRunning=false;
 	
-	public MessageMailer() {
+	public MessageMailer(AgentManager agentManager) {
 		// TODO Auto-generated constructor stub
+		this.agentManager=agentManager;
+		
 		msgQueue=new LinkedBlockingQueue<Message>(100);
 	}
 	
@@ -24,7 +26,11 @@ public class MessageMailer extends Thread{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
+		
 		isRunning=true;
+		
+		this.agentManager.startAgents();
+		
 		while(isRunning==true)
 		{
 			Message msg;

@@ -4,12 +4,14 @@ public class Message {
 	
 	private int idSender;
 	private int idReceiver;
+	private int type;
 	private Object value;
 	
-	public Message(int idSender, int idReceiver, Object value) {
+	public Message(int idSender, int idReceiver, int type, Object value) {
 		super();
 		this.idSender = idSender;
 		this.idReceiver = idReceiver;
+		this.type=type;
 		this.value = value;
 	}
 	
@@ -17,23 +19,16 @@ public class Message {
 		return idSender;
 	}
 	
-	public void setIdSender(int idSender) {
-		this.idSender = idSender;
-	}
-	
 	public int getIdReceiver() {
 		return idReceiver;
 	}
 	
-	public void setIdReceiver(int idReceiver) {
-		this.idReceiver = idReceiver;
+	public int getType()
+	{
+		return this.type;
 	}
 	
 	public Object getValue() {
 		return value;
-	}
-	
-	public void setValue(Object value) {
-		this.value = value;
 	}
 }

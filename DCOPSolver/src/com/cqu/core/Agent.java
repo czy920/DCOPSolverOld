@@ -1,35 +1,55 @@
 package com.cqu.core;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * 计算单位
+ * @author CQU
+ *
+ */
 public abstract class Agent implements Runnable{
-	
-	public final static String KEY_PARENT="parent";
-	public final static String KEY_PSEUDO_PARENT="pseudo_parent";
-	public final static String KEY_CHILDREN="children";
-	public final static String KEY_NEIGHBOUR="neighbour";
 	
 	public final static int CHECK_MESSAGE_CYCLE=100;
 	
 	protected int id;
 	protected String name;
+	protected int[] domain;
+	protected Map<Integer, Integer> valueIndexes;
 	
-	protected Variable internalVariable;
-	protected Variable[] externalVariables;
-	protected Map<String, int[]> graph;
+	protected int[] neighbours;
+	protected int parent;
+	protected int[] pseudoParents;
+	protected int[] children;
+	protected int[] pseudoChildren;
+	
+	protected List<int[]> neighbourDomains;
+	protected List<int[][]> relationCosts;
+	
 	
 	protected BlockingQueue<Message> msgQueue;
 	
 	private boolean isRunning=false;
 	
-	public Agent(int id, String name) {
+	private MessageMailer msgMailer;
+	
+	public Agent(int id, String name, int[] domain) {
 		super();
 		this.id = id;
 		this.name = name;
+		this.domain=domain;
+		
+		this.msgQueue=new LinkedBlockingQueue<Message>(50);
+		
+		this.valueIndexes=new HashMap<Integer, Integer>();
+		for(int i=0;i<domain.length;i++)
+		{
+			this.valueIndexes.put(domain[i], i);
+		}
 	}
-
 	
 	public int getId() {
 		return id;
@@ -39,13 +59,21 @@ public abstract class Agent implements Runnable{
 		return name;
 	}
 	
-	public void initialize(Variable internalVariable, Variable[] externalVariables, Map<String, int[]> graph)
+	public void setNeibours(int[] neighbours, int parent, int[] children, int[] pseudoParents, int[] pseudoChildren, List<int[]> neighbourDomains, List<int[][]> relationCosts)
 	{
-		this.internalVariable=internalVariable;
-		this.externalVariables=externalVariables;
-		this.graph=graph;
+		this.neighbours=neighbours;
+		this.parent=parent;
+		this.children=children;
+		this.pseudoParents=pseudoParents;
+		this.pseudoChildren=pseudoChildren;
 		
-		this.msgQueue=new LinkedBlockingQueue<Message>(50);
+		this.neighbourDomains=neighbourDomains;
+		this.relationCosts=relationCosts;
+	}
+	
+	public void setMessageMailer(MessageMailer msgMailer)
+	{
+		this.msgMailer=msgMailer;
 	}
 	
 	public void stop()
@@ -57,6 +85,9 @@ public abstract class Agent implements Runnable{
 	public void run()
 	{
 		this.isRunning=true;
+		
+		initRun();
+		
 		while(isRunning==true)
 		{
 			Message msg;
@@ -70,6 +101,8 @@ public abstract class Agent implements Runnable{
 		}
 	}
 	
+	protected abstract void initRun();
+	
 	public void addMessage(Message msg)
 	{
 		try {
@@ -82,7 +115,7 @@ public abstract class Agent implements Runnable{
 	
 	public void sendMessage(Message msg)
 	{
-		
+		msgMailer.addMessage(msg);
 	}
 	
 	protected abstract void dispose(Message msg);

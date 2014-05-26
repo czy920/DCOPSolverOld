@@ -4,16 +4,28 @@ import java.util.List;
 
 public class Problem {
 	
+	public final static String KEY_PARENT="parent";
+	public final static String KEY_PSEUDO_PARENT="pseudo_parent";
+	public final static String KEY_CHILDREN="children";
+	public final static String KEY_NEIGHBOUR="neighbour";
+	
 	public int agentCount;
 	public int constraintCount;
 	
+	//all possible domains and costs
 	public List<int[]> domains;
 	public List<int[][]> costs;
 	
-	//对每个agent
+	//for each agent
 	public int[] agentIds;
 	public String[] agentNames;
-	public int[] neighbourAgents;
-	public int[] agentDomains;//存储domains的index
-	public int[] agentConstraints;//存储
+	
+	public List<int[]> neighbourAgents;
+	public List<Integer> parentAgents;
+	public List<int[]> pseudoParentAgents;
+	public List<int[]> childAgents;
+	public List<int[]> pseudoChildAgents;
+	
+	public int[] neighbourAgentDomains;
+	public List<int[]> agentConstraintCosts;
 }
