@@ -29,7 +29,7 @@ public class MessageMailer extends Thread{
 		
 		isRunning=true;
 		
-		this.agentManager.startAgents();
+		this.agentManager.startAgents(this);
 		
 		while(isRunning==true)
 		{

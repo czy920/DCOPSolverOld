@@ -48,7 +48,7 @@ public class Main {
 		problem.pseudoChildAgents.add(null);
 		problem.pseudoChildAgents.add(null);
 		
-		problem.neighbourAgentDomains=new int[]{0, 0, 0, 0};
+		problem.neighbourAgentDomains=new int[][]{{0, 0}, {0, 0, 0}, {0, 0}, {0}};
 		
 		problem.costs=new ArrayList<int[][]>();
 		problem.costs.add(new int[][]{{5, 8}, {20, 3}});
@@ -56,11 +56,7 @@ public class Main {
 		problem.costs.add(new int[][]{{5, 4}, {3, 3}});
 		problem.costs.add(new int[][]{{3, 8}, {10, 3}});
 		
-		problem.agentConstraintCosts=new ArrayList<int[]>();
-		problem.agentConstraintCosts.add(new int[]{0, 1});
-		problem.agentConstraintCosts.add(new int[]{0, 2, 3});
-		problem.agentConstraintCosts.add(new int[]{1, 2});
-		problem.agentConstraintCosts.add(new int[]{3});
+		problem.agentConstraintCosts=new int[][]{{0, 1}, {0, 2, 3}, {1, 2}, {3}};
 		
 		MessageMailer msgMailer=new MessageMailer(new AgentManager(problem));
 		msgMailer.start();

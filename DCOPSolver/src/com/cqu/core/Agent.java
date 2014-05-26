@@ -13,7 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public abstract class Agent implements Runnable{
 	
-	public final static int CHECK_MESSAGE_CYCLE=100;
+	public final static int INFINITY=Integer.MAX_VALUE;
 	
 	protected int id;
 	protected String name;
@@ -27,7 +27,7 @@ public abstract class Agent implements Runnable{
 	protected int[] pseudoChildren;
 	
 	protected List<int[]> neighbourDomains;
-	protected List<int[][]> relationCosts;
+	protected List<int[][]> constraintCosts;
 	
 	
 	protected BlockingQueue<Message> msgQueue;
@@ -59,7 +59,7 @@ public abstract class Agent implements Runnable{
 		return name;
 	}
 	
-	public void setNeibours(int[] neighbours, int parent, int[] children, int[] pseudoParents, int[] pseudoChildren, List<int[]> neighbourDomains, List<int[][]> relationCosts)
+	public void setNeibours(int[] neighbours, int parent, int[] children, int[] pseudoParents, int[] pseudoChildren, List<int[]> neighbourDomains, List<int[][]> constraintCosts)
 	{
 		this.neighbours=neighbours;
 		this.parent=parent;
@@ -68,7 +68,7 @@ public abstract class Agent implements Runnable{
 		this.pseudoChildren=pseudoChildren;
 		
 		this.neighbourDomains=neighbourDomains;
-		this.relationCosts=relationCosts;
+		this.constraintCosts=constraintCosts;
 	}
 	
 	public void setMessageMailer(MessageMailer msgMailer)
@@ -87,6 +87,13 @@ public abstract class Agent implements Runnable{
 		this.isRunning=true;
 		
 		initRun();
+		
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}//延迟启动，让所有的Agent thread创建完成后再运行
 		
 		while(isRunning==true)
 		{

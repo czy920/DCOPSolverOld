@@ -26,6 +26,6 @@ public class Problem {
 	public List<int[]> childAgents;
 	public List<int[]> pseudoChildAgents;
 	
-	public int[] neighbourAgentDomains;
-	public List<int[]> agentConstraintCosts;
+	public int[][] neighbourAgentDomains;
+	public int[][] agentConstraintCosts;
 }
