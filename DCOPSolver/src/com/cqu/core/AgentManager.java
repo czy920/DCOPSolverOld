@@ -1,8 +1,6 @@
 package com.cqu.core;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.cqu.adopt.AdoptAgent;
@@ -18,15 +16,15 @@ public class AgentManager {
 		for(int i=0;i<problem.agentCount;i++)
 		{
 			Agent agent=new AdoptAgent(problem.agentIds[i], problem.agentNames[i], problem.domains.get(i));
-			List<int[]> neighbourDomains=new ArrayList<int[]>();
-			List<int[][]> constraintCosts=new ArrayList<int[][]>();
+			Map<Integer, int[]> neighbourDomains=new HashMap<Integer, int[]>();
+			Map<Integer, int[][]> constraintCosts=new HashMap<Integer, int[][]>();
 			for(int j=0;j<problem.neighbourAgentDomains[i].length;j++)
 			{
-				neighbourDomains.add(problem.domains.get(problem.neighbourAgentDomains[i][j]));
+				neighbourDomains.put(agent.getId(), problem.domains.get(problem.neighbourAgentDomains[i][j]));
 			}
 			for(int j=0;j<problem.agentConstraintCosts[i].length;j++)
 			{
-				constraintCosts.add(problem.costs.get(problem.agentConstraintCosts[i][j]));
+				constraintCosts.put(agent.getId(), problem.costs.get(problem.agentConstraintCosts[i][j]));
 			}
 			
 			agent.setNeibours(problem.neighbourAgents.get(i), problem.parentAgents.get(i), 

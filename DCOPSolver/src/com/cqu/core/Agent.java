@@ -1,7 +1,5 @@
 package com.cqu.core;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -18,7 +16,6 @@ public abstract class Agent implements Runnable{
 	protected int id;
 	protected String name;
 	protected int[] domain;
-	protected Map<Integer, Integer> valueIndexes;
 	
 	protected int[] neighbours;
 	protected int parent;
@@ -26,8 +23,8 @@ public abstract class Agent implements Runnable{
 	protected int[] children;
 	protected int[] pseudoChildren;
 	
-	protected List<int[]> neighbourDomains;
-	protected List<int[][]> constraintCosts;
+	protected Map<Integer, int[]> neighbourDomains;
+	protected Map<Integer, int[][]> constraintCosts;
 	
 	
 	protected BlockingQueue<Message> msgQueue;
@@ -43,12 +40,6 @@ public abstract class Agent implements Runnable{
 		this.domain=domain;
 		
 		this.msgQueue=new LinkedBlockingQueue<Message>(50);
-		
-		this.valueIndexes=new HashMap<Integer, Integer>();
-		for(int i=0;i<domain.length;i++)
-		{
-			this.valueIndexes.put(domain[i], i);
-		}
 	}
 	
 	public int getId() {
@@ -59,7 +50,7 @@ public abstract class Agent implements Runnable{
 		return name;
 	}
 	
-	public void setNeibours(int[] neighbours, int parent, int[] children, int[] pseudoParents, int[] pseudoChildren, List<int[]> neighbourDomains, List<int[][]> constraintCosts)
+	public void setNeibours(int[] neighbours, int parent, int[] children, int[] pseudoParents, int[] pseudoChildren, Map<Integer, int[]> neighbourDomains, Map<Integer, int[][]> constraintCosts)
 	{
 		this.neighbours=neighbours;
 		this.parent=parent;
