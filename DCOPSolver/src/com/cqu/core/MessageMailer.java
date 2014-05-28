@@ -1,5 +1,8 @@
 package com.cqu.core;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -11,11 +14,14 @@ public class MessageMailer extends Thread{
 	
 	private boolean isRunning=false;
 	
+	private List<Map<String, Object>> results;
+	
 	public MessageMailer(AgentManager agentManager) {
 		// TODO Auto-generated constructor stub
 		this.agentManager=agentManager;
 		
 		msgQueue=new LinkedBlockingQueue<Message>(100);
+		results=new ArrayList<Map<String, Object>>();
 	}
 	
 	public void stopRunning()
@@ -42,6 +48,8 @@ public class MessageMailer extends Thread{
 				e1.printStackTrace();
 			}
 		}
+		
+		this.agentManager.printResults(results);
 	}
 	
 	public void addMessage(Message msg)
@@ -52,5 +60,19 @@ public class MessageMailer extends Thread{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public synchronized void setResult(Map<String, Object> result)
+	{
+		results.add(result);
+		if(results.size()==this.agentManager.getAgentCount())
+		{
+			this.stopRunning();
+		}
+	}
+	
+	public List<Map<String, Object>> getResults()
+	{
+		return this.results;
 	}
 }

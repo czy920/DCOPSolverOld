@@ -19,6 +19,7 @@ public class Problem {
 	//for each agent
 	public int[] agentIds;
 	public String[] agentNames;
+	public int[] agentDomains;
 	
 	public List<int[]> neighbourAgents;
 	public List<Integer> parentAgents;

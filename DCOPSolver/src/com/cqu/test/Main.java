@@ -22,6 +22,8 @@ public class Main {
 		problem.domains=new ArrayList<int[]>();
 		problem.domains.add(new int[]{0, 1});
 		
+		problem.agentDomains=new int[]{0, 0, 0, 0};
+		
 		problem.neighbourAgents=new ArrayList<int[]>();
 		problem.parentAgents=new ArrayList<Integer>();
 		problem.pseudoParentAgents=new ArrayList<int[]>();
@@ -37,6 +39,11 @@ public class Main {
 		problem.parentAgents.add(0);
 		problem.parentAgents.add(1);
 		problem.parentAgents.add(1);
+		
+		problem.pseudoParentAgents.add(null);
+		problem.pseudoParentAgents.add(new int[]{0});
+		problem.pseudoParentAgents.add(new int[]{0, 1});
+		problem.pseudoParentAgents.add(new int[]{1});
 		
 		problem.childAgents.add(new int[]{1});
 		problem.childAgents.add(new int[]{2, 3});

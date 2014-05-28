@@ -1,5 +1,6 @@
 package com.cqu.core;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -31,7 +32,7 @@ public abstract class Agent implements Runnable{
 	
 	private boolean isRunning=false;
 	
-	private MessageMailer msgMailer;
+	protected MessageMailer msgMailer;
 	
 	public Agent(int id, String name, int[] domain) {
 		super();
@@ -67,9 +68,14 @@ public abstract class Agent implements Runnable{
 		this.msgMailer=msgMailer;
 	}
 	
-	public void stop()
+	public void stopRunning()
 	{
 		isRunning=false;
+	}
+	
+	public boolean isRunning()
+	{
+		return this.isRunning;
 	}
 
 	@Override
@@ -77,14 +83,14 @@ public abstract class Agent implements Runnable{
 	{
 		this.isRunning=true;
 		
-		initRun();
-		
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}//延迟启动，让所有的Agent thread创建完成后再运行
+		
+		initRun();
 		
 		while(isRunning==true)
 		{
@@ -97,9 +103,15 @@ public abstract class Agent implements Runnable{
 				e1.printStackTrace();
 			}
 		}
+		
+		finished();
 	}
 	
+	protected abstract void finished();
+	
 	protected abstract void initRun();
+	
+	public abstract void printResults(List<Map<String, Object>> results);
 	
 	public void addMessage(Message msg)
 	{
