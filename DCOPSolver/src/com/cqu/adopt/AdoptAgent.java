@@ -563,4 +563,26 @@ public class AdoptAgent extends Agent{
 		}
 		System.out.println("totalCost: "+totalCost);
 	}
+
+	@Override
+	public String easyMessageContent(Message msg, Agent sender, Agent receiver) {
+		// TODO Auto-generated method stub
+		return "from "+sender.getName()+" to "+receiver.getName()+" type "+AdoptAgent.getTypeString(msg.getType());
+	}
+	
+	public static String getTypeString(int type)
+	{
+		switch (type) {
+		case AdoptAgent.TYPE_VALUE_MESSAGE:
+			return "value";
+		case AdoptAgent.TYPE_COST_MESSAGE:
+			return "cost";
+		case AdoptAgent.TYPE_THRESHOLD_MESSAGE:
+			return "threshold";
+		case AdoptAgent.TYPE_TERMINATE_MESSAGE:
+			return "terminate";
+		default:
+			return "unknown";
+		}
+	}
 }

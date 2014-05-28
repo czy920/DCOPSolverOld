@@ -113,6 +113,8 @@ public abstract class Agent implements Runnable{
 	
 	public abstract void printResults(List<Map<String, Object>> results);
 	
+	public abstract String easyMessageContent(Message msg, Agent sender, Agent receiver);
+	
 	public void addMessage(Message msg)
 	{
 		try {

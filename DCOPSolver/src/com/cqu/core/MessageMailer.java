@@ -42,6 +42,9 @@ public class MessageMailer extends Thread{
 			Message msg;
 			try {
 				msg = msgQueue.take();
+				
+				System.out.println(this.agentManager.easyMessageContent(msg));//log
+				
 				agentManager.getAgent(msg.getIdReceiver()).addMessage(msg);
 			} catch (InterruptedException e1) {
 				// TODO Auto-generated catch block
@@ -56,6 +59,9 @@ public class MessageMailer extends Thread{
 	{
 		try {
 			msgQueue.put(msg);
+			
+			//System.out.println(this.agentManager.easyMessageContent(msg));//log
+			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

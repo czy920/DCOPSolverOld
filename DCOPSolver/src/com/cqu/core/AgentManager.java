@@ -68,4 +68,11 @@ public class AgentManager {
 			this.agents.get(0).printResults(results);
 		}
 	}
+	
+	public String easyMessageContent(Message msg)
+	{
+		Agent senderAgent=this.getAgent(msg.getIdSender());
+		Agent receiverAgent=this.getAgent(msg.getIdReceiver());
+		return senderAgent.easyMessageContent(msg, senderAgent, receiverAgent);
+	}
 }
