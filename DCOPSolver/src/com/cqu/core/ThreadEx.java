@@ -3,16 +3,18 @@ package com.cqu.core;
 public abstract class ThreadEx{
 	
 	private Thread thread;
+	private String threadName;
 	protected volatile boolean isRunning=false;
 	
-	public ThreadEx() {
+	public ThreadEx(String threadName) {
 		// TODO Auto-generated constructor stub
-		thread=new Thread(task);
+		this.threadName=threadName;
 	}
 	
 	public void start()
 	{
-		this.thread.start();
+		thread=new Thread(task, threadName);
+		thread.start();
 	}
 	
 	public void stopRunning()

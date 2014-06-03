@@ -1,6 +1,6 @@
 package com.cqu.core;
 
-public class Message {
+public class Message  {
 	
 	private int idSender;
 	private int idReceiver;

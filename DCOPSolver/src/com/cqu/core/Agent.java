@@ -2,8 +2,8 @@ package com.cqu.core;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * 计算单位
@@ -13,6 +13,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public abstract class Agent extends ThreadEx{
 	
 	public final static int INFINITY=Integer.MAX_VALUE;
+	public final static int QUEUE_CAPACITY=50;
 	
 	protected int id;
 	protected String name;
@@ -30,17 +31,15 @@ public abstract class Agent extends ThreadEx{
 	
 	protected BlockingQueue<Message> msgQueue;
 	
-	private boolean isRunning=false;
-	
 	protected MessageMailer msgMailer;
 	
 	public Agent(int id, String name, int[] domain) {
-		super();
+		super("Agent "+name);
 		this.id = id;
 		this.name = name;
 		this.domain=domain;
 		
-		this.msgQueue=new LinkedBlockingQueue<Message>(50);
+		this.msgQueue=new ArrayBlockingQueue<Message>(QUEUE_CAPACITY, true);
 	}
 	
 	public int getId() {
@@ -84,7 +83,10 @@ public abstract class Agent extends ThreadEx{
 		{
 			Message msg;
 			try {
+				System.out.println(Thread.currentThread().getName()+": before take() in agent "+this.name);//for debug
 				msg = msgQueue.take();
+				System.out.println(Thread.currentThread().getName()+": after take() in agent "+this.name);//for debug
+				System.out.println(Thread.currentThread().getName()+": Message taken out in agent "+this.name+": "+this.msgMailer.easyMessageContent(msg));//for debug
 				if(msg!=null)
 				{
 					dispose(msg);
@@ -101,7 +103,10 @@ public abstract class Agent extends ThreadEx{
 	public void addMessage(Message msg)
 	{
 		try {
+			System.out.println(Thread.currentThread().getName()+": before put() in agent "+this.name);//for debug
 			msgQueue.put(msg);
+			System.out.println(Thread.currentThread().getName()+": after put() in agent "+this.name);//for debug
+			System.out.println(Thread.currentThread().getName()+": Message taken out in agent "+this.name+": "+this.msgMailer.easyMessageContent(msg));//for debug
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			Thread.currentThread().interrupt();

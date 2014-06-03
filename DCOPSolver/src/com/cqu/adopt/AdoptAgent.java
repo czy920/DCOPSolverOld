@@ -166,8 +166,6 @@ public class AdoptAgent extends Agent{
 	@Override
 	protected void dispose(Message msg) {
 		// TODO Auto-generated method stub
-		System.out.println("Message got "+this.msgMailer.easyMessageContent(msg));//for debug
-		
 		if(msg.getType()==AdoptAgent.TYPE_VALUE_MESSAGE)
 		{
 			disposeValueMessage(msg);
@@ -567,9 +565,9 @@ public class AdoptAgent extends Agent{
 				totalCost=UB_;
 			}
 			
-			String displayStr="Agent "+name_+": "+id_+" "+value_+" "+LB_+" ";
+			String displayStr="Agent "+name_+": id="+id_+" value="+value_+" LB="+LB_+" UB=";
 			displayStr+=IntegerUtil.getEasyString(UB_);
-			displayStr+=" "+TH_;
+			displayStr+=" TH="+TH_;
 			System.out.println(displayStr);
 		}
 		System.out.println("totalCost: "+IntegerUtil.getEasyString(totalCost));
