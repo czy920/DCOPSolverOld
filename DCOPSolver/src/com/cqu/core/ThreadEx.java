@@ -3,7 +3,7 @@ package com.cqu.core;
 public abstract class ThreadEx{
 	
 	private Thread thread;
-	protected boolean isRunning=false;
+	protected volatile boolean isRunning=false;
 	
 	public ThreadEx() {
 		// TODO Auto-generated constructor stub
@@ -15,13 +15,13 @@ public abstract class ThreadEx{
 		this.thread.start();
 	}
 	
-	public synchronized void stopRunning()
+	public void stopRunning()
 	{
 		isRunning=false;
 		thread.interrupt();
 	}
 	
-	public synchronized boolean isRunning()
+	public boolean isRunning()
 	{
 		return this.isRunning;
 	}
