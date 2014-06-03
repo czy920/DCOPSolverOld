@@ -10,7 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author CQU
  *
  */
-public abstract class Agent implements Runnable{
+public abstract class Agent extends ThreadEx{
 	
 	public final static int INFINITY=Integer.MAX_VALUE;
 	
@@ -68,27 +68,15 @@ public abstract class Agent implements Runnable{
 		this.msgMailer=msgMailer;
 	}
 	
-	public void stopRunning()
-	{
-		isRunning=false;
-	}
-	
-	public boolean isRunning()
-	{
-		return this.isRunning;
-	}
-
 	@Override
-	public void run()
-	{
-		this.isRunning=true;
-		
+	protected void runProcess() {
+		// TODO Auto-generated method stub
 		try {
-			Thread.sleep(100);
+			Thread.sleep(100);//延迟启动，让所有的Agent thread创建完成后再运行
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}//延迟启动，让所有的Agent thread创建完成后再运行
+			Thread.currentThread().interrupt();
+		}
 		
 		initRun();
 		
@@ -97,23 +85,18 @@ public abstract class Agent implements Runnable{
 			Message msg;
 			try {
 				msg = msgQueue.take();
-				dispose(msg);
+				if(msg!=null)
+				{
+					dispose(msg);
+				}
 			} catch (InterruptedException e1) {
 				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				Thread.currentThread().interrupt();
 			}
 		}
 		
-		finished();
+		runFinished();
 	}
-	
-	protected abstract void finished();
-	
-	protected abstract void initRun();
-	
-	public abstract void printResults(List<Map<String, Object>> results);
-	
-	public abstract String easyMessageContent(Message msg, Agent sender, Agent receiver);
 	
 	public void addMessage(Message msg)
 	{
@@ -121,7 +104,7 @@ public abstract class Agent implements Runnable{
 			msgQueue.put(msg);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Thread.currentThread().interrupt();
 		}
 	}
 	
@@ -130,5 +113,9 @@ public abstract class Agent implements Runnable{
 		msgMailer.addMessage(msg);
 	}
 	
+	protected abstract void initRun();
+	protected abstract void runFinished();
 	protected abstract void dispose(Message msg);
+    public abstract void printResults(List<Map<String, Object>> results);
+	public abstract String easyMessageContent(Message msg, Agent sender, Agent receiver);
 }

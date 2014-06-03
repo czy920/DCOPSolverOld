@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import com.cqu.core.Agent;
 import com.cqu.core.Message;
+import com.cqu.util.IntegerUtil;
 
 public class AdoptAgent extends Agent{
 
@@ -19,6 +20,7 @@ public class AdoptAgent extends Agent{
 	public final static String KEY_TH="KEY_TH";
 	
 	public final static String KEY_ID="KEY_ID";
+	public final static String KEY_NAME="KEY_NAME";
 	public final static String KEY_VALUE="KEY_VALUE";
 	
 	private Map<Integer, int[]> lbs;
@@ -164,6 +166,8 @@ public class AdoptAgent extends Agent{
 	@Override
 	protected void dispose(Message msg) {
 		// TODO Auto-generated method stub
+		System.out.println("Message got "+this.msgMailer.easyMessageContent(msg));//for debug
+		
 		if(msg.getType()==AdoptAgent.TYPE_VALUE_MESSAGE)
 		{
 			disposeValueMessage(msg);
@@ -529,18 +533,21 @@ public class AdoptAgent extends Agent{
 			}
 		}
 	}
-
+	
 	@Override
-	protected void finished() {
+	protected void runFinished() {
 		// TODO Auto-generated method stub
 		Map<String, Object> result=new HashMap<String, Object>();
 		result.put(AdoptAgent.KEY_ID, this.id);
+		result.put(AdoptAgent.KEY_NAME, this.name);
 		result.put(AdoptAgent.KEY_VALUE, this.domain[valueIndex]);
 		result.put(AdoptAgent.KEY_LB, this.LB);
 		result.put(AdoptAgent.KEY_UB, this.UB);
 		result.put(AdoptAgent.KEY_TH, this.TH);
 		
 		this.msgMailer.setResult(result);
+		
+		System.out.println("Agent "+this.name+" stopped!");
 	}
 
 	@Override
@@ -550,6 +557,7 @@ public class AdoptAgent extends Agent{
 		for(Map<String, Object> result : results)
 		{
 			int id_=(Integer) result.get(AdoptAgent.KEY_ID);
+			String name_=(String) result.get(AdoptAgent.KEY_NAME);
 			int value_=(Integer) result.get(AdoptAgent.KEY_VALUE);
 			int LB_=(Integer) result.get(AdoptAgent.KEY_LB);
 			int UB_=(Integer) result.get(AdoptAgent.KEY_UB);
@@ -559,9 +567,12 @@ public class AdoptAgent extends Agent{
 				totalCost=UB_;
 			}
 			
-			System.out.println(id_+" "+value_+" "+LB_+" "+UB_+" "+TH_);
+			String displayStr="Agent "+name_+": "+id_+" "+value_+" "+LB_+" ";
+			displayStr+=IntegerUtil.getEasyString(UB_);
+			displayStr+=" "+TH_;
+			System.out.println(displayStr);
 		}
-		System.out.println("totalCost: "+totalCost);
+		System.out.println("totalCost: "+IntegerUtil.getEasyString(totalCost));
 	}
 
 	@Override

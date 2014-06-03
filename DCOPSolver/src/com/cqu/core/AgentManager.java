@@ -57,7 +57,7 @@ public class AgentManager {
 		for(Agent agent : agents.values())
 		{
 			agent.setMessageMailer(msgMailer);
-			new Thread(agent).start();
+			agent.start();
 		}
 	}
 	

@@ -6,13 +6,11 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class MessageMailer extends Thread{
+public class MessageMailer extends ThreadEx{
 	
 	private AgentManager agentManager;
 	
 	private BlockingQueue<Message> msgQueue;
-	
-	private boolean isRunning=false;
 	
 	private List<Map<String, Object>> results;
 	
@@ -24,47 +22,13 @@ public class MessageMailer extends Thread{
 		results=new ArrayList<Map<String, Object>>();
 	}
 	
-	public void stopRunning()
-	{
-		isRunning=false;
-	}
-	
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		
-		isRunning=true;
-		
-		this.agentManager.startAgents(this);
-		
-		while(isRunning==true)
-		{
-			Message msg;
-			try {
-				msg = msgQueue.take();
-				
-				System.out.println(this.agentManager.easyMessageContent(msg));//log
-				
-				agentManager.getAgent(msg.getIdReceiver()).addMessage(msg);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-		}
-		
-		this.agentManager.printResults(results);
-	}
-	
 	public void addMessage(Message msg)
 	{
 		try {
 			msgQueue.put(msg);
-			
-			//System.out.println(this.agentManager.easyMessageContent(msg));//log
-			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Thread.currentThread().interrupt();
 		}
 	}
 	
@@ -80,5 +44,32 @@ public class MessageMailer extends Thread{
 	public List<Map<String, Object>> getResults()
 	{
 		return this.results;
+	}
+
+	@Override
+	protected void runProcess() {
+		// TODO Auto-generated method stub
+		while(isRunning==true)
+		{
+			Message msg;
+			try {
+				msg = msgQueue.take();
+				if(msg!=null)
+				{
+					agentManager.getAgent(msg.getIdReceiver()).addMessage(msg);
+				}
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				Thread.currentThread().interrupt();
+			}
+		}
+		this.agentManager.printResults(results);
+		
+		System.out.println("Message mailer stopped!");
+	}
+	
+	public String easyMessageContent(Message msg)
+	{
+		return this.agentManager.easyMessageContent(msg);
 	}
 }

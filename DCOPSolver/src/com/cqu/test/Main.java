@@ -65,7 +65,10 @@ public class Main {
 		
 		problem.agentConstraintCosts=new int[][]{{0, 1}, {0, 2, 3}, {1, 2}, {3}};
 		
-		MessageMailer msgMailer=new MessageMailer(new AgentManager(problem));
+		AgentManager agentManager=new AgentManager(problem); 
+		MessageMailer msgMailer=new MessageMailer(agentManager);
+		
+		agentManager.startAgents(msgMailer);
 		msgMailer.start();
 	}
 
