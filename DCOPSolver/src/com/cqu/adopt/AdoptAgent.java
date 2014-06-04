@@ -45,6 +45,8 @@ public class AdoptAgent extends Agent{
 	@Override
 	protected void initRun() {
 		// TODO Auto-generated method stub
+		super.initRun();
+		
 		TH=0;
 		currentContext=new Context(); 
 		
@@ -164,8 +166,10 @@ public class AdoptAgent extends Agent{
 	}
 
 	@Override
-	protected void dispose(Message msg) {
+	protected void disposeMessage(Message msg) {
 		// TODO Auto-generated method stub
+		System.out.println(Thread.currentThread().getName()+": message got in agent "+
+				this.name+" "+this.msgMailer.easyMessageContent(msg));
 		if(msg.getType()==AdoptAgent.TYPE_VALUE_MESSAGE)
 		{
 			disposeValueMessage(msg);
@@ -179,6 +183,13 @@ public class AdoptAgent extends Agent{
 		{
 			disposeTerminateMessage(msg);
 		}
+	}
+	
+	@Override
+	protected void messageLost(Message msg) {
+		// TODO Auto-generated method stub
+		System.out.println(Thread.currentThread().getName()+": message lost in agent "+
+		this.name+" "+this.msgMailer.easyMessageContent(msg));
 	}
 	
 	private void disposeValueMessage(Message msg)
@@ -535,6 +546,8 @@ public class AdoptAgent extends Agent{
 	@Override
 	protected void runFinished() {
 		// TODO Auto-generated method stub
+		super.runFinished();
+		
 		Map<String, Object> result=new HashMap<String, Object>();
 		result.put(AdoptAgent.KEY_ID, this.id);
 		result.put(AdoptAgent.KEY_NAME, this.name);
