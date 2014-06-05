@@ -51,4 +51,14 @@ public class MessageMailer extends QueueMessager{
 		// TODO Auto-generated method stub
 		System.out.println(Thread.currentThread().getName()+": message lost "+this.easyMessageContent(msg));
 	}
+	
+	@Override
+	protected void runFinished() {
+		// TODO Auto-generated method stub
+		super.runFinished();
+		
+		this.agentManager.printResults(results);
+		
+		System.out.println("Mailer stopped!");
+	}
 }

@@ -10,7 +10,6 @@ import java.util.Map;
  */
 public abstract class Agent extends QueueMessager{
 	
-	public final static int INFINITY=Integer.MAX_VALUE;
 	public final static int QUEUE_CAPACITY=50;
 	
 	protected int id;

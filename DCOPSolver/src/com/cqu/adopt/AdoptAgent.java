@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.cqu.core.Agent;
+import com.cqu.core.Infinity;
 import com.cqu.core.Message;
-import com.cqu.util.IntegerUtil;
 
 public class AdoptAgent extends Agent{
 
@@ -68,7 +68,7 @@ public class AdoptAgent extends Agent{
 				for(int j=0;j<this.domain.length;j++)
 				{
 					childLbs[j]=0;
-					childUbs[j]=Agent.INFINITY;
+					childUbs[j]=Infinity.INFINITY;
 					childThs[j]=0;
 					childContexts[j]=new Context();
 				}
@@ -169,7 +169,7 @@ public class AdoptAgent extends Agent{
 	protected void disposeMessage(Message msg) {
 		// TODO Auto-generated method stub
 		System.out.println(Thread.currentThread().getName()+": message got in agent "+
-				this.name+" "+this.msgMailer.easyMessageContent(msg));
+				this.name+" "+this.msgMailer.easyMessageContent(msg)+" | VALUE="+this.domain[valueIndex]+" LB="+this.LB+" UB="+Infinity.infinityEasy(this.UB)+" TH="+Infinity.infinityEasy(this.TH));
 		if(msg.getType()==AdoptAgent.TYPE_VALUE_MESSAGE)
 		{
 			disposeValueMessage(msg);
@@ -220,7 +220,7 @@ public class AdoptAgent extends Agent{
 				{
 					lbs.get(childId)[j]=0;
 					ths.get(childId)[j]=0;
-					ubs.get(childId)[j]=Agent.INFINITY;
+					ubs.get(childId)[j]=Infinity.INFINITY;
 					contexts.get(childId)[j].reset();
 				}
 			}
@@ -287,8 +287,8 @@ public class AdoptAgent extends Agent{
 	private int[] computeMinimalLBAndUB()
 	{
 		int[] localCosts_=this.localCosts();
-		int minLB=Agent.INFINITY;
-		int minUB=Agent.INFINITY;
+		int minLB=Infinity.INFINITY;
+		int minUB=Infinity.INFINITY;
 		int dMinimizesLB=0;
 		int LB_CurValue=0;
 		int dMinimizesUB=0;
@@ -328,10 +328,10 @@ public class AdoptAgent extends Agent{
 			{
 				childId=this.children[j];
 				sumlb+=this.lbs.get(childId)[i];
-				sumub+=this.ubs.get(childId)[i];
+				sumub=Infinity.add(sumub, this.ubs.get(childId)[i]);
 			}
 			sumlb+=localCosts_[i];
-			sumub+=localCosts_[i];
+			sumub=Infinity.add(sumub, localCosts_[i]);
 			if(i==valueIndex)
 			{
 				LB_CurValue=sumlb;
@@ -347,7 +347,6 @@ public class AdoptAgent extends Agent{
 				dMinimizesUB=i;
 			}
 		}
-		
 		this.LB=minLB;
 		this.UB=minUB;
 		
@@ -368,9 +367,9 @@ public class AdoptAgent extends Agent{
 		for(int i=0;i<this.children.length;i++)
 		{
 			childId=this.children[i];
-			TH_di+=this.ths.get(childId)[di];
+			TH_di=Infinity.add(TH_di, this.ths.get(childId)[di]);
 		}
-		TH_di+=localCost_;
+		TH_di=Infinity.add(TH_di, localCost_);
 		
 		return TH_di;
 	}
@@ -479,47 +478,66 @@ public class AdoptAgent extends Agent{
 		{
 			return;
 		}
-		
 		int diff=this.TH-computeTH(valueIndex);
+		int diffOriginalValue=diff;
 		int childId=0;
 		if(diff>0)
 		{
 			while(diff!=0)
 			{
+				diffOriginalValue=diff;
 				for(int i=0;i<this.children.length;i++)
 				{
 					childId=this.children[i];
-					if(this.ubs.get(childId)[valueIndex]>this.ths.get(childId)[valueIndex])
+					int availDiff=Infinity.minus(this.ubs.get(childId)[valueIndex], this.ths.get(childId)[valueIndex]);
+					if(availDiff>0)
 					{
-						this.ths.get(childId)[valueIndex]+=1;
-						diff-=1;
-						if(diff==0)
+						if((diff-availDiff)<=0)
 						{
+							this.ths.get(childId)[valueIndex]=Infinity.add(this.ths.get(childId)[valueIndex],diff);
+							diff=0;
 							break;
+						}else
+						{
+							this.ths.get(childId)[valueIndex]=Infinity.add(this.ths.get(childId)[valueIndex],availDiff);
+							diff=Infinity.minus(diff, availDiff);
 						}
 					}
+				}
+				if(diff==diffOriginalValue)
+				{
+					break;//无法使diff为0，也退出
 				}
 			}
 		}else if(diff<0)
 		{
 			while(diff!=0)
 			{
+				diffOriginalValue=diff;
 				for(int i=0;i<this.children.length;i++)
 				{
 					childId=this.children[i];
-					if(this.ths.get(childId)[valueIndex]>this.lbs.get(childId)[valueIndex])
+					int availDiff=Infinity.minus(this.ths.get(childId)[valueIndex], this.lbs.get(childId)[valueIndex]);
+					if(availDiff>0)
 					{
-						this.ths.get(childId)[valueIndex]-=1;
-						diff+=1;
-						if(diff==0)
+						if((diff+availDiff)>=0)
 						{
+							this.ths.get(childId)[valueIndex]=Infinity.minus(this.ths.get(childId)[valueIndex], diff);
+							diff=0;
 							break;
+						}else
+						{
+							this.ths.get(childId)[valueIndex]=Infinity.minus(this.ths.get(childId)[valueIndex], availDiff);
+							diff=Infinity.add(diff, availDiff);
 						}
 					}
 				}
+				if(diff==diffOriginalValue)
+				{
+					break;//无法使diff为0，也退出
+				}
 			}
 		}
-		
 		sendThresholdMessages();
 	}
 	
@@ -579,11 +597,11 @@ public class AdoptAgent extends Agent{
 			}
 			
 			String displayStr="Agent "+name_+": id="+id_+" value="+value_+" LB="+LB_+" UB=";
-			displayStr+=IntegerUtil.getEasyString(UB_);
-			displayStr+=" TH="+TH_;
+			displayStr+=Infinity.infinityEasy(UB_);
+			displayStr+=" TH="+Infinity.infinityEasy(TH_);
 			System.out.println(displayStr);
 		}
-		System.out.println("totalCost: "+IntegerUtil.getEasyString(totalCost));
+		System.out.println("totalCost: "+Infinity.infinityEasy(totalCost));
 	}
 
 	@Override
