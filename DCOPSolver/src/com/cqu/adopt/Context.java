@@ -78,4 +78,10 @@ public class Context{
 		}
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return context.toString();
+	}
 }

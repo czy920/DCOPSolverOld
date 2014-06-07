@@ -375,7 +375,6 @@ public class AdoptAgent extends Agent{
 					dMinimizesUB=i;
 				}
 			}
-			
 			this.LB=minLB;
 			this.UB=minUB;
 			
@@ -463,7 +462,7 @@ public class AdoptAgent extends Agent{
 					ret[j]+=0;
 				}else
 				{
-					ret[j]+=this.constraintCosts.get(pseudoParentId)[oppositeAgentValueIndex][j];	
+					ret[j]+=this.constraintCosts.get(pseudoParentId)[j][oppositeAgentValueIndex];	
 				}
 			}
 		}
@@ -491,7 +490,7 @@ public class AdoptAgent extends Agent{
 				ret+=0;
 			}else
 			{
-				ret+=this.constraintCosts.get(pseudoParentId)[oppositeAgentValueIndex][di];	
+				ret+=this.constraintCosts.get(pseudoParentId)[di][oppositeAgentValueIndex];	
 			}
 		}
 		return ret;
@@ -670,20 +669,37 @@ public class AdoptAgent extends Agent{
 	@Override
 	public String easyMessageContent(Message msg, Agent sender, Agent receiver) {
 		// TODO Auto-generated method stub
-		return "from "+sender.getName()+" to "+receiver.getName()+" type "+AdoptAgent.getTypeString(msg.getType());
+		return "from "+sender.getName()+" to "+receiver.getName()+" type "+AdoptAgent.getMessageContent(msg);
 	}
 	
-	public static String getTypeString(int type)
+	@SuppressWarnings("unchecked")
+	public static String getMessageContent(Message msg)
 	{
-		switch (type) {
+		switch (msg.getType()) {
 		case AdoptAgent.TYPE_VALUE_MESSAGE:
-			return "value";
+		{
+			int valueIndex=(Integer) msg.getValue();
+			return "value["+valueIndex+"]";
+		}
 		case AdoptAgent.TYPE_COST_MESSAGE:
-			return "cost";
+		{
+			Map<String, Object> msgValue=(Map<String, Object>) msg.getValue();
+			int LB_=(Integer) msgValue.get(KEY_LB);
+			int UB_=(Integer) msgValue.get(KEY_UB);
+			Context c=(Context) msgValue.get(KEY_CONTEXT);
+			return "cost[LB="+LB_+" UB="+UB_+" context="+c.toString()+"]";
+		}
 		case AdoptAgent.TYPE_THRESHOLD_MESSAGE:
-			return "threshold";
+		{
+			Map<String, Object> msgValue=(Map<String, Object>) msg.getValue();
+			int TH_=(Integer) msgValue.get(KEY_TH);
+			Context c=(Context) msgValue.get(KEY_CONTEXT);
+			return "threshold[TH="+TH_+" context="+c.toString()+"]";
+		}
 		case AdoptAgent.TYPE_TERMINATE_MESSAGE:
-			return "terminate";
+		{
+			return "terminate[]";
+		}
 		default:
 			return "unknown";
 		}
