@@ -15,6 +15,12 @@ public abstract class QueueMessager extends ThreadEx{
 		this.msgQueue=new LinkedList<Message>();
 	}
 	
+	/**
+	 * 添加消息至缓冲队列，若已满，则丢弃消息；
+	 * 但是terminate消息不会被丢弃，而是丢弃
+	 * 队列尾的一个消息并把它加上
+	 * @param msg
+	 */
 	public void addMessage(Message msg)
 	{
 		synchronized (msgQueue) {
@@ -24,7 +30,6 @@ public abstract class QueueMessager extends ThreadEx{
 				msgQueue.notifyAll();
 			}else
 			{
-				//终止消息不能被丢弃：丢弃队列尾的消息，而把它加上
 				if(msg.getType()==Message.TYPE_TERMINATE_MESSAGE)
 				{
 					messageLost(msgQueue.removeLast());

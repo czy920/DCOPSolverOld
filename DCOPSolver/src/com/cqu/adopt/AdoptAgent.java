@@ -669,11 +669,11 @@ public class AdoptAgent extends Agent{
 	@Override
 	public String easyMessageContent(Message msg, Agent sender, Agent receiver) {
 		// TODO Auto-generated method stub
-		return "from "+sender.getName()+" to "+receiver.getName()+" type "+AdoptAgent.getMessageContent(msg);
+		return "from "+sender.getName()+" to "+receiver.getName()+" type "+AdoptAgent.messageContent(msg);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static String getMessageContent(Message msg)
+	public static String messageContent(Message msg)
 	{
 		switch (msg.getType()) {
 		case AdoptAgent.TYPE_VALUE_MESSAGE:
