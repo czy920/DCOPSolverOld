@@ -12,7 +12,7 @@ public class AdoptAgent extends Agent{
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_COST_MESSAGE=1;
 	public final static int TYPE_THRESHOLD_MESSAGE=2;
-	public final static int TYPE_TERMINATE_MESSAGE=3;
+	public final static int TYPE_TERMINATE_MESSAGE=Message.TYPE_TERMINATE_MESSAGE;
 	
 	public final static String KEY_CONTEXT="KEY_CONTEXT";
 	public final static String KEY_LB="KEY_LB";
@@ -22,6 +22,8 @@ public class AdoptAgent extends Agent{
 	public final static String KEY_ID="KEY_ID";
 	public final static String KEY_NAME="KEY_NAME";
 	public final static String KEY_VALUE="KEY_VALUE";
+	
+	public final static String KEY_VALUE_MESSAGE="KEY_VALUE_MESSAGE";
 	
 	private Map<Integer, int[]> lbs;
 	private Map<Integer, int[]> ubs;
@@ -146,7 +148,54 @@ public class AdoptAgent extends Agent{
 		}
 	}
 	
+	/**
+	 * 由于QueueMessager会丢失消息，所以Agent停止前必须保证：
+	 * 1. children agent必须接到自己的terminate消息
+	 * 2. pseudo children agent必须接到自己的最新value消息
+	 * QueueMessager保证了terminate消息一定不会被丢弃
+	 * 这两点保证均由terminate消息来保证，即在terminate消息中包含
+	 * value消息，并且terminate消息扩展为发往pseudo children
+	 */
 	private void sendTerminateMessages()
+	{
+		if(this.isLeafAgent()==true)
+		{
+			return;
+		}
+		
+		int childId=0;
+		for(int i=0;i<this.children.length;i++)
+		{
+			childId=this.children[i];
+			Context c=new Context(currentContext);
+			c.addOrUpdate(this.id, this.valueIndex);
+			
+			Message valueMsg=new Message(this.id, childId, AdoptAgent.TYPE_VALUE_MESSAGE, valueIndex);
+			
+			Map<String, Object> mapValue=new HashMap<String, Object>();
+			mapValue.put(KEY_CONTEXT, c);
+			mapValue.put(KEY_VALUE_MESSAGE, valueMsg);
+			
+			Message msg=new Message(this.id, childId, AdoptAgent.TYPE_TERMINATE_MESSAGE, mapValue);
+			this.sendMessage(msg);
+		}
+		
+		if(this.pseudoChildrenReal!=null)
+		{
+			int pseudoChildId=0;
+			for(int i=0;i<this.pseudoChildrenReal.length;i++)
+			{
+				pseudoChildId=this.pseudoChildrenReal[i];
+				
+				Message valueMsg=new Message(this.id, pseudoChildId, AdoptAgent.TYPE_VALUE_MESSAGE, valueIndex);
+				
+				Message msg=new Message(this.id, pseudoChildId, AdoptAgent.TYPE_TERMINATE_MESSAGE, valueMsg);
+				this.sendMessage(msg);
+			}
+		}
+	}
+	
+	/*private void sendTerminateMessages()
 	{
 		if(this.isLeafAgent()==true)
 		{
@@ -163,7 +212,7 @@ public class AdoptAgent extends Agent{
 			Message msg=new Message(this.id, childId, AdoptAgent.TYPE_TERMINATE_MESSAGE, c);
 			this.sendMessage(msg);
 		}
-	}
+	}*/
 
 	@Override
 	protected void disposeMessage(Message msg) {
@@ -243,15 +292,15 @@ public class AdoptAgent extends Agent{
 		{
 			merge(c);
 			checkCompatible();
-			if(c.compatible(currentContext)==true)
-			{
-				lbs.get(msg.getIdSender())[myValueIndex]=(Integer) cost.get(AdoptAgent.KEY_LB);
-				ubs.get(msg.getIdSender())[myValueIndex]=(Integer) cost.get(AdoptAgent.KEY_UB);
-				contexts.get(msg.getIdSender())[myValueIndex]=c;
-				
-				maintainChildThresholdInvariant();
-				maintainThresholdInvariant();
-			}
+		}
+		if(c.compatible(currentContext)==true)
+		{
+			lbs.get(msg.getIdSender())[myValueIndex]=(Integer) cost.get(AdoptAgent.KEY_LB);
+			ubs.get(msg.getIdSender())[myValueIndex]=(Integer) cost.get(AdoptAgent.KEY_UB);
+			contexts.get(msg.getIdSender())[myValueIndex]=c;
+			
+			maintainChildThresholdInvariant();
+			maintainThresholdInvariant();
 		}
 		backtrack();
 		
@@ -276,11 +325,25 @@ public class AdoptAgent extends Agent{
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void disposeTerminateMessage(Message msg)
 	{
-		this.terminateReceivedFromParent=true;
-		currentContext=(Context) msg.getValue();
-		backtrack();
+		Message valueMsg=null;
+		//父agent发过来的terminate消息为包含了基本的terminate消息和value消息
+		if(msg.getIdSender()==this.parent)
+		{
+			Map<String, Object> mapValue=(Map<String, Object>) msg.getValue();
+			currentContext=(Context) mapValue.get(KEY_CONTEXT);
+			this.terminateReceivedFromParent=true;
+			backtrack();
+			
+			valueMsg=(Message) mapValue.get(KEY_VALUE_MESSAGE);
+		}else
+		{
+			//pseudo父agent发过来的terminate消息仅包含了value消息
+			valueMsg=(Message) msg.getValue();
+		}
+		disposeMessage(valueMsg);
 	}
 	
 	//return int[]{dMinimizesLB, LB(curValue), dMinimizesUB}

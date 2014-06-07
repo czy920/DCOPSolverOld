@@ -24,7 +24,15 @@ public abstract class QueueMessager extends ThreadEx{
 				msgQueue.notifyAll();
 			}else
 			{
-				messageLost(msg);
+				//终止消息不能被丢弃：丢弃队列尾的消息，而把它加上
+				if(msg.getType()==Message.TYPE_TERMINATE_MESSAGE)
+				{
+					messageLost(msgQueue.removeLast());
+					msgQueue.add(msg);
+				}else
+				{
+					messageLost(msg);
+				}
 			}
 		}
 	}

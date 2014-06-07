@@ -21,7 +21,7 @@ public class MessageMailer extends QueueMessager{
 	
 	public void setResult(Map<String, Object> result)
 	{
-		synchronized (result) {
+		synchronized (results) {
 			results.add(result);
 			if(results.size()==this.agentManager.getAgentCount())
 			{

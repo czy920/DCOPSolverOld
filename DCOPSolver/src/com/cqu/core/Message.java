@@ -2,6 +2,8 @@ package com.cqu.core;
 
 public class Message  {
 	
+	public final static int TYPE_TERMINATE_MESSAGE=9999;
+	
 	private int idSender;
 	private int idReceiver;
 	private int type;

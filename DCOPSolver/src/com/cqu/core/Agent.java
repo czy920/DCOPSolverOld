@@ -3,6 +3,8 @@ package com.cqu.core;
 import java.util.List;
 import java.util.Map;
 
+import com.cqu.util.ArrayUtil;
+
 /**
  * 计算单位
  * @author CQU
@@ -21,6 +23,7 @@ public abstract class Agent extends QueueMessager{
 	protected int[] pseudoParents;
 	protected int[] children;
 	protected int[] pseudoChildren;
+	protected int[] pseudoChildrenReal;//pseudoChildren-children
 	
 	protected Map<Integer, int[]> neighbourDomains;
 	protected Map<Integer, int[][]> constraintCosts;
@@ -49,6 +52,10 @@ public abstract class Agent extends QueueMessager{
 		this.children=children;
 		this.pseudoParents=pseudoParents;
 		this.pseudoChildren=pseudoChildren;
+		if(this.pseudoChildren!=null&&this.children!=null)
+		{
+			this.pseudoChildrenReal=ArrayUtil.except(this.pseudoChildren, this.children);
+		}
 		
 		this.neighbourDomains=neighbourDomains;
 		this.constraintCosts=constraintCosts;
