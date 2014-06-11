@@ -333,6 +333,11 @@ public class ProblemParser {
 			return null;
 		}
 		
+		List<int[]> neighborAgents=new ArrayList<int[]>();
+		int[][] neighborAgentDomains=null;
+		int[][] agentConstraintCosts=null;
+		List<int[][]> costs=new ArrayList<int[][]>();
+		Map<String, Integer> costNameIndex=new HashMap<String, Integer>();
 		List<int[]> adjacentList=new ArrayList<int[]>();
 		for(int i=0;i<nbConstraints;i++)
 		{
@@ -345,7 +350,29 @@ public class ProblemParser {
 			String[] constraintedParts=elementList.get(i).getAttributeValue(SCOPE).split(" ");
 			int rows=problem.domains.get(problem.agentDomains[variableNameAgentIndexes.get(constraintedParts[0])]).length;
 			int cols=problem.domains.get(problem.agentDomains[variableNameAgentIndexes.get(constraintedParts[1])]).length;
-			//int[][]
+
+			String costName=elementList.get(i).getAttributeValue(REFERENCE);
+			int costIndex=-1;
+			if(costNameIndex.containsKey(costName)==false)
+			{
+				int[] costRelation=relationNameCosts.get(costName);
+				int[][] cost=new int[rows][cols];
+				for(int j=0;j<rows;j++)
+				{
+					for(int k=0;k<cols;k++)
+					{
+						cost[j][k]=costRelation[j*cols+k];
+					}
+				}
+				costs.add(cost);
+				costIndex=costs.size()-1;
+				costNameIndex.put(costName, costIndex);
+			}else
+			{
+				costIndex=costNameIndex.get(costName);
+			}
+			
+			
 		}
 		
 		return adjacentList;
