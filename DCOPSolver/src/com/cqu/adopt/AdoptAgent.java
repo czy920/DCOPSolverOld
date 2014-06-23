@@ -462,7 +462,8 @@ public class AdoptAgent extends Agent{
 					ret[j]+=0;
 				}else
 				{
-					ret[j]+=this.constraintCosts.get(pseudoParentId)[j][oppositeAgentValueIndex];	
+					//ret[j]+=this.constraintCosts.get(pseudoParentId)[j][oppositeAgentValueIndex];
+					ret[j]+=this.constraintCosts.get(pseudoParentId)[oppositeAgentValueIndex][j];
 				}
 			}
 		}
@@ -490,7 +491,8 @@ public class AdoptAgent extends Agent{
 				ret+=0;
 			}else
 			{
-				ret+=this.constraintCosts.get(pseudoParentId)[di][oppositeAgentValueIndex];	
+				//ret+=this.constraintCosts.get(pseudoParentId)[di][oppositeAgentValueIndex];
+				ret+=this.constraintCosts.get(pseudoParentId)[oppositeAgentValueIndex][di];
 			}
 		}
 		return ret;
@@ -644,7 +646,7 @@ public class AdoptAgent extends Agent{
 	@Override
 	public void printResults(List<Map<String, Object>> results) {
 		// TODO Auto-generated method stub
-		int totalCost=0;
+		int totalCost=-1;
 		for(Map<String, Object> result : results)
 		{
 			int id_=(Integer) result.get(AdoptAgent.KEY_ID);
@@ -653,7 +655,7 @@ public class AdoptAgent extends Agent{
 			int LB_=(Integer) result.get(AdoptAgent.KEY_LB);
 			int UB_=(Integer) result.get(AdoptAgent.KEY_UB);
 			int TH_=(Integer) result.get(AdoptAgent.KEY_TH);
-			if(totalCost<UB_)
+			if(totalCost==-1)
 			{
 				totalCost=UB_;
 			}

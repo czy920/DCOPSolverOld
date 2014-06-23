@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
-
 import com.cqu.core.Problem;
+import com.cqu.util.ArrayUtil;
 import com.cqu.util.XmlUtil;
 
 public class ProblemParser {
@@ -66,34 +66,37 @@ public class ProblemParser {
 			return null;
 		}
 		
-		Map<String, Integer> agentNameIndexes=parseAgents(root.getChild(AGENTS), problem);
-		if(agentNameIndexes==null)
+		Map<String, Integer> agentNameIds=parseAgents(root.getChild(AGENTS), problem);
+		if(agentNameIds==null)
 		{
-			this.printMessage("parseAgents()=false");
+			this.printMessage("parseAgents() fails!");
 			return null;
 		}
 		
-		Map<String, Integer> domainNameIndexes=parseDomains(root.getChild(DOMAINS), problem);
-		if(domainNameIndexes==null)
+		if(parseDomains(root.getChild(DOMAINS), problem)==false)
 		{
-			this.printMessage("parseDomains()=false");
+			this.printMessage("parseDomains() fails!");
 			return null;
 		}
 		
-		Map<String, Integer> variableNameAgentIndexes=parseVariables(root.getChild(VARIABLES), problem, agentNameIndexes, domainNameIndexes);
-		if(variableNameAgentIndexes==null)
+		Map<String, Integer> variableNameAgentIds=parseVariables(root.getChild(VARIABLES), problem, agentNameIds);
+		if(variableNameAgentIds==null)
 		{
-			this.printMessage("parseVariables()=false");
+			this.printMessage("parseVariables() fails!");
 			return null;
 		}
 		
-		Map<String, int[]> relationNameCosts=parseRelations(root.getChild(RELATIONS), problem);
-		if(relationNameCosts==null)
+		if(parseRelations(root.getChild(RELATIONS), problem)==false)
 		{
-			this.printMessage("parseRelations()=false");
+			this.printMessage("parseRelations() fails!");
 			return null;
 		}
 		
+		if(parseConstraints(root.getChild(CONSTRAINTS), problem, variableNameAgentIds)==false)
+		{
+			this.printMessage("parseConstraints() fails!");
+			return null;
+		}
 		
 		return problem;
 	}
@@ -133,35 +136,29 @@ public class ProblemParser {
 			printMessage("nbAgents!=elementList.size()");
 			return null;
 		}
-		
-		Map<String, Integer> agentNameIndexes=new HashMap<String, Integer>();
-		int[] agentIds=new int[nbAgents];
-		String[] agentNames=new String[nbAgents];
+		Map<String, Integer> agentNameIds=new HashMap<String, Integer>();
 		try{
-			for(int i=0;i<agentIds.length;i++)
+			for(int i=0;i<nbAgents;i++)
 			{
-				agentIds[i]=Integer.parseInt(elementList.get(i).getAttributeValue(ID));
-				agentNames[i]=elementList.get(i).getAttributeValue(NAME);
-				agentNameIndexes.put(agentNames[i], i);
+				int id=Integer.parseInt(elementList.get(i).getAttributeValue(ID));
+				String name=elementList.get(i).getAttributeValue(NAME);
+				
+				agentNameIds.put(name, id);
+				problem.agentNames.put(id, name);
 			}
 		}catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}
-		
-		problem.agentCount=nbAgents;
-		problem.agentIds=agentIds;
-		problem.agentNames=agentNames;
-		
-		return agentNameIndexes;
+		return agentNameIds;
 	}
 	
-	private Map<String, Integer> parseDomains(Element element, Problem problem)
+	private boolean parseDomains(Element element, Problem problem)
 	{
 		if(element==null)
 		{
-			return null;
+			return false;
 		}
 		int nbDomains=-1;
 		try {
@@ -169,33 +166,29 @@ public class ProblemParser {
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return null;
+			return false;
 		}
 		
 		List<Element> elementList=element.getChildren();
 		if(nbDomains!=elementList.size())
 		{
 			printMessage("nbDomains!=elementList.size()");
-			return null;
+			return false;
 		}
 		
-		Map<String, Integer> domainNameIndexes=new HashMap<String, Integer>();
-		List<int[]> domains=new ArrayList<int[]>();
 		for(int i=0;i<nbDomains;i++)
 		{
-			domainNameIndexes.put(elementList.get(i).getAttributeValue(NAME), i);
 			int[] domain=parseFromTo(elementList.get(i).getValue());
 			int nbValues=Integer.parseInt(elementList.get(i).getAttributeValue(NBVALUES));
 			if(nbValues!=domain.length)
 			{
 				printMessage("nbValues!=domain.length");
-				return null;
+				return false;
 			}
-			domains.add(domain);
+			problem.domains.put(elementList.get(i).getAttributeValue(NAME), domain);
 		}
 		
-		problem.domains=domains;
-		return domainNameIndexes;
+		return true;
 	}
 	
 	private int[] parseFromTo(String fromToStr)
@@ -218,7 +211,7 @@ public class ProblemParser {
 		return ret;
 	}
 	
-	private Map<String, Integer> parseVariables(Element element, Problem problem, Map<String, Integer> agentNameIndexes, Map<String, Integer> domainNameIndexes)
+	private Map<String, Integer> parseVariables(Element element, Problem problem, Map<String, Integer> agentNameIds)
 	{
 		if(element==null)
 		{
@@ -239,29 +232,26 @@ public class ProblemParser {
 			printMessage("nbVariables!=elementList.size()");
 			return null;
 		}
-		if(nbVariables!=problem.agentCount)
+		if(nbVariables!=problem.agentNames.size())
 		{
 			printMessage("nbVariables!=problem.agentCount，要求每个agent中只包含一个variable");
 			return null;
 		}
-		
-		Map<String, Integer> variableNameAgentIndexes=new HashMap<String, Integer>();
-		int[] agentDomains=new int[nbVariables];
+		Map<String, Integer> variableNameAgentIds=new HashMap<String, Integer>();
 		for(int i=0;i<nbVariables;i++)
 		{
-			variableNameAgentIndexes.put(elementList.get(i).getAttributeValue(NAME), agentNameIndexes.get(elementList.get(i).getAttributeValue(AGENT)));
-			agentDomains[agentNameIndexes.get(elementList.get(i).getAttributeValue(AGENT))]=domainNameIndexes.get(elementList.get(i).getAttributeValue(DOMAIN));
+			int agentId=agentNameIds.get(elementList.get(i).getAttributeValue(AGENT));
+			variableNameAgentIds.put(elementList.get(i).getAttributeValue(NAME), agentId);
+			problem.agentDomains.put(agentId, elementList.get(i).getAttributeValue(DOMAIN));
 		}
-		
-		problem.agentDomains=agentDomains;
-		return variableNameAgentIndexes;
+		return variableNameAgentIds;
 	}
 	
-	private Map<String, int[]> parseRelations(Element element, Problem problem)
+	private boolean parseRelations(Element element, Problem problem)
 	{
 		if(element==null)
 		{
-			return null;
+			return false;
 		}
 		int nbRelations=-1;
 		try {
@@ -269,35 +259,34 @@ public class ProblemParser {
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return null;
+			return false;
 		}
 		
 		List<Element> elementList=element.getChildren();
 		if(nbRelations!=elementList.size())
 		{
 			printMessage("nbRelations!=elementList.size()");
-			return null;
+			return false;
 		}
 		
-		Map<String, int[]> relationNameCosts=new HashMap<String, int[]>();
 		for(int i=0;i<nbRelations;i++)
 		{
 			int arity=Integer.parseInt(elementList.get(i).getAttributeValue(ARITY));
 			if(arity!=2)
 			{
 				printMessage("arity!=2");
-				return null;
+				return false;
 			}
 			int[] cost=paseConstraintCost(elementList.get(i).getValue());
 			int nbTuples=Integer.parseInt(elementList.get(i).getAttributeValue(NBTUPLES));
 			if(nbTuples!=cost.length)
 			{
 				printMessage("nbValues!=cost length");
-				return null;
+				return false;
 			}
-			relationNameCosts.put(elementList.get(i).getAttributeValue(NAME), cost);
+			problem.costs.put(elementList.get(i).getAttributeValue(NAME), cost);
 		}
-		return relationNameCosts;
+		return true;
 	}
 	
 	private int[] paseConstraintCost(String costStr)
@@ -311,11 +300,11 @@ public class ProblemParser {
 		return costs;
 	}
 	
-	private List<int[]> parseConstraints(Element element, Problem problem, Map<String, int[]> relationNameCosts, Map<String, Integer> variableNameAgentIndexes)
+	private boolean parseConstraints(Element element, Problem problem, Map<String, Integer> variableNameAgentIds)
 	{
 		if(element==null)
 		{
-			return null;
+			return false;
 		}
 		int nbConstraints=-1;
 		try {
@@ -323,59 +312,62 @@ public class ProblemParser {
 		} catch (NumberFormatException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return null;
+			return false;
 		}
 		
 		List<Element> elementList=element.getChildren();
 		if(nbConstraints!=elementList.size())
 		{
 			printMessage("nbConstraints!=elementList.size()");
-			return null;
+			return false;
 		}
 		
-		List<int[]> neighborAgents=new ArrayList<int[]>();
-		int[][] neighborAgentDomains=null;
-		int[][] agentConstraintCosts=null;
-		List<int[][]> costs=new ArrayList<int[][]>();
-		Map<String, Integer> costNameIndex=new HashMap<String, Integer>();
-		List<int[]> adjacentList=new ArrayList<int[]>();
+		//图的邻接表存储结构
+		Map<Integer, List<Integer>> neighbourAgents=new HashMap<Integer, List<Integer>>();
+		Map<Integer, Map<Integer, String>> neighbourConstraintCosts=new HashMap<Integer, Map<Integer, String>>();
+		for(Integer agentId : problem.agentNames.keySet())
+		{
+			neighbourAgents.put(agentId, new ArrayList<Integer>());
+			neighbourConstraintCosts.put(agentId, new HashMap<Integer, String>());
+		}
+		
 		for(int i=0;i<nbConstraints;i++)
 		{
 			int arity=Integer.parseInt(elementList.get(i).getAttributeValue(ARITY));
 			if(arity!=2)
 			{
 				printMessage("arity!=2");
-				return null;
+				return false;
 			}
 			String[] constraintedParts=elementList.get(i).getAttributeValue(SCOPE).split(" ");
-			int rows=problem.domains.get(problem.agentDomains[variableNameAgentIndexes.get(constraintedParts[0])]).length;
-			int cols=problem.domains.get(problem.agentDomains[variableNameAgentIndexes.get(constraintedParts[1])]).length;
-
-			String costName=elementList.get(i).getAttributeValue(REFERENCE);
-			int costIndex=-1;
-			if(costNameIndex.containsKey(costName)==false)
+			int leftAgentId=variableNameAgentIds.get(constraintedParts[0]);
+			int rightAgentId=variableNameAgentIds.get(constraintedParts[1]);
+			if(leftAgentId>rightAgentId)//保证id小的agent放在行的位置，id大的放在列的位置
 			{
-				int[] costRelation=relationNameCosts.get(costName);
-				int[][] cost=new int[rows][cols];
-				for(int j=0;j<rows;j++)
-				{
-					for(int k=0;k<cols;k++)
-					{
-						cost[j][k]=costRelation[j*cols+k];
-					}
-				}
-				costs.add(cost);
-				costIndex=costs.size()-1;
-				costNameIndex.put(costName, costIndex);
-			}else
-			{
-				costIndex=costNameIndex.get(costName);
+				int temp=leftAgentId;
+				leftAgentId=rightAgentId;
+				rightAgentId=temp;
 			}
+			neighbourAgents.get(leftAgentId).add(rightAgentId);
+			neighbourAgents.get(rightAgentId).add(leftAgentId);
+			neighbourConstraintCosts.get(leftAgentId).put(rightAgentId, elementList.get(i).getAttributeValue(REFERENCE));
+			neighbourConstraintCosts.get(rightAgentId).put(leftAgentId, elementList.get(i).getAttributeValue(REFERENCE));
+		}
+		for(Integer agentId : problem.agentNames.keySet())
+		{
+			List<Integer> temp=neighbourAgents.get(agentId);
+			Integer[] buff=new Integer[temp.size()];
+			problem.neighbourAgents.put(agentId, ArrayUtil.toInt(temp.toArray(buff)));
 			
-			
+			String[] costNames=new String[temp.size()];
+			for(int i=0;i<buff.length;i++)
+			{
+				costNames[i]=neighbourConstraintCosts.get(agentId).get(buff[i]);
+			}
+			problem.agentConstraintCosts.put(agentId, costNames);
 		}
 		
-		return adjacentList;
+		return true;
 	}
 	
 	private void printMessage(String msg)

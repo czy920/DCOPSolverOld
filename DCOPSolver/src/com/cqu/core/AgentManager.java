@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.adopt.AdoptAgent;
+import com.cqu.util.ArrayUtil;
 
 public class AgentManager {
 	
@@ -14,23 +15,28 @@ public class AgentManager {
 		// TODO Auto-generated constructor stub
 		
 		agents=new HashMap<Integer, Agent>();
-		for(int i=0;i<problem.agentCount;i++)
+		for(Integer agentId : problem.agentNames.keySet())
 		{
-			Agent agent=new AdoptAgent(problem.agentIds[i], problem.agentNames[i], problem.domains.get(problem.agentDomains[i]));
+			Agent agent=new AdoptAgent(agentId, problem.agentNames.get(agentId), problem.domains.get(problem.agentDomains.get(agentId)));
 			Map<Integer, int[]> neighbourDomains=new HashMap<Integer, int[]>();
 			Map<Integer, int[][]> constraintCosts=new HashMap<Integer, int[][]>();
-			for(int j=0;j<problem.neighbourAgentDomains[i].length;j++)
+			int[] neighbourAgentIds=problem.neighbourAgents.get(agentId);
+			for(int i=0;i<neighbourAgentIds.length;i++)
 			{
-				neighbourDomains.put(problem.neighbourAgents.get(i)[j], problem.domains.get(problem.neighbourAgentDomains[i][j]));
+				neighbourDomains.put(neighbourAgentIds[i], problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])));
 			}
-			for(int j=0;j<problem.agentConstraintCosts[i].length;j++)
+			String[] neighbourAgentCostNames=problem.agentConstraintCosts.get(agentId);
+			for(int i=0;i<neighbourAgentCostNames.length;i++)
 			{
-				constraintCosts.put(problem.neighbourAgents.get(i)[j], problem.costs.get(problem.agentConstraintCosts[i][j]));
+				constraintCosts.put(neighbourAgentIds[i], 
+						ArrayUtil.toTwoDimension(problem.costs.get(neighbourAgentCostNames[i]), 
+								problem.domains.get(problem.agentDomains.get(agentId)).length, 
+								problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])).length));
 			}
 			
-			agent.setNeibours(problem.neighbourAgents.get(i), problem.parentAgents.get(i), 
-					problem.childAgents.get(i), problem.pseudoParentAgents.get(i), 
-					problem.pseudoChildAgents.get(i), neighbourDomains, constraintCosts);
+			agent.setNeibours(problem.neighbourAgents.get(agentId), problem.parentAgents.get(agentId), 
+					problem.childAgents.get(agentId), problem.pseudoParentAgents.get(agentId), 
+					problem.pseudoChildAgents.get(agentId), neighbourDomains, constraintCosts);
 			
 			agents.put(agent.getId(), agent);
 		}

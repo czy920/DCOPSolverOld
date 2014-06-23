@@ -1,6 +1,7 @@
 package com.cqu.core;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Problem {
 	
@@ -9,24 +10,33 @@ public class Problem {
 	public final static String KEY_CHILDREN="children";
 	public final static String KEY_NEIGHBOUR="neighbour";
 	
-	public int agentCount;
-	public int constraintCount;
+	public Problem() {
+		// TODO Auto-generated constructor stub
+		domains=new HashMap<String, int[]>();
+		costs=new HashMap<String, int[]>();
+		agentNames=new HashMap<Integer, String>();
+		agentDomains=new HashMap<Integer, String>();
+		neighbourAgents=new HashMap<Integer, int[]>();
+		parentAgents=new HashMap<Integer, Integer>();
+		pseudoParentAgents=new HashMap<Integer, int[]>();
+		childAgents=new HashMap<Integer, int[]>();
+		pseudoChildAgents=new HashMap<Integer, int[]>();
+		agentConstraintCosts=new HashMap<Integer, String[]>();
+	}
 	
 	//all possible domains and costs
-	public List<int[]> domains;
-	public List<int[][]> costs;
+	public Map<String, int[]> domains;
+	public Map<String, int[]> costs;
 	
 	//for each agent
-	public int[] agentIds;
-	public String[] agentNames;
-	public int[] agentDomains;
+	public Map<Integer, String> agentNames;
+	public Map<Integer,String> agentDomains;
+	public Map<Integer, int[]> neighbourAgents;
 	
-	public List<int[]> neighbourAgents;
-	public List<Integer> parentAgents;
-	public List<int[]> pseudoParentAgents;
-	public List<int[]> childAgents;
-	public List<int[]> pseudoChildAgents;
+	public Map<Integer, Integer> parentAgents;
+	public Map<Integer, int[]> pseudoParentAgents;
+	public Map<Integer, int[]> childAgents;
+	public Map<Integer, int[]> pseudoChildAgents;
 	
-	public int[][] neighbourAgentDomains;
-	public int[][] agentConstraintCosts;
+	public Map<Integer, String[]> agentConstraintCosts;
 }
