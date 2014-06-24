@@ -4,7 +4,7 @@ import com.cqu.core.AgentManager;
 import com.cqu.core.MessageMailer;
 import com.cqu.core.Problem;
 
-public class Main {
+public class Demo2 {
 
 	/**
 	 * @param args
@@ -59,11 +59,15 @@ public class Main {
 		problem.agentConstraintCosts.put(2, new String[]{"R1", "R2"});
 		problem.agentConstraintCosts.put(3, new String[]{"R3"});
 		
+		start(problem);
+	}
+	
+	private static void start(Problem problem)
+	{
 		AgentManager agentManager=new AgentManager(problem); 
 		MessageMailer msgMailer=new MessageMailer(agentManager);
 		
 		agentManager.startAgents(msgMailer);
 		msgMailer.start();
 	}
-
 }

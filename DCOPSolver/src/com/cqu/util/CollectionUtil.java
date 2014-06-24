@@ -1,9 +1,11 @@
 package com.cqu.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class ArrayUtil {
+public class CollectionUtil {
 	
 	public static String arrayToString(int[] localCosts_)
 	{
@@ -47,6 +49,12 @@ public class ArrayUtil {
 		return ret;
 	}
 	
+	public static int[] toInt(List<Integer> list)
+	{
+		Integer[] ret=new Integer[list.size()];
+		return CollectionUtil.toInt(list.toArray(ret));
+	}
+	
 	public static int indexOf(int[] arr, int e)
 	{
 		for(int i=0;i<arr.length;i++)
@@ -70,5 +78,41 @@ public class ArrayUtil {
 			}
 		}
 		return ret;
+	}
+	
+	public static Map<Integer, int[]> transform(Map<Integer, List<Integer>> raw)
+	{
+		Map<Integer, int[]> ret=new HashMap<Integer, int[]>();
+		for(Integer id : raw.keySet())
+		{
+			List<Integer> elementList=raw.get(id);
+			Integer[] elements=new Integer[elementList.size()];
+			ret.put(id, CollectionUtil.toInt(elementList.toArray(elements)));
+		}
+		return ret;
+	}
+	
+	public static int exists(int[] arr, int value)
+	{
+		for(int i=0;i<arr.length;i++)
+		{
+			if(arr[i]==value)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	public static int exists(List<Integer> list, Integer value)
+	{
+		for(int i=0;i<list.size();i++)
+		{
+			if(list.get(i)==value)
+			{
+				return i;
+			}
+		}
+		return -1;
 	}
 }

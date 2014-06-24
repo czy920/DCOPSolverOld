@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.adopt.AdoptAgent;
-import com.cqu.util.ArrayUtil;
+import com.cqu.util.CollectionUtil;
 
 public class AgentManager {
 	
@@ -29,7 +29,7 @@ public class AgentManager {
 			for(int i=0;i<neighbourAgentCostNames.length;i++)
 			{
 				constraintCosts.put(neighbourAgentIds[i], 
-						ArrayUtil.toTwoDimension(problem.costs.get(neighbourAgentCostNames[i]), 
+						CollectionUtil.toTwoDimension(problem.costs.get(neighbourAgentCostNames[i]), 
 								problem.domains.get(problem.agentDomains.get(agentId)).length, 
 								problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])).length));
 			}
@@ -71,7 +71,13 @@ public class AgentManager {
 	{
 		if(results.size()>0)
 		{
-			this.agents.get(0).printResults(results);
+			Agent agent=null;
+			for(Integer agentId : this.agents.keySet())
+			{
+				agent=this.agents.get(agentId);
+				break;
+			}
+			agent.printResults(results);
 		}
 	}
 	

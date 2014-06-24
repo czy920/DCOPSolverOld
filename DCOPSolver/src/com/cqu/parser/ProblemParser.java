@@ -7,8 +7,10 @@ import java.util.Map;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
+
+import com.cqu.core.DFSTree;
 import com.cqu.core.Problem;
-import com.cqu.util.ArrayUtil;
+import com.cqu.util.CollectionUtil;
 import com.cqu.util.XmlUtil;
 
 public class ProblemParser {
@@ -53,6 +55,7 @@ public class ProblemParser {
 		this.xmlPath=path;
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Problem parse()
 	{
 		Problem problem=new Problem();
@@ -97,6 +100,15 @@ public class ProblemParser {
 			this.printMessage("parseConstraints() fails!");
 			return null;
 		}
+		
+		DFSTree dfsTree=new DFSTree(problem.neighbourAgents);
+		dfsTree.generate();
+		
+		problem.parentAgents=dfsTree.getParentNode();
+		problem.childAgents=dfsTree.getChildrenNodes();
+		Map[] pseudoParentsAndChildren=dfsTree.getPseudoChildrenAndParentNodes();
+		problem.pseudoParentAgents=pseudoParentsAndChildren[0];
+		problem.pseudoChildAgents=pseudoParentsAndChildren[1];
 		
 		return problem;
 	}
@@ -291,7 +303,7 @@ public class ProblemParser {
 	
 	private int[] paseConstraintCost(String costStr)
 	{
-		String[] parts=costStr.split("|");
+		String[] parts=costStr.split("\\|");
 		int[] costs=new int[parts.length];
 		for(int i=0;i<parts.length;i++)
 		{
@@ -357,7 +369,7 @@ public class ProblemParser {
 		{
 			List<Integer> temp=neighbourAgents.get(agentId);
 			Integer[] buff=new Integer[temp.size()];
-			problem.neighbourAgents.put(agentId, ArrayUtil.toInt(temp.toArray(buff)));
+			problem.neighbourAgents.put(agentId, CollectionUtil.toInt(temp.toArray(buff)));
 			
 			String[] costNames=new String[temp.size()];
 			for(int i=0;i<buff.length;i++)

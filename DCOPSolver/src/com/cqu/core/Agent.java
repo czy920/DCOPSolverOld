@@ -3,7 +3,7 @@ package com.cqu.core;
 import java.util.List;
 import java.util.Map;
 
-import com.cqu.util.ArrayUtil;
+import com.cqu.util.CollectionUtil;
 
 /**
  * 计算单位
@@ -54,7 +54,7 @@ public abstract class Agent extends QueueMessager{
 		this.pseudoChildren=pseudoChildren;
 		if(this.pseudoChildren!=null&&this.children!=null)
 		{
-			this.pseudoChildrenReal=ArrayUtil.except(this.pseudoChildren, this.children);
+			this.pseudoChildrenReal=CollectionUtil.except(this.pseudoChildren, this.children);
 		}
 		
 		this.neighbourDomains=neighbourDomains;
