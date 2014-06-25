@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.cqu.test.Debugger;
+
 public class MessageMailer extends QueueMessager{
 	
 	public final static int QUEUE_CAPACITY=100;
@@ -49,7 +51,10 @@ public class MessageMailer extends QueueMessager{
 	@Override
 	protected void messageLost(Message msg) {
 		// TODO Auto-generated method stub
-		System.out.println(Thread.currentThread().getName()+": message lost "+this.easyMessageContent(msg));
+		if(Debugger.debugOn==true)
+		{
+			System.out.println(Thread.currentThread().getName()+": message lost "+this.easyMessageContent(msg));
+		}
 	}
 	
 	@Override
@@ -58,6 +63,8 @@ public class MessageMailer extends QueueMessager{
 		super.runFinished();
 		
 		this.agentManager.printResults(results);
+		
+		Debugger.printValueChanges();
 		
 		System.out.println("Mailer stopped!");
 	}

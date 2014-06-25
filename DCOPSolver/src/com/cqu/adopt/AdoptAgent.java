@@ -6,6 +6,7 @@ import java.util.Map;
 import com.cqu.core.Agent;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
+import com.cqu.test.Debugger;
 
 public class AdoptAgent extends Agent{
 
@@ -82,6 +83,8 @@ public class AdoptAgent extends Agent{
 		}
 		
 		valueIndex=this.computeMinimalLBAndUB()[0];
+		
+		Debugger.valueChanges.get(this.name).add(this.valueIndex);
 		
 		backtrack();
 	}
@@ -217,8 +220,12 @@ public class AdoptAgent extends Agent{
 	@Override
 	protected void disposeMessage(Message msg) {
 		// TODO Auto-generated method stub
-		System.out.println(Thread.currentThread().getName()+": message got in agent "+
-				this.name+" "+this.msgMailer.easyMessageContent(msg)+" | VALUE="+this.domain[valueIndex]+" LB="+this.LB+" UB="+Infinity.infinityEasy(this.UB)+" TH="+Infinity.infinityEasy(this.TH));
+		if(Debugger.debugOn==true)
+		{
+			System.out.println(Thread.currentThread().getName()+": message got in agent "+
+					this.name+" "+this.msgMailer.easyMessageContent(msg)+" | VALUE="+this.domain[valueIndex]+" LB="+this.LB+" UB="+Infinity.infinityEasy(this.UB)+" TH="+Infinity.infinityEasy(this.TH));
+		}
+		
 		if(msg.getType()==AdoptAgent.TYPE_VALUE_MESSAGE)
 		{
 			disposeValueMessage(msg);
@@ -237,8 +244,11 @@ public class AdoptAgent extends Agent{
 	@Override
 	protected void messageLost(Message msg) {
 		// TODO Auto-generated method stub
-		System.out.println(Thread.currentThread().getName()+": message lost in agent "+
-		this.name+" "+this.msgMailer.easyMessageContent(msg));
+		if(Debugger.debugOn==true)
+		{
+			System.out.println(Thread.currentThread().getName()+": message lost in agent "+
+					this.name+" "+this.msgMailer.easyMessageContent(msg));
+		}
 	}
 	
 	private void disposeValueMessage(Message msg)
@@ -506,9 +516,19 @@ public class AdoptAgent extends Agent{
 		int dMinimizesUB=ret[2];
 		if(this.TH==this.UB)
 		{
+			if(this.valueIndex!=dMinimizesUB)
+			{
+				Debugger.valueChanges.get(this.name).add(dMinimizesUB);
+			}
+			
 			this.valueIndex=dMinimizesUB;
 		}else if(LB_CurValue>this.TH)
 		{
+			if(this.valueIndex!=dMinimizesLB)
+			{
+				Debugger.valueChanges.get(this.name).add(dMinimizesLB);
+			}
+			
 			this.valueIndex=dMinimizesLB;
 		}
 		sendValueMessages();

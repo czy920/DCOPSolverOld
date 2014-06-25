@@ -12,12 +12,19 @@ public class Demo {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		ProblemParser parser=new ProblemParser("problems/random_dcop_1.xml");
+		String instance="problems/random_dcop_1.xml";
+		//String instance="problems/random_dcop_2.xml";
+		//String instance="problems/RandomDCOP_12_8_2.xml";
+		
+		ProblemParser parser=new ProblemParser(instance);
 		Problem problem=parser.parse();
 		if(problem==null)
 		{
 			return;
 		}
+		
+		Debugger.init(problem.agentNames);
+		Debugger.debugOn=false;
 		
 		start(problem);
 	}
