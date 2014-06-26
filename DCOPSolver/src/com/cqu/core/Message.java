@@ -33,4 +33,11 @@ public class Message  {
 	public Object getValue() {
 		return value;
 	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return this.idSender+"->"+this.idReceiver+":"+this.type;
+		//return super.toString();
+	}
 }

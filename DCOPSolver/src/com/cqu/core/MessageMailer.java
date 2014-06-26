@@ -25,7 +25,7 @@ public class MessageMailer extends QueueMessager{
 	{
 		synchronized (results) {
 			results.add(result);
-			if(results.size()==this.agentManager.getAgentCount())
+			if(results.size()>=this.agentManager.getAgentCount())
 			{
 				this.stopRunning();
 			}

@@ -344,16 +344,20 @@ public class AdoptAgent extends Agent{
 		{
 			Map<String, Object> mapValue=(Map<String, Object>) msg.getValue();
 			currentContext=(Context) mapValue.get(KEY_CONTEXT);
-			this.terminateReceivedFromParent=true;
-			backtrack();
 			
 			valueMsg=(Message) mapValue.get(KEY_VALUE_MESSAGE);
+			disposeMessage(valueMsg);
+			
+            this.terminateReceivedFromParent=true;
+
+			backtrack();
 		}else
 		{
 			//pseudo父agent发过来的terminate消息仅包含了value消息
 			valueMsg=(Message) msg.getValue();
+			disposeMessage(valueMsg);
 		}
-		disposeMessage(valueMsg);
+		
 	}
 	
 	//return int[]{dMinimizesLB, LB(curValue), dMinimizesUB}

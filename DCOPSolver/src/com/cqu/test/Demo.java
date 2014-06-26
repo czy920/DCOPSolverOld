@@ -25,6 +25,7 @@ public class Demo {
 		
 		Debugger.init(problem.agentNames);
 		Debugger.debugOn=false;
+		//Debugger.debugOn=true;
 		
 		start(problem);
 	}
