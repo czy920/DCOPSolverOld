@@ -12,9 +12,10 @@ public class Demo {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String instance="problems/random_dcop_1.xml";
+		//String instance="problems/random_dcop_1.xml";
 		//String instance="problems/random_dcop_2.xml";
-		//String instance="problems/RandomDCOP_12_8_2.xml";
+		String instance="problems/RandomDCOP_7_3_1.xml";
+		//String instance="problems/RandomDCOP_7_3_2.xml";
 		
 		ProblemParser parser=new ProblemParser(instance);
 		Problem problem=parser.parse();
@@ -24,8 +25,7 @@ public class Demo {
 		}
 		
 		Debugger.init(problem.agentNames);
-		Debugger.debugOn=false;
-		//Debugger.debugOn=true;
+		Debugger.debugOn=true;
 		
 		start(problem);
 	}

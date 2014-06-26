@@ -1,5 +1,6 @@
 package com.cqu.test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,12 @@ public class Debugger {
 		for(Integer agentId : agentNames.keySet())
 		{
 			valueChanges.put(agentNames.get(agentId), new ArrayList<Integer>());
+		}
+		
+		File f=new File("dfsTree.txt");
+		if(f.exists()==true)
+		{
+			f.delete();
 		}
 	}
 	

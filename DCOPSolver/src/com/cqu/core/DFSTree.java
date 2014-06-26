@@ -8,7 +8,7 @@ import java.util.Map;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.StatisticsUtil;
 
-public class DFSTree {
+public class DFSTree implements DFSTreeGenerator{
 	
 	private Map<Integer, int[]> neighbourNodes;//无向图（邻接表存储）
 	
@@ -60,8 +60,30 @@ public class DFSTree {
 		this.rootId=maxNeighbourCountNodeId;
 	}
 	
-	public void generate()
+	private Integer getMaxNeighboursNodeId(Integer nodeId)
 	{
+		int[] neighbours=this.neighbourNodes.get(nodeId);
+		int[] counts=this.neighbourCounts.get(nodeId);
+		for(int i=0;i<counts.length;i++)
+		{
+			if(this.nodeIterated.get(neighbours[i])==true)
+			{
+				counts[i]=-1;
+			}
+		}
+		int maxIndex=StatisticsUtil.max(counts);
+		if(counts[maxIndex]==-1)
+		{
+			return -1;
+		}else
+		{
+			return neighbours[maxIndex];
+		}
+	}
+
+	@Override
+	public void generate() {
+		// TODO Auto-generated method stub
 		int iteratedCount=0;
 		Integer curFloor=0;
 		
@@ -95,45 +117,23 @@ public class DFSTree {
 			}
 		}
 	}
-	
-	private Integer getMaxNeighboursNodeId(Integer nodeId)
-	{
-		int[] neighbours=this.neighbourNodes.get(nodeId);
-		int[] counts=this.neighbourCounts.get(nodeId);
-		for(int i=0;i<counts.length;i++)
-		{
-			if(this.nodeIterated.get(neighbours[i])==true)
-			{
-				counts[i]=-1;
-			}
-		}
-		int maxIndex=StatisticsUtil.max(counts);
-		if(counts[maxIndex]==-1)
-		{
-			return -1;
-		}else
-		{
-			return neighbours[maxIndex];
-		}
-	}
-	
-	public Map<Integer, int[]> getChildrenNodes()
-	{
-		return CollectionUtil.transform(childrenNodes);
-	}
-	
-	public Map<Integer, Integer> getParentNode()
-	{
+
+	@Override
+	public Map<Integer, Integer> getParentNode() {
+		// TODO Auto-generated method stub
 		return this.parentNode;
 	}
-	
-	/**
-	 * pseudoChildren包含children, pseudoParents包含parent
-	 * @return Map<Integer, int[]>[2]{pseudoParents, pseudoChildren}
-	 */
+
+	@Override
+	public Map<Integer, int[]> getChildrenNodes() {
+		// TODO Auto-generated method stub
+		return CollectionUtil.transform(childrenNodes);
+	}
+
 	@SuppressWarnings("rawtypes")
-	public Map[] getPseudoChildrenAndParentNodes()
-	{
+	@Override
+	public Map[] getPseudoChildrenAndParentNodes() {
+		// TODO Auto-generated method stub
 		Map<Integer, List<Integer>> pseudoChildren=new HashMap<Integer, List<Integer>>();
 		Map<Integer, List<Integer>> pseudoParents=new HashMap<Integer, List<Integer>>();
 		for(Integer nodeId : this.neighbourNodes.keySet())

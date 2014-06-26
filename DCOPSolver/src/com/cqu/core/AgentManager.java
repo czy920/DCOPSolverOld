@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.adopt.AdoptAgent;
+import com.cqu.test.Debugger;
 import com.cqu.util.CollectionUtil;
+import com.cqu.util.FileUtil;
 
 public class AgentManager {
 	
@@ -39,6 +41,16 @@ public class AgentManager {
 					problem.pseudoChildAgents.get(agentId), neighbourDomains, constraintCosts);
 			
 			agents.put(agent.getId(), agent);
+			
+			if(Debugger.debugOn==true)
+			{
+				String str="-----------"+agent.name+"-----------\n";
+				str+="Parent: "+agent.parent+"\n";
+				str+="Children: "+CollectionUtil.arrayToString(agent.children)+"\n";
+				str+="PseudoParents: "+CollectionUtil.arrayToString(agent.pseudoParents)+"\n";
+				str+="PseudoChildren: "+CollectionUtil.arrayToString(agent.pseudoChildren)+"\n";
+				FileUtil.writeStringAppend(str, "dfsTree.txt");
+			}
 		}
 	}
 	

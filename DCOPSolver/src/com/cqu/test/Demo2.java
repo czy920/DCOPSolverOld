@@ -59,6 +59,9 @@ public class Demo2 {
 		problem.agentConstraintCosts.put(2, new String[]{"R1", "R2"});
 		problem.agentConstraintCosts.put(3, new String[]{"R3"});
 		
+		Debugger.init(problem.agentNames);
+		Debugger.debugOn=true;
+		
 		start(problem);
 	}
 	

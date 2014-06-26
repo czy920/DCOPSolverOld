@@ -7,18 +7,6 @@ import java.util.Map;
 
 public class CollectionUtil {
 	
-	public static String arrayToString(int[] localCosts_)
-	{
-		String str="[";
-		for(int e : localCosts_)
-		{
-			str+=e+",";
-		}
-		str=str.substring(0, str.length()-1);
-		str+="]";
-		return str;
-	}
-	
 	public static int[] except(int[] arrA, int[] arrB)
 	{
 		List<Integer> exceptList=new ArrayList<Integer>();
@@ -114,5 +102,20 @@ public class CollectionUtil {
 			}
 		}
 		return -1;
+	}
+	
+	public static String arrayToString(int[] arr)
+	{
+		if(arr==null||arr.length==0)
+		{
+			return "";
+		}
+		String str="[";
+		for(int i=0;i<arr.length-1;i++)
+		{
+			str+=arr[i]+",";
+		}
+		str+=arr[arr.length-1]+"]";
+		return str;
 	}
 }
