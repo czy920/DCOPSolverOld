@@ -194,4 +194,41 @@ public class DFSTree implements DFSTreeGenerator{
 		}
 		return new Map[]{CollectionUtil.transform(pseudoParents), CollectionUtil.transform(pseudoChildren)};
 	}
+	
+	public static String toTreeString(Map<Integer, String> agentNames, Map<Integer, Integer> parentAgents, Map<Integer, int[]> childAgents)
+	{
+		Integer rootId=-1;
+		for(Integer nodeId : parentAgents.keySet())
+		{
+			if(parentAgents.get(nodeId)==-1)
+			{
+				rootId=nodeId;
+				break;
+			}
+		}
+		String treeString=getNodeString(rootId, agentNames, childAgents);
+		return "["+treeString+"]";
+	}
+	
+	private static String getNodeString(Integer nodeId, Map<Integer, String> agentNames, Map<Integer, int[]> childAgents)
+	{
+		int[] children=childAgents.get(nodeId);
+		if(children!=null&&children.length>0)
+		{
+			String str="{";
+			str+=agentNames.get(nodeId);
+			str+="; ";
+			for(int i=0;i<children.length-1;i++)
+			{
+				str+=getNodeString(children[i], agentNames, childAgents);
+				str+="; ";
+			}
+			str+=getNodeString(children[children.length-1], agentNames, childAgents);
+			str+="}";
+			return str;
+		}else
+		{
+			return "{"+agentNames.get(nodeId)+"}";
+		}
+	}
 }

@@ -1,9 +1,11 @@
 package com.cqu.test;
 
 import com.cqu.core.AgentManager;
+import com.cqu.core.DFSTree;
 import com.cqu.core.MessageMailer;
 import com.cqu.core.Problem;
 import com.cqu.parser.ProblemParser;
+import com.cqu.visualtree.TreeFrame;
 
 public class Demo {
 
@@ -23,6 +25,9 @@ public class Demo {
 		{
 			return;
 		}
+		
+		TreeFrame treeFrame=new TreeFrame(DFSTree.toTreeString(problem.agentNames, problem.parentAgents, problem.childAgents));
+		treeFrame.showTreeFrame();
 		
 		Debugger.init(problem.agentNames);
 		Debugger.debugOn=true;
