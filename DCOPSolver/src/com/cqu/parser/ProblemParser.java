@@ -1,10 +1,10 @@
 package com.cqu.parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.jdom2.Document;
 import org.jdom2.Element;
 
@@ -303,11 +303,23 @@ public class ProblemParser {
 	
 	private int[] paseConstraintCost(String costStr)
 	{
-		String[] parts=costStr.split("\\|");
-		int[] costs=new int[parts.length];
-		for(int i=0;i<parts.length;i++)
+		String[] items=costStr.split("\\|");
+		String[] costParts=new String[items.length];
+		Map<String, Integer> valuePairParts=new HashMap<String, Integer>();
+		int index=0;
+		for(int i=0;i<items.length;i++)
 		{
-			costs[i]=Integer.parseInt(parts[i].substring(0, parts[i].indexOf(':')));
+			index=items[i].indexOf(':');
+			costParts[i]=items[i].substring(0, index);
+			valuePairParts.put(items[i].substring(index+1), i);
+		}
+		Object[] valuePairPartsKeyArray=valuePairParts.keySet().toArray();
+		Arrays.sort(valuePairPartsKeyArray);
+		
+		int[] costs=new int[items.length];
+		for(int i=0;i<items.length;i++)
+		{
+			costs[i]=Integer.parseInt(costParts[valuePairParts.get(valuePairPartsKeyArray[i])]);
 		}
 		return costs;
 	}

@@ -344,12 +344,15 @@ public class AdoptAgent extends Agent{
 		{
 			Map<String, Object> mapValue=(Map<String, Object>) msg.getValue();
 			currentContext=(Context) mapValue.get(KEY_CONTEXT);
-			
 			valueMsg=(Message) mapValue.get(KEY_VALUE_MESSAGE);
 			disposeMessage(valueMsg);
 			
             this.terminateReceivedFromParent=true;
-
+            
+            //此处与Adopt:Pragnesh Jay Modi et al.中的伪代码不一样
+            //terminateReceivedFromParent变为true，再次调用maintainThresholdInvariant()
+            //防止TH==UB失败导致agent不能终止
+            maintainThresholdInvariant();
 			backtrack();
 		}else
 		{
@@ -476,8 +479,14 @@ public class AdoptAgent extends Agent{
 					ret[j]+=0;
 				}else
 				{
-					//ret[j]+=this.constraintCosts.get(pseudoParentId)[j][oppositeAgentValueIndex];
-					ret[j]+=this.constraintCosts.get(pseudoParentId)[oppositeAgentValueIndex][j];
+					//保证id小的为行，id大的为列
+					if(this.id<pseudoParentId)
+					{
+						ret[j]+=this.constraintCosts.get(pseudoParentId)[j][oppositeAgentValueIndex];
+					}else
+					{
+						ret[j]+=this.constraintCosts.get(pseudoParentId)[oppositeAgentValueIndex][j];
+					}
 				}
 			}
 		}
@@ -505,8 +514,14 @@ public class AdoptAgent extends Agent{
 				ret+=0;
 			}else
 			{
-				//ret+=this.constraintCosts.get(pseudoParentId)[di][oppositeAgentValueIndex];
-				ret+=this.constraintCosts.get(pseudoParentId)[oppositeAgentValueIndex][di];
+				//保证id小的为行，id大的为列
+				if(this.id<pseudoParentId)
+				{
+					ret+=this.constraintCosts.get(pseudoParentId)[di][oppositeAgentValueIndex];
+				}else
+				{
+					ret+=this.constraintCosts.get(pseudoParentId)[oppositeAgentValueIndex][di];
+				}
 			}
 		}
 		return ret;

@@ -11,8 +11,10 @@ public class MessageMailer extends QueueMessager{
 	public final static int QUEUE_CAPACITY=100;
 	
 	private AgentManager agentManager;
-	
 	private List<Map<String, Object>> results;
+	
+	private long timeStart=0;
+	private long timeEnd=0;
 	
 	public MessageMailer(AgentManager agentManager) {
 		// TODO Auto-generated constructor stub
@@ -58,14 +60,22 @@ public class MessageMailer extends QueueMessager{
 	}
 	
 	@Override
+	protected void initRun() {
+		// TODO Auto-generated method stub
+		super.initRun();
+		
+		timeStart=System.currentTimeMillis();
+	}
+	
+	@Override
 	protected void runFinished() {
 		// TODO Auto-generated method stub
 		super.runFinished();
 		
 		this.agentManager.printResults(results);
-		
 		Debugger.printValueChanges();
 		
-		System.out.println("Mailer stopped!");
+		timeEnd=System.currentTimeMillis();
+		System.out.println("Mailer stopped, totalTime: "+(timeEnd-timeStart)+"ms");
 	}
 }
