@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.adopt.AdoptAgent;
-import com.cqu.test.Debugger;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FileUtil;
 
@@ -42,7 +41,6 @@ public class AgentManager {
 			
 			agents.put(agent.getId(), agent);
 			
-			if(Debugger.debugOn==true)
 			{
 				String str="-----------"+agent.name+"-----------\n";
 				str+="Parent: "+agent.parent+"\n";
