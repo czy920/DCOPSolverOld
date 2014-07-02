@@ -15,8 +15,8 @@ public class Demo {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		//String instance="problems/random_dcop_1.xml";
-		//String instance="problems/random_dcop_2.xml";
-		String instance="problems/RandomDCOP_7_3_1.xml";
+		String instance="problems/random_dcop_2.xml";
+		//String instance="problems/RandomDCOP_7_3_1.xml";
 		//String instance="problems/RandomDCOP_7_3_2.xml";
 		
 		ProblemParser parser=new ProblemParser(instance);
@@ -32,14 +32,8 @@ public class Demo {
 		Debugger.init(problem.agentNames);
 		Debugger.debugOn=false;
 		
-		start(problem);
-	}
-	
-	private static void start(Problem problem)
-	{
 		AgentManager agentManager=new AgentManager(problem); 
 		MessageMailer msgMailer=new MessageMailer(agentManager);
-		
 		agentManager.startAgents(msgMailer);
 		msgMailer.start();
 	}

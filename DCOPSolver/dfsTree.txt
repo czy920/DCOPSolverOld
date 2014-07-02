@@ -1,0 +1,55 @@
+-----------A1-----------
+Parent: 2
+Children: [3,10]
+PseudoParents: [2]
+PseudoChildren: [10,11,3]
+-----------A2-----------
+Parent: -1
+Children: [1,5,4]
+PseudoParents: 
+PseudoChildren: [1,3,4,5,6]
+-----------A3-----------
+Parent: 1
+Children: [8]
+PseudoParents: [2,1]
+PseudoChildren: [8,9]
+-----------A4-----------
+Parent: 2
+Children: 
+PseudoParents: [2]
+PseudoChildren: 
+-----------A5-----------
+Parent: 2
+Children: [6]
+PseudoParents: [2]
+PseudoChildren: [6,7]
+-----------A6-----------
+Parent: 5
+Children: [7]
+PseudoParents: [5,2]
+PseudoChildren: [7]
+-----------A7-----------
+Parent: 6
+Children: 
+PseudoParents: [6,5]
+PseudoChildren: 
+-----------A8-----------
+Parent: 3
+Children: [9]
+PseudoParents: [3]
+PseudoChildren: [9]
+-----------A9-----------
+Parent: 8
+Children: 
+PseudoParents: [3,8]
+PseudoChildren: 
+-----------A10-----------
+Parent: 1
+Children: [11]
+PseudoParents: [1]
+PseudoChildren: [11]
+-----------A11-----------
+Parent: 10
+Children: 
+PseudoParents: [1,10]
+PseudoChildren: 
