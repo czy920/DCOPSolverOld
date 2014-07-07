@@ -30,6 +30,8 @@ public abstract class Agent extends QueueMessager{
 	
 	protected MessageMailer msgMailer;
 	
+	protected int valueIndex;
+	
 	public Agent(int id, String name, int[] domain) {
 		super("Agent "+name, QUEUE_CAPACITY);
 		this.id = id;
@@ -87,4 +89,14 @@ public abstract class Agent extends QueueMessager{
     public abstract void printResults(List<Map<String, Object>> results);
     
 	public abstract String easyMessageContent(Message msg, Agent sender, Agent receiver);
+	
+	protected boolean isLeafAgent()
+	{
+		return this.children==null;
+	}
+	
+	protected boolean isRootAgent()
+	{
+		return this.parent==-1;
+	}
 }

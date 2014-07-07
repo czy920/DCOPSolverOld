@@ -36,7 +36,6 @@ public class AdoptAgent extends Agent{
 	private Map<Integer, Context[]> contexts;
 	private Context currentContext;
 	
-	private int valueIndex;
 	private boolean terminateReceivedFromParent=false;
 	
 	
@@ -87,16 +86,6 @@ public class AdoptAgent extends Agent{
 		Debugger.valueChanges.get(this.name).add(this.valueIndex);
 		
 		backtrack();
-	}
-	
-	private boolean isLeafAgent()
-	{
-		return this.children==null;
-	}
-	
-	private boolean isRootAgent()
-	{
-		return this.parent==-1;
 	}
 	
 	private void sendValueMessages()
