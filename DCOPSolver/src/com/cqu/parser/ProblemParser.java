@@ -106,9 +106,9 @@ public class ProblemParser {
 		
 		problem.parentAgents=dfsTree.getParentNode();
 		problem.childAgents=dfsTree.getChildrenNodes();
-		Map[] pseudoParentsAndChildren=dfsTree.getPseudoChildrenAndParentNodes();
-		problem.pseudoParentAgents=pseudoParentsAndChildren[0];
-		problem.pseudoChildAgents=pseudoParentsAndChildren[1];
+		Map[] allParentsAndChildren=dfsTree.getAllChildrenAndParentNodes();
+		problem.allParentAgents=allParentsAndChildren[0];
+		problem.allChildrenAgents=allParentsAndChildren[1];
 		
 		return problem;
 	}

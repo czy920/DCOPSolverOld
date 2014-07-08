@@ -18,9 +18,9 @@ public class Problem {
 		agentDomains=new HashMap<Integer, String>();
 		neighbourAgents=new HashMap<Integer, int[]>();
 		parentAgents=new HashMap<Integer, Integer>();
-		pseudoParentAgents=new HashMap<Integer, int[]>();
+		allParentAgents=new HashMap<Integer, int[]>();
 		childAgents=new HashMap<Integer, int[]>();
-		pseudoChildAgents=new HashMap<Integer, int[]>();
+		allChildrenAgents=new HashMap<Integer, int[]>();
 		agentConstraintCosts=new HashMap<Integer, String[]>();
 	}
 	
@@ -34,9 +34,9 @@ public class Problem {
 	public Map<Integer, int[]> neighbourAgents;
 	
 	public Map<Integer, Integer> parentAgents;
-	public Map<Integer, int[]> pseudoParentAgents;
+	public Map<Integer, int[]> allParentAgents;
 	public Map<Integer, int[]> childAgents;
-	public Map<Integer, int[]> pseudoChildAgents;
+	public Map<Integer, int[]> allChildrenAgents;
 	
 	public Map<Integer, String[]> agentConstraintCosts;
 }

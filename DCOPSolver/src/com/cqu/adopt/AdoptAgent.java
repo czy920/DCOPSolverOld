@@ -38,7 +38,6 @@ public class AdoptAgent extends Agent{
 	
 	private boolean terminateReceivedFromParent=false;
 	
-	
 	public AdoptAgent(int id, String name, int[] domain) {
 		super(id, name, domain);
 		// TODO Auto-generated constructor stub
@@ -96,9 +95,9 @@ public class AdoptAgent extends Agent{
 		}
 		
 		int pseudoChildId=0;
-		for(int i=0;i<this.pseudoChildren.length;i++)
+		for(int i=0;i<this.allChildren.length;i++)
 		{
-			pseudoChildId=this.pseudoChildren[i];
+			pseudoChildId=this.allChildren[i];
 			Message msg=new Message(this.id, pseudoChildId, AdoptAgent.TYPE_VALUE_MESSAGE, valueIndex);
 			this.sendMessage(msg);
 		}
@@ -172,12 +171,12 @@ public class AdoptAgent extends Agent{
 			this.sendMessage(msg);
 		}
 		
-		if(this.pseudoChildrenReal!=null)
+		if(this.pseudoChildren!=null)
 		{
 			int pseudoChildId=0;
-			for(int i=0;i<this.pseudoChildrenReal.length;i++)
+			for(int i=0;i<this.pseudoChildren.length;i++)
 			{
-				pseudoChildId=this.pseudoChildrenReal[i];
+				pseudoChildId=this.pseudoChildren[i];
 				
 				Message valueMsg=new Message(this.id, pseudoChildId, AdoptAgent.TYPE_VALUE_MESSAGE, valueIndex);
 				
@@ -457,9 +456,9 @@ public class AdoptAgent extends Agent{
 		
 		int pseudoParentId=0;
 		int oppositeAgentValueIndex=0;
-		for(int i=0;i<this.pseudoParents.length;i++)
+		for(int i=0;i<this.allParents.length;i++)
 		{
-			pseudoParentId=this.pseudoParents[i];
+			pseudoParentId=this.allParents[i];
 			for(int j=0;j<this.domain.length;j++)
 			{
 				oppositeAgentValueIndex=currentContext.get(pseudoParentId);
@@ -493,9 +492,9 @@ public class AdoptAgent extends Agent{
 		
 		int pseudoParentId=0;
 		int oppositeAgentValueIndex=0;
-		for(int i=0;i<this.pseudoParents.length;i++)
+		for(int i=0;i<this.allParents.length;i++)
 		{
-			pseudoParentId=this.pseudoParents[i];
+			pseudoParentId=this.allParents[i];
 			
 			oppositeAgentValueIndex=currentContext.get(pseudoParentId);
 			if(oppositeAgentValueIndex==-1)

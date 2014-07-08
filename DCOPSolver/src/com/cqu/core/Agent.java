@@ -20,10 +20,11 @@ public abstract class Agent extends QueueMessager{
 	
 	protected int[] neighbours;
 	protected int parent;
+	protected int[] allParents;
 	protected int[] pseudoParents;
+	protected int[] allChildren;
 	protected int[] children;
 	protected int[] pseudoChildren;
-	protected int[] pseudoChildrenReal;//pseudoChildren-children
 	
 	protected Map<Integer, int[]> neighbourDomains;
 	protected Map<Integer, int[][]> constraintCosts;
@@ -47,16 +48,20 @@ public abstract class Agent extends QueueMessager{
 		return name;
 	}
 	
-	public void setNeibours(int[] neighbours, int parent, int[] children, int[] pseudoParents, int[] pseudoChildren, Map<Integer, int[]> neighbourDomains, Map<Integer, int[][]> constraintCosts)
+	public void setNeibours(int[] neighbours, int parent, int[] children, int[] allParents, int[] allChildren, Map<Integer, int[]> neighbourDomains, Map<Integer, int[][]> constraintCosts)
 	{
 		this.neighbours=neighbours;
 		this.parent=parent;
 		this.children=children;
-		this.pseudoParents=pseudoParents;
-		this.pseudoChildren=pseudoChildren;
-		if(this.pseudoChildren!=null&&this.children!=null)
+		this.allParents=allParents;
+		this.allChildren=allChildren;
+		if(this.allChildren!=null&&this.children!=null)
 		{
-			this.pseudoChildrenReal=CollectionUtil.except(this.pseudoChildren, this.children);
+			this.pseudoChildren=CollectionUtil.except(this.allChildren, this.children);
+		}
+		if(this.allParents!=null&&this.parent!=-1)
+		{
+			this.pseudoParents=CollectionUtil.except(this.allParents, new int[]{this.parent});
 		}
 		
 		this.neighbourDomains=neighbourDomains;

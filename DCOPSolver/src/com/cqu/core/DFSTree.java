@@ -132,10 +132,10 @@ public class DFSTree implements DFSTreeGenerator{
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public Map[] getPseudoChildrenAndParentNodes() {
+	public Map[] getAllChildrenAndParentNodes() {
 		// TODO Auto-generated method stub
-		Map<Integer, List<Integer>> pseudoChildren=new HashMap<Integer, List<Integer>>();
-		Map<Integer, List<Integer>> pseudoParents=new HashMap<Integer, List<Integer>>();
+		Map<Integer, List<Integer>> allChildren=new HashMap<Integer, List<Integer>>();
+		Map<Integer, List<Integer>> allParents=new HashMap<Integer, List<Integer>>();
 		for(Integer nodeId : this.neighbourNodes.keySet())
 		{
 			int[] neighbours=this.neighbourNodes.get(nodeId);
@@ -145,54 +145,54 @@ public class DFSTree implements DFSTreeGenerator{
 			if(parent==-1)
 			{
 				//根节点
-				List<Integer> pseudoChildrenList=new ArrayList<Integer>();
+				List<Integer> allChildrenList=new ArrayList<Integer>();
 				for(int i=0;i<neighbours.length;i++)
 				{
-					pseudoChildrenList.add(neighbours[i]);
+					allChildrenList.add(neighbours[i]);
 				}
-				pseudoParents.put(nodeId, new ArrayList<Integer>());
-				pseudoChildren.put(nodeId, pseudoChildrenList);
+				allParents.put(nodeId, new ArrayList<Integer>());
+				allChildren.put(nodeId, allChildrenList);
 			}else if(children.size()==0)
 			{
 				//叶子节点
-				List<Integer> pseudoParentList=new ArrayList<Integer>();
+				List<Integer> allParentList=new ArrayList<Integer>();
 				for(int i=0;i<neighbours.length;i++)
 				{
-					pseudoParentList.add(neighbours[i]);
+					allParentList.add(neighbours[i]);
 				}
-				pseudoParents.put(nodeId, pseudoParentList);
-				pseudoChildren.put(nodeId, new ArrayList<Integer>());
+				allParents.put(nodeId, allParentList);
+				allChildren.put(nodeId, new ArrayList<Integer>());
 			}else
 			{
 				//中间节点
-				List<Integer> pseudoParentList=new ArrayList<Integer>();
-				List<Integer> pseudoChildrenList=new ArrayList<Integer>();
+				List<Integer> allParentList=new ArrayList<Integer>();
+				List<Integer> allChildrenList=new ArrayList<Integer>();
 				for(int i=0;i<neighbours.length;i++)
 				{
 					if(neighbours[i]==parent)
 					{
-						pseudoParentList.add(neighbours[i]);
+						allParentList.add(neighbours[i]);
 					}else if(CollectionUtil.exists(children, neighbours[i])!=-1)
 					{
-						pseudoChildrenList.add(neighbours[i]);
+						allChildrenList.add(neighbours[i]);
 					}else
 					{
 						if(floor<this.nodeFloor.get(neighbours[i]))
 						{
 							//在本节点之下
-							pseudoChildrenList.add(neighbours[i]);
+							allChildrenList.add(neighbours[i]);
 						}else
 						{
 							//在本节点之上
-							pseudoParentList.add(neighbours[i]);
+							allParentList.add(neighbours[i]);
 						}
 					}
 				}
-				pseudoParents.put(nodeId, pseudoParentList);
-				pseudoChildren.put(nodeId, pseudoChildrenList);
+				allParents.put(nodeId, allParentList);
+				allChildren.put(nodeId, allChildrenList);
 			}
 		}
-		return new Map[]{CollectionUtil.transform(pseudoParents), CollectionUtil.transform(pseudoChildren)};
+		return new Map[]{CollectionUtil.transform(allParents), CollectionUtil.transform(allChildren)};
 	}
 	
 	public static String toTreeString(Map<Integer, String> agentNames, Map<Integer, Integer> parentAgents, Map<Integer, int[]> childAgents)

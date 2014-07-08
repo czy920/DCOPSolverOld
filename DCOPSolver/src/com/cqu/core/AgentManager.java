@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cqu.adopt.AdoptAgent;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FileUtil;
 
@@ -12,13 +11,13 @@ public class AgentManager {
 	
 	private Map<Integer, Agent> agents;
 	
-	public AgentManager(Problem problem) {
+	public AgentManager(Problem problem, AgentConstructor agentConstructor) {
 		// TODO Auto-generated constructor stub
 		
 		agents=new HashMap<Integer, Agent>();
 		for(Integer agentId : problem.agentNames.keySet())
 		{
-			Agent agent=new AdoptAgent(agentId, problem.agentNames.get(agentId), problem.domains.get(problem.agentDomains.get(agentId)));
+			Agent agent=agentConstructor.constructAgent(agentId, problem.agentNames.get(agentId), problem.domains.get(problem.agentDomains.get(agentId)));
 			Map<Integer, int[]> neighbourDomains=new HashMap<Integer, int[]>();
 			Map<Integer, int[][]> constraintCosts=new HashMap<Integer, int[][]>();
 			int[] neighbourAgentIds=problem.neighbourAgents.get(agentId);
@@ -36,8 +35,8 @@ public class AgentManager {
 			}
 			
 			agent.setNeibours(problem.neighbourAgents.get(agentId), problem.parentAgents.get(agentId), 
-					problem.childAgents.get(agentId), problem.pseudoParentAgents.get(agentId), 
-					problem.pseudoChildAgents.get(agentId), neighbourDomains, constraintCosts);
+					problem.childAgents.get(agentId), problem.allParentAgents.get(agentId), 
+					problem.allChildrenAgents.get(agentId), neighbourDomains, constraintCosts);
 			
 			agents.put(agent.getId(), agent);
 			
@@ -45,8 +44,8 @@ public class AgentManager {
 				String str="-----------"+agent.name+"-----------\n";
 				str+="Parent: "+agent.parent+"\n";
 				str+="Children: "+CollectionUtil.arrayToString(agent.children)+"\n";
-				str+="PseudoParents: "+CollectionUtil.arrayToString(agent.pseudoParents)+"\n";
-				str+="PseudoChildren: "+CollectionUtil.arrayToString(agent.pseudoChildren)+"\n";
+				str+="AllParents: "+CollectionUtil.arrayToString(agent.allParents)+"\n";
+				str+="AllChildren: "+CollectionUtil.arrayToString(agent.allChildren)+"\n";
 				FileUtil.writeStringAppend(str, "dfsTree.txt");
 			}
 		}

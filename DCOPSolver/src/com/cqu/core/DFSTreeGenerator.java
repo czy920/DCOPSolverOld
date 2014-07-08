@@ -13,5 +13,5 @@ public interface DFSTreeGenerator {
 	 * @return Map<Integer, int[]>[2]{pseudoParents, pseudoChildren}
 	 */
 	@SuppressWarnings("rawtypes")
-	Map[] getPseudoChildrenAndParentNodes();
+	Map[] getAllChildrenAndParentNodes();
 }
