@@ -9,8 +9,8 @@ public interface DFSTreeGenerator {
 	Map<Integer, Integer> getParentNode();
 	
 	/**
-	 * pseudoChildren包含children, pseudoParents包含parent
-	 * @return Map<Integer, int[]>[2]{pseudoParents, pseudoChildren}
+	 * allChildren包含children和pseudoChildren, allParents包含parent和pseudoParents
+	 * @return Map<Integer, int[]>[2]{allParents, allChildren}
 	 */
 	@SuppressWarnings("rawtypes")
 	Map[] getAllChildrenAndParentNodes();

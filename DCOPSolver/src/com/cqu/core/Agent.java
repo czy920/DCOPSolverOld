@@ -97,7 +97,7 @@ public abstract class Agent extends QueueMessager{
 	
 	protected boolean isLeafAgent()
 	{
-		return this.children==null;
+		return this.children==null||this.children.length==0;
 	}
 	
 	protected boolean isRootAgent()
