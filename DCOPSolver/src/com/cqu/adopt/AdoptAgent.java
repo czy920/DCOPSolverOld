@@ -214,16 +214,17 @@ public class AdoptAgent extends Agent{
 					this.name+" "+this.msgMailer.easyMessageContent(msg)+" | VALUE="+this.domain[valueIndex]+" LB="+this.LB+" UB="+Infinity.infinityEasy(this.UB)+" TH="+Infinity.infinityEasy(this.TH));
 		}
 		
-		if(msg.getType()==AdoptAgent.TYPE_VALUE_MESSAGE)
+		int type=msg.getType();
+		if(type==AdoptAgent.TYPE_VALUE_MESSAGE)
 		{
 			disposeValueMessage(msg);
-		}else if(msg.getType()==AdoptAgent.TYPE_COST_MESSAGE)
+		}else if(type==AdoptAgent.TYPE_COST_MESSAGE)
 		{
 			disposeCostMessage(msg);
-		}else if(msg.getType()==AdoptAgent.TYPE_THRESHOLD_MESSAGE)
+		}else if(type==AdoptAgent.TYPE_THRESHOLD_MESSAGE)
 		{
 			disposeThresholdMessage(msg);
-		}else if(msg.getType()==AdoptAgent.TYPE_TERMINATE_MESSAGE)
+		}else if(type==AdoptAgent.TYPE_TERMINATE_MESSAGE)
 		{
 			disposeTerminateMessage(msg);
 		}
@@ -716,14 +717,14 @@ public class AdoptAgent extends Agent{
 			int LB_=(Integer) msgValue.get(KEY_LB);
 			int UB_=(Integer) msgValue.get(KEY_UB);
 			Context c=(Context) msgValue.get(KEY_CONTEXT);
-			return "cost[LB="+LB_+" UB="+UB_+" context="+c.toString()+"]";
+			return "cost[LB="+LB_+" UB="+Infinity.infinityEasy(UB_)+" context="+c.toString()+"]";
 		}
 		case AdoptAgent.TYPE_THRESHOLD_MESSAGE:
 		{
 			Map<String, Object> msgValue=(Map<String, Object>) msg.getValue();
 			int TH_=(Integer) msgValue.get(KEY_TH);
 			Context c=(Context) msgValue.get(KEY_CONTEXT);
-			return "threshold[TH="+TH_+" context="+c.toString()+"]";
+			return "threshold[TH="+Infinity.infinityEasy(TH_)+" context="+c.toString()+"]";
 		}
 		case AdoptAgent.TYPE_TERMINATE_MESSAGE:
 		{

@@ -6,7 +6,7 @@ import java.util.Map;
 import com.cqu.util.CollectionUtil;
 
 /**
- * 计算单位
+ * computing unit
  * @author CQU
  *
  */

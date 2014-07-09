@@ -18,7 +18,8 @@ public class Demo {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		//String instance="problems/random_dcop_1.xml";
-		String instance="problems/RandomDCOP_7_3_2.xml";
+		//String instance="problems/RandomDCOP_7_3_1.xml";
+		String instance="problems/RandomDCOP_5_10_2.xml";
 		
 		//parse problem xml
 		ProblemParser parser=new ProblemParser(instance);
