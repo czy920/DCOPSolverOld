@@ -1,18 +1,23 @@
 package com.cqu.dpop;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.cqu.core.Agent;
 import com.cqu.core.Message;
+import com.cqu.util.ArrayIndexComparator;
 
 public class DPOPAgent extends Agent{
 
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_UTIL_MESSAGE=1;
 	
-	public DPOPAgent(int id, String name, int[] domain) {
-		super(id, name, domain);
+	private int[] neighbourLevelSortIndexes;
+	
+	public DPOPAgent(int id, String name, int level, int[] domain) {
+		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -20,6 +25,11 @@ public class DPOPAgent extends Agent{
 	protected void initRun() {
 		// TODO Auto-generated method stub
 		super.initRun();
+		
+		ArrayIndexComparator<Integer> comparator=new ArrayIndexComparator<Integer>(this.neighbourLevels);
+		Arrays.sort(this.neighbourLevels, comparator);
+		this.neighbourLevelSortIndexes=comparator.getSortIndexes();
+		
 		if(this.isLeafAgent()==true)
 		{
 			sendUtilMessage();
@@ -61,11 +71,9 @@ public class DPOPAgent extends Agent{
 	{
 		if(this.isRootAgent()==true)
 		{
-			
-		}else
-		{
-			
+			return;
 		}
+		
 	}
 	
 	private void disposeUtilMessage(Message msg)
@@ -78,7 +86,26 @@ public class DPOPAgent extends Agent{
 	
 	private void sendValueMessage()
 	{
+		if(this.isLeafAgent()==true)
+		{
+			return;
+		}
+		int dataLength=1;
+		Map<String, Integer> dimentionNames=new HashMap<String, Integer>();
+		int[] dimentionLengths=new int[allParents.length];
+		for(int i=0;i<allParents.length;i++)
+		{
+			int parentId=allParents[neighbourLevelSortIndexes[i]];
+			dimentionNames.put(neighbourNames[neighbourLevelSortIndexes[i]], i);
+			dimentionLengths[i]=neighbourDomains.get(parentId).length;
+			dataLength=dataLength*dimentionLengths[i];
+		}
+		int[] data=new int[dataLength];
+		//待续
 		
+		MulitiDimentionalData multiDimentionalData=new MulitiDimentionalData(data, dimentionLengths, dimentionNames);
+		Message utilMsg=new Message(this.id, this.parent, TYPE_UTIL_MESSAGE, multiDimentionalData);
+		this.sendMessage(utilMsg);
 	}
 	
 	private void disposeValueMessage(Message msg)

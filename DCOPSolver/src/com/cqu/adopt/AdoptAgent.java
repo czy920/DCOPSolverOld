@@ -38,8 +38,8 @@ public class AdoptAgent extends Agent{
 	
 	private boolean terminateReceivedFromParent=false;
 	
-	public AdoptAgent(int id, String name, int[] domain) {
-		super(id, name, domain);
+	public AdoptAgent(int id, String name, int level, int[] domain) {
+		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -94,11 +94,11 @@ public class AdoptAgent extends Agent{
 			return;
 		}
 		
-		int pseudoChildId=0;
+		int childId=0;
 		for(int i=0;i<this.allChildren.length;i++)
 		{
-			pseudoChildId=this.allChildren[i];
-			Message msg=new Message(this.id, pseudoChildId, AdoptAgent.TYPE_VALUE_MESSAGE, valueIndex);
+			childId=this.allChildren[i];
+			Message msg=new Message(this.id, childId, AdoptAgent.TYPE_VALUE_MESSAGE, valueIndex);
 			this.sendMessage(msg);
 		}
 	}
@@ -455,26 +455,26 @@ public class AdoptAgent extends Agent{
 			return ret;
 		}
 		
-		int pseudoParentId=0;
+		int parentId=0;
 		int oppositeAgentValueIndex=0;
 		for(int i=0;i<this.allParents.length;i++)
 		{
-			pseudoParentId=this.allParents[i];
+			parentId=this.allParents[i];
 			for(int j=0;j<this.domain.length;j++)
 			{
-				oppositeAgentValueIndex=currentContext.get(pseudoParentId);
+				oppositeAgentValueIndex=currentContext.get(parentId);
 				if(oppositeAgentValueIndex==-1)
 				{
 					ret[j]+=0;
 				}else
 				{
 					//保证id小的为行，id大的为列
-					if(this.id<pseudoParentId)
+					if(this.id<parentId)
 					{
-						ret[j]+=this.constraintCosts.get(pseudoParentId)[j][oppositeAgentValueIndex];
+						ret[j]+=this.constraintCosts.get(parentId)[j][oppositeAgentValueIndex];
 					}else
 					{
-						ret[j]+=this.constraintCosts.get(pseudoParentId)[oppositeAgentValueIndex][j];
+						ret[j]+=this.constraintCosts.get(parentId)[oppositeAgentValueIndex][j];
 					}
 				}
 			}
@@ -491,25 +491,25 @@ public class AdoptAgent extends Agent{
 			return ret;
 		}
 		
-		int pseudoParentId=0;
+		int parentId=0;
 		int oppositeAgentValueIndex=0;
 		for(int i=0;i<this.allParents.length;i++)
 		{
-			pseudoParentId=this.allParents[i];
+			parentId=this.allParents[i];
 			
-			oppositeAgentValueIndex=currentContext.get(pseudoParentId);
+			oppositeAgentValueIndex=currentContext.get(parentId);
 			if(oppositeAgentValueIndex==-1)
 			{
 				ret+=0;
 			}else
 			{
 				//保证id小的为行，id大的为列
-				if(this.id<pseudoParentId)
+				if(this.id<parentId)
 				{
-					ret+=this.constraintCosts.get(pseudoParentId)[di][oppositeAgentValueIndex];
+					ret+=this.constraintCosts.get(parentId)[di][oppositeAgentValueIndex];
 				}else
 				{
-					ret+=this.constraintCosts.get(pseudoParentId)[oppositeAgentValueIndex][di];
+					ret+=this.constraintCosts.get(parentId)[oppositeAgentValueIndex][di];
 				}
 			}
 		}

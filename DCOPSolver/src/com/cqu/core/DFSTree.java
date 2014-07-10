@@ -14,7 +14,7 @@ public class DFSTree implements DFSTreeGenerator{
 	
 	private Map<Integer, List<Integer>> childrenNodes;//生成树子节点
 	private Map<Integer, Integer> parentNode;//生成树父节点
-	private Map<Integer, Integer> nodeFloor;//节点层次，根节点为0层
+	private Map<Integer, Integer> nodeLevel;//节点层次，根节点为0层
 	
 	private Map<Integer, Boolean> nodeIterated;
 	private Map<Integer, int[]> neighbourCounts;
@@ -27,7 +27,7 @@ public class DFSTree implements DFSTreeGenerator{
 		
 		this.childrenNodes=new HashMap<Integer, List<Integer>>();
 		this.parentNode=new HashMap<Integer, Integer>();
-		this.nodeFloor=new HashMap<Integer, Integer>();
+		this.nodeLevel=new HashMap<Integer, Integer>();
 		
 		this.nodeIterated=new HashMap<Integer, Boolean>();
 		this.neighbourCounts=new HashMap<Integer, int[]>();
@@ -91,7 +91,7 @@ public class DFSTree implements DFSTreeGenerator{
 		this.nodeIterated.put(curNodeId, true);
 		iteratedCount++;//根节点已遍历
 		this.parentNode.put(curNodeId, -1);
-		this.nodeFloor.put(curNodeId, curFloor);
+		this.nodeLevel.put(curNodeId, curFloor);
 		
 		int totalCount=neighbourNodes.size();
 		while(iteratedCount<totalCount)
@@ -110,12 +110,18 @@ public class DFSTree implements DFSTreeGenerator{
 				this.parentNode.put(nextNodeId, curNodeId);
 				
 				this.nodeIterated.put(nextNodeId, true);
-				this.nodeFloor.put(nextNodeId, curFloor);
+				this.nodeLevel.put(nextNodeId, curFloor);
 				iteratedCount++;
 				
 				curNodeId=nextNodeId;
 			}
 		}
+	}
+	
+	@Override
+	public Map<Integer, Integer> getNodeLevels() {
+		// TODO Auto-generated method stub
+		return this.nodeLevel;
 	}
 
 	@Override
@@ -141,7 +147,7 @@ public class DFSTree implements DFSTreeGenerator{
 			int[] neighbours=this.neighbourNodes.get(nodeId);
 			List<Integer> children=this.childrenNodes.get(nodeId);
 			Integer parent=this.parentNode.get(nodeId);
-			Integer floor=this.nodeFloor.get(nodeId);
+			Integer floor=this.nodeLevel.get(nodeId);
 			if(parent==-1)
 			{
 				//根节点
@@ -177,7 +183,7 @@ public class DFSTree implements DFSTreeGenerator{
 						allChildrenList.add(neighbours[i]);
 					}else
 					{
-						if(floor<this.nodeFloor.get(neighbours[i]))
+						if(floor<this.nodeLevel.get(neighbours[i]))
 						{
 							//在本节点之下
 							allChildrenList.add(neighbours[i]);

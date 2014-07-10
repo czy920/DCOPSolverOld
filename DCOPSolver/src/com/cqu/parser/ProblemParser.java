@@ -104,6 +104,7 @@ public class ProblemParser {
 		DFSTree dfsTree=new DFSTree(problem.neighbourAgents);
 		dfsTree.generate();
 		
+		problem.agentLevels=dfsTree.getNodeLevels();
 		problem.parentAgents=dfsTree.getParentNode();
 		problem.childAgents=dfsTree.getChildrenNodes();
 		Map[] allParentsAndChildren=dfsTree.getAllChildrenAndParentNodes();

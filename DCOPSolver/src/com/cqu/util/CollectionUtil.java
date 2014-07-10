@@ -43,6 +43,16 @@ public class CollectionUtil {
 		return CollectionUtil.toInt(list.toArray(ret));
 	}
 	
+	public static Integer[] toInteger(int[] arr)
+	{
+		Integer[] ret=new Integer[arr.length];
+		for(int i=0;i<arr.length;i++)
+		{
+			ret[i]=arr[i];
+		}
+		return ret;
+	}
+	
 	public static int indexOf(int[] arr, int e)
 	{
 		for(int i=0;i<arr.length;i++)

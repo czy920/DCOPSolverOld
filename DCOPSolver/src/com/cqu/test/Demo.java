@@ -41,9 +41,9 @@ public class Demo {
 		AgentManager agentManager=new AgentManager(problem, new AgentConstructor() {
 			
 			@Override
-			public Agent constructAgent(int id, String name, int[] domain) {
+			public Agent constructAgent(int id, String name, int level, int[] domain) {
 				// TODO Auto-generated method stub
-				return new AdoptAgent(id, name, domain);
+				return new AdoptAgent(id, name, level, domain);
 			}
 		});
 		

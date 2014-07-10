@@ -16,6 +16,7 @@ public abstract class Agent extends QueueMessager{
 	
 	protected int id;
 	protected String name;
+	protected int level;
 	protected int[] domain;
 	
 	protected int[] neighbours;
@@ -27,15 +28,18 @@ public abstract class Agent extends QueueMessager{
 	protected int[] pseudoChildren;
 	
 	protected Map<Integer, int[]> neighbourDomains;
+	protected String[] neighbourNames;
+	protected Integer[] neighbourLevels;
 	protected Map<Integer, int[][]> constraintCosts;
 	
 	protected MessageMailer msgMailer;
 	
 	protected int valueIndex;
 	
-	public Agent(int id, String name, int[] domain) {
+	public Agent(int id, String name, int level, int[] domain) {
 		super("Agent "+name, QUEUE_CAPACITY);
 		this.id = id;
+		this.level=level;
 		this.name = name;
 		this.domain=domain;
 	}
@@ -48,7 +52,9 @@ public abstract class Agent extends QueueMessager{
 		return name;
 	}
 	
-	public void setNeibours(int[] neighbours, int parent, int[] children, int[] allParents, int[] allChildren, Map<Integer, int[]> neighbourDomains, Map<Integer, int[][]> constraintCosts)
+	public void setNeibours(int[] neighbours, int parent, int[] children, int[] allParents, 
+			int[] allChildren, Map<Integer, int[]> neighbourDomains, Map<Integer, 
+			int[][]> constraintCosts, String[] neighbourNames, Integer[] neighbourLevels)
 	{
 		this.neighbours=neighbours;
 		this.parent=parent;
@@ -66,6 +72,8 @@ public abstract class Agent extends QueueMessager{
 		
 		this.neighbourDomains=neighbourDomains;
 		this.constraintCosts=constraintCosts;
+		this.neighbourNames=neighbourNames;
+		this.neighbourLevels=neighbourLevels;
 	}
 	
 	public void setMessageMailer(MessageMailer msgMailer)
