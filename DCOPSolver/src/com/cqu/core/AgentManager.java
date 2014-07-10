@@ -21,13 +21,11 @@ public class AgentManager {
 			Map<Integer, int[]> neighbourDomains=new HashMap<Integer, int[]>();
 			Map<Integer, int[][]> constraintCosts=new HashMap<Integer, int[][]>();
 			int[] neighbourAgentIds=problem.neighbourAgents.get(agentId);
-			String[] neighbourNames=new String[neighbourAgentIds.length];
-			Integer[] neighbourLevels=new Integer[neighbourAgentIds.length];
+			Map<Integer, Integer> neighbourLevels=new HashMap<Integer, Integer>();
 			for(int i=0;i<neighbourAgentIds.length;i++)
 			{
 				neighbourDomains.put(neighbourAgentIds[i], problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])));
-				neighbourNames[i]=problem.agentNames.get(neighbourAgentIds[i]);
-				neighbourLevels[i]=problem.agentLevels.get(neighbourAgentIds[i]);
+				neighbourLevels.put(neighbourAgentIds[i], problem.agentLevels.get(neighbourAgentIds[i]));
 			}
 			String[] neighbourAgentCostNames=problem.agentConstraintCosts.get(agentId);
 			for(int i=0;i<neighbourAgentCostNames.length;i++)
@@ -40,7 +38,7 @@ public class AgentManager {
 			
 			agent.setNeibours(problem.neighbourAgents.get(agentId), problem.parentAgents.get(agentId), 
 					problem.childAgents.get(agentId), problem.allParentAgents.get(agentId), 
-					problem.allChildrenAgents.get(agentId), neighbourDomains, constraintCosts, neighbourNames, neighbourLevels);
+					problem.allChildrenAgents.get(agentId), neighbourDomains, constraintCosts, neighbourLevels);
 			
 			agents.put(agent.getId(), agent);
 			

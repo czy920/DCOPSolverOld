@@ -1,23 +1,23 @@
 package com.cqu.test;
 
-import com.cqu.adopt.AdoptAgent;
 import com.cqu.core.Agent;
 import com.cqu.core.AgentConstructor;
 import com.cqu.core.AgentManager;
 import com.cqu.core.DFSTree;
 import com.cqu.core.MessageMailer;
 import com.cqu.core.Problem;
+import com.cqu.dpop.DPOPAgent;
 import com.cqu.parser.ProblemParser;
 import com.cqu.visualtree.TreeFrame;
 
-public class Demo {
-
+public class DPOPDemo {
+	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String instance="problems/RandomDCOP_12_3_1.xml";
+		String instance="problems/RandomDCOP_7_3_1.xml";
 		//parse problem xml
 		ProblemParser parser=new ProblemParser(instance);
 		Problem problem=parser.parse();
@@ -40,7 +40,7 @@ public class Demo {
 			@Override
 			public Agent constructAgent(int id, String name, int level, int[] domain) {
 				// TODO Auto-generated method stub
-				return new AdoptAgent(id, name, level, domain);
+				return new DPOPAgent(id, name, level, domain);
 			}
 		});
 		

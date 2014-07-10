@@ -1,6 +1,5 @@
 package com.cqu.dpop;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +13,8 @@ public class DPOPAgent extends Agent{
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_UTIL_MESSAGE=1;
 	
-	private int[] neighbourLevelSortIndexes;
+	private Integer[] parentLevels;
+	private Integer[] parentLevelSortIndexes;
 	
 	public DPOPAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
@@ -26,9 +26,13 @@ public class DPOPAgent extends Agent{
 		// TODO Auto-generated method stub
 		super.initRun();
 		
-		ArrayIndexComparator<Integer> comparator=new ArrayIndexComparator<Integer>(this.neighbourLevels);
-		Arrays.sort(this.neighbourLevels, comparator);
-		this.neighbourLevelSortIndexes=comparator.getSortIndexes();
+		parentLevels=new Integer[allParents.length];
+		for(int i=0;i<allParents.length;i++)
+		{
+			parentLevels[i]=neighbourLevels.get(allParents[i]);
+		}
+		ArrayIndexComparator<Integer> comparator=new ArrayIndexComparator<Integer>(parentLevels);
+		parentLevelSortIndexes=comparator.sort();
 		
 		if(this.isLeafAgent()==true)
 		{
@@ -73,7 +77,66 @@ public class DPOPAgent extends Agent{
 		{
 			return;
 		}
+		MulitiDimentionalData multiDimentionalData=this.computeLocalUtils();
+		Message utilMsg=new Message(this.id, this.parent, TYPE_UTIL_MESSAGE, multiDimentionalData);
+		this.sendMessage(utilMsg);
+	}
+	
+	private MulitiDimentionalData computeLocalUtils()
+	{
+		int dataLength=1;
+		Map<String, Integer> dimentionNames=new HashMap<String, Integer>();
+		int[] dimentionLengths=new int[allParents.length+1];
+		for(int i=0;i<allParents.length;i++)
+		{
+			int parentId=allParents[parentLevelSortIndexes[i]];
+			dimentionNames.put(parentId+"", i);
+			dimentionLengths[i]=neighbourDomains.get(parentId).length;
+			dataLength=dataLength*dimentionLengths[i];
+		}
+		dimentionLengths[dimentionLengths.length-1]=this.domain.length;
+		dimentionNames.put(this.id+"", dimentionLengths.length-1);
+		dataLength=dataLength*this.domain.length;
+		//set data
+		int[] agentValueIndexes=new int[allParents.length+1];
+		int[] data=new int[dataLength];
+		int dataIndex=0;
+		int curDimention=agentValueIndexes.length-1;
+		while(dataIndex<data.length)
+		{
+			int costSum=0;
+			for(int i=0;i<allParents.length;i++)
+			{
+				//保证id小的为行，id大的为列
+				if(this.id<allParents[i])
+				{
+					costSum+=this.constraintCosts.get(allParents[i])[agentValueIndexes[agentValueIndexes.length-1]][agentValueIndexes[i]];
+				}else
+				{
+					costSum+=this.constraintCosts.get(allParents[i])[agentValueIndexes[i]][agentValueIndexes[agentValueIndexes.length-1]];
+				}
+			}
+			data[dataIndex]=costSum;
+			
+			agentValueIndexes[curDimention]+=1;
+			while(agentValueIndexes[curDimention]>=dimentionLengths[curDimention])
+			{
+				agentValueIndexes[curDimention]=0;
+				curDimention-=1;
+				if(curDimention==-1)
+				{
+					//all data has been set
+					break;
+				}
+				agentValueIndexes[curDimention]+=1;
+			}
+			curDimention=agentValueIndexes.length-1;
+			dataIndex++;
+		}
 		
+		MulitiDimentionalData multiDimentionalData=new MulitiDimentionalData(data, dimentionLengths, dimentionNames);
+		multiDimentionalData=multiDimentionalData.reductionDimention(this.id+"", MulitiDimentionalData.REDUCT_DIMENTION_WITH_MIN);
+		return multiDimentionalData;
 	}
 	
 	private void disposeUtilMessage(Message msg)
@@ -90,22 +153,6 @@ public class DPOPAgent extends Agent{
 		{
 			return;
 		}
-		int dataLength=1;
-		Map<String, Integer> dimentionNames=new HashMap<String, Integer>();
-		int[] dimentionLengths=new int[allParents.length];
-		for(int i=0;i<allParents.length;i++)
-		{
-			int parentId=allParents[neighbourLevelSortIndexes[i]];
-			dimentionNames.put(neighbourNames[neighbourLevelSortIndexes[i]], i);
-			dimentionLengths[i]=neighbourDomains.get(parentId).length;
-			dataLength=dataLength*dimentionLengths[i];
-		}
-		int[] data=new int[dataLength];
-		//待续
-		
-		MulitiDimentionalData multiDimentionalData=new MulitiDimentionalData(data, dimentionLengths, dimentionNames);
-		Message utilMsg=new Message(this.id, this.parent, TYPE_UTIL_MESSAGE, multiDimentionalData);
-		this.sendMessage(utilMsg);
 	}
 	
 	private void disposeValueMessage(Message msg)

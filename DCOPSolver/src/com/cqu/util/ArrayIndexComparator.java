@@ -1,17 +1,18 @@
 package com.cqu.util;
 
+import java.util.Arrays;
 import java.util.Comparator;
 
 public class ArrayIndexComparator<T> implements Comparator<Integer>{
 
 	private final T[] array;
-	private int[] indexes;
+	private Integer[] indexes;
 
     public ArrayIndexComparator(T[] array)
     {
         this.array = array;
         
-        indexes = new int[array.length];
+        indexes = new Integer[array.length];
         for (int i = 0; i < array.length; i++)
         {
             indexes[i] = i;
@@ -25,8 +26,9 @@ public class ArrayIndexComparator<T> implements Comparator<Integer>{
 		return ((Comparable<T>) array[o1]).compareTo(array[o2]);
 	}
 	
-	public int[] getSortIndexes()
+	public Integer[] sort()
 	{
+		Arrays.sort(indexes, this);
 		return indexes;
 	}
 }

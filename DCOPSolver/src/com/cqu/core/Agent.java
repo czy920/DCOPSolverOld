@@ -28,8 +28,7 @@ public abstract class Agent extends QueueMessager{
 	protected int[] pseudoChildren;
 	
 	protected Map<Integer, int[]> neighbourDomains;
-	protected String[] neighbourNames;
-	protected Integer[] neighbourLevels;
+	protected Map<Integer, Integer> neighbourLevels;
 	protected Map<Integer, int[][]> constraintCosts;
 	
 	protected MessageMailer msgMailer;
@@ -54,7 +53,7 @@ public abstract class Agent extends QueueMessager{
 	
 	public void setNeibours(int[] neighbours, int parent, int[] children, int[] allParents, 
 			int[] allChildren, Map<Integer, int[]> neighbourDomains, Map<Integer, 
-			int[][]> constraintCosts, String[] neighbourNames, Integer[] neighbourLevels)
+			int[][]> constraintCosts, Map<Integer, Integer> neighbourLevels)
 	{
 		this.neighbours=neighbours;
 		this.parent=parent;
@@ -72,7 +71,6 @@ public abstract class Agent extends QueueMessager{
 		
 		this.neighbourDomains=neighbourDomains;
 		this.constraintCosts=constraintCosts;
-		this.neighbourNames=neighbourNames;
 		this.neighbourLevels=neighbourLevels;
 	}
 	
