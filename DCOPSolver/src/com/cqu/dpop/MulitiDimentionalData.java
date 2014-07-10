@@ -56,36 +56,55 @@ public class MulitiDimentionalData {
 		}
 		
 		//降低指定维度
-		int step=1;
+		int outerPeriod=1;
 		for(int i=dimentionIndex;i<dimentionLengths.length;i++)
 		{
-			step=step*dimentionLengths[i];
+			outerPeriod=outerPeriod*dimentionLengths[i];
 		}
-		step=step/dimentionLengths[dimentionIndex];
+		int innerPeriod=outerPeriod/dimentionLengths[dimentionIndex];
 		//投影或聚集
 		int[] resultIndexes=new int[dataNew.length];
-		for(int i=0;i<dataNew.length;i++)
+		int indexTemp=0;
+		if(reductDimentionMethod==REDUCT_DIMENTION_WITH_MIN)
 		{
-			int valueChoosen=data[i];
-			for(int j=i;j<data.length;j+=step)
+			
+			for(int i=0;i<data.length;i+=outerPeriod)
 			{
-				if(reductDimentionMethod==REDUCT_DIMENTION_WITH_MIN)
+				for(int j=0;j<innerPeriod;j++)
 				{
-					if(valueChoosen>data[j])
+					indexTemp=i*innerPeriod/outerPeriod+j;
+					int valueChoosen=Integer.MAX_VALUE;
+					for(int k=0;k<outerPeriod;k+=innerPeriod)
 					{
-						valueChoosen=data[j];
-						resultIndexes[i]=j;
+						if(valueChoosen>data[i+j+k])
+						{
+							valueChoosen=data[i+j+k];
+							resultIndexes[indexTemp]=k/innerPeriod;
+						}
 					}
-				}else
-				{
-					if(valueChoosen<data[j])
-					{
-						valueChoosen=data[j];
-						resultIndexes[i]=j;
-					}
+					dataNew[indexTemp]=valueChoosen;
 				}
 			}
-			dataNew[i]=valueChoosen;
+		}else
+		{
+			
+			for(int i=0;i<data.length;i+=outerPeriod)
+			{
+				for(int j=0;j<innerPeriod;j++)
+				{
+					indexTemp=i*innerPeriod/outerPeriod+j;
+					int valueChoosen=Integer.MIN_VALUE;
+					for(int k=0;k<outerPeriod;k+=innerPeriod)
+					{
+						if(valueChoosen<data[i+j+k])
+						{
+							valueChoosen=data[i+j+k];
+							resultIndexes[indexTemp]=k/innerPeriod;
+						}
+					}
+					dataNew[indexTemp]=valueChoosen;
+				}
+			}
 		}
 		
 		return new MulitiDimentionalData(dataNew, dimentionLengthsNew, dimentionNamesNew, resultIndexes);
