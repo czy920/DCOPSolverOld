@@ -22,7 +22,7 @@ public class MulitiDimentionalData {
 		this.dimentionNames=dimentionNames;
 	}
 	
-	public MulitiDimentionalData reductionDimention(String dimentionName, int reductDimentionMethod)
+	public MulitiDimentionalData reductDimention(String dimentionName, int reductDimentionMethod)
 	{
 		int dimentionIndex=dimentionNames.get(dimentionName);
 		int dimentionToReductLength=dimentionLengths[dimentionIndex];
@@ -136,10 +136,10 @@ public class MulitiDimentionalData {
 		names.put("A2", 1);
 		names.put("A3", 2);
 		MulitiDimentionalData data=new MulitiDimentionalData(new int[]{1, 3, 2, 4, 2, 8, 3, 1}, new int[]{2, 2, 2}, names);
-		System.out.println(data.reductionDimention("A1", REDUCT_DIMENTION_WITH_MIN).toString());
-		System.out.println(data.reductionDimention("A2", REDUCT_DIMENTION_WITH_MIN).toString());
-		System.out.println(data.reductionDimention("A3", REDUCT_DIMENTION_WITH_MIN).toString());
+		System.out.println(data.reductDimention("A1", REDUCT_DIMENTION_WITH_MIN).toString());
+		System.out.println(data.reductDimention("A2", REDUCT_DIMENTION_WITH_MIN).toString());
+		System.out.println(data.reductDimention("A3", REDUCT_DIMENTION_WITH_MIN).toString());
 		
-		System.out.println(data.reductionDimention("A1", REDUCT_DIMENTION_WITH_MIN).reductionDimention("A2", REDUCT_DIMENTION_WITH_MIN).reductionDimention("A3", REDUCT_DIMENTION_WITH_MIN));
+		System.out.println(data.reductDimention("A1", REDUCT_DIMENTION_WITH_MIN).reductDimention("A2", REDUCT_DIMENTION_WITH_MIN).reductDimention("A3", REDUCT_DIMENTION_WITH_MIN));
 	}
 }

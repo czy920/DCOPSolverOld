@@ -15,6 +15,12 @@ public class DPOPAgent extends Agent{
 	
 	private Integer[] parentLevels;
 	private Integer[] parentLevelSortIndexes;
+	private Map<Integer, MulitiDimentionalData> allChildrenUtils;
+	
+	{
+		//表示消息不丢失
+		QUEUE_CAPACITY=-1;
+	}
 	
 	public DPOPAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
@@ -25,6 +31,8 @@ public class DPOPAgent extends Agent{
 	protected void initRun() {
 		// TODO Auto-generated method stub
 		super.initRun();
+		
+		allChildrenUtils=new HashMap<Integer, MulitiDimentionalData>();
 		
 		parentLevels=new Integer[allParents.length];
 		for(int i=0;i<allParents.length;i++)
@@ -135,7 +143,7 @@ public class DPOPAgent extends Agent{
 		}
 		
 		MulitiDimentionalData multiDimentionalData=new MulitiDimentionalData(data, dimentionLengths, dimentionNames);
-		multiDimentionalData=multiDimentionalData.reductionDimention(this.id+"", MulitiDimentionalData.REDUCT_DIMENTION_WITH_MIN);
+		multiDimentionalData=multiDimentionalData.reductDimention(this.id+"", MulitiDimentionalData.REDUCT_DIMENTION_WITH_MIN);
 		return multiDimentionalData;
 	}
 	
@@ -144,6 +152,12 @@ public class DPOPAgent extends Agent{
 		if(this.isRootAgent()==true)
 		{
 			sendValueMessage();
+		}
+		allChildrenUtils.put(msg.getIdSender(), (MulitiDimentionalData) msg.getValue());
+		if(allChildrenUtils.size()>=allChildren.length)
+		{
+			//所有子节点(包括伪子节点)的UtilMessage都以收集完毕，
+			//则可以进行针对本节点的加和和降维，将最终得到的UtilMessage再往父节点发送
 		}
 	}
 	

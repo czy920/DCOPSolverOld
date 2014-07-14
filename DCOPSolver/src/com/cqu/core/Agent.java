@@ -12,7 +12,7 @@ import com.cqu.util.CollectionUtil;
  */
 public abstract class Agent extends QueueMessager{
 	
-	public final static int QUEUE_CAPACITY=50;
+	public static int QUEUE_CAPACITY=50;
 	
 	protected int id;
 	protected String name;

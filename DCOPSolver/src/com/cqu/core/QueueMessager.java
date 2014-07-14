@@ -26,6 +26,14 @@ public abstract class QueueMessager extends ThreadEx{
 	public void addMessage(Message msg)
 	{
 		synchronized (msgQueue) {
+			//消息不可丢失
+			if(queueCapacity<0)
+			{
+				msgQueue.add(msg);
+				msgQueue.notifyAll();
+				return;
+			}
+			//消息可丢失
 			if(msgQueue.size()<queueCapacity)
 			{
 				msgQueue.add(msg);
