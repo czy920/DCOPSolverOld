@@ -12,13 +12,15 @@ public class MulitiDimentionalData {
 	
 	private int[] data;
 	private int[] dimentionLengths;
+	private int[] dimentionPriorities;
 	private Map<String, Integer> dimentionNames;
 	private int[] reductDimentionResultIndexes;
 	
-	public MulitiDimentionalData(int[] data, int[] dimentionLengths, Map<String, Integer> dimentionNames) {
+	public MulitiDimentionalData(int[] data, int[] dimentionLengths, int[] dimentionPriorities, Map<String, Integer> dimentionNames) {
 		// TODO Auto-generated constructor stub
 		this.data=data;
 		this.dimentionLengths=dimentionLengths;
+		this.dimentionPriorities=dimentionPriorities;
 		this.dimentionNames=dimentionNames;
 	}
 	
@@ -45,13 +47,16 @@ public class MulitiDimentionalData {
 		
 		int[] dataNew=new int[data.length/dimentionToReductLength];
 		int[] dimentionLengthsNew=new int[dimentionLengths.length-1];
+		int[] dimentionPriorityNew=new int[dimentionLengths.length-1];
 		for(int i=0;i<dimentionIndex;i++)
 		{
 			dimentionLengthsNew[i]=dimentionLengths[i];
+			dimentionPriorityNew[i]=dimentionPriorities[i];
 		}
 		for(int i=dimentionIndex+1;i<dimentionLengths.length;i++)
 		{
 			dimentionLengthsNew[i-1]=dimentionLengths[i];
+			dimentionPriorityNew[i-1]=dimentionPriorities[i];
 		}
 		
 		//降低指定维度
@@ -106,9 +111,16 @@ public class MulitiDimentionalData {
 			}
 		}
 		
-		MulitiDimentionalData multiDimentionalData=new MulitiDimentionalData(dataNew, dimentionLengthsNew, dimentionNamesNew);
+		MulitiDimentionalData multiDimentionalData=new MulitiDimentionalData(dataNew, dimentionLengthsNew, dimentionPriorityNew, dimentionNamesNew);
 		multiDimentionalData.setReductDimentionResultIndexes(resultIndexes);
 		return multiDimentionalData;
+	}
+	
+	public MulitiDimentionalData merge(MulitiDimentionalData mdData)
+	{
+		Map<String, Integer> dimentionNamesMerged=new HashMap<String, Integer>();
+		
+		return null;
 	}
 	
 	public void setReductDimentionResultIndexes(int[] reductDimentionResultIndexes) {
@@ -135,7 +147,7 @@ public class MulitiDimentionalData {
 		names.put("A1", 0);
 		names.put("A2", 1);
 		names.put("A3", 2);
-		MulitiDimentionalData data=new MulitiDimentionalData(new int[]{1, 3, 2, 4, 2, 8, 3, 1}, new int[]{2, 2, 2}, names);
+		MulitiDimentionalData data=new MulitiDimentionalData(new int[]{1, 3, 2, 4, 2, 8, 3, 1}, new int[]{2, 2, 2}, new int[]{0, 1, 2}, names);
 		System.out.println(data.reductDimention("A1", REDUCT_DIMENTION_WITH_MIN).toString());
 		System.out.println(data.reductDimention("A2", REDUCT_DIMENTION_WITH_MIN).toString());
 		System.out.println(data.reductDimention("A3", REDUCT_DIMENTION_WITH_MIN).toString());

@@ -142,7 +142,7 @@ public class DPOPAgent extends Agent{
 			dataIndex++;
 		}
 		
-		MulitiDimentionalData multiDimentionalData=new MulitiDimentionalData(data, dimentionLengths, dimentionNames);
+		MulitiDimentionalData multiDimentionalData=new MulitiDimentionalData(data, dimentionLengths, new int[]{}, dimentionNames);
 		multiDimentionalData=multiDimentionalData.reductDimention(this.id+"", MulitiDimentionalData.REDUCT_DIMENTION_WITH_MIN);
 		return multiDimentionalData;
 	}
