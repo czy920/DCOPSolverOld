@@ -7,6 +7,7 @@ import com.cqu.core.AgentManager;
 import com.cqu.core.DFSTree;
 import com.cqu.core.MessageMailer;
 import com.cqu.core.Problem;
+import com.cqu.dpop.MultiDimensionDataB;
 import com.cqu.parser.ProblemParser;
 import com.cqu.visualtree.TreeFrame;
 
@@ -17,7 +18,7 @@ public class Demo {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String instance="problems/RandomDCOP_10_3_5.xml";
+		String instance="problems/RandomDCOP_7_3_1.xml";
 		//parse problem xml
 		ProblemParser parser=new ProblemParser(instance);
 		Problem problem=parser.parse();

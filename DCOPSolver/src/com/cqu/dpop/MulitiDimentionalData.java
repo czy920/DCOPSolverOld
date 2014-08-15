@@ -148,10 +148,10 @@ public class MulitiDimentionalData {
 		names.put("A2", 1);
 		names.put("A3", 2);
 		MulitiDimentionalData data=new MulitiDimentionalData(new int[]{1, 3, 2, 4, 2, 8, 3, 1}, new int[]{2, 2, 2}, new int[]{0, 1, 2}, names);
-		System.out.println(data.reductDimention("A1", REDUCT_DIMENTION_WITH_MIN).toString());
-		System.out.println(data.reductDimention("A2", REDUCT_DIMENTION_WITH_MIN).toString());
-		System.out.println(data.reductDimention("A3", REDUCT_DIMENTION_WITH_MIN).toString());
+		System.out.println(data.reductDimention("A1", REDUCT_DIMENTION_WITH_MAX).toString());
+		System.out.println(data.reductDimention("A2", REDUCT_DIMENTION_WITH_MAX).toString());
+		System.out.println(data.reductDimention("A3", REDUCT_DIMENTION_WITH_MAX).toString());
 		
-		System.out.println(data.reductDimention("A1", REDUCT_DIMENTION_WITH_MIN).reductDimention("A2", REDUCT_DIMENTION_WITH_MIN).reductDimention("A3", REDUCT_DIMENTION_WITH_MIN));
+		System.out.println(data.reductDimention("A1", REDUCT_DIMENTION_WITH_MAX).reductDimention("A2", REDUCT_DIMENTION_WITH_MAX).reductDimention("A3", REDUCT_DIMENTION_WITH_MAX));
 	}
 }
