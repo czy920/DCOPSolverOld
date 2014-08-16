@@ -1,12 +1,11 @@
 package com.cqu.dpop;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.cqu.core.Agent;
 import com.cqu.core.Message;
-import com.cqu.util.ArrayIndexComparator;
 
 public class DPOPAgent extends Agent{
 
@@ -14,8 +13,9 @@ public class DPOPAgent extends Agent{
 	public final static int TYPE_UTIL_MESSAGE=1;
 	
 	private Integer[] parentLevels;
-	private Integer[] parentLevelSortIndexes;
-	private Map<Integer, MulitiDimentionalData> allChildrenUtils;
+	private int disposedChildrenCount;
+	private int[] reductDimensionResultIndexes;
+	private MultiDimensionDataB rawMDData;
 	
 	{
 		//表示消息不丢失
@@ -25,6 +25,7 @@ public class DPOPAgent extends Agent{
 	public DPOPAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
+		disposedChildrenCount=0;
 	}
 	
 	@Override
@@ -32,15 +33,11 @@ public class DPOPAgent extends Agent{
 		// TODO Auto-generated method stub
 		super.initRun();
 		
-		allChildrenUtils=new HashMap<Integer, MulitiDimentionalData>();
-		
 		parentLevels=new Integer[allParents.length];
 		for(int i=0;i<allParents.length;i++)
 		{
 			parentLevels[i]=neighbourLevels.get(allParents[i]);
 		}
-		ArrayIndexComparator<Integer> comparator=new ArrayIndexComparator<Integer>(parentLevels);
-		parentLevelSortIndexes=comparator.sort();
 		
 		if(this.isLeafAgent()==true)
 		{
@@ -85,25 +82,23 @@ public class DPOPAgent extends Agent{
 		{
 			return;
 		}
-		MulitiDimentionalData multiDimentionalData=this.computeLocalUtils();
+		MultiDimensionDataB multiDimentionalData=this.computeLocalUtils();
 		Message utilMsg=new Message(this.id, this.parent, TYPE_UTIL_MESSAGE, multiDimentionalData);
 		this.sendMessage(utilMsg);
 	}
 	
-	private MulitiDimentionalData computeLocalUtils()
+	private MultiDimensionDataB computeLocalUtils()
 	{
 		int dataLength=1;
-		Map<String, Integer> dimentionNames=new HashMap<String, Integer>();
-		int[] dimentionLengths=new int[allParents.length+1];
+		List<Dimension> dimensions=new ArrayList<Dimension>();
 		for(int i=0;i<allParents.length;i++)
 		{
-			int parentId=allParents[parentLevelSortIndexes[i]];
-			dimentionNames.put(parentId+"", i);
-			dimentionLengths[i]=neighbourDomains.get(parentId).length;
-			dataLength=dataLength*dimentionLengths[i];
+			int parentId=allParents[i];
+			int dimensionSize=neighbourDomains.get(parentId).length;
+			dimensions.add(new Dimension(parentId+"", dimensionSize, parentLevels[i]));
+			dataLength=dataLength*dimensionSize;
 		}
-		dimentionLengths[dimentionLengths.length-1]=this.domain.length;
-		dimentionNames.put(this.id+"", dimentionLengths.length-1);
+		dimensions.add(new Dimension(this.id+"", this.domain.length, this.level));
 		dataLength=dataLength*this.domain.length;
 		//set data
 		int[] agentValueIndexes=new int[allParents.length+1];
@@ -127,7 +122,7 @@ public class DPOPAgent extends Agent{
 			data[dataIndex]=costSum;
 			
 			agentValueIndexes[curDimention]+=1;
-			while(agentValueIndexes[curDimention]>=dimentionLengths[curDimention])
+			while(agentValueIndexes[curDimention]>=dimensions.get(curDimention).getSize())
 			{
 				agentValueIndexes[curDimention]=0;
 				curDimention-=1;
@@ -142,8 +137,10 @@ public class DPOPAgent extends Agent{
 			dataIndex++;
 		}
 		
-		MulitiDimentionalData multiDimentionalData=new MulitiDimentionalData(data, dimentionLengths, new int[]{}, dimentionNames);
-		multiDimentionalData=multiDimentionalData.reductDimention(this.id+"", MulitiDimentionalData.REDUCT_DIMENTION_WITH_MIN);
+		MultiDimensionDataB multiDimentionalData=new MultiDimensionDataB(dimensions, data);
+		ReductDimensionResult result=multiDimentionalData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
+		multiDimentionalData=result.getMdData();
+		reductDimensionResultIndexes=result.getResultIndex();
 		return multiDimentionalData;
 	}
 	
@@ -153,11 +150,13 @@ public class DPOPAgent extends Agent{
 		{
 			sendValueMessage();
 		}
-		allChildrenUtils.put(msg.getIdSender(), (MulitiDimentionalData) msg.getValue());
-		if(allChildrenUtils.size()>=allChildren.length)
+		rawMDData=rawMDData.mergeDimension((MultiDimensionDataB) msg.getValue());
+		disposedChildrenCount++;
+		if(disposedChildrenCount>=allChildren.length)
 		{
-			//所有子节点(包括伪子节点)的UtilMessage都以收集完毕，
-			//则可以进行针对本节点的加和和降维，将最终得到的UtilMessage再往父节点发送
+			//所有子节点(包括伪子节点)的UtilMessage都已收集完毕，
+			//则可以进行针对本节点的降维，将最终得到的UtilMessage再往父节点发送
+			rawMDData=rawMDData.mergeDimension(computeLocalUtils());
 		}
 	}
 	

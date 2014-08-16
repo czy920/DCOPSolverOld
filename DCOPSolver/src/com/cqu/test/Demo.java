@@ -7,7 +7,6 @@ import com.cqu.core.AgentManager;
 import com.cqu.core.DFSTree;
 import com.cqu.core.MessageMailer;
 import com.cqu.core.Problem;
-import com.cqu.dpop.MultiDimensionDataB;
 import com.cqu.parser.ProblemParser;
 import com.cqu.visualtree.TreeFrame;
 
