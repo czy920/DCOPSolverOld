@@ -37,4 +37,10 @@ public class Dimension implements Comparable<Dimension>{
 		// TODO Auto-generated method stub
 		return this.priority.compareTo(o.priority);
 	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return "["+name+" "+size+" "+priority+"]";
+	}
 }

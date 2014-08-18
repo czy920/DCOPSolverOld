@@ -5,20 +5,20 @@ public class ReductDimensionResult {
 	public static final int REDUCT_DIMENSION_WITH_MAX=0;
 	public static final int REDUCT_DIMENSION_WITH_MIN=1;
 	
-	private MultiDimensionDataB mdData;
+	private MultiDimensionData mdData;
 	private int[] resultIndex;
 	
-	public ReductDimensionResult(MultiDimensionDataB mdData, int[] resultIndex) {
+	public ReductDimensionResult(MultiDimensionData mdData, int[] resultIndex) {
 		super();
 		this.mdData = mdData;
 		this.resultIndex = resultIndex;
 	}
 	
-	public MultiDimensionDataB getMdData() {
+	public MultiDimensionData getMdData() {
 		return mdData;
 	}
 	
-	public void setMdData(MultiDimensionDataB mdData) {
+	public void setMdData(MultiDimensionData mdData) {
 		this.mdData = mdData;
 	}
 	

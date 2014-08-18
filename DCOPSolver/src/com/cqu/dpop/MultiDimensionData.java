@@ -6,14 +6,14 @@ import java.util.Collections;
 import java.util.List;
 import com.cqu.util.CollectionUtil;
 
-public class MultiDimensionDataB {
+public class MultiDimensionData {
 	
 	
 	
 	private List<Dimension> dimensions;
 	private int[] data;
 
-	public MultiDimensionDataB(List<Dimension> dimentions, int[] data) {
+	public MultiDimensionData(List<Dimension> dimentions, int[] data) {
 		super();
 		this.dimensions = dimentions;
 		this.data = data;
@@ -153,13 +153,13 @@ public class MultiDimensionDataB {
 			}
 		}
 		
-		MultiDimensionDataB mdData=new MultiDimensionDataB(dimensionsNew, dataNew);
+		MultiDimensionData mdData=new MultiDimensionData(dimensionsNew, dataNew);
 		return new ReductDimensionResult(mdData, resultIndexes);
 	}
 	
-	public MultiDimensionDataB mergeDimension(MultiDimensionDataB mdDataB)
+	public MultiDimensionData mergeDimension(MultiDimensionData mdDataB)
 	{
-		MultiDimensionDataB mdDataA=this;
+		MultiDimensionData mdDataA=this;
 		
 		List<Dimension> dimensionsNew=new ArrayList<Dimension>();
 		for(Dimension dimen : mdDataA.dimensions)
@@ -168,7 +168,7 @@ public class MultiDimensionDataB {
 		}
 		for(Dimension dimen : mdDataB.dimensions)
 		{
-			if(MultiDimensionDataB.indexOf(dimensionsNew, dimen.getName())==-1)
+			if(MultiDimensionData.indexOf(dimensionsNew, dimen.getName())==-1)
 			{
 				dimensionsNew.add(dimen);
 			}
@@ -251,7 +251,7 @@ public class MultiDimensionDataB {
 			dataIndexNew++;
 		}
 		
-		return new MultiDimensionDataB(dimensionsNew, dataNew);
+		return new MultiDimensionData(dimensionsNew, dataNew);
 	}
 	
 	@Override
@@ -265,18 +265,18 @@ public class MultiDimensionDataB {
 	 */
 	public static void main(String[] args)
 	{
-		MultiDimensionDataB mdDataA, mdDataB;
+		MultiDimensionData mdDataA, mdDataB;
 		{
 			List<Dimension> dimensions=new ArrayList<Dimension>();
 			dimensions.add(new Dimension("A1", 2, 0));
 			dimensions.add(new Dimension("A2", 3, 1));
-			mdDataA=new MultiDimensionDataB(dimensions, new int[]{1, 0, 5, 3, 4, 2});
+			mdDataA=new MultiDimensionData(dimensions, new int[]{1, 0, 5, 3, 4, 2});
 		}
 		{
 			List<Dimension> dimensions=new ArrayList<Dimension>();
 			dimensions.add(new Dimension("A2", 3, 1));
 			dimensions.add(new Dimension("A3", 2, 2));
-			mdDataB=new MultiDimensionDataB(dimensions, new int[]{3, 4, 2, 5, 1, 2});
+			mdDataB=new MultiDimensionData(dimensions, new int[]{3, 4, 2, 5, 1, 2});
 		}
 
 		System.out.println(mdDataA.mergeDimension(mdDataB).toString());

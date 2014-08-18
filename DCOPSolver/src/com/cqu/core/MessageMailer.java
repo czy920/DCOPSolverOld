@@ -73,7 +73,7 @@ public class MessageMailer extends QueueMessager{
 		super.runFinished();
 		
 		this.agentManager.printResults(results);
-		Debugger.printValueChanges();
+		//Debugger.printValueChanges();
 		
 		timeEnd=System.currentTimeMillis();
 		System.out.println("Mailer stopped, totalTime: "+(timeEnd-timeStart)+"ms");

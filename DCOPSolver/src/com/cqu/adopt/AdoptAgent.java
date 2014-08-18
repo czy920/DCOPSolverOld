@@ -20,10 +20,6 @@ public class AdoptAgent extends Agent{
 	public final static String KEY_UB="KEY_UB";
 	public final static String KEY_TH="KEY_TH";
 	
-	public final static String KEY_ID="KEY_ID";
-	public final static String KEY_NAME="KEY_NAME";
-	public final static String KEY_VALUE="KEY_VALUE";
-	
 	public final static String KEY_VALUE_MESSAGE="KEY_VALUE_MESSAGE";
 	
 	private Map<Integer, int[]> lbs;

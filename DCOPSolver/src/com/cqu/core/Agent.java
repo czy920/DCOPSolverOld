@@ -12,6 +12,10 @@ import com.cqu.util.CollectionUtil;
  */
 public abstract class Agent extends QueueMessager{
 	
+	public final static String KEY_ID="KEY_ID";
+	public final static String KEY_NAME="KEY_NAME";
+	public final static String KEY_VALUE="KEY_VALUE";
+	
 	public static int QUEUE_CAPACITY=50;
 	
 	protected int id;
