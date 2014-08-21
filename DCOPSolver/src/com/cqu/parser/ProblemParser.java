@@ -8,8 +8,10 @@ import java.util.Map;
 import org.jdom2.Document;
 import org.jdom2.Element;
 
+import com.cqu.core.BFSTree;
 import com.cqu.core.DFSTree;
 import com.cqu.core.Problem;
+import com.cqu.core.TreeGenerator;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.XmlUtil;
 
@@ -56,7 +58,7 @@ public class ProblemParser {
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Problem parse()
+	public Problem parse(String treeGeneratorType)
 	{
 		Problem problem=new Problem();
 		
@@ -101,13 +103,20 @@ public class ProblemParser {
 			return null;
 		}
 		
-		DFSTree dfsTree=new DFSTree(problem.neighbourAgents);
-		dfsTree.generate();
+		TreeGenerator treeGenerator;
+		if(treeGeneratorType.equals(TreeGenerator.TREE_GENERATOR_TYPE_DFS))
+		{
+			treeGenerator=new DFSTree(problem.neighbourAgents);
+		}else
+		{
+			treeGenerator=new BFSTree(problem.neighbourAgents);
+		}
+		treeGenerator.generate();
 		
-		problem.agentLevels=dfsTree.getNodeLevels();
-		problem.parentAgents=dfsTree.getParentNode();
-		problem.childAgents=dfsTree.getChildrenNodes();
-		Map[] allParentsAndChildren=dfsTree.getAllChildrenAndParentNodes();
+		problem.agentLevels=treeGenerator.getNodeLevels();
+		problem.parentAgents=treeGenerator.getParentNode();
+		problem.childAgents=treeGenerator.getChildrenNodes();
+		Map[] allParentsAndChildren=treeGenerator.getAllChildrenAndParentNodes();
 		problem.allParentAgents=allParentsAndChildren[0];
 		problem.allChildrenAgents=allParentsAndChildren[1];
 		

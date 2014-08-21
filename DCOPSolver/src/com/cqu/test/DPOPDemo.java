@@ -6,6 +6,7 @@ import com.cqu.core.AgentManager;
 import com.cqu.core.DFSTree;
 import com.cqu.core.MessageMailer;
 import com.cqu.core.Problem;
+import com.cqu.core.TreeGenerator;
 import com.cqu.dpop.DPOPAgent;
 import com.cqu.parser.ProblemParser;
 import com.cqu.visualtree.TreeFrame;
@@ -20,7 +21,7 @@ public class DPOPDemo {
 		String instance="problems/RandomDCOP_7_3_1.xml";
 		//parse problem xml
 		ProblemParser parser=new ProblemParser(instance);
-		Problem problem=parser.parse();
+		Problem problem=parser.parse(TreeGenerator.TREE_GENERATOR_TYPE_DFS);
 		if(problem==null)
 		{
 			return;

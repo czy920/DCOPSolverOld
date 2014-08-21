@@ -2,7 +2,10 @@ package com.cqu.core;
 
 import java.util.Map;
 
-public interface DFSTreeGenerator {
+public interface TreeGenerator {
+	
+	public static final String TREE_GENERATOR_TYPE_DFS="DFS";
+	public static final String TREE_GENERATOR_TYPE_BFS="BFS";
 	
 	void generate();
 	Map<Integer, int[]> getChildrenNodes();

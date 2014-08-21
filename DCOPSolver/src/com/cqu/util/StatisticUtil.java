@@ -1,6 +1,6 @@
 package com.cqu.util;
 
-public class StatisticsUtil {
+public class StatisticUtil {
 	
 	/**
 	 * 

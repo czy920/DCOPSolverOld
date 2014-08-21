@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.util.CollectionUtil;
-import com.cqu.util.StatisticsUtil;
+import com.cqu.util.StatisticUtil;
 
-public class DFSTree implements DFSTreeGenerator{
+public class DFSTree implements TreeGenerator{
 	
 	private Map<Integer, int[]> neighbourNodes;//无向图（邻接表存储）
 	
@@ -71,7 +71,7 @@ public class DFSTree implements DFSTreeGenerator{
 				counts[i]=-1;
 			}
 		}
-		int maxIndex=StatisticsUtil.max(counts);
+		int maxIndex=StatisticUtil.max(counts);
 		if(counts[maxIndex]==-1)
 		{
 			return -1;
@@ -85,13 +85,13 @@ public class DFSTree implements DFSTreeGenerator{
 	public void generate() {
 		// TODO Auto-generated method stub
 		int iteratedCount=0;
-		Integer curFloor=0;
+		Integer curLevel=0;
 		
 		Integer curNodeId=this.rootId;
 		this.nodeIterated.put(curNodeId, true);
 		iteratedCount++;//根节点已遍历
 		this.parentNode.put(curNodeId, -1);
-		this.nodeLevel.put(curNodeId, curFloor);
+		this.nodeLevel.put(curNodeId, curLevel);
 		
 		int totalCount=neighbourNodes.size();
 		while(iteratedCount<totalCount)
@@ -99,18 +99,18 @@ public class DFSTree implements DFSTreeGenerator{
 			Integer nextNodeId=this.getMaxNeighboursNodeId(curNodeId);
 			if(nextNodeId==-1)
 			{
-				curFloor--;
+				curLevel--;
 				//回溯
 				curNodeId=this.parentNode.get(curNodeId);
 			}else
 			{
-				curFloor++;
+				curLevel++;
 				
 				this.childrenNodes.get(curNodeId).add(nextNodeId);
 				this.parentNode.put(nextNodeId, curNodeId);
 				
 				this.nodeIterated.put(nextNodeId, true);
-				this.nodeLevel.put(nextNodeId, curFloor);
+				this.nodeLevel.put(nextNodeId, curLevel);
 				iteratedCount++;
 				
 				curNodeId=nextNodeId;
@@ -147,7 +147,7 @@ public class DFSTree implements DFSTreeGenerator{
 			int[] neighbours=this.neighbourNodes.get(nodeId);
 			List<Integer> children=this.childrenNodes.get(nodeId);
 			Integer parent=this.parentNode.get(nodeId);
-			Integer floor=this.nodeLevel.get(nodeId);
+			Integer level=this.nodeLevel.get(nodeId);
 			if(parent==-1)
 			{
 				//根节点
@@ -183,7 +183,7 @@ public class DFSTree implements DFSTreeGenerator{
 						allChildrenList.add(neighbours[i]);
 					}else
 					{
-						if(floor<this.nodeLevel.get(neighbours[i]))
+						if(level<this.nodeLevel.get(neighbours[i]))
 						{
 							//在本节点之下
 							allChildrenList.add(neighbours[i]);
