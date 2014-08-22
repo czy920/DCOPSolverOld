@@ -8,8 +8,6 @@ import com.cqu.util.CollectionUtil;
 
 public class MultiDimensionData {
 	
-	
-	
 	private List<Dimension> dimensions;
 	private int[] data;
 
@@ -49,6 +47,18 @@ public class MultiDimensionData {
 			}
 		}
 		return -1;
+	}
+	
+	/**
+	 * decide if the dimension is reductable;<br/>
+	 * if the constraintCount is equal to constraintCountTotal, yes; otherwise, no;<br/>
+	 * constraintCount<=constraintCountTotal
+	 * @param dimensionName
+	 * @return
+	 */
+	public boolean isReductable(String dimensionName)
+	{
+		return this.dimensions.get(this.indexOf(dimensionName)).isReductable();
 	}
 	
 	public ReductDimensionResult reductDimension(String dimensionName, int reductDimentionMethod)
@@ -168,9 +178,13 @@ public class MultiDimensionData {
 		}
 		for(Dimension dimen : mdDataB.dimensions)
 		{
-			if(MultiDimensionData.indexOf(dimensionsNew, dimen.getName())==-1)
+			int index=MultiDimensionData.indexOf(dimensionsNew, dimen.getName());
+			if(index==-1)
 			{
 				dimensionsNew.add(dimen);
+			}else
+			{
+				dimensionsNew.get(index).mergeConstraintCount(dimen);
 			}
 		}
 		Collections.sort(dimensionsNew);
@@ -268,14 +282,14 @@ public class MultiDimensionData {
 		MultiDimensionData mdDataA, mdDataB;
 		{
 			List<Dimension> dimensions=new ArrayList<Dimension>();
-			dimensions.add(new Dimension("A1", 2, 0));
-			dimensions.add(new Dimension("A2", 3, 1));
+			dimensions.add(new Dimension("A1", 2, 0, 1));
+			dimensions.add(new Dimension("A2", 3, 1, 2));
 			mdDataA=new MultiDimensionData(dimensions, new int[]{1, 0, 5, 3, 4, 2});
 		}
 		{
 			List<Dimension> dimensions=new ArrayList<Dimension>();
-			dimensions.add(new Dimension("A2", 3, 1));
-			dimensions.add(new Dimension("A3", 2, 2));
+			dimensions.add(new Dimension("A2", 3, 1, 2));
+			dimensions.add(new Dimension("A3", 2, 2, 1));
 			mdDataB=new MultiDimensionData(dimensions, new int[]{3, 4, 2, 5, 1, 2});
 		}
 

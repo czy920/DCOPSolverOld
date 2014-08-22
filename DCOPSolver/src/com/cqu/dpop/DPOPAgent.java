@@ -166,10 +166,10 @@ public class DPOPAgent extends Agent{
 		{
 			int parentId=allParents[i];
 			int dimensionSize=neighbourDomains.get(parentId).length;
-			dimensions.add(new Dimension(parentId+"", dimensionSize, parentLevels[i]));
+			dimensions.add(new Dimension(parentId+"", dimensionSize, parentLevels[i], -1));
 			dataLength=dataLength*dimensionSize;
 		}
-		dimensions.add(new Dimension(this.id+"", this.domain.length, this.level));
+		dimensions.add(new Dimension(this.id+"", this.domain.length, this.level, this.neighbours.length));
 		dataLength=dataLength*this.domain.length;
 		//set data
 		int[] agentValueIndexes=new int[allParents.length+1];
