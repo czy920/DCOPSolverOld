@@ -9,14 +9,24 @@ public class Dimension implements Comparable<Dimension>{
 	private int constraintCountTotal;
 	private int constraintCount;
 	
-	public Dimension(String name, int size, Integer priority, int constraintCountTotal) {
+	public Dimension(String name, int size, Integer priority) {
+		super();
+		this.name = name;
+		this.size = size;
+		this.priority = priority;
+		
+		this.constraintCountTotal=Integer.MAX_VALUE;
+		this.constraintCount=0;
+	}
+	
+	public Dimension(String name, int size, Integer priority, int constraintCountTotal, int constraintCount) {
 		super();
 		this.name = name;
 		this.size = size;
 		this.priority = priority;
 		
 		this.constraintCountTotal=constraintCountTotal;
-		this.constraintCount=0;
+		this.constraintCount=constraintCount;
 	}
 	
 	public Dimension(Dimension dimen)

@@ -21,11 +21,8 @@ public class BFSDPOPAgent extends Agent{
 	
 	public final static String KEY_TOTAL_COST="KEY_TOTAL_COST";
 	
-	private Integer[] parentLevels;
 	private int disposedChildrenCount;
-	private int[] reductDimensionResultIndexes;
 	private MultiDimensionData rawMDData;
-	private List<Dimension> dimensions;
 	
 	private Map<Integer, Integer> allParentValueIndexes;
 	private int totalCost;
@@ -36,12 +33,17 @@ public class BFSDPOPAgent extends Agent{
 		QUEUE_CAPACITY=-1;
 	}
 	
+	private Map<Integer, int[]> reductDimensionResultIndexList;
+	private Map<Integer, List<Dimension>> dimensionList;
+	
 	public BFSDPOPAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
 		disposedChildrenCount=0;
 		allParentValueIndexes=new HashMap<Integer, Integer>();
 		totalCost=0;
+		reductDimensionResultIndexList=new HashMap<Integer, int[]>();
+		dimensionList=new HashMap<Integer, List<Dimension>>();
 	}
 	
 	@Override
@@ -61,23 +63,19 @@ public class BFSDPOPAgent extends Agent{
 			}
 		}
 		
-		parentLevels=new Integer[allParents.length];
-		for(int i=0;i<allParents.length;i++)
-		{
-			parentLevels[i]=neighbourLevels.get(allParents[i]);
-		}
-		
 		if(this.isRootAgent()==false)
 		{
 			rawMDData=this.computeLocalUtils();
 		}
 		if(this.isLeafAgent()==true)
 		{
-			ReductDimensionResult result=rawMDData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
-			rawMDData=result.getMdData();
-			dimensions=rawMDData.getDimensions();
-			reductDimensionResultIndexes=result.getResultIndex();
-			
+			if(rawMDData.isReductable(this.id+"")==true)
+			{
+				ReductDimensionResult result=rawMDData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
+				rawMDData=result.getMdData();
+				dimensions=rawMDData.getDimensions();
+				reductDimensionResultIndexList.put(this.id, result.getResultIndex());
+			}
 			sendUtilMessage(rawMDData);
 		}
 	}
@@ -180,32 +178,48 @@ public class BFSDPOPAgent extends Agent{
 	{
 		int dataLength=1;
 		List<Dimension> dimensions=new ArrayList<Dimension>();
-		for(int i=0;i<allParents.length;i++)
+		List<Integer> relatedNodes=new ArrayList<Integer>();
+		for(int i=0;i<neighbours.length;i++)
 		{
-			int parentId=allParents[i];
-			int dimensionSize=neighbourDomains.get(parentId).length;
-			dimensions.add(new Dimension(parentId+"", dimensionSize, parentLevels[i], -1));
-			dataLength=dataLength*dimensionSize;
+			if(this.isCrossNeighbours[i]==false)
+			{
+				int parentId=neighbours[i];
+				int dimensionSize=neighbourDomains.get(parentId).length;
+				dimensions.add(new Dimension(parentId+"", dimensionSize, neighbourLevels.get(parentId)));
+				dataLength=dataLength*dimensionSize;
+				relatedNodes.add(parentId);
+			}else
+			{
+				int crossNeighbourId=neighbours[i];
+				//for crossing constraint edges, current agent just consider those whose ids are larger than its.
+				if(this.id<crossNeighbourId)
+				{
+					int dimensionSize=neighbourDomains.get(crossNeighbourId).length;
+					dimensions.add(new Dimension(crossNeighbourId+"", dimensionSize, neighbourLevels.get(crossNeighbourId), Integer.MAX_VALUE, 1));
+					dataLength=dataLength*dimensionSize;
+					relatedNodes.add(crossNeighbourId);
+				}
+			}
 		}
-		dimensions.add(new Dimension(this.id+"", this.domain.length, this.level, this.neighbours.length));
+		dimensions.add(new Dimension(this.id+"", this.domain.length, this.level, this.neighbours.length, relatedNodes.size()));
 		dataLength=dataLength*this.domain.length;
 		//set data
-		int[] agentValueIndexes=new int[allParents.length+1];
+		int[] agentValueIndexes=new int[relatedNodes.size()+1];
 		int[] data=new int[dataLength];
 		int dataIndex=0;
 		int curDimention=agentValueIndexes.length-1;
 		while(dataIndex<data.length)
 		{
 			int costSum=0;
-			for(int i=0;i<allParents.length;i++)
+			for(int i=0;i<relatedNodes.size();i++)
 			{
 				//保证id小的为行，id大的为列
-				if(this.id<allParents[i])
+				if(this.id<relatedNodes.get(i))
 				{
-					costSum+=this.constraintCosts.get(allParents[i])[agentValueIndexes[agentValueIndexes.length-1]][agentValueIndexes[i]];
+					costSum+=this.constraintCosts.get(relatedNodes.get(i))[agentValueIndexes[agentValueIndexes.length-1]][agentValueIndexes[i]];
 				}else
 				{
-					costSum+=this.constraintCosts.get(allParents[i])[agentValueIndexes[i]][agentValueIndexes[agentValueIndexes.length-1]];
+					costSum+=this.constraintCosts.get(relatedNodes.get(i))[agentValueIndexes[i]][agentValueIndexes[agentValueIndexes.length-1]];
 				}
 			}
 			data[dataIndex]=costSum;
@@ -238,32 +252,41 @@ public class BFSDPOPAgent extends Agent{
 		{
 			rawMDData=rawMDData.mergeDimension((MultiDimensionData) msg.getValue());
 		}
+		rawMDData.getDimensions().get(rawMDData.indexOf(this.id+"")).setConstraintCountTotal(this.neighbours.length);
 		
 		disposedChildrenCount++;
 		if(disposedChildrenCount>=this.children.length)
 		{
 			//所有子节点(包括伪子节点)的UtilMessage都已收集完毕，
 			//则可以进行针对本节点的降维，将最终得到的UtilMessage再往父节点发送
-			ReductDimensionResult result=rawMDData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
-			this.reductDimensionResultIndexes=result.getResultIndex();
-			
-			dimensions=result.getMdData().getDimensions();
+			List<Dimension> dimenList=rawMDData.getDimensions();
+			for(Dimension dimen : dimenList)
+			{
+				if(rawMDData.isReductable(dimen.getName())==true)
+				{
+					int agentId=Integer.parseInt(dimen.getName());
+					ReductDimensionResult result=rawMDData.reductDimension(dimen.getName(), ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
+					reductDimensionResultIndexList.put(agentId, result.getResultIndex());
+					rawMDData=result.getMdData();
+					dimensionList.put(agentId, rawMDData.getDimensions());
+				}
+			}
 			
 			if(this.isRootAgent()==true)
 			{
-				this.totalCost=result.getMdData().getData()[0];
-				this.valueIndex=this.reductDimensionResultIndexes[0];
+				this.totalCost=rawMDData.getData()[0];
+				this.valueIndex=reductDimensionResultIndexList.get(this.id)[0];
 				sendValueMessage(this.valueIndex);
 				
 				this.stopRunning();
 			}else
 			{
-				this.sendUtilMessage(result.getMdData());
+				this.sendUtilMessage(rawMDData);
 			}
 		}
 	}
 	
-	private void sendValueMessage(int valueIndex)
+	private void sendValueMessage(HashMap<Integer, Integer> valueIndexes)
 	{
 		if(this.isLeafAgent()==true)
 		{
@@ -271,7 +294,7 @@ public class BFSDPOPAgent extends Agent{
 		}
 		for(int i=0;i<this.allChildren.length;i++)
 		{
-			Message valueMsg=new Message(this.id, this.allChildren[i], TYPE_VALUE_MESSAGE, valueIndex);
+			Message valueMsg=new Message(this.id, this.allChildren[i], TYPE_VALUE_MESSAGE, valueIndexes);
 			this.sendMessage(valueMsg);
 		}
 	}

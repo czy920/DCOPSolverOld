@@ -282,14 +282,14 @@ public class MultiDimensionData {
 		MultiDimensionData mdDataA, mdDataB;
 		{
 			List<Dimension> dimensions=new ArrayList<Dimension>();
-			dimensions.add(new Dimension("A1", 2, 0, 1));
-			dimensions.add(new Dimension("A2", 3, 1, 2));
+			dimensions.add(new Dimension("A1", 2, 0));
+			dimensions.add(new Dimension("A2", 3, 1));
 			mdDataA=new MultiDimensionData(dimensions, new int[]{1, 0, 5, 3, 4, 2});
 		}
 		{
 			List<Dimension> dimensions=new ArrayList<Dimension>();
-			dimensions.add(new Dimension("A2", 3, 1, 2));
-			dimensions.add(new Dimension("A3", 2, 2, 1));
+			dimensions.add(new Dimension("A2", 3, 1));
+			dimensions.add(new Dimension("A3", 2, 2));
 			mdDataB=new MultiDimensionData(dimensions, new int[]{3, 4, 2, 5, 1, 2});
 		}
 
