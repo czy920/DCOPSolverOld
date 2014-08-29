@@ -24,7 +24,6 @@ public class BFSDPOPAgent extends Agent{
 	private int disposedChildrenCount;
 	private MultiDimensionData rawMDData;
 	
-	private Map<Integer, Integer> allParentValueIndexes;
 	private int totalCost;
 	
 	private boolean[] isCrossNeighbours;
@@ -34,16 +33,15 @@ public class BFSDPOPAgent extends Agent{
 	}
 	
 	private Map<Integer, int[]> reductDimensionResultIndexList;
-	private Map<Integer, List<Dimension>> dimensionList;
+	private Map<Integer, List<Dimension>> dimensionLists;
 	
 	public BFSDPOPAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
 		disposedChildrenCount=0;
-		allParentValueIndexes=new HashMap<Integer, Integer>();
 		totalCost=0;
 		reductDimensionResultIndexList=new HashMap<Integer, int[]>();
-		dimensionList=new HashMap<Integer, List<Dimension>>();
+		dimensionLists=new HashMap<Integer, List<Dimension>>();
 	}
 	
 	@Override
@@ -73,7 +71,7 @@ public class BFSDPOPAgent extends Agent{
 			{
 				ReductDimensionResult result=rawMDData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
 				rawMDData=result.getMdData();
-				dimensions=rawMDData.getDimensions();
+				dimensionLists.put(this.id, rawMDData.getDimensions());
 				reductDimensionResultIndexList.put(this.id, result.getResultIndex());
 			}
 			sendUtilMessage(rawMDData);
@@ -259,16 +257,17 @@ public class BFSDPOPAgent extends Agent{
 		{
 			//所有子节点(包括伪子节点)的UtilMessage都已收集完毕，
 			//则可以进行针对本节点的降维，将最终得到的UtilMessage再往父节点发送
-			List<Dimension> dimenList=rawMDData.getDimensions();
-			for(Dimension dimen : dimenList)
+			List<Dimension> dimens=rawMDData.getDimensions();
+			for(int i=dimens.size()-1;i>-1;i--)
 			{
+				Dimension dimen=dimens.get(i);
 				if(rawMDData.isReductable(dimen.getName())==true)
 				{
 					int agentId=Integer.parseInt(dimen.getName());
 					ReductDimensionResult result=rawMDData.reductDimension(dimen.getName(), ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
 					reductDimensionResultIndexList.put(agentId, result.getResultIndex());
 					rawMDData=result.getMdData();
-					dimensionList.put(agentId, rawMDData.getDimensions());
+					dimensionLists.put(agentId, rawMDData.getDimensions());
 				}
 			}
 			
@@ -276,7 +275,18 @@ public class BFSDPOPAgent extends Agent{
 			{
 				this.totalCost=rawMDData.getData()[0];
 				this.valueIndex=reductDimensionResultIndexList.get(this.id)[0];
-				sendValueMessage(this.valueIndex);
+				Map<Integer, Integer> valueIndexes=new HashMap<Integer, Integer>();
+				valueIndexes.put(this.id, this.valueIndex);
+				Integer[] keys=new ListSizeComparator<Dimension>(dimensionLists).sort();
+				if(dimensionLists.size()>1)
+				{
+					for(int i=1;i<keys.length;i++)
+					{
+						this.calValueIndex(keys[i], dimensionLists.get(keys[i]), reductDimensionResultIndexList.get(keys[i]), valueIndexes);
+					}
+				}
+				
+				sendValueMessage(valueIndexes);
 				
 				this.stopRunning();
 			}else
@@ -286,43 +296,56 @@ public class BFSDPOPAgent extends Agent{
 		}
 	}
 	
-	private void sendValueMessage(HashMap<Integer, Integer> valueIndexes)
+	private void sendValueMessage(Map<Integer, Integer> valueIndexes)
 	{
 		if(this.isLeafAgent()==true)
 		{
 			return;
 		}
-		for(int i=0;i<this.allChildren.length;i++)
+		//only send valueIndexes to children
+		for(int i=0;i<this.children.length;i++)
 		{
-			Message valueMsg=new Message(this.id, this.allChildren[i], TYPE_VALUE_MESSAGE, valueIndexes);
+			Message valueMsg=new Message(this.id, this.children[i], TYPE_VALUE_MESSAGE, valueIndexes);
 			this.sendMessage(valueMsg);
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void disposeValueMessage(Message msg)
 	{
-		allParentValueIndexes.put(msg.getIdSender(), (Integer) msg.getValue());
-		if(allParentValueIndexes.size()>=this.allParents.length)
+		Map<Integer, Integer> valueIndexes=(Map<Integer, Integer>) msg.getValue();
+		
+		Integer[] keys=new ListSizeComparator<Dimension>(dimensionLists).sort();
+		for(int i=0;i<keys.length;i++)
 		{
-			int[] periods=new int[dimensions.size()];
-			for(int i=0;i<dimensions.size();i++)
-			{
-				int temp=1;
-				for(int j=i+1;j<dimensions.size();j++)
-				{
-					temp*=dimensions.get(j).getSize();
-				}
-				periods[i]=temp;
-			}
-			int index=0;
-			for(int i=0;i<periods.length;i++)
-			{
-				index+=allParentValueIndexes.get(Integer.parseInt(dimensions.get(i).getName()))*periods[i];
-			}
-			this.valueIndex=this.reductDimensionResultIndexes[index];
-			this.sendValueMessage(this.valueIndex);
-			
-			this.stopRunning();
+			this.calValueIndex(keys[i], dimensionLists.get(keys[i]), reductDimensionResultIndexList.get(keys[i]), valueIndexes);
 		}
+		this.valueIndex=valueIndexes.get(this.id);
+		
+		valueIndexes.remove(this.id);
+		this.sendValueMessage(valueIndexes);
+		
+		this.stopRunning();
+	}
+	
+	private Map<Integer, Integer> calValueIndex(int agentId, List<Dimension> dimensions, int[] reductDimensionResultIndexes, Map<Integer, Integer> otherDimensionValueIndexes)
+	{
+		int[] periods=new int[dimensions.size()];
+		for(int i=0;i<dimensions.size();i++)
+		{
+			int temp=1;
+			for(int j=i+1;j<dimensions.size();j++)
+			{
+				temp*=dimensions.get(j).getSize();
+			}
+			periods[i]=temp;
+		}
+		int index=0;
+		for(int i=0;i<periods.length;i++)
+		{
+			index+=otherDimensionValueIndexes.get(Integer.parseInt(dimensions.get(i).getName()))*periods[i];
+		}
+		otherDimensionValueIndexes.put(agentId, reductDimensionResultIndexes[index]);
+		return otherDimensionValueIndexes;
 	}
 }

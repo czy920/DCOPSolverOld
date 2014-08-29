@@ -53,6 +53,7 @@ public class Dimension implements Comparable<Dimension>{
 
 	public void mergeConstraintCount(Dimension dimen) {
 		this.constraintCount +=dimen.constraintCount;
+		this.constraintCountTotal=Math.min(this.constraintCountTotal, dimen.constraintCountTotal);
 	}
 	
 	public void setConstraintCountTotal(int constraintCountTotal) {
