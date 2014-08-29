@@ -128,4 +128,14 @@ public class CollectionUtil {
 		str+=arr[arr.length-1]+"]";
 		return str;
 	}
+	
+	public static Map<Integer, Integer> copy(Map<Integer, Integer> rawData)
+	{
+		Map<Integer, Integer> copiedData=new HashMap<Integer, Integer>();
+		for(Integer key : rawData.keySet())
+		{
+			copiedData.put(key, rawData.get(key));
+		}
+		return copiedData;
+	}
 }

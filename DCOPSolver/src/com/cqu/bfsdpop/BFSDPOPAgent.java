@@ -179,14 +179,7 @@ public class BFSDPOPAgent extends Agent{
 		List<Integer> relatedNodes=new ArrayList<Integer>();
 		for(int i=0;i<neighbours.length;i++)
 		{
-			if(this.isCrossNeighbours[i]==false)
-			{
-				int parentId=neighbours[i];
-				int dimensionSize=neighbourDomains.get(parentId).length;
-				dimensions.add(new Dimension(parentId+"", dimensionSize, neighbourLevels.get(parentId)));
-				dataLength=dataLength*dimensionSize;
-				relatedNodes.add(parentId);
-			}else
+			if(this.isCrossNeighbours[i]==true)
 			{
 				int crossNeighbourId=neighbours[i];
 				//for crossing constraint edges, current agent just consider those whose ids are larger than its.
@@ -199,8 +192,18 @@ public class BFSDPOPAgent extends Agent{
 				}
 			}
 		}
-		dimensions.add(new Dimension(this.id+"", this.domain.length, this.level, this.neighbours.length, relatedNodes.size()));
-		dataLength=dataLength*this.domain.length;
+		{
+			int parentId=this.parent;
+			int dimensionSize=neighbourDomains.get(parentId).length;
+			dimensions.add(new Dimension(parentId+"", dimensionSize, neighbourLevels.get(parentId), Integer.MAX_VALUE, 1));
+			dataLength=dataLength*dimensionSize;
+			relatedNodes.add(parentId);
+		}
+		{
+			dimensions.add(new Dimension(this.id+"", this.domain.length, this.level, this.neighbours.length, relatedNodes.size()));
+			dataLength=dataLength*this.domain.length;
+		}
+		
 		//set data
 		int[] agentValueIndexes=new int[relatedNodes.size()+1];
 		int[] data=new int[dataLength];
@@ -305,7 +308,7 @@ public class BFSDPOPAgent extends Agent{
 		//only send valueIndexes to children
 		for(int i=0;i<this.children.length;i++)
 		{
-			Message valueMsg=new Message(this.id, this.children[i], TYPE_VALUE_MESSAGE, valueIndexes);
+			Message valueMsg=new Message(this.id, this.children[i], TYPE_VALUE_MESSAGE, CollectionUtil.copy(valueIndexes));
 			this.sendMessage(valueMsg);
 		}
 	}
@@ -314,7 +317,7 @@ public class BFSDPOPAgent extends Agent{
 	private void disposeValueMessage(Message msg)
 	{
 		Map<Integer, Integer> valueIndexes=(Map<Integer, Integer>) msg.getValue();
-		
+
 		Integer[] keys=new ListSizeComparator<Dimension>(dimensionLists).sort();
 		for(int i=0;i<keys.length;i++)
 		{
@@ -322,7 +325,7 @@ public class BFSDPOPAgent extends Agent{
 		}
 		this.valueIndex=valueIndexes.get(this.id);
 		
-		valueIndexes.remove(this.id);
+		valueIndexes.remove(this.parent);
 		this.sendValueMessage(valueIndexes);
 		
 		this.stopRunning();

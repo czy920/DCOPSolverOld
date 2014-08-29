@@ -18,7 +18,7 @@ public class BFSDPOPDemo {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String instance="problems/RandomDCOP_4_2_1.xml";
+		String instance="problems/RandomDCOP_7_3_1.xml";
 		//parse problem xml
 		ProblemParser parser=new ProblemParser(instance);
 		Problem problem=parser.parse(TreeGenerator.TREE_GENERATOR_TYPE_BFS);
