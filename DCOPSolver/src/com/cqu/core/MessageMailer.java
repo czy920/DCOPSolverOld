@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.test.Debugger;
+import com.cqu.util.FormatUtil;
 
 public class MessageMailer extends QueueMessager{
 	
@@ -16,11 +17,17 @@ public class MessageMailer extends QueueMessager{
 	private long timeStart=0;
 	private long timeEnd=0;
 	
+	private int messageQuantity;
+	private int messageLostQuantity;
+	
 	public MessageMailer(AgentManager agentManager) {
 		// TODO Auto-generated constructor stub
 		super("Mailer", QUEUE_CAPACITY);
 		this.agentManager=agentManager;
 		results=new ArrayList<Map<String, Object>>();
+		
+		messageQuantity=0;
+		messageLostQuantity=0;
 	}
 	
 	public void setResult(Map<String, Object> result)
@@ -47,12 +54,16 @@ public class MessageMailer extends QueueMessager{
 	@Override
 	protected void disposeMessage(Message msg) {
 		// TODO Auto-generated method stub
+		messageQuantity++;
+		
 		agentManager.getAgent(msg.getIdReceiver()).addMessage(msg);
 	}
 
 	@Override
 	protected void messageLost(Message msg) {
 		// TODO Auto-generated method stub
+		messageLostQuantity++;
+		
 		if(Debugger.debugOn==true)
 		{
 			System.out.println(Thread.currentThread().getName()+": message lost "+this.easyMessageContent(msg));
@@ -73,6 +84,10 @@ public class MessageMailer extends QueueMessager{
 		super.runFinished();
 		
 		this.agentManager.printResults(results);
+		System.out.println(
+				"messageQuantity="+messageQuantity+
+				" messageLostQuantity="+messageLostQuantity+
+				" lostRatio="+FormatUtil.format(messageLostQuantity*100.0/(messageQuantity+messageLostQuantity), "#.0")+"%");
 		//Debugger.printValueChanges();
 		
 		timeEnd=System.currentTimeMillis();
