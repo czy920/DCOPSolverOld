@@ -20,6 +20,8 @@ public class MessageMailer extends QueueMessager{
 	private int messageQuantity;
 	private int messageLostQuantity;
 	
+	private List<EventListener> eventListeners;
+	
 	public MessageMailer(AgentManager agentManager) {
 		// TODO Auto-generated constructor stub
 		super("Mailer", QUEUE_CAPACITY);
@@ -28,6 +30,8 @@ public class MessageMailer extends QueueMessager{
 		
 		messageQuantity=0;
 		messageLostQuantity=0;
+		
+		eventListeners=new ArrayList<EventListener>();
 	}
 	
 	public void setResult(Map<String, Object> result)
@@ -92,5 +96,20 @@ public class MessageMailer extends QueueMessager{
 		
 		timeEnd=System.currentTimeMillis();
 		System.out.println("Mailer stopped, totalTime: "+(timeEnd-timeStart)+"ms");
+		
+		for(EventListener el : this.eventListeners)
+		{
+			el.onFinished();
+		}
+	}
+	
+	public void addEventListener(EventListener el)
+	{
+		this.eventListeners.add(el);
+	}
+	
+	public void removeEventListener(EventListener el)
+	{
+		this.eventListeners.remove(el);
 	}
 }

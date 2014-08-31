@@ -4,10 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cqu.adopt.AdoptAgent;
+import com.cqu.bfsdpop.BFSDPOPAgent;
+import com.cqu.dpop.DPOPAgent;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FileUtil;
 
 public class AgentManager {
+	
+	public static final String[] AGENT_TYPES=new String[]{"ADOPT", "DPOP", "BFSDPOP"};
 	
 	private Map<Integer, Agent> agents;
 	
@@ -97,5 +102,40 @@ public class AgentManager {
 		Agent senderAgent=this.getAgent(msg.getIdSender());
 		Agent receiverAgent=this.getAgent(msg.getIdReceiver());
 		return senderAgent.easyMessageContent(msg, senderAgent, receiverAgent);
+	}
+	
+	public static AgentConstructor getAgentConstructor(String agentType)
+	{
+		if(agentType.equals("DPOP"))
+		{
+            return new AgentConstructor() {
+				
+				@Override
+				public Agent constructAgent(int id, String name, int level, int[] domain) {
+					// TODO Auto-generated method stub
+					return new DPOPAgent(id, name, level, domain);
+				}
+			};
+		}else if(agentType.equals("BFSDPOP"))
+		{
+            return new AgentConstructor() {
+				
+				@Override
+				public Agent constructAgent(int id, String name, int level, int[] domain) {
+					// TODO Auto-generated method stub
+					return new BFSDPOPAgent(id, name, level, domain);
+				}
+			};
+		}else
+		{
+            return new AgentConstructor() {
+				
+				@Override
+				public Agent constructAgent(int id, String name, int level, int[] domain) {
+					// TODO Auto-generated method stub
+					return new AdoptAgent(id, name, level, domain);
+				}
+			};
+		}
 	}
 }

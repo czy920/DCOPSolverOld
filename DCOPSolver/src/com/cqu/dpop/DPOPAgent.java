@@ -8,6 +8,7 @@ import java.util.Map;
 import com.cqu.core.Agent;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
+import com.cqu.util.CollectionUtil;
 
 public class DPOPAgent extends Agent{
 
@@ -22,7 +23,6 @@ public class DPOPAgent extends Agent{
 	private MultiDimensionData rawMDData;
 	private List<Dimension> dimensions;
 	
-	private Map<Integer, Integer> allParentValueIndexes;
 	private int totalCost;
 	
 	{
@@ -34,7 +34,6 @@ public class DPOPAgent extends Agent{
 		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
 		disposedChildrenCount=0;
-		allParentValueIndexes=new HashMap<Integer, Integer>();
 		totalCost=0;
 	}
 	
@@ -228,14 +227,16 @@ public class DPOPAgent extends Agent{
 			//则可以进行针对本节点的降维，将最终得到的UtilMessage再往父节点发送
 			ReductDimensionResult result=rawMDData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
 			this.reductDimensionResultIndexes=result.getResultIndex();
-			
 			dimensions=result.getMdData().getDimensions();
 			
 			if(this.isRootAgent()==true)
 			{
 				this.totalCost=result.getMdData().getData()[0];
 				this.valueIndex=this.reductDimensionResultIndexes[0];
-				sendValueMessage(this.valueIndex);
+				
+				Map<Integer, Integer> valueIndexes=new HashMap<Integer, Integer>();
+				valueIndexes.put(this.id, this.valueIndex);
+				sendValueMessage(valueIndexes);
 				
 				this.stopRunning();
 			}else
@@ -245,44 +246,46 @@ public class DPOPAgent extends Agent{
 		}
 	}
 	
-	private void sendValueMessage(int valueIndex)
+	private void sendValueMessage(Map<Integer, Integer> valueIndexes)
 	{
 		if(this.isLeafAgent()==true)
 		{
 			return;
 		}
-		for(int i=0;i<this.allChildren.length;i++)
+		//only send valueIndexes to children
+		for(int i=0;i<this.children.length;i++)
 		{
-			Message valueMsg=new Message(this.id, this.allChildren[i], TYPE_VALUE_MESSAGE, valueIndex);
+			Message valueMsg=new Message(this.id, this.children[i], TYPE_VALUE_MESSAGE, CollectionUtil.copy(valueIndexes));
 			this.sendMessage(valueMsg);
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void disposeValueMessage(Message msg)
 	{
-		allParentValueIndexes.put(msg.getIdSender(), (Integer) msg.getValue());
-		if(allParentValueIndexes.size()>=this.allParents.length)
+		Map<Integer, Integer> valueIndexes=(Map<Integer, Integer>) msg.getValue();
+		
+		int[] periods=new int[dimensions.size()];
+		for(int i=0;i<dimensions.size();i++)
 		{
-			int[] periods=new int[dimensions.size()];
-			for(int i=0;i<dimensions.size();i++)
+			int temp=1;
+			for(int j=i+1;j<dimensions.size();j++)
 			{
-				int temp=1;
-				for(int j=i+1;j<dimensions.size();j++)
-				{
-					temp*=dimensions.get(j).getSize();
-				}
-				periods[i]=temp;
+				temp*=dimensions.get(j).getSize();
 			}
-			int index=0;
-			for(int i=0;i<periods.length;i++)
-			{
-				index+=allParentValueIndexes.get(Integer.parseInt(dimensions.get(i).getName()))*periods[i];
-			}
-			this.valueIndex=this.reductDimensionResultIndexes[index];
-			this.sendValueMessage(this.valueIndex);
-			
-			this.stopRunning();
+			periods[i]=temp;
 		}
+		int index=0;
+		for(int i=0;i<periods.length;i++)
+		{
+			index+=valueIndexes.get(Integer.parseInt(dimensions.get(i).getName()))*periods[i];
+		}
+		this.valueIndex=this.reductDimensionResultIndexes[index];
+		
+		valueIndexes.put(this.id, this.valueIndex);
+		this.sendValueMessage(valueIndexes);
+		
+		this.stopRunning();
 	}
 
 }
