@@ -6,6 +6,7 @@ import java.util.Map;
 import com.cqu.core.Agent;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
+import com.cqu.core.MessageNCCC;
 import com.cqu.test.Debugger;
 
 public class AdoptAgent extends Agent{
@@ -19,6 +20,7 @@ public class AdoptAgent extends Agent{
 	public final static String KEY_LB="KEY_LB";
 	public final static String KEY_UB="KEY_UB";
 	public final static String KEY_TH="KEY_TH";
+	public final static String KEY_NCCC="KEY_NCCC";
 	
 	public final static String KEY_VALUE_MESSAGE="KEY_VALUE_MESSAGE";
 	
@@ -31,12 +33,14 @@ public class AdoptAgent extends Agent{
 	
 	private Map<Integer, Context[]> contexts;
 	private Context currentContext;
-	
 	private boolean terminateReceivedFromParent=false;
+	
+	private int nccc;
 	
 	public AdoptAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
+		this.nccc=0;
 	}
 	
 	@Override
@@ -95,7 +99,7 @@ public class AdoptAgent extends Agent{
 		{
 			childId=this.allChildren[i];
 			Message msg=new Message(this.id, childId, AdoptAgent.TYPE_VALUE_MESSAGE, valueIndex);
-			this.sendMessage(msg);
+			this.sendMessage(this.constructNcccMessage(msg));
 		}
 	}
 	
@@ -112,7 +116,7 @@ public class AdoptAgent extends Agent{
 		cost.put(AdoptAgent.KEY_UB, UB);
 		
 		Message msg=new Message(this.id, this.parent, AdoptAgent.TYPE_COST_MESSAGE, cost);
-		this.sendMessage(msg);
+		this.sendMessage(this.constructNcccMessage(msg));
 	}
 	
 	private void sendThresholdMessages()
@@ -131,7 +135,7 @@ public class AdoptAgent extends Agent{
 			thresh.put(AdoptAgent.KEY_TH, this.ths.get(childId)[valueIndex]);
 			
 			Message msg=new Message(this.id, childId, AdoptAgent.TYPE_THRESHOLD_MESSAGE, thresh);
-			this.sendMessage(msg);
+			this.sendMessage(this.constructNcccMessage(msg));
 		}
 	}
 	
@@ -161,10 +165,10 @@ public class AdoptAgent extends Agent{
 			
 			Map<String, Object> mapValue=new HashMap<String, Object>();
 			mapValue.put(KEY_CONTEXT, c);
-			mapValue.put(KEY_VALUE_MESSAGE, valueMsg);
+			mapValue.put(KEY_VALUE_MESSAGE, this.constructNcccMessage(valueMsg));
 			
 			Message msg=new Message(this.id, childId, AdoptAgent.TYPE_TERMINATE_MESSAGE, mapValue);
-			this.sendMessage(msg);
+			this.sendMessage(this.constructNcccMessage(msg));
 		}
 		
 		if(this.pseudoChildren!=null)
@@ -176,8 +180,8 @@ public class AdoptAgent extends Agent{
 				
 				Message valueMsg=new Message(this.id, pseudoChildId, AdoptAgent.TYPE_VALUE_MESSAGE, valueIndex);
 				
-				Message msg=new Message(this.id, pseudoChildId, AdoptAgent.TYPE_TERMINATE_MESSAGE, valueMsg);
-				this.sendMessage(msg);
+				Message msg=new Message(this.id, pseudoChildId, AdoptAgent.TYPE_TERMINATE_MESSAGE, this.constructNcccMessage(valueMsg));
+				this.sendMessage(this.constructNcccMessage(msg));
 			}
 		}
 	}
@@ -209,6 +213,9 @@ public class AdoptAgent extends Agent{
 			System.out.println(Thread.currentThread().getName()+": message got in agent "+
 					this.name+" "+this.msgMailer.easyMessageContent(msg)+" | VALUE="+this.domain[valueIndex]+" LB="+this.LB+" UB="+Infinity.infinityEasy(this.UB)+" TH="+Infinity.infinityEasy(this.TH));
 		}
+		
+		//do nccc message here
+		this.increaseNcccFromMessage((MessageNCCC)msg);
 		
 		int type=msg.getType();
 		if(type==AdoptAgent.TYPE_VALUE_MESSAGE)
@@ -518,6 +525,10 @@ public class AdoptAgent extends Agent{
 		int dMinimizesLB=ret[0];
 		int LB_CurValue=ret[1];
 		int dMinimizesUB=ret[2];
+		
+		//do nccc local here
+		this.increaseNcccLocal();
+		
 		if(this.TH==this.UB)
 		{
 			if(this.valueIndex!=dMinimizesUB)
@@ -546,6 +557,33 @@ public class AdoptAgent extends Agent{
 			}
 		}
 		sendCostMessage();
+	}
+	
+	/**
+	 * Non-concurrent constraint checks (NCCCs):NCCCs are a weighted sum of processing<br/>
+	 * and communication time. Every agent A maintains a counter NCCC(A), which is <br/>
+	 * initialized to 0. The agent assigns NCCC(A):= NCCC(A)+1 every time it performs <br/>
+	 * a constraint check to account for the time it takes to perform the constraint<br/>
+	 * check. It assigns NCCC(A):=max{NCCC(A), NCCC(B)+t} every time it receives a <br/>
+	 * message from agent B to account for the time it takes to wait for agent B to<br/>
+	 * send the message (NCCC(B)) and the transmission time of the message (t). We use<br/> 
+	 * t = 0 to simulate fast communication and t = 1000 to simulate slow communication.<br/> 
+	 * The number of NCCCs then is the largest counter value of any agent.<br/>
+	 */
+	private void increaseNcccLocal()
+	{
+		this.nccc++;
+	}
+	
+	private void increaseNcccFromMessage(MessageNCCC mn)
+	{
+		int t=0;
+		this.nccc=Math.max(mn.getNccc()+t, this.nccc);
+	}
+	
+	private Message constructNcccMessage(Message msg)
+	{
+		return new MessageNCCC(msg, this.nccc);
 	}
 	
 	private void maintainThresholdInvariant()
@@ -661,6 +699,7 @@ public class AdoptAgent extends Agent{
 		result.put(AdoptAgent.KEY_LB, this.LB);
 		result.put(AdoptAgent.KEY_UB, this.UB);
 		result.put(AdoptAgent.KEY_TH, this.TH);
+		result.put(AdoptAgent.KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
 		
@@ -671,6 +710,7 @@ public class AdoptAgent extends Agent{
 	public void printResults(List<Map<String, Object>> results) {
 		// TODO Auto-generated method stub
 		int totalCost=-1;
+		int maxNccc=0;
 		for(Map<String, Object> result : results)
 		{
 			int id_=(Integer) result.get(AdoptAgent.KEY_ID);
@@ -679,6 +719,11 @@ public class AdoptAgent extends Agent{
 			int LB_=(Integer) result.get(AdoptAgent.KEY_LB);
 			int UB_=(Integer) result.get(AdoptAgent.KEY_UB);
 			int TH_=(Integer) result.get(AdoptAgent.KEY_TH);
+			int ncccTemp=(Integer) result.get(AdoptAgent.KEY_NCCC);
+			if(maxNccc<ncccTemp)
+			{
+				maxNccc=ncccTemp;
+			}
 			if(totalCost==-1)
 			{
 				totalCost=UB_;
@@ -689,7 +734,7 @@ public class AdoptAgent extends Agent{
 			displayStr+=" TH="+Infinity.infinityEasy(TH_);
 			System.out.println(displayStr);
 		}
-		System.out.println("totalCost: "+Infinity.infinityEasy(totalCost));
+		System.out.println("totalCost: "+Infinity.infinityEasy(totalCost)+" NCCC: "+maxNccc);
 	}
 
 	@Override
