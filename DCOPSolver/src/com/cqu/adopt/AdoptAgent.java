@@ -186,25 +186,6 @@ public class AdoptAgent extends Agent{
 			}
 		}
 	}
-	
-	/*private void sendTerminateMessages()
-	{
-		if(this.isLeafAgent()==true)
-		{
-			return;
-		}
-		
-		int childId=0;
-		for(int i=0;i<this.children.length;i++)
-		{
-			childId=this.children[i];
-			Context c=new Context(currentContext);
-			c.addOrUpdate(this.id, this.valueIndex);
-			
-			Message msg=new Message(this.id, childId, AdoptAgent.TYPE_TERMINATE_MESSAGE, c);
-			this.sendMessage(msg);
-		}
-	}*/
 
 	@Override
 	protected void disposeMessage(Message msg) {
