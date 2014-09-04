@@ -6,13 +6,14 @@ import java.util.Map;
 
 import com.cqu.adopt.AdoptAgent;
 import com.cqu.bfsdpop.BFSDPOPAgent;
+import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.dpop.DPOPAgent;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FileUtil;
 
 public class AgentManager {
 	
-	public static final String[] AGENT_TYPES=new String[]{"ADOPT", "DPOP", "BFSDPOP"};
+	public static final String[] AGENT_TYPES=new String[]{"ADOPT", "BNBADOPT", "DPOP", "BFSDPOP"};
 	
 	private Map<Integer, Agent> agents;
 	
@@ -114,6 +115,16 @@ public class AgentManager {
 				public Agent constructAgent(int id, String name, int level, int[] domain) {
 					// TODO Auto-generated method stub
 					return new DPOPAgent(id, name, level, domain);
+				}
+			};
+		}else if(agentType.equals("BNBADOPT"))
+		{
+            return new AgentConstructor() {
+				
+				@Override
+				public Agent constructAgent(int id, String name, int level, int[] domain) {
+					// TODO Auto-generated method stub
+					return new BnBAdoptAgent(id, name, level, domain);
 				}
 			};
 		}else if(agentType.equals("BFSDPOP"))

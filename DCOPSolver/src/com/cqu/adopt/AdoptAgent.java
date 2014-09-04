@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.cqu.core.Agent;
+import com.cqu.core.Context;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.MessageNCCC;
@@ -568,7 +569,8 @@ public class AdoptAgent extends Agent{
 	 * message from agent B to account for the time it takes to wait for agent B to<br/>
 	 * send the message (NCCC(B)) and the transmission time of the message (t). We use<br/> 
 	 * t = 0 to simulate fast communication and t = 1000 to simulate slow communication.<br/> 
-	 * The number of NCCCs then is the largest counter value of any agent.<br/>
+	 * The number of NCCCs then is the largest counter value of any agent. NCCCs are a<br/> 
+	 * good runtime metric if the ratio of processing and communication time can be estimated reliably.
 	 */
 	private void increaseNcccLocal()
 	{
