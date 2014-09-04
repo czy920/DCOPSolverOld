@@ -114,4 +114,44 @@ public abstract class Agent extends QueueMessager{
 	{
 		return this.parent==-1;
 	}
+
+	public int[] getDomain() {
+		return domain;
+	}
+
+	public void setDomain(int[] domain) {
+		this.domain = domain;
+	}
+
+	public int getParent() {
+		return parent;
+	}
+
+	public void setParent(int parent) {
+		this.parent = parent;
+	}
+
+	public int[] getPseudoParents() {
+		return pseudoParents;
+	}
+
+	public void setPseudoParents(int[] pseudoParents) {
+		this.pseudoParents = pseudoParents;
+	}
+
+	public int[] getChildren() {
+		return children;
+	}
+
+	public void setChildren(int[] children) {
+		this.children = children;
+	}
+
+	public int[] getPseudoChildren() {
+		return pseudoChildren;
+	}
+
+	public void setPseudoChildren(int[] pseudoChildren) {
+		this.pseudoChildren = pseudoChildren;
+	}
 }
