@@ -304,7 +304,7 @@ public class ProblemParser {
 			int[] cost=null;
 			if(this.problemType.equals(TYPE_GRAPH_COLORING))
 			{
-				cost=parseConstraintCostDisCSP(problem.domains.values().iterator().next());
+				cost=parseConstraintCostDisCSP(problem.domains.values().iterator().next(), elementList.get(i).getValue());
 			}else
 			{
 				cost=parseConstraintCost(elementList.get(i).getValue());
@@ -343,14 +343,15 @@ public class ProblemParser {
 		return costs;
 	}
 	
-	private int[] parseConstraintCostDisCSP(int[] domain)
+	private int[] parseConstraintCostDisCSP(int[] domain, String costStr)
 	{
+		String[] items=costStr.split("\\|");
 		int[] costs=new int[domain.length*domain.length];
 		for(int i=0;i<domain.length;i++)
 		{
 			for(int j=0;j<domain.length;j++)
 			{
-				if(i==j)
+				if(CollectionUtil.indexOf(items, domain[i]+" "+domain[j])!=-1)
 				{
 					costs[i*domain.length+j]=1;
 				}else

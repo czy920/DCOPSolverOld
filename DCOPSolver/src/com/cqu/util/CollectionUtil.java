@@ -65,6 +65,18 @@ public class CollectionUtil {
 		return -1;
 	}
 	
+	public static int indexOf(String[] arr, String e)
+	{
+		for(int i=0;i<arr.length;i++)
+		{
+			if(arr[i].equals(e))
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+	
 	public static int[][] toTwoDimension(int[] arr, int rows, int cols)
 	{
 		int[][] ret=new int[rows][cols];

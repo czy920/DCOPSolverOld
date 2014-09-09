@@ -1,50 +1,50 @@
 -----------A1-----------
 Parent: -1
-Children: [10,6,9,4,8,3]
+Children: [3]
 AllParents: 
-AllChildren: 
+AllChildren: [3,4,6,7,10]
 -----------A2-----------
-Parent: 9
+Parent: 7
 Children: 
-AllParents: 
+AllParents: [3,7]
 AllChildren: 
 -----------A3-----------
 Parent: 1
-Children: 
-AllParents: 
-AllChildren: 
+Children: [9]
+AllParents: [1]
+AllChildren: [2,8,9]
 -----------A4-----------
-Parent: 1
-Children: 
-AllParents: 
-AllChildren: 
------------A5-----------
-Parent: 6
-Children: 
-AllParents: 
-AllChildren: 
------------A6-----------
-Parent: 1
-Children: [5]
-AllParents: 
-AllChildren: 
------------A7-----------
 Parent: 10
 Children: 
-AllParents: 
+AllParents: [1,9,10]
 AllChildren: 
------------A8-----------
-Parent: 1
+-----------A5-----------
+Parent: 10
 Children: 
-AllParents: 
+AllParents: [10,8,9]
 AllChildren: 
+-----------A6-----------
+Parent: 7
+Children: 
+AllParents: [1,7]
+AllChildren: 
+-----------A7-----------
+Parent: 9
+Children: [2,6]
+AllParents: [1,9]
+AllChildren: [2,6]
+-----------A8-----------
+Parent: 9
+Children: [10]
+AllParents: [3,9]
+AllChildren: [5,10]
 -----------A9-----------
-Parent: 1
-Children: [2]
-AllParents: 
-AllChildren: 
+Parent: 3
+Children: [7,8]
+AllParents: [3]
+AllChildren: [4,5,7,8]
 -----------A10-----------
-Parent: 1
-Children: [7]
-AllParents: 
-AllChildren: 
+Parent: 8
+Children: [4,5]
+AllParents: [1,8]
+AllChildren: [4,5]
