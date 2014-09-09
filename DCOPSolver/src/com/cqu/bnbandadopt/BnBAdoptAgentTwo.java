@@ -1,17 +1,19 @@
-package com.cqu.bnbadopt;
+package com.cqu.bnbandadopt;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.cqu.adopt.AdoptAgent;
+import com.cqu.bnbadopt.BnBAdoptAgent;
+import com.cqu.bnbadopt.Context;
 import com.cqu.core.Agent;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.MessageNCCC;
 import com.cqu.test.Debugger;
 
-public class BnBAdoptAgent extends Agent {
+public class BnBAdoptAgentTwo extends Agent {
 	
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_COST_MESSAGE=1;
@@ -30,20 +32,18 @@ public class BnBAdoptAgent extends Agent {
 	private int LB;
 	private int UB;
 	private int TH;
-	
+
 	private Map<Integer, Context[]> contexts;
 	private Context currentContext;
 	private boolean terminateReceivedFromParent=false;
-	
 	private int valueID;
+
 	private boolean Readytermintate=false;
-	//public String strategy="bnbadopt";      //表示采用的是bnbadopt策略
-	
 	private int nccc;
 
-	public BnBAdoptAgent(int id, String name, int level, int[] domain) {
-		super(id, name, level, domain);
+	public BnBAdoptAgentTwo(int id, String name, int level, int[] domain) {
 		// TODO Auto-generated constructor stub
+		super(id,name,level,domain);
 		this.nccc = 0;
 	}
 
@@ -53,15 +53,14 @@ public class BnBAdoptAgent extends Agent {
 		super.initRun();
 		
 		valueID=0;
-		currentContext=new Context();
-		if(this.pseudoParents!=null)
-		{
-			for(int pseudoP:this.pseudoParents){
+		currentContext=new Context(); 
+		if (this.pseudoParents != null) {
+			for (int pseudoP : this.pseudoParents) {
 				int[] cdomain = this.neighbourDomains.get(pseudoP);
-			    currentContext.addOrUpdate(pseudoP, cdomain[0], 0);
+				currentContext.addOrUpdate(pseudoP, cdomain[0], 0);
 			}
 		}
-		lbs=new HashMap<Integer, int[]>();
+		lbs = new HashMap<Integer, int[]>();
 		ubs=new HashMap<Integer, int[]>();
 		contexts=new HashMap<Integer, Context[]>();
 		InitChild();
@@ -69,7 +68,7 @@ public class BnBAdoptAgent extends Agent {
 		backtrack();
 	}
 	
-	private void InitChild(){
+	void InitChild(){
 		if(this.isLeafAgent()==false)
 		{
 			int childId=0;
@@ -92,17 +91,18 @@ public class BnBAdoptAgent extends Agent {
 		}
 	}
 	 
-	private void InitChild(int child)
+	void InitChild(int child)
 	{
 		if(this.isLeafAgent()==false)
 		{
-			
+		
 			for(int j=0;j<this.domain.length;j++)
 			{
 				lbs.get(child)[j] = 0;
 				ubs.get(child)[j] = Infinity.INFINITY;
 				contexts.get(child)[j].reset();
 			}
+	
 		}
 	}
 	
@@ -131,6 +131,7 @@ public class BnBAdoptAgent extends Agent {
 				valueID = valueID + 1;
 				Debugger.valueChanges.get(this.name).add(valueIndex);
 			}
+			
 			currentContext.addOrUpdate(this.id, valueIndex, valueID);
 		}
 		if(((isRootAgent()==true)&&(UB<=LB))||terminateReceivedFromParent==true)
@@ -165,7 +166,7 @@ public class BnBAdoptAgent extends Agent {
 		{
 			childId=this.children[i];
 			val[2]=computeTH(valueIndex,childId);
-			Message msg=new Message(this.id, childId, BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
+			Message msg=new Message(this.id, childId, BnBAdoptAgentTwo.TYPE_VALUE_MESSAGE, val);
 			this.sendMessage(this.constructNcccMessage(msg));
 		}
 		}
@@ -176,7 +177,7 @@ public class BnBAdoptAgent extends Agent {
 		{
 			pseudoChildId=this.pseudoChildren[i];
 			val[2]=Infinity.INFINITY;
-			Message msg=new Message(this.id, pseudoChildId, BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
+			Message msg=new Message(this.id, pseudoChildId, BnBAdoptAgentTwo.TYPE_VALUE_MESSAGE, val);
 			this.sendMessage(this.constructNcccMessage(msg));
 		}
 		}
@@ -192,14 +193,15 @@ public class BnBAdoptAgent extends Agent {
 		Map<String, Object> cost=new HashMap<String, Object>();
 		Context context=new Context(currentContext);
 		context.Remove(this.id);
-		cost.put(BnBAdoptAgent.KEY_CONTEXT, context);
-		cost.put(BnBAdoptAgent.KEY_LB, LB);
-		cost.put(BnBAdoptAgent.KEY_UB, UB);
+		cost.put(BnBAdoptAgentTwo.KEY_CONTEXT, context);
+		cost.put(BnBAdoptAgentTwo.KEY_LB, LB);
+		cost.put(BnBAdoptAgentTwo.KEY_UB, UB);
 		
-		Message msg=new Message(this.id, this.parent, BnBAdoptAgent.TYPE_COST_MESSAGE, cost);
+		Message msg=new Message(this.id, this.parent, BnBAdoptAgentTwo.TYPE_COST_MESSAGE, cost);
 		this.sendMessage(this.constructNcccMessage(msg));
 	}
 	
+
 	private void sendTerminateMessages()
 	{
 		if(this.isLeafAgent()==true)
@@ -216,13 +218,13 @@ public class BnBAdoptAgent extends Agent {
 			val[0]=valueIndex;
 			val[1]=valueID;
 			val[2]=computeTH(valueIndex,childId);
-			Message valueMsg=new Message(this.id, childId, BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
+			Message valueMsg=new Message(this.id, childId, BnBAdoptAgentTwo.TYPE_VALUE_MESSAGE, val);
 			
 			Map<String, Object> mapValue=new HashMap<String, Object>();
 			mapValue.put(KEY_CONTEXT, c);
 			mapValue.put(KEY_VALUE_MESSAGE, valueMsg);
 			
-			Message msg=new Message(this.id, childId, BnBAdoptAgent.TYPE_TERMINATE_MESSAGE, mapValue);
+			Message msg=new Message(this.id, childId, BnBAdoptAgentTwo.TYPE_TERMINATE_MESSAGE, mapValue);
 			this.sendMessage(this.constructNcccMessage(msg));
 		}			
 	}
@@ -238,14 +240,14 @@ public class BnBAdoptAgent extends Agent {
 		
 		//do nccc message here
 		this.increaseNcccFromMessage((MessageNCCC)msg);
-	
-		if(msg.getType()==BnBAdoptAgent.TYPE_VALUE_MESSAGE)
+		
+		if(msg.getType()==BnBAdoptAgentTwo.TYPE_VALUE_MESSAGE)
 		{
 			disposeValueMessage(msg);
-		}else if(msg.getType()==BnBAdoptAgent.TYPE_COST_MESSAGE)
+		}else if(msg.getType()==BnBAdoptAgentTwo.TYPE_COST_MESSAGE)
 		{
 			disposeCostMessage(msg);
-		}else if(msg.getType()==BnBAdoptAgent.TYPE_TERMINATE_MESSAGE)
+		}else if(msg.getType()==BnBAdoptAgentTwo.TYPE_TERMINATE_MESSAGE)
 		{
 			disposeTerminateMessage(msg);
 		}
@@ -266,6 +268,7 @@ public class BnBAdoptAgent extends Agent {
 		if(this.terminateReceivedFromParent==false)
 		{
 			Context temp = new Context(currentContext);
+			
 			int[] val =(int[]) msg.getValue();
 			currentContext.addOrUpdate(msg.getIdSender(), val[0], val[1]);
 			
@@ -308,38 +311,42 @@ public class BnBAdoptAgent extends Agent {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private void disposeCostMessage(Message msg) {
-		Map<String, Object> cost = (Map<String, Object>) msg.getValue();
-		Context c = (Context) cost.get(BnBAdoptAgent.KEY_CONTEXT);
-		int myValueIndex = c.get(this.id);
-
-		if (myValueIndex == -1) {
+	private void disposeCostMessage(Message msg)
+	{
+		Map<String, Object> cost=(Map<String, Object>) msg.getValue();
+		Context c=(Context) cost.get(BnBAdoptAgentTwo.KEY_CONTEXT);
+		int myValueIndex=c.get(this.id);
+		
+		if(myValueIndex==-1)
+		{
 			return;
 		}
 		Context temp = new Context(currentContext);
+
 		merge(c);
-
-		if (!checkCompatible(currentContext, temp)) {
-			checkCompatible();
-
-		}
-		if (checkCompatible(c, temp)) {
-			if (lbs.get(msg.getIdSender())[myValueIndex] < (Integer) cost
-					.get(BnBAdoptAgent.KEY_LB))
-				lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
-						.get(BnBAdoptAgent.KEY_LB);
-			if (ubs.get(msg.getIdSender())[myValueIndex] > (Integer) cost
-					.get(BnBAdoptAgent.KEY_UB))
-				ubs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
-						.get(BnBAdoptAgent.KEY_UB);
+		
+		if(!checkCompatible(currentContext,temp))
+	    {
+	    	checkCompatible();
+	    	
+	    }
+	    if(checkCompatible(c,temp))
+	    {
+			if(lbs.get(msg.getIdSender())[myValueIndex] < (Integer) cost.get(BnBAdoptAgent.KEY_LB))
+				lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost.get(BnBAdoptAgent.KEY_LB);
+			if(ubs.get(msg.getIdSender())[myValueIndex] > (Integer) cost.get(BnBAdoptAgent.KEY_UB))
+				ubs.get(msg.getIdSender())[myValueIndex] = (Integer) cost.get(BnBAdoptAgent.KEY_UB);
 			contexts.get(msg.getIdSender())[myValueIndex] = c;
-		}
-
-		if (!checkCompatible(currentContext, temp)) {
-			InitSelf();
-
-		}
+	    }
+			
+	    if(!checkCompatible(currentContext,temp))
+	    {
+	    	InitSelf();
+	    	
+	    } 
+	    
 		backtrack();
+		
 	}
 	
 	private void merge(Context c)
@@ -348,86 +355,76 @@ public class BnBAdoptAgent extends Agent {
 	}
 		
 	@SuppressWarnings("unchecked")
-	private void disposeTerminateMessage(Message msg) {
-		Message valueMsg = null;
-		this.Readytermintate = true;
-		Map<String, Object> mapValue = (Map<String, Object>) msg.getValue();
-		currentContext = (Context) mapValue.get(KEY_CONTEXT);
-		valueMsg = (Message) mapValue.get(KEY_VALUE_MESSAGE);
-		disposeMessage(this.constructNcccMessage(valueMsg));
-		this.terminateReceivedFromParent = true;
-		backtrack();
-
+	private void disposeTerminateMessage(Message msg)
+	{
+		Message valueMsg=null;
+		//鐖禷gent鍙戣繃鏉ョ殑terminate娑堟伅涓哄寘鍚簡鍩烘湰鐨則erminate娑堟伅鍜寁alue娑堟伅
+		   this.Readytermintate=true;
+			Map<String, Object> mapValue=(Map<String, Object>) msg.getValue();
+			currentContext=(Context) mapValue.get(KEY_CONTEXT);
+			valueMsg=(Message) mapValue.get(KEY_VALUE_MESSAGE);
+			disposeMessage(this.constructNcccMessage(valueMsg));
+			this.terminateReceivedFromParent=true;
+			backtrack();
+		
 	}
 	
-	//return int[]{dMinimizesLB, LB(curValue), dMinimizesUB}
-	private int[] computeMinimalLBAndUB()
-	{
-		int[] localCosts_=this.localCosts();
-		int minLB=Infinity.INFINITY;
-		int minUB=Infinity.INFINITY;
-		int dMinimizesLB=0;
-		int LB_CurValue=0;
-		int dMinimizesUB=0;
-		
-		if(this.isLeafAgent()==true)
-		{
-			for(int i=0;i<this.domain.length;i++)
-			{
-				if(i==valueIndex)
-				{
-					LB_CurValue=localCosts_[i];
+	// return int[]{dMinimizesLB, LB(curValue), dMinimizesUB}
+	private int[] computeMinimalLBAndUB() {
+		int[] localCosts_ = this.localCosts();
+		int minLB = Infinity.INFINITY;
+		int minUB = Infinity.INFINITY;
+		int dMinimizesLB = 0;
+		int LB_CurValue = 0;
+		int dMinimizesUB = 0;
+
+		if (this.isLeafAgent() == true) {
+			for (int i = 0; i < this.domain.length; i++) {
+				if (i == valueIndex) {
+					LB_CurValue = localCosts_[i];
 				}
-				if(localCosts_[i]<minLB)
-				{
-					minLB=localCosts_[i];
-					dMinimizesLB=i;
+				if (localCosts_[i] < minLB) {
+					minLB = localCosts_[i];
+					dMinimizesLB = i;
 				}
-				if(localCosts_[i]<minUB)
-				{
-					minUB=localCosts_[i];
-					dMinimizesUB=i;
+				if (localCosts_[i] < minUB) {
+					minUB = localCosts_[i];
+					dMinimizesUB = i;
 				}
 			}
-			this.LB=minLB;
-			this.UB=minUB;
-			
-			return new int[]{dMinimizesLB, LB_CurValue, dMinimizesUB};
+			this.LB = minLB;
+			this.UB = minUB;
+
+			return new int[] { dMinimizesLB, LB_CurValue, dMinimizesUB };
 		}
-		
-		int childId=0;
-		for(int i=0;i<this.domain.length;i++)
-		{
-			int sumlb=0;
-			int sumub=0;
-			for(int j=0;j<this.children.length;j++)
-			{
-				childId=this.children[j];
-				sumlb+=this.lbs.get(childId)[i];
-				sumub=Infinity.add(sumub, this.ubs.get(childId)[i]);
+
+		int childId = 0;
+		for (int i = 0; i < this.domain.length; i++) {
+			int sumlb = 0;
+			int sumub = 0;
+			for (int j = 0; j < this.children.length; j++) {
+				childId = this.children[j];
+				sumlb += this.lbs.get(childId)[i];
+				sumub = Infinity.add(sumub, this.ubs.get(childId)[i]);
 			}
-			sumlb+=localCosts_[i];
-			sumub=Infinity.add(sumub, localCosts_[i]);
-			if(i==valueIndex)
-			{
-				LB_CurValue=sumlb;
+			sumlb += localCosts_[i];
+			sumub = Infinity.add(sumub, localCosts_[i]);
+			if (i == valueIndex) {
+				LB_CurValue = sumlb;
 			}
-			if(sumlb<minLB)
-			{
-				minLB=sumlb;
-				dMinimizesLB=i;
+			if (sumlb < minLB) {
+				minLB = sumlb;
+				dMinimizesLB = i;
 			}
-			if(sumub<minUB)
-			{
-				minUB=sumub;
-				dMinimizesUB=i;
+			if (sumub < minUB) {
+				minUB = sumub;
+				dMinimizesUB = i;
 			}
 		}
-		this.LB=minLB;
-		this.UB=minUB;
-		
-		
-		return new int[]{dMinimizesLB, LB_CurValue, dMinimizesUB};
+		this.LB = minLB;
+		this.UB = minUB;
+
+		return new int[] { dMinimizesLB, LB_CurValue, dMinimizesUB };
 	}
 	
 	private int computeTH(int di,int child)
@@ -451,39 +448,30 @@ public class BnBAdoptAgent extends Agent {
 		return (TH>UB)?(UB-TH_di):(TH-TH_di);
 	}
 	
-	private int[] localCosts()
-	{
-		int[] ret=new int[this.domain.length];
-		
-		if(this.isRootAgent()==true)
-		{
-			for(int i=0;i<this.domain.length;i++)
-			{
-				ret[i]=0;
+	private int[] localCosts() {
+		int[] ret = new int[this.domain.length];
+
+		if (this.isRootAgent() == true) {
+			for (int i = 0; i < this.domain.length; i++) {
+				ret[i] = 0;
 			}
 			return ret;
 		}
-		
-		int parentId=0;
-		int oppositeAgentValueIndex=0;
-		for(int i=0;i<this.allParents.length;i++)
-		{
-			parentId=this.allParents[i];
-			for(int j=0;j<this.domain.length;j++)
-			{
-				oppositeAgentValueIndex=currentContext.get(parentId);
-				if(oppositeAgentValueIndex==-1)
-				{
-					ret[j]+=0;
-				}else
-				{
-					//保证id小的为行，id大的为列
-					if(this.id<parentId)
-					{
-						ret[j]+=this.constraintCosts.get(parentId)[j][oppositeAgentValueIndex];
-					}else
-					{
-						ret[j]+=this.constraintCosts.get(parentId)[oppositeAgentValueIndex][j];
+
+		int parentId = 0;
+		int oppositeAgentValueIndex = 0;
+		for (int i = 0; i < this.allParents.length; i++) {
+			parentId = this.allParents[i];
+			for (int j = 0; j < this.domain.length; j++) {
+				oppositeAgentValueIndex = currentContext.get(parentId);
+				if (oppositeAgentValueIndex == -1) {
+					ret[j] += 0;
+				} else {
+					// 保证id小的为行，id大的为列
+					if (this.id < parentId) {
+						ret[j] += this.constraintCosts.get(parentId)[j][oppositeAgentValueIndex];
+					} else {
+						ret[j] += this.constraintCosts.get(parentId)[oppositeAgentValueIndex][j];
 					}
 				}
 			}
@@ -491,34 +479,27 @@ public class BnBAdoptAgent extends Agent {
 		return ret;
 	}
 	
-	private int localCost(int di)
-	{
-		int ret=0;
-		
-		if(this.isRootAgent()==true)
-		{
+	private int localCost(int di) {
+		int ret = 0;
+
+		if (this.isRootAgent() == true) {
 			return ret;
 		}
-		
-		int parentId=0;
-		int oppositeAgentValueIndex=0;
-		for(int i=0;i<this.allParents.length;i++)
-		{
-			parentId=this.allParents[i];
-			
-			oppositeAgentValueIndex=currentContext.get(parentId);
-			if(oppositeAgentValueIndex==-1)
-			{
-				ret+=0;
-			}else
-			{
-				//保证id小的为行，id大的为列
-				if(this.id<parentId)
-				{
-					ret+=this.constraintCosts.get(parentId)[di][oppositeAgentValueIndex];
-				}else
-				{
-					ret+=this.constraintCosts.get(parentId)[oppositeAgentValueIndex][di];
+
+		int parentId = 0;
+		int oppositeAgentValueIndex = 0;
+		for (int i = 0; i < this.allParents.length; i++) {
+			parentId = this.allParents[i];
+
+			oppositeAgentValueIndex = currentContext.get(parentId);
+			if (oppositeAgentValueIndex == -1) {
+				ret += 0;
+			} else {
+				// 保证id小的为行，id大的为列
+				if (this.id < parentId) {
+					ret += this.constraintCosts.get(parentId)[di][oppositeAgentValueIndex];
+				} else {
+					ret += this.constraintCosts.get(parentId)[oppositeAgentValueIndex][di];
 				}
 			}
 		}
@@ -550,12 +531,12 @@ public class BnBAdoptAgent extends Agent {
 		super.runFinished();
 		
 		Map<String, Object> result=new HashMap<String, Object>();
-		result.put(AdoptAgent.KEY_ID, this.id);
-		result.put(AdoptAgent.KEY_NAME, this.name);
-		result.put(AdoptAgent.KEY_VALUE, this.domain[valueIndex]);
-		result.put(AdoptAgent.KEY_LB, this.LB);
-		result.put(AdoptAgent.KEY_UB, this.UB);
-		result.put(AdoptAgent.KEY_TH, this.TH);
+		result.put(BnBAdoptAgentTwo.KEY_ID, this.id);
+		result.put(BnBAdoptAgentTwo.KEY_NAME, this.name);
+		result.put(BnBAdoptAgentTwo.KEY_VALUE, this.domain[valueIndex]);
+		result.put(BnBAdoptAgentTwo.KEY_LB, this.LB);
+		result.put(BnBAdoptAgentTwo.KEY_UB, this.UB);
+		result.put(BnBAdoptAgentTwo.KEY_TH, this.TH);
 		result.put(AdoptAgent.KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
@@ -570,12 +551,12 @@ public class BnBAdoptAgent extends Agent {
 		int maxNccc=0;
 		for(Map<String, Object> result : results)
 		{
-			int id_=(Integer) result.get(AdoptAgent.KEY_ID);
-			String name_=(String) result.get(AdoptAgent.KEY_NAME);
-			int value_=(Integer) result.get(AdoptAgent.KEY_VALUE);
-			int LB_=(Integer) result.get(AdoptAgent.KEY_LB);
-			int UB_=(Integer) result.get(AdoptAgent.KEY_UB);
-			int TH_=(Integer) result.get(AdoptAgent.KEY_TH);
+			int id_=(Integer) result.get(BnBAdoptAgentTwo.KEY_ID);
+			String name_=(String) result.get(BnBAdoptAgentTwo.KEY_NAME);
+			int value_=(Integer) result.get(BnBAdoptAgentTwo.KEY_VALUE);
+			int LB_=(Integer) result.get(BnBAdoptAgentTwo.KEY_LB);
+			int UB_=(Integer) result.get(BnBAdoptAgentTwo.KEY_UB);
+			int TH_=(Integer) result.get(BnBAdoptAgentTwo.KEY_TH);
 			int ncccTemp=(Integer) result.get(AdoptAgent.KEY_NCCC);
 			if(maxNccc<ncccTemp)
 			{
@@ -591,35 +572,34 @@ public class BnBAdoptAgent extends Agent {
 			displayStr+=" TH="+Infinity.infinityEasy(TH_);
 			System.out.println(displayStr);
 		}
-		System.out.println("totalCost: "+Infinity.infinityEasy(totalCost)+" NCCC: "+maxNccc);
+		System.out.println("totalCost: "+Infinity.infinityEasy(totalCost) + " NCCC: "+maxNccc);
 	}
 
 	@Override
 	public String easyMessageContent(Message msg, Agent sender, Agent receiver) {
 		// TODO Auto-generated method stub
-		return "from "+sender.getName()+" to "+receiver.getName()+" type "+BnBAdoptAgent.messageContent(msg);
+		return "from "+sender.getName()+" to "+receiver.getName()+" type "+BnBAdoptAgentTwo.messageContent(msg);
 	}
-	
 	
 	@SuppressWarnings("unchecked")
 	public static String messageContent(Message msg)
 	{
 		switch (msg.getType()) {
-		case BnBAdoptAgent.TYPE_VALUE_MESSAGE:
+		case BnBAdoptAgentTwo.TYPE_VALUE_MESSAGE:
 		{
 			int[] val=(int[]) msg.getValue();
 			int valueIndex=(Integer) val[0];
 			return "value["+valueIndex+"]";
 		}
-		case BnBAdoptAgent.TYPE_COST_MESSAGE:
+		case BnBAdoptAgentTwo.TYPE_COST_MESSAGE:
 		{
 			Map<String, Object> msgValue=(Map<String, Object>) msg.getValue();
 			int LB_=(Integer) msgValue.get(KEY_LB);
 			int UB_=(Integer) msgValue.get(KEY_UB);
 			Context c=(Context) msgValue.get(KEY_CONTEXT);
-			return "cost[LB="+LB_+" UB="+Infinity.infinityEasy(UB_)+" context="+c.toString()+"]";
+			return "cost[LB="+LB_+" UB="+UB_+" context="+c.toString()+"]";
 		}
-		case BnBAdoptAgent.TYPE_TERMINATE_MESSAGE:
+		case BnBAdoptAgentTwo.TYPE_TERMINATE_MESSAGE:
 		{
 			return "terminate[]";
 		}
@@ -627,6 +607,6 @@ public class BnBAdoptAgent extends Agent {
 			return "unknown";
 		}
 	}
-	
 }
+
 
