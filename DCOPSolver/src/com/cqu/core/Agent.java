@@ -105,18 +105,26 @@ public abstract class Agent extends QueueMessager{
     
 	public abstract String easyMessageContent(Message msg, Agent sender, Agent receiver);
 	
-	protected boolean isLeafAgent()
+	public boolean isLeafAgent()
 	{
 		return this.children==null||this.children.length==0;
 	}
 	
-	protected boolean isRootAgent()
+	public boolean isRootAgent()
 	{
 		return this.parent==-1;
 	}
 
 	public int[] getDomain() {
 		return domain;
+	}
+
+	public int getValueIndex() {
+		return valueIndex;
+	}
+
+	public void setValueIndex(int valueIndex) {
+		this.valueIndex = valueIndex;
 	}
 
 	public void setDomain(int[] domain) {

@@ -4,11 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cqu.adopt.AdoptAgent;
 import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.bnbadopt.Context;
 import com.cqu.core.Agent;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
+import com.cqu.core.MessageNCCC;
 import com.cqu.test.Debugger;
 
 public class BnBAdoptAgentTwo extends Agent {
@@ -21,10 +23,7 @@ public class BnBAdoptAgentTwo extends Agent {
 	public final static String KEY_LB="KEY_LB";
 	public final static String KEY_UB="KEY_UB";
 	public final static String KEY_TH="KEY_TH";
-	
-	public final static String KEY_ID="KEY_ID";
-	public final static String KEY_NAME="KEY_NAME";
-	public final static String KEY_VALUE="KEY_VALUE";
+	public final static String KEY_NCCC="KEY_NCCC";
 	
 	public final static String KEY_VALUE_MESSAGE="KEY_VALUE_MESSAGE";
 	
@@ -36,31 +35,16 @@ public class BnBAdoptAgentTwo extends Agent {
 
 	private Map<Integer, Context[]> contexts;
 	private Context currentContext;
-	
-	private int valueIndex;
-	private int valueID;
 	private boolean terminateReceivedFromParent=false;
+	private int valueID;
+
 	private boolean Readytermintate=false;
-	
-	private int height;	
-		public int getHeight() {
-			return height;
-		}
+	private int nccc;
 
-		public void setHeight(int height) {
-			this.height = height;
-		}
-
-	public BnBAdoptAgentTwo(int id, String name, int level, int[] domain,int Height) {
-		// TODO Auto-generated constructor stub
-		super(id,name,level,domain);
-		this.height=Height;
-	}
-	
 	public BnBAdoptAgentTwo(int id, String name, int level, int[] domain) {
 		// TODO Auto-generated constructor stub
 		super(id,name,level,domain);
-		this.height=0;
+		this.nccc = 0;
 	}
 
 	@Override
@@ -70,11 +54,13 @@ public class BnBAdoptAgentTwo extends Agent {
 		
 		valueID=0;
 		currentContext=new Context(); 
-		for(int pseudoP:this.pseudoChildren){
-			int[] cdomain = this.neighbourDomains.get(pseudoP);
-		    currentContext.addOrUpdate(pseudoP, cdomain[0], 0);
+		if (this.pseudoParents != null) {
+			for (int pseudoP : this.pseudoParents) {
+				int[] cdomain = this.neighbourDomains.get(pseudoP);
+				currentContext.addOrUpdate(pseudoP, cdomain[0], 0);
+			}
 		}
-		lbs=new HashMap<Integer, int[]>();
+		lbs = new HashMap<Integer, int[]>();
 		ubs=new HashMap<Integer, int[]>();
 		contexts=new HashMap<Integer, Context[]>();
 		InitChild();
@@ -125,7 +111,7 @@ public class BnBAdoptAgentTwo extends Agent {
 		TH=Infinity.INFINITY;
 		valueIndex=this.computeMinimalLBAndUB()[0];
 		valueID = valueID + 1;
-		Debugger.valueChanges.get(this.name).add(valueIndex);
+		//Debugger.valueChanges.get(this.name).add(valueIndex);
 		currentContext.addOrUpdate(this.id, valueIndex, valueID);
 	}
 		
@@ -133,6 +119,10 @@ public class BnBAdoptAgentTwo extends Agent {
 	private void backtrack() {
 		// TODO Auto-generated method stub
 		int[] compute = computeMinimalLBAndUB();
+		
+		//do nccc local here
+		this.increaseNcccLocal();
+				
 		int oldValue = valueIndex;
 		int min = (TH>UB)?UB:TH;
 		if(compute[1]>=min){
@@ -177,7 +167,7 @@ public class BnBAdoptAgentTwo extends Agent {
 			childId=this.children[i];
 			val[2]=computeTH(valueIndex,childId);
 			Message msg=new Message(this.id, childId, BnBAdoptAgentTwo.TYPE_VALUE_MESSAGE, val);
-			this.sendMessage(msg);
+			this.sendMessage(this.constructNcccMessage(msg));
 		}
 		}
 		if(this.NoPseudoChild()==false)
@@ -188,7 +178,7 @@ public class BnBAdoptAgentTwo extends Agent {
 			pseudoChildId=this.pseudoChildren[i];
 			val[2]=Infinity.INFINITY;
 			Message msg=new Message(this.id, pseudoChildId, BnBAdoptAgentTwo.TYPE_VALUE_MESSAGE, val);
-			this.sendMessage(msg);
+			this.sendMessage(this.constructNcccMessage(msg));
 		}
 		}
 	}
@@ -208,7 +198,7 @@ public class BnBAdoptAgentTwo extends Agent {
 		cost.put(BnBAdoptAgentTwo.KEY_UB, UB);
 		
 		Message msg=new Message(this.id, this.parent, BnBAdoptAgentTwo.TYPE_COST_MESSAGE, cost);
-		this.sendMessage(msg);
+		this.sendMessage(this.constructNcccMessage(msg));
 	}
 	
 
@@ -235,7 +225,7 @@ public class BnBAdoptAgentTwo extends Agent {
 			mapValue.put(KEY_VALUE_MESSAGE, valueMsg);
 			
 			Message msg=new Message(this.id, childId, BnBAdoptAgentTwo.TYPE_TERMINATE_MESSAGE, mapValue);
-			this.sendMessage(msg);
+			this.sendMessage(this.constructNcccMessage(msg));
 		}			
 	}
 	
@@ -248,7 +238,9 @@ public class BnBAdoptAgentTwo extends Agent {
 					this.name+" "+this.msgMailer.easyMessageContent(msg)+" | VALUE="+this.domain[valueIndex]+" LB="+this.LB+" UB="+Infinity.infinityEasy(this.UB)+" TH="+Infinity.infinityEasy(this.TH));
 		}
 		
-	
+		//do nccc message here
+		this.increaseNcccFromMessage((MessageNCCC)msg);
+		
 		if(msg.getType()==BnBAdoptAgentTwo.TYPE_VALUE_MESSAGE)
 		{
 			disposeValueMessage(msg);
@@ -371,7 +363,7 @@ public class BnBAdoptAgentTwo extends Agent {
 			Map<String, Object> mapValue=(Map<String, Object>) msg.getValue();
 			currentContext=(Context) mapValue.get(KEY_CONTEXT);
 			valueMsg=(Message) mapValue.get(KEY_VALUE_MESSAGE);
-			disposeMessage(valueMsg);
+			disposeMessage(this.constructNcccMessage(valueMsg));
 			this.terminateReceivedFromParent=true;
 			backtrack();
 		
@@ -514,6 +506,25 @@ public class BnBAdoptAgentTwo extends Agent {
 		return ret;
 	}
 	
+	/**
+	 * 关于nccc的计算，可参考adopt里面的说明
+	 */
+	private void increaseNcccLocal()
+	{
+		this.nccc++;
+	}
+	
+	private void increaseNcccFromMessage(MessageNCCC mn)
+	{
+		int t=0;
+		this.nccc=Math.max(mn.getNccc()+t, this.nccc);
+	}
+	
+	private Message constructNcccMessage(Message msg)
+	{
+		return new MessageNCCC(msg, this.nccc);
+	}
+	
 	@Override
 	protected void runFinished() {
 		// TODO Auto-generated method stub
@@ -526,6 +537,7 @@ public class BnBAdoptAgentTwo extends Agent {
 		result.put(BnBAdoptAgentTwo.KEY_LB, this.LB);
 		result.put(BnBAdoptAgentTwo.KEY_UB, this.UB);
 		result.put(BnBAdoptAgentTwo.KEY_TH, this.TH);
+		result.put(AdoptAgent.KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
 		
@@ -536,6 +548,7 @@ public class BnBAdoptAgentTwo extends Agent {
 	public void printResults(List<Map<String, Object>> results) {
 		// TODO Auto-generated method stub
 		int totalCost=-1;
+		int maxNccc=0;
 		for(Map<String, Object> result : results)
 		{
 			int id_=(Integer) result.get(BnBAdoptAgentTwo.KEY_ID);
@@ -544,6 +557,11 @@ public class BnBAdoptAgentTwo extends Agent {
 			int LB_=(Integer) result.get(BnBAdoptAgentTwo.KEY_LB);
 			int UB_=(Integer) result.get(BnBAdoptAgentTwo.KEY_UB);
 			int TH_=(Integer) result.get(BnBAdoptAgentTwo.KEY_TH);
+			int ncccTemp=(Integer) result.get(AdoptAgent.KEY_NCCC);
+			if(maxNccc<ncccTemp)
+			{
+				maxNccc=ncccTemp;
+			}
 			if(totalCost==-1)
 			{
 				totalCost=UB_;
@@ -554,7 +572,7 @@ public class BnBAdoptAgentTwo extends Agent {
 			displayStr+=" TH="+Infinity.infinityEasy(TH_);
 			System.out.println(displayStr);
 		}
-		System.out.println("totalCost: "+Infinity.infinityEasy(totalCost));
+		System.out.println("totalCost: "+Infinity.infinityEasy(totalCost) + " NCCC: "+maxNccc);
 	}
 
 	@Override

@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cqu.adopt.AdoptAgent;
 import com.cqu.bnbadopt.Context;
 import com.cqu.core.Agent;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
+import com.cqu.core.MessageNCCC;
 import com.cqu.test.Debugger;
 
 public class AdoptAgentTwo extends Agent{
@@ -21,10 +23,7 @@ public class AdoptAgentTwo extends Agent{
 	public final static String KEY_LB="KEY_LB";
 	public final static String KEY_UB="KEY_UB";
 	public final static String KEY_TH="KEY_TH";
-	
-	public final static String KEY_ID="KEY_ID";
-	public final static String KEY_NAME="KEY_NAME";
-	public final static String KEY_VALUE="KEY_VALUE";
+	public final static String KEY_NCCC="KEY_NCCC";
 	
 	public final static String KEY_VALUE_MESSAGE="KEY_VALUE_MESSAGE";
 	
@@ -37,33 +36,14 @@ public class AdoptAgentTwo extends Agent{
 	
 	private Map<Integer, Context[]> contexts;
 	private Context currentContext;
-	
-	private int height;
-	
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
-	private int valueIndex;
-	private int valueID;
 	private boolean terminateReceivedFromParent=false;
-	
-	
-	public AdoptAgentTwo(int id, String name, int level, int[] domain,int Height) {
-		super(id, name, level, domain);
-		this.height=Height;
-	
-	}
+	private int nccc;
+	private int valueID;
 	
 	public AdoptAgentTwo(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
-		this.height=0;
-	
-	}
+		this.nccc=0;
+	}	
 	
 	@Override
 	protected void initRun() {
@@ -116,17 +96,17 @@ public class AdoptAgentTwo extends Agent{
 			return;
 		}
 		
-		int pseudoChildId=0;
+		int ChildId=0;
 		int[] val=new int[3] ;
 		val[0]=valueIndex;
 		val[1]=valueID;
 		val[2]=-1;   //a virtural th
-		for(int i=0;i<this.pseudoChildren.length;i++)
-		{
-			pseudoChildId=this.pseudoChildren[i];
-			Message msg=new Message(this.id, pseudoChildId, AdoptAgentTwo.TYPE_VALUE_MESSAGE, val);
-			this.sendMessage(msg);
-		}
+		for (int i = 0; i < this.allChildren.length; i++) {
+				ChildId = this.allChildren[i];
+				Message msg = new Message(this.id, ChildId,
+						AdoptAgentTwo.TYPE_VALUE_MESSAGE, val);
+				this.sendMessage(this.constructNcccMessage(msg));
+			}
 	}
 	
 	private void sendCostMessage()
@@ -142,7 +122,7 @@ public class AdoptAgentTwo extends Agent{
 		cost.put(AdoptAgentTwo.KEY_UB, UB);
 		
 		Message msg=new Message(this.id, this.parent, AdoptAgentTwo.TYPE_COST_MESSAGE, cost);
-		this.sendMessage(msg);
+		this.sendMessage(this.constructNcccMessage(msg));
 	}
 	
 	private void sendThresholdMessages()
@@ -161,7 +141,7 @@ public class AdoptAgentTwo extends Agent{
 			thresh.put(AdoptAgentTwo.KEY_TH, this.ths.get(childId)[valueIndex]);
 			
 			Message msg=new Message(this.id, childId, AdoptAgentTwo.TYPE_THRESHOLD_MESSAGE, thresh);
-			this.sendMessage(msg);
+			this.sendMessage(this.constructNcccMessage(msg));
 		}
 	}
 	
@@ -186,10 +166,10 @@ public class AdoptAgentTwo extends Agent{
 			
 			Map<String, Object> mapValue=new HashMap<String, Object>();
 			mapValue.put(KEY_CONTEXT, c);
-			mapValue.put(KEY_VALUE_MESSAGE, valueMsg);
+			mapValue.put(KEY_VALUE_MESSAGE, this.constructNcccMessage(valueMsg));
 			
 			Message msg=new Message(this.id, childId, AdoptAgentTwo.TYPE_TERMINATE_MESSAGE, mapValue);
-			this.sendMessage(msg);
+			this.sendMessage(this.constructNcccMessage(msg));
 		}
 		
 		if(this.pseudoChildren!=null)
@@ -205,29 +185,10 @@ public class AdoptAgentTwo extends Agent{
 				Message valueMsg=new Message(this.id, pseudoChildId, AdoptAgentTwo.TYPE_VALUE_MESSAGE, val);
 				
 				Message msg=new Message(this.id, pseudoChildId, AdoptAgentTwo.TYPE_TERMINATE_MESSAGE, valueMsg);
-				this.sendMessage(msg);
+				this.sendMessage(this.constructNcccMessage(msg));
 			}
 		}
 	}
-	
-	/*private void sendTerminateMessages()
-	{
-		if(this.isLeafAgent()==true)
-		{
-			return;
-		}
-		
-		int childId=0;
-		for(int i=0;i<this.children.length;i++)
-		{
-			childId=this.children[i];
-			Context c=new Context(currentContext);
-			c.addOrUpdate(this.id, this.valueIndex);
-			
-			Message msg=new Message(this.id, childId, AdoptAgent.TYPE_TERMINATE_MESSAGE, c);
-			this.sendMessage(msg);
-		}
-	}*/
 
 	@Override
 	protected void disposeMessage(Message msg) {
@@ -238,6 +199,10 @@ public class AdoptAgentTwo extends Agent{
 					this.name+" "+this.msgMailer.easyMessageContent(msg)+" | VALUE="+this.domain[valueIndex]+" LB="+this.LB+" UB="+Infinity.infinityEasy(this.UB)+" TH="+Infinity.infinityEasy(this.TH));
 		}
 		
+		
+		//do nccc message here
+		this.increaseNcccFromMessage((MessageNCCC)msg);
+				
 		if(msg.getType()==AdoptAgentTwo.TYPE_VALUE_MESSAGE)
 		{
 			disposeValueMessage(msg);
@@ -269,7 +234,7 @@ public class AdoptAgentTwo extends Agent{
 		{
 			int[] val=new int[3];
 			val=(int[]) msg.getValue();
-			if(msg.getIdSender()==this.id&&this.height==4&&val[2]!=(-1)){
+			if(this.level==3&&val[2]!=(-1)){          //仅仅是对一个选定问题的一个规定
 				this.TH=val[2];
 				maintainThresholdInvariant();
 			}
@@ -357,25 +322,26 @@ public class AdoptAgentTwo extends Agent{
 	protected void disposeTerminateMessage(Message msg)
 	{
 		Message valueMsg=null;
-		//鐖禷gent鍙戣繃鏉ョ殑terminate娑堟伅涓哄寘鍚簡鍩烘湰鐨則erminate娑堟伅鍜寁alue娑堟伅
+		//父agent发过来的terminate消息为包含了基本的terminate消息和value消息
 		if(msg.getIdSender()==this.parent)
 		{
 			Map<String, Object> mapValue=(Map<String, Object>) msg.getValue();
 			currentContext=(Context) mapValue.get(KEY_CONTEXT);
 			valueMsg=(Message) mapValue.get(KEY_VALUE_MESSAGE);
-			disposeMessage(valueMsg);
+			disposeMessage(this.constructNcccMessage(valueMsg));
 			
             this.terminateReceivedFromParent=true;
             
-            //姝ゅ涓嶢dopt:Pragnesh Jay Modi et al.涓殑浼唬鐮佷笉涓�牱
-            //terminateReceivedFromParent鍙樹负true锛屽啀娆¤皟鐢╩aintainThresholdInvariant()
-            //闃叉TH==UB澶辫触瀵艰嚧agent涓嶈兘缁堟
+            //此处与Adopt:Pragnesh Jay Modi et al.中的伪代码不一样
+            //terminateReceivedFromParent变为true，再次调用maintainThresholdInvariant()
+            //防止TH==UB失败导致agent不能终止
             maintainThresholdInvariant();
 			backtrack();
 		}else
 		{
+			//pseudo父agent发过来的terminate消息仅包含了value消息
 			valueMsg=(Message) msg.getValue();
-			disposeMessage(valueMsg);
+			disposeMessage(this.constructNcccMessage(valueMsg));
 		}
 		
 	}
@@ -520,6 +486,10 @@ public class AdoptAgentTwo extends Agent{
 		int dMinimizesLB=ret[0];
 		int LB_CurValue=ret[1];
 		int dMinimizesUB=ret[2];
+		
+		//do nccc local here
+	    this.increaseNcccLocal();
+	    
 		if(this.TH==this.UB)
 		{
 			if(this.valueIndex!=dMinimizesUB)
@@ -550,6 +520,22 @@ public class AdoptAgentTwo extends Agent{
 			}
 		}
 		sendCostMessage();
+	}
+	
+	private void increaseNcccLocal()
+	{
+		this.nccc++;
+	}
+	
+	private void increaseNcccFromMessage(MessageNCCC mn)
+	{
+		int t=0;
+		this.nccc=Math.max(mn.getNccc()+t, this.nccc);
+	}
+	
+	private Message constructNcccMessage(Message msg)
+	{
+		return new MessageNCCC(msg, this.nccc);
 	}
 	
 	private void maintainThresholdInvariant()
@@ -665,6 +651,7 @@ public class AdoptAgentTwo extends Agent{
 		result.put(AdoptAgentTwo.KEY_LB, this.LB);
 		result.put(AdoptAgentTwo.KEY_UB, this.UB);
 		result.put(AdoptAgentTwo.KEY_TH, this.TH);
+		result.put(AdoptAgent.KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
 		
@@ -675,6 +662,7 @@ public class AdoptAgentTwo extends Agent{
 	public void printResults(List<Map<String, Object>> results) {
 		
 		int totalCost=-1;
+		int maxNccc=0;
 		for(Map<String, Object> result : results)
 		{
 			int id_=(Integer) result.get(AdoptAgentTwo.KEY_ID);
@@ -683,6 +671,11 @@ public class AdoptAgentTwo extends Agent{
 			int LB_=(Integer) result.get(AdoptAgentTwo.KEY_LB);
 			int UB_=(Integer) result.get(AdoptAgentTwo.KEY_UB);
 			int TH_=(Integer) result.get(AdoptAgentTwo.KEY_TH);
+			int ncccTemp=(Integer) result.get(AdoptAgent.KEY_NCCC);
+			if(maxNccc<ncccTemp)
+			{
+				maxNccc=ncccTemp;
+			}
 			if(totalCost==-1)
 			{
 				totalCost=UB_;
@@ -693,7 +686,7 @@ public class AdoptAgentTwo extends Agent{
 			displayStr+=" TH="+Infinity.infinityEasy(TH_);
 			System.out.println(displayStr);
 		}
-		System.out.println("totalCost: "+Infinity.infinityEasy(totalCost));
+		System.out.println("totalCost: "+Infinity.infinityEasy(totalCost)+" NCCC: "+maxNccc);
 	}
 
 	@Override
