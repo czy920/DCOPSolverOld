@@ -49,8 +49,10 @@ public class ProblemParser {
 	
 	
 	public static final String TYPE_DCOP="DCOP";
+	public static final String TYPE_GRAPH_COLORING="DisCSP";
 	
 	private String xmlPath;
+	private String problemType;
 	
 	public ProblemParser(String path) {
 		// TODO Auto-generated constructor stub
@@ -129,10 +131,10 @@ public class ProblemParser {
 		{
 			return false;
 		}
-		String type=element.getAttributeValue(TYPE);
-		if(type.equals(TYPE_DCOP)==false)
+		problemType=element.getAttributeValue(TYPE);
+		if(problemType.equals(TYPE_DCOP)==true||problemType.equals(TYPE_GRAPH_COLORING)==true)
 		{
-			return false;
+			return true;
 		}
 		return true;
 	}
@@ -299,19 +301,26 @@ public class ProblemParser {
 				printMessage("arity!=2");
 				return false;
 			}
-			int[] cost=paseConstraintCost(elementList.get(i).getValue());
-			int nbTuples=Integer.parseInt(elementList.get(i).getAttributeValue(NBTUPLES));
-			if(nbTuples!=cost.length)
+			int[] cost=null;
+			if(this.problemType.equals(TYPE_GRAPH_COLORING))
 			{
-				printMessage("nbValues!=cost length");
-				return false;
+				cost=parseConstraintCostDisCSP(problem.domains.values().iterator().next(), elementList.get(i).getValue());
+			}else
+			{
+				cost=parseConstraintCost(elementList.get(i).getValue());
+				int nbTuples=Integer.parseInt(elementList.get(i).getAttributeValue(NBTUPLES));
+				if(nbTuples!=cost.length)
+				{
+					printMessage("nbValues!=cost length");
+					return false;
+				}
 			}
 			problem.costs.put(elementList.get(i).getAttributeValue(NAME), cost);
 		}
 		return true;
 	}
 	
-	private int[] paseConstraintCost(String costStr)
+	private int[] parseConstraintCost(String costStr)
 	{
 		String[] items=costStr.split("\\|");
 		String[] costParts=new String[items.length];
@@ -330,6 +339,26 @@ public class ProblemParser {
 		for(int i=0;i<items.length;i++)
 		{
 			costs[i]=Integer.parseInt(costParts[valuePairParts.get(valuePairPartsKeyArray[i])]);
+		}
+		return costs;
+	}
+	
+	private int[] parseConstraintCostDisCSP(int[] domain, String costStr)
+	{
+		String[] items=costStr.split("\\|");
+		int[] costs=new int[domain.length*domain.length];
+		for(int i=0;i<domain.length;i++)
+		{
+			for(int j=0;j<domain.length;j++)
+			{
+				if(CollectionUtil.indexOf(items, domain[i]+" "+domain[j])!=-1)
+				{
+					costs[i*domain.length+j]=1;
+				}else
+				{
+					costs[i*domain.length+j]=0;
+				}
+			}
 		}
 		return costs;
 	}
