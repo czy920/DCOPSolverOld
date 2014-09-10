@@ -13,6 +13,8 @@ import com.cqu.dpop.Dimension;
 import com.cqu.dpop.MultiDimensionData;
 import com.cqu.dpop.ReductDimensionResult;
 import com.cqu.util.CollectionUtil;
+import com.cqu.util.FormatUtil;
+import com.cqu.util.StatisticUtil;
 
 public class BFSDPOPAgent extends Agent{
 	
@@ -20,13 +22,15 @@ public class BFSDPOPAgent extends Agent{
 	public final static int TYPE_UTIL_MESSAGE=1;
 	
 	public final static String KEY_TOTAL_COST="KEY_TOTAL_COST";
+	public final static String KEY_UTIL_MESSAGE_SIZES="KEY_UTIL_MESSAGE_SIZES";
 	
 	private int disposedChildrenCount;
 	private MultiDimensionData rawMDData;
 	
+	private List<Integer> utilMsgSizes;
 	private int totalCost;
-	
 	private boolean[] isCrossNeighbours;
+	
 	{
 		//表示消息不丢失
 		QUEUE_CAPACITY=-1;
@@ -42,6 +46,8 @@ public class BFSDPOPAgent extends Agent{
 		totalCost=0;
 		reductDimensionResultIndexList=new HashMap<Integer, int[]>();
 		dimensionLists=new HashMap<Integer, List<Dimension>>();
+		
+		utilMsgSizes=new ArrayList<Integer>();
 	}
 	
 	@Override
@@ -91,17 +97,20 @@ public class BFSDPOPAgent extends Agent{
 		{
 			result.put(DPOPAgent.KEY_TOTAL_COST, this.totalCost);
 		}
+		result.put(KEY_UTIL_MESSAGE_SIZES, this.utilMsgSizes);
 		
 		this.msgMailer.setResult(result);
 		
 		System.out.println("Agent "+this.name+" stopped!");
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void printResults(List<Map<String, Object>> results) {
 		// TODO Auto-generated method stub
 		int totalCost=-1;
 		Map<String, Object> result;
+		List<Integer> sizeList=new ArrayList<Integer>();
 		for(int i=0;i<results.size();i++)
 		{
 			result=results.get(i);
@@ -112,10 +121,18 @@ public class BFSDPOPAgent extends Agent{
 			{
 				totalCost=(Integer) result.get(DPOPAgent.KEY_TOTAL_COST);
 			}
+			sizeList.addAll((List<Integer>)result.get(BFSDPOPAgent.KEY_UTIL_MESSAGE_SIZES));
 			
 			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
 			System.out.println(displayStr);
 		}
+		
+		Integer[] sizeArr=new Integer[sizeList.size()];
+		sizeList.toArray(sizeArr);
+		int[] minMaxAvg=StatisticUtil.minMaxAvg(CollectionUtil.toInt(sizeArr));
+		System.out.println("utilMsgCount: "+sizeArr.length+" utilMsgSizeMin: "+FormatUtil.format(minMaxAvg[0])+" utilMsgSizeMax: "+
+		FormatUtil.format(minMaxAvg[2])+" utilMsgSizeAvg: "+FormatUtil.format(minMaxAvg[4]));
+		
 		System.out.println("totalCost: "+Infinity.infinityEasy(totalCost));
 	}
 
@@ -152,6 +169,8 @@ public class BFSDPOPAgent extends Agent{
 			disposeValueMessage(msg);
 		}else if(type==TYPE_UTIL_MESSAGE)
 		{
+			utilMsgSizes.add(((MultiDimensionData) msg.getValue()).size());
+			
 			disposeUtilMessage(msg);
 		}
 	}

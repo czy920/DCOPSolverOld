@@ -8,4 +8,21 @@ public class FormatUtil {
 	{
 		return new DecimalFormat(formatString).format(value);
 	}
+	
+	public static String format(int size)
+	{
+		if(size<1024)
+		{
+			return size+"B";
+		}else if(size<1024*1024)
+		{
+			return FormatUtil.format(size*1.0/1024, "#.0")+"KB";
+		}else if(size<1024*1024*1024)
+		{
+			return FormatUtil.format(size*1.0/(1024*1024), "#.0")+"MB"; 
+		}else
+		{
+			return FormatUtil.format(size*1.0/(1024*1024*1024), "#.0")+"GB";
+		}
+	}
 }

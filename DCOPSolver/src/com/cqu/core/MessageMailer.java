@@ -89,9 +89,9 @@ public class MessageMailer extends QueueMessager{
 		
 		this.agentManager.printResults(results);
 		System.out.println(
-				"messageQuantity="+messageQuantity+
-				" messageLostQuantity="+messageLostQuantity+
-				" lostRatio="+FormatUtil.format(messageLostQuantity*100.0/(messageQuantity+messageLostQuantity), "#.0")+"%");
+				"messageQuantity: "+messageQuantity+
+				" messageLostQuantity: "+messageLostQuantity+
+				" lostRatio: "+FormatUtil.format(messageLostQuantity*100.0/(messageQuantity+messageLostQuantity), "#.0")+"%");
 		//Debugger.printValueChanges();
 		
 		timeEnd=System.currentTimeMillis();

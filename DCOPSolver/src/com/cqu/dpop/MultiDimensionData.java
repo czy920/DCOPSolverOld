@@ -274,6 +274,11 @@ public class MultiDimensionData {
 		return CollectionUtil.arrayToString(data);
 	}
 	
+	public int size()
+	{
+		return this.data.length*4;
+	}
+	
 	/**
 	 * @param args
 	 */
