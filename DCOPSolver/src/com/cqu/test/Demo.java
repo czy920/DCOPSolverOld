@@ -1,6 +1,6 @@
 package com.cqu.test;
 
-import com.cqu.adopt.AdoptAgent;
+import com.cqu.bnbmergeadopt.AgentModel;
 import com.cqu.core.Agent;
 import com.cqu.core.AgentConstructor;
 import com.cqu.core.AgentManager;
@@ -18,7 +18,7 @@ public class Demo {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String instance="problems/RandomDCOP_7_3_2.xml";
+		String instance="problems/RandomDCOP_10_3_2.xml";
 		//parse problem xml
 		ProblemParser parser=new ProblemParser(instance);
 		Problem problem=parser.parse(TreeGenerator.TREE_GENERATOR_TYPE_DFS);
@@ -40,8 +40,22 @@ public class Demo {
 			
 			@Override
 			public Agent constructAgent(int id, String name, int level, int[] domain) {
-				// TODO Auto-generated method stub
-				return new AdoptAgent(id, name, level, domain);
+				// 返回不同的agent类型
+			    
+				//返回一个adopt类型的agent
+				//return new AdoptAgent(id, name, level, domain);
+				//return new AdoptAgentTwo(id,name,level,domain);
+				
+				//测试adopt与bnbadopt的结合，这里是简单的测试
+				//BnBandAdoptAgent agentmodel = new BnBandAdoptAgent(id, name, level, domain);
+				//return agentmodel.getAgent();
+				
+				//返回一个不同策略的agent
+				return new AgentModel(id, name, level, domain);
+				
+				//返回一个bnbadopt类型的agent
+				//return new BnBAdoptAgent(id,name,level,domain);
+				//return new BnBAdoptAgentTwo(id,name,level,domain);
 			}
 		});
 		
