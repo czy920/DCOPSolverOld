@@ -1,46 +1,46 @@
 -----------A1-----------
-Parent: 2
-Children: 
+Parent: -1
+Children: [12,8,9,11]
 AllParents: 
 AllChildren: 
 -----------A2-----------
-Parent: 19
-Children: [1,12,5,9,18,26]
+Parent: 9
+Children: 
 AllParents: 
 AllChildren: 
 -----------A3-----------
-Parent: 19
-Children: [16]
+Parent: 12
+Children: [6]
 AllParents: 
 AllChildren: 
 -----------A4-----------
-Parent: 19
-Children: [27]
+Parent: 9
+Children: 
 AllParents: 
 AllChildren: 
 -----------A5-----------
-Parent: 2
+Parent: 12
 Children: 
 AllParents: 
 AllChildren: 
 -----------A6-----------
-Parent: 19
+Parent: 3
 Children: 
 AllParents: 
 AllChildren: 
 -----------A7-----------
-Parent: 19
-Children: [22,13]
+Parent: 12
+Children: 
 AllParents: 
 AllChildren: 
 -----------A8-----------
-Parent: 19
+Parent: 1
 Children: [10]
 AllParents: 
 AllChildren: 
 -----------A9-----------
-Parent: 2
-Children: 
+Parent: 1
+Children: [2,4]
 AllParents: 
 AllChildren: 
 -----------A10-----------
@@ -49,102 +49,12 @@ Children:
 AllParents: 
 AllChildren: 
 -----------A11-----------
-Parent: 19
+Parent: 1
 Children: 
 AllParents: 
 AllChildren: 
 -----------A12-----------
-Parent: 2
-Children: 
-AllParents: 
-AllChildren: 
------------A13-----------
-Parent: 7
-Children: 
-AllParents: 
-AllChildren: 
------------A14-----------
-Parent: 19
-Children: 
-AllParents: 
-AllChildren: 
------------A15-----------
-Parent: 19
-Children: 
-AllParents: 
-AllChildren: 
------------A17-----------
-Parent: 19
-Children: 
-AllParents: 
-AllChildren: 
------------A16-----------
-Parent: 3
-Children: 
-AllParents: 
-AllChildren: 
------------A19-----------
-Parent: -1
-Children: [2,3,4,6,7,8,11,14,15,17,24,28,21,30,23,25,29,20]
-AllParents: 
-AllChildren: 
------------A18-----------
-Parent: 2
-Children: 
-AllParents: 
-AllChildren: 
------------A21-----------
-Parent: 19
-Children: 
-AllParents: 
-AllChildren: 
------------A20-----------
-Parent: 19
-Children: 
-AllParents: 
-AllChildren: 
------------A23-----------
-Parent: 19
-Children: 
-AllParents: 
-AllChildren: 
------------A22-----------
-Parent: 7
-Children: 
-AllParents: 
-AllChildren: 
------------A25-----------
-Parent: 19
-Children: 
-AllParents: 
-AllChildren: 
------------A24-----------
-Parent: 19
-Children: 
-AllParents: 
-AllChildren: 
------------A27-----------
-Parent: 4
-Children: 
-AllParents: 
-AllChildren: 
------------A26-----------
-Parent: 2
-Children: 
-AllParents: 
-AllChildren: 
------------A29-----------
-Parent: 19
-Children: 
-AllParents: 
-AllChildren: 
------------A28-----------
-Parent: 19
-Children: 
-AllParents: 
-AllChildren: 
------------A30-----------
-Parent: 19
-Children: 
+Parent: 1
+Children: [3,5,7]
 AllParents: 
 AllChildren: 
