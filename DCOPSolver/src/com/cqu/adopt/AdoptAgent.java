@@ -726,7 +726,7 @@ public class AdoptAgent extends Agent{
 			{
 				maxNccc=ncccTemp;
 			}
-			if(totalCost==-1)
+			if(totalCost<UB_)
 			{
 				totalCost=UB_;
 			}
