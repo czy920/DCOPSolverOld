@@ -46,7 +46,7 @@ public class BFSTree implements TreeGenerator{
 			this.neighbourCounts.put(nodeId, nodeNeighbourCounts);
 		}
 		
-		/*int maxNeighbourCount=-1;
+		int maxNeighbourCount=-1;
 		int maxNeighbourCountNodeId=-1;
 		for(Integer nodeId : this.neighbourNodes.keySet())
 		{
@@ -57,8 +57,8 @@ public class BFSTree implements TreeGenerator{
 				maxNeighbourCountNodeId=nodeId;
 			}
 		}
-		this.rootId=maxNeighbourCountNodeId;*/
-		int minNeighbourCount=Integer.MAX_VALUE;
+		this.rootId=maxNeighbourCountNodeId;
+		/*int minNeighbourCount=Integer.MAX_VALUE;
 		int minNeighbourCountNodeId=-1;
 		for(Integer nodeId : this.neighbourNodes.keySet())
 		{
@@ -69,7 +69,7 @@ public class BFSTree implements TreeGenerator{
 				minNeighbourCountNodeId=nodeId;
 			}
 		}
-		this.rootId=minNeighbourCountNodeId;
+		this.rootId=minNeighbourCountNodeId;*/
 	}
 
 	public void generate() {
@@ -83,6 +83,7 @@ public class BFSTree implements TreeGenerator{
 		while(nodeQueue.size()>0)
 		{
 			curNodeId=nodeQueue.remove(0);
+			curLevel=this.nodeLevel.get(curNodeId);
 			
 			int[] curLevelNodes=this.neighbourNodes.get(curNodeId);
 			for(int i=0;i<curLevelNodes.length;i++)
@@ -99,7 +100,6 @@ public class BFSTree implements TreeGenerator{
 				}
 			}
 			this.nodeIterated.put(curNodeId, true);
-			curLevel=this.nodeLevel.get(curNodeId);
 		}
 	}
 	

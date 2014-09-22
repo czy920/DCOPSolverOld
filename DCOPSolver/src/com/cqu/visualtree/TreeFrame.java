@@ -41,7 +41,7 @@ public class TreeFrame extends JFrame {
 	 */
 	public TreeFrame(String treeString) {
 		super(title);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setLayout(new BorderLayout());
 		Dimension size = new Dimension(800, 500);
 		AbstractTree<VarIdentifier> tree = AbstractTree.fromString(treeString , VarIdentifier.class);

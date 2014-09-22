@@ -21,8 +21,8 @@ import com.cqu.core.DFSTree;
 import com.cqu.core.EventListener;
 import com.cqu.core.MessageMailer;
 import com.cqu.core.Problem;
+import com.cqu.core.ProblemParser;
 import com.cqu.core.TreeGenerator;
-import com.cqu.parser.ProblemParser;
 import com.cqu.visualtree.TreeFrame;
 
 public class MainFrame extends JFrame {
@@ -176,7 +176,7 @@ public class MainFrame extends JFrame {
 		Debugger.debugOn=cbDebug.isSelected();
 		
 		//construct agents
-		AgentManager agentManager=new AgentManager(problem, AgentManager.getAgentConstructor(agentType));
+		AgentManager agentManager=new AgentManager(problem, agentType);
 		
 		//start agents and MessageMailer
 		EventListener el=new EventListener() {

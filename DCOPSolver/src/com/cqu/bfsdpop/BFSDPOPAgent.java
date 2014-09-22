@@ -30,6 +30,7 @@ public class BFSDPOPAgent extends Agent{
 	private List<Integer> utilMsgSizes;
 	private int totalCost;
 	private boolean[] isCrossNeighbours;
+	private boolean[] consideredConstraints;
 	
 	{
 		//表示消息不丢失
@@ -39,9 +40,11 @@ public class BFSDPOPAgent extends Agent{
 	private Map<Integer, int[]> reductDimensionResultIndexList;
 	private Map<Integer, List<Dimension>> dimensionLists;
 	
-	public BFSDPOPAgent(int id, String name, int level, int[] domain) {
+	public BFSDPOPAgent(int id, String name, int level, int[] domain, boolean[] consideredConstraints) {
 		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
+		this.consideredConstraints=consideredConstraints;
+		
 		disposedChildrenCount=0;
 		totalCost=0;
 		reductDimensionResultIndexList=new HashMap<Integer, int[]>();
@@ -201,8 +204,8 @@ public class BFSDPOPAgent extends Agent{
 			if(this.isCrossNeighbours[i]==true)
 			{
 				int crossNeighbourId=neighbours[i];
-				//for crossing constraint edges, current agent just consider those whose ids are larger than its.
-				if(this.id<crossNeighbourId)
+				//for crossing constraint edges
+				if(this.consideredConstraints[i]==true)
 				{
 					int dimensionSize=neighbourDomains.get(crossNeighbourId).length;
 					dimensions.add(new Dimension(crossNeighbourId+"", dimensionSize, neighbourLevels.get(crossNeighbourId), Integer.MAX_VALUE, 1));

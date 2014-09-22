@@ -1,4 +1,4 @@
-package com.cqu.parser;
+package com.cqu.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,10 +8,7 @@ import java.util.Map;
 import org.jdom2.Document;
 import org.jdom2.Element;
 
-import com.cqu.core.BFSTree;
-import com.cqu.core.DFSTree;
-import com.cqu.core.Problem;
-import com.cqu.core.TreeGenerator;
+import com.cqu.bfsdpop.CrossEdgeAllocator;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.XmlUtil;
 
@@ -121,6 +118,13 @@ public class ProblemParser {
 		Map[] allParentsAndChildren=treeGenerator.getAllChildrenAndParentNodes();
 		problem.allParentAgents=allParentsAndChildren[0];
 		problem.allChildrenAgents=allParentsAndChildren[1];
+		
+		if(treeGeneratorType.equals(TreeGenerator.TREE_GENERATOR_TYPE_BFS))
+		{
+			CrossEdgeAllocator crossEdgeAllocator=new CrossEdgeAllocator(problem);
+			crossEdgeAllocator.allocate();
+			problem.crossConstraintAllocation=crossEdgeAllocator.getConsideredConstraint();
+		}
 		
 		return problem;
 	}

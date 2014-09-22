@@ -91,11 +91,12 @@ public class CrossEdgeAllocator {
 				{
 					boolean[] considered=considerCrossConstraint.get(edge.getNodeA());
 					int[] neighbours=problem.neighbourAgents.get(edge.getNodeA());
-					considered[this.indexInNeighbours(neighbours, edge.getNodeA())]=true;
+					considered[this.indexInNeighbours(neighbours, edge.getNodeB())]=true;
 				}
-				for(Edge edge : crossConstraints.get(maxKey))
+				List<Edge> edges=crossConstraints.get(maxKey);
+				for(int i=0;i<edges.size();i++)
 				{
-					this.removeEdge(crossConstraints.get(edge.getBranchB()), edge);
+					this.removeEdge(crossConstraints.get(edges.get(i).getBranchB()), edges.get(i));
 				}
 				crossConstraints.get(maxKey).clear();
 				maxKey=this.maxEdgesItemKey(crossConstraints);
@@ -143,7 +144,7 @@ public class CrossEdgeAllocator {
 	
 	private Integer maxEdgesItemKey(Map<Integer, List<Edge>> crossConstraints)
 	{
-		int maxCount=0;
+		int maxCount=-1;
 		int maxKey=-1;
 		for(Integer key : crossConstraints.keySet())
 		{
@@ -162,18 +163,18 @@ public class CrossEdgeAllocator {
 		Integer branchNodeB=edge.getNodeB();
 		int branchLevelA=problem.agentLevels.get(branchNodeA);
 		int branchLevelB=problem.agentLevels.get(branchNodeB);
-		if(branchLevelA<branchLevelB)
+		if(branchLevelA>branchLevelB)
 		{
 			branchNodeA=problem.parentAgents.get(branchNodeA);
 			branchLevelA=problem.agentLevels.get(branchNodeA);
-		}else
+		}else if(branchLevelA<branchLevelB)
 		{
 			branchNodeB=problem.parentAgents.get(branchNodeB);
 			branchLevelB=problem.agentLevels.get(branchNodeB);
 		}
 		Integer branchNodeABuf=branchNodeA;
 		Integer branchNodeBBuf=branchNodeB;
-		while(branchNodeA!=branchNodeB)
+		while(branchNodeA.equals(branchNodeB)==false)
 		{
 			branchNodeABuf=branchNodeA;
 			branchNodeA=problem.parentAgents.get(branchNodeA);

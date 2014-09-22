@@ -17,13 +17,30 @@ public class AgentManager {
 	
 	private Map<Integer, Agent> agents;
 	
-	public AgentManager(Problem problem, AgentConstructor agentConstructor) {
+	public AgentManager(Problem problem, String agentType) {
 		// TODO Auto-generated constructor stub
 		
 		agents=new HashMap<Integer, Agent>();
 		for(Integer agentId : problem.agentNames.keySet())
 		{
-			Agent agent=agentConstructor.constructAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), problem.domains.get(problem.agentDomains.get(agentId)));
+			Agent agent=null;;
+			if(agentType.equals("DPOP"))
+			{
+				agent=new DPOPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}else if(agentType.equals("BNBADOPT"))
+			{
+				agent=new BnBAdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}else if(agentType.equals("BFSDPOP"))
+			{
+				agent=new BFSDPOPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)), problem.crossConstraintAllocation.get(agentId));
+			}else
+			{
+				agent=new AdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
 			Map<Integer, int[]> neighbourDomains=new HashMap<Integer, int[]>();
 			Map<Integer, int[][]> constraintCosts=new HashMap<Integer, int[][]>();
 			int[] neighbourAgentIds=problem.neighbourAgents.get(agentId);
@@ -103,50 +120,5 @@ public class AgentManager {
 		Agent senderAgent=this.getAgent(msg.getIdSender());
 		Agent receiverAgent=this.getAgent(msg.getIdReceiver());
 		return senderAgent.easyMessageContent(msg, senderAgent, receiverAgent);
-	}
-	
-	public static AgentConstructor getAgentConstructor(String agentType)
-	{
-		if(agentType.equals("DPOP"))
-		{
-            return new AgentConstructor() {
-				
-				@Override
-				public Agent constructAgent(int id, String name, int level, int[] domain) {
-					// TODO Auto-generated method stub
-					return new DPOPAgent(id, name, level, domain);
-				}
-			};
-		}else if(agentType.equals("BNBADOPT"))
-		{
-            return new AgentConstructor() {
-				
-				@Override
-				public Agent constructAgent(int id, String name, int level, int[] domain) {
-					// TODO Auto-generated method stub
-					return new BnBAdoptAgent(id, name, level, domain);
-				}
-			};
-		}else if(agentType.equals("BFSDPOP"))
-		{
-            return new AgentConstructor() {
-				
-				@Override
-				public Agent constructAgent(int id, String name, int level, int[] domain) {
-					// TODO Auto-generated method stub
-					return new BFSDPOPAgent(id, name, level, domain);
-				}
-			};
-		}else
-		{
-            return new AgentConstructor() {
-				
-				@Override
-				public Agent constructAgent(int id, String name, int level, int[] domain) {
-					// TODO Auto-generated method stub
-					return new AdoptAgent(id, name, level, domain);
-				}
-			};
-		}
 	}
 }

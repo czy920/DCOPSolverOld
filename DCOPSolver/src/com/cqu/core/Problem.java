@@ -41,4 +41,6 @@ public class Problem {
 	public Map<Integer, int[]> allChildrenAgents;
 	
 	public Map<Integer, String[]> agentConstraintCosts;
+	
+	public Map<Integer, boolean[]> crossConstraintAllocation;
 }
