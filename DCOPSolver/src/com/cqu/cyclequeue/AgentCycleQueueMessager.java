@@ -1,6 +1,8 @@
 package com.cqu.cyclequeue;
 
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.cqu.core.Message;
 import com.cqu.core.ThreadEx;
@@ -8,16 +10,19 @@ import com.cqu.core.ThreadEx;
 public abstract class AgentCycleQueueMessager extends ThreadEx{
 	
     private LinkedList<Message> msgQueue;
-    
-    private Object startCycle;
+    private AtomicBoolean cycleBegin;
+    private AtomicInteger cycleBeginCount;
+    private AtomicBoolean cycleEnd;
+    private AtomicInteger totalAgentCount;
 	
-	public AgentCycleQueueMessager(String threadName, Object startCycle) {
+	public AgentCycleQueueMessager(String threadName, AtomicBoolean cycleBegin, AtomicInteger cycleBeginCount, AtomicBoolean cycleEnd, AtomicInteger totalAgentCount) {
 		super(threadName);
 		// TODO Auto-generated constructor stub
 		this.msgQueue=new LinkedList<Message>();
+		this.cycleBegin=cycleBegin;
+		this.cycleBeginCount=cycleBeginCount;
+		this.cycleEnd=cycleEnd;
 		this.totalAgentCount=totalAgentCount;
-		this.arrivedAgentCount=0;
-		this.startCycle=new Object();
 	}
 	
 	/**
@@ -32,14 +37,6 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 			msgQueue.add(msg);
 		}
 	}
-	
-	public void notifyAgentArrival()
-	{
-		synchronized (arrivedAgentCount) {
-			arrivedAgentCount++;
-			arrivedAgentCount.notifyAll();
-		}
-	}
 
 	@Override
 	protected void runProcess() {
@@ -47,12 +44,12 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 		initRun();
 		while(isRunning==true)
 		{
-			//wait for all agents notify arrivals and then put all messages to agents
-			synchronized (arrivedAgentCount) {
-				while(arrivedAgentCount<this.totalAgentCount)
+			//wait for mailer to put messages out to all agents
+			synchronized (cycleBegin) {
+				while(cycleBegin.get()==false)
 				{
 					try {
-						arrivedAgentCount.wait();
+						cycleBegin.wait();
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -62,15 +59,36 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 					}
 				}
 			}
-			while(msgQueue.isEmpty()==false)
+			if(cycleBegin.get()==true)
 			{
-				Message msg=msgQueue.removeFirst();
-				if(msg!=null)
+				synchronized (cycleBeginCount) {
+					if(cycleBeginCount.incrementAndGet()>=this.totalAgentCount.get())
+					{
+						cycleEnd.set(true);
+						cycleBeginCount.set(0);
+					}
+				}
+				while(msgQueue.isEmpty()==false)
 				{
-					disposeMessage(msg);
+					Message msg=msgQueue.removeFirst();
+					if(msg!=null)
+					{
+						disposeMessage(msg);
+					}
+				}
+				synchronized (cycleEnd) {
+					while(cycleEnd.get()==false)
+					{
+						try {
+							cycleEnd.wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+							Thread.currentThread().interrupt();
+						}
+					}
 				}
 			}
-			startCycle.notifyAll();
 		}
 		runFinished();
 	}

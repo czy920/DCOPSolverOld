@@ -1,6 +1,9 @@
 package com.cqu.cyclequeue;
 
 import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.cqu.core.Message;
 import com.cqu.core.ThreadEx;
 
@@ -8,18 +11,21 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 	
     private LinkedList<Message> msgQueue;
     
-    private final int totalAgentCount;
-    private Integer arrivedAgentCount;
-    
-    private Object startCycle;
+    protected AtomicBoolean cycleBegin;
+    protected AtomicInteger cycleBeginCount;
+    protected AtomicBoolean cycleEnd;
+    protected AtomicInteger cycleEndCount;
+    protected AtomicInteger totalAgentCount;
 	
 	public MailerCycleQueueMessager(String threadName, int totalAgentCount) {
 		super(threadName);
 		// TODO Auto-generated constructor stub
 		this.msgQueue=new LinkedList<Message>();
-		this.totalAgentCount=totalAgentCount;
-		this.arrivedAgentCount=0;
-		this.startCycle=new Object();
+		this.totalAgentCount=new AtomicInteger(totalAgentCount);
+		this.cycleBegin=new AtomicBoolean(false);
+		this.cycleBeginCount=new AtomicInteger(0);
+		this.cycleEnd=new AtomicBoolean(false);
+		this.cycleEndCount=new AtomicInteger(0);
 	}
 	
 	/**
@@ -35,11 +41,14 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 		}
 	}
 	
-	public void notifyAgentArrival()
+	public void notifyCycleEnd()
 	{
-		synchronized (arrivedAgentCount) {
-			arrivedAgentCount++;
-			arrivedAgentCount.notifyAll();
+		synchronized (cycleEndCount) {
+			if(cycleEndCount.incrementAndGet()>=this.totalAgentCount.get())
+			{
+				this.cycleEnd.set(true);
+				this.cycleEndCount.set(0);
+			}
 		}
 	}
 
@@ -50,11 +59,11 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 		while(isRunning==true)
 		{
 			//wait for all agents notify arrivals and then put all messages to agents
-			synchronized (arrivedAgentCount) {
-				while(arrivedAgentCount<this.totalAgentCount)
+			synchronized (cycleEnd) {
+				while(cycleEnd.get()==false)
 				{
 					try {
-						arrivedAgentCount.wait();
+						cycleEnd.wait();
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -64,15 +73,21 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 					}
 				}
 			}
-			while(msgQueue.isEmpty()==false)
+			if(cycleEnd.get()==true)
 			{
-				Message msg=msgQueue.removeFirst();
-				if(msg!=null)
+				while(msgQueue.isEmpty()==false)
 				{
-					disposeMessage(msg);
+					Message msg=msgQueue.removeFirst();
+					if(msg!=null)
+					{
+						disposeMessage(msg);
+					}
+				}
+				synchronized (cycleBegin) {
+					cycleBegin.set(true);
+					cycleBegin.notifyAll();
 				}
 			}
-			startCycle.notifyAll();
 		}
 		runFinished();
 	}
