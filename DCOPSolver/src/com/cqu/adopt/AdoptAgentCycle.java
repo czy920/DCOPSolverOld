@@ -3,10 +3,6 @@ package com.cqu.adopt;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import com.cqu.core.Agent;
 import com.cqu.core.Context;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
@@ -42,9 +38,8 @@ public class AdoptAgentCycle extends AgentCycle{
 	
 	private int nccc;
 	
-	public AdoptAgentCycle(int id, String name, int level, int[] domain, AtomicBoolean cycleBegin, AtomicInteger cycleBeginCount,
-			AtomicBoolean cycleEnd, AtomicInteger totalAgentCount) {
-		super(id, name, level, domain, cycleBegin, cycleBeginCount, cycleEnd, totalAgentCount);
+	public AdoptAgentCycle(int id, String name, int level, int[] domain) {
+		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
 		this.nccc=0;
 	}
@@ -745,7 +740,7 @@ public class AdoptAgentCycle extends AgentCycle{
 	}
 
 	@Override
-	public String easyMessageContent(Message msg, Agent sender, Agent receiver) {
+	public String easyMessageContent(Message msg, AgentCycle sender, AgentCycle receiver) {
 		// TODO Auto-generated method stub
 		return "from "+sender.getName()+" to "+receiver.getName()+" type "+AdoptAgent.messageContent(msg);
 	}

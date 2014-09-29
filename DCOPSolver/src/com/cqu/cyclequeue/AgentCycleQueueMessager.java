@@ -13,15 +13,21 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
     private AtomicBoolean cycleBegin;
     private AtomicInteger cycleBeginCount;
     private AtomicBoolean cycleEnd;
+    protected AtomicInteger cycleEndCount;
     private AtomicInteger totalAgentCount;
 	
-	public AgentCycleQueueMessager(String threadName, AtomicBoolean cycleBegin, AtomicInteger cycleBeginCount, AtomicBoolean cycleEnd, AtomicInteger totalAgentCount) {
+	public AgentCycleQueueMessager(String threadName) {
 		super(threadName);
 		// TODO Auto-generated constructor stub
 		this.msgQueue=new LinkedList<Message>();
+	}
+	
+	public void setLocks(AtomicBoolean cycleBegin, AtomicInteger cycleBeginCount, AtomicBoolean cycleEnd, AtomicInteger cycleEndCount, AtomicInteger totalAgentCount)
+	{
 		this.cycleBegin=cycleBegin;
 		this.cycleBeginCount=cycleBeginCount;
 		this.cycleEnd=cycleEnd;
+		this.cycleEndCount=cycleEndCount;
 		this.totalAgentCount=totalAgentCount;
 	}
 	
@@ -76,6 +82,7 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 						disposeMessage(msg);
 					}
 				}
+				this.notifyCycleEnd();
 				synchronized (cycleEnd) {
 					while(cycleEnd.get()==false)
 					{
@@ -91,6 +98,17 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 			}
 		}
 		runFinished();
+	}
+	
+	private void notifyCycleEnd()
+	{
+		synchronized (cycleEndCount) {
+			if(cycleEndCount.incrementAndGet()>=this.totalAgentCount.get())
+			{
+				this.cycleEnd.set(true);
+				this.cycleEndCount.set(0);
+			}
+		}
 	}
 	
 	protected void initRun(){}

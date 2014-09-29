@@ -23,8 +23,8 @@ import com.cqu.core.MessageMailer;
 import com.cqu.core.Problem;
 import com.cqu.core.ProblemParser;
 import com.cqu.core.TreeGenerator;
-import com.cqu.synchronousqueue.AgentManagerSynchronous;
-import com.cqu.synchronousqueue.MessageMailerSynchronous;
+import com.cqu.cyclequeue.AgentManagerCycle;
+import com.cqu.cyclequeue.MessageMailerCycle;
 import com.cqu.visualtree.TreeFrame;
 
 public class MainFrame extends JFrame {
@@ -192,13 +192,14 @@ public class MainFrame extends JFrame {
 				enableUI(true);
 			}
 		};
-		if(agentType.equals("ADOPT")||agentType.equals("BNBADOPT"))
+		if(agentType.equals("ADOPT"))
 		{
 			//construct agents
-			AgentManagerSynchronous agentManager=new AgentManagerSynchronous(problem, agentType);
-			MessageMailerSynchronous msgMailer=new MessageMailerSynchronous(agentManager);
+			AgentManagerCycle agentManager=new AgentManagerCycle(problem, agentType);
+			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManager);
 			msgMailer.addEventListener(el);
-			msgMailer.execute();
+			agentManager.startAgents(msgMailer);
+			msgMailer.start();
 		}else
 		{
 			//construct agents

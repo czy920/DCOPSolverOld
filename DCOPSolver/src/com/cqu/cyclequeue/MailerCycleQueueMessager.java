@@ -16,6 +16,8 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
     protected AtomicBoolean cycleEnd;
     protected AtomicInteger cycleEndCount;
     protected AtomicInteger totalAgentCount;
+    
+    protected int cycleCount;
 	
 	public MailerCycleQueueMessager(String threadName, int totalAgentCount) {
 		super(threadName);
@@ -26,6 +28,8 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 		this.cycleBeginCount=new AtomicInteger(0);
 		this.cycleEnd=new AtomicBoolean(false);
 		this.cycleEndCount=new AtomicInteger(0);
+		
+		this.cycleCount=0;
 	}
 	
 	/**
@@ -38,17 +42,6 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 	{
 		synchronized (msgQueue) {
 			msgQueue.add(msg);
-		}
-	}
-	
-	public void notifyCycleEnd()
-	{
-		synchronized (cycleEndCount) {
-			if(cycleEndCount.incrementAndGet()>=this.totalAgentCount.get())
-			{
-				this.cycleEnd.set(true);
-				this.cycleEndCount.set(0);
-			}
 		}
 	}
 
@@ -87,6 +80,7 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 					cycleBegin.set(true);
 					cycleBegin.notifyAll();
 				}
+				cycleCount++;
 			}
 		}
 		runFinished();

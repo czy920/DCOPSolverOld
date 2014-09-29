@@ -1,33 +1,31 @@
-package com.cqu.synchronousqueue;
+package com.cqu.cyclequeue;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cqu.adopt.AdoptAgentSynchronous;
+import com.cqu.adopt.AdoptAgentCycle;
 import com.cqu.core.Message;
 import com.cqu.core.Problem;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FileUtil;
 
-public class AgentManagerSynchronous {
+public class AgentManagerCycle {
+
+    private Map<Integer, AgentCycle> agents;
 	
-	private Map<Integer, AgentSynchronous> agents;
-	
-	public AgentManagerSynchronous(Problem problem, String agentType) {
+	public AgentManagerCycle(Problem problem, String agentType) {
 		// TODO Auto-generated constructor stub
 		
-		agents=new HashMap<Integer, AgentSynchronous>();
+		agents=new HashMap<Integer, AgentCycle>();
 		for(Integer agentId : problem.agentNames.keySet())
 		{
-			AgentSynchronous agent=null;;
-			if(agentType.equals("BNBADOPT"))
+			AdoptAgentCycle agent=null;;
+			if(agentType.equals("DPOP"))
 			{
-				//agent=new BnBAdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						//problem.domains.get(problem.agentDomains.get(agentId)));
 			}else
 			{
-				agent=new AdoptAgentSynchronous(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+				agent=new AdoptAgentCycle(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			Map<Integer, int[]> neighbourDomains=new HashMap<Integer, int[]>();
@@ -65,7 +63,7 @@ public class AgentManagerSynchronous {
 		}
 	}
 	
-	public AgentSynchronous getAgent(int agentId)
+	public AgentCycle getAgent(int agentId)
 	{
 		if(agents.containsKey(agentId))
 		{
@@ -76,18 +74,9 @@ public class AgentManagerSynchronous {
 		}
 	}
 	
-	public Map<Integer, AgentSynchronous> getAgents()
+	public Map<Integer, AgentCycle> getAgents()
 	{
 		return this.agents;
-	}
-	
-	public void initAgents(MessageMailerSynchronous msgMailer)
-	{
-		for(AgentSynchronous agent : agents.values())
-		{
-			agent.setMessageMailer(msgMailer);
-			agent.initRun();
-		}
 	}
 	
 	public int getAgentCount()
@@ -95,11 +84,20 @@ public class AgentManagerSynchronous {
 		return this.agents.size();
 	}
 	
+	public void startAgents(MessageMailerCycle msgMailer)
+	{
+		for(AgentCycle agent : agents.values())
+		{
+			agent.setMessageMailer(msgMailer);
+			agent.start();
+		}
+	}
+	
 	public void printResults(List<Map<String, Object>> results)
 	{
 		if(results.size()>0)
 		{
-			AgentSynchronous agent=null;
+			AgentCycle agent=null;
 			for(Integer agentId : this.agents.keySet())
 			{
 				agent=this.agents.get(agentId);
@@ -111,8 +109,8 @@ public class AgentManagerSynchronous {
 	
 	public String easyMessageContent(Message msg)
 	{
-		AgentSynchronous senderAgent=this.getAgent(msg.getIdSender());
-		AgentSynchronous receiverAgent=this.getAgent(msg.getIdReceiver());
+		AgentCycle senderAgent=this.getAgent(msg.getIdSender());
+		AgentCycle receiverAgent=this.getAgent(msg.getIdReceiver());
 		return senderAgent.easyMessageContent(msg, senderAgent, receiverAgent);
 	}
 }

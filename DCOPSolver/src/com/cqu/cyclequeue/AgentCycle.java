@@ -2,12 +2,7 @@ package com.cqu.cyclequeue;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import com.cqu.core.Agent;
 import com.cqu.core.Message;
-import com.cqu.core.MessageMailer;
 import com.cqu.util.CollectionUtil;
 
 public abstract class AgentCycle extends AgentCycleQueueMessager{
@@ -33,13 +28,12 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 	protected Map<Integer, Integer> neighbourLevels;
 	protected Map<Integer, int[][]> constraintCosts;
 	
-	protected MessageMailer msgMailer;
+	protected MessageMailerCycle msgMailer;
 	
 	protected int valueIndex;
 	
-	public AgentCycle(int id, String name, int level, int[] domain, AtomicBoolean cycleBegin,
-			AtomicInteger cycleBeginCount, AtomicBoolean cycleEnd, AtomicInteger totalAgentCount) {
-		super("Agent "+name, cycleBegin, cycleBeginCount, cycleEnd, totalAgentCount);
+	public AgentCycle(int id, String name, int level, int[] domain) {
+		super("Agent "+name);
 		this.id = id;
 		this.level=level;
 		this.name = name;
@@ -77,7 +71,7 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 		this.neighbourLevels=neighbourLevels;
 	}
 	
-	public void setMessageMailer(MessageMailer msgMailer)
+	public void setMessageMailer(MessageMailerCycle msgMailer)
 	{
 		this.msgMailer=msgMailer;
 	}
@@ -102,7 +96,7 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 	
     public abstract void printResults(List<Map<String, Object>> results);
     
-	public abstract String easyMessageContent(Message msg, Agent sender, Agent receiver);
+	public abstract String easyMessageContent(Message msg, AgentCycle sender, AgentCycle receiver);
 	
 	protected boolean isLeafAgent()
 	{

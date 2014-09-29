@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.cqu.core.AgentManager;
 import com.cqu.core.EventListener;
 import com.cqu.core.Message;
 import com.cqu.test.Debugger;
@@ -12,7 +11,7 @@ import com.cqu.util.FormatUtil;
 
 public class MessageMailerCycle extends MailerCycleQueueMessager{
 
-	private AgentManager agentManager;
+	private AgentManagerCycle agentManager;
 	private List<Map<String, Object>> results;
 	
 	private long timeStart=0;
@@ -23,7 +22,7 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 	
 	private List<EventListener> eventListeners;
 	
-	public MessageMailerCycle(AgentManager agentManager) {
+	public MessageMailerCycle(AgentManagerCycle agentManager) {
 		// TODO Auto-generated constructor stub
 		super("Mailer", agentManager.getAgentCount());
 		this.agentManager=agentManager;
@@ -44,6 +43,8 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 				this.stopRunning();
 			}
 		}
+		//one agent terminated
+		this.totalAgentCount.decrementAndGet();
 	}
 	
 	public List<Map<String, Object>> getResults()
@@ -80,6 +81,11 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		// TODO Auto-generated method stub
 		super.initRun();
 		
+		for(AgentCycle agent : this.agentManager.getAgents().values())
+		{
+			agent.setLocks(cycleBegin, cycleBeginCount, cycleEnd, cycleEndCount, cycleEndCount);
+		}
+		
 		timeStart=System.currentTimeMillis();
 	}
 	
@@ -97,6 +103,7 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		
 		timeEnd=System.currentTimeMillis();
 		System.out.println("Mailer stopped, totalTime: "+(timeEnd-timeStart)+"ms");
+		System.out.println("Cycle Count: "+this.cycleCount);
 		
 		for(EventListener el : this.eventListeners)
 		{
