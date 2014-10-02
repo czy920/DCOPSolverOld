@@ -11,7 +11,6 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 	
     private LinkedList<Message> msgQueue;
     private AtomicBoolean cycleBegin;
-    private AtomicInteger cycleBeginCount;
     private AtomicBoolean cycleEnd;
     protected AtomicInteger cycleEndCount;
     private AtomicInteger totalAgentCount;
@@ -22,10 +21,9 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 		this.msgQueue=new LinkedList<Message>();
 	}
 	
-	public void setLocks(AtomicBoolean cycleBegin, AtomicInteger cycleBeginCount, AtomicBoolean cycleEnd, AtomicInteger cycleEndCount, AtomicInteger totalAgentCount)
+	public void setLocks(AtomicBoolean cycleBegin, AtomicBoolean cycleEnd, AtomicInteger cycleEndCount, AtomicInteger totalAgentCount)
 	{
 		this.cycleBegin=cycleBegin;
-		this.cycleBeginCount=cycleBeginCount;
 		this.cycleEnd=cycleEnd;
 		this.cycleEndCount=cycleEndCount;
 		this.totalAgentCount=totalAgentCount;
@@ -67,13 +65,6 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 			}
 			if(cycleBegin.get()==true)
 			{
-				synchronized (cycleBeginCount) {
-					if(cycleBeginCount.incrementAndGet()>=this.totalAgentCount.get())
-					{
-						cycleEnd.set(true);
-						cycleBeginCount.set(0);
-					}
-				}
 				while(msgQueue.isEmpty()==false)
 				{
 					Message msg=msgQueue.removeFirst();
@@ -82,7 +73,13 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 						disposeMessage(msg);
 					}
 				}
-				this.notifyCycleEnd();
+				synchronized (cycleEndCount) {
+					cycleEndCount.incrementAndGet();
+					if(cycleEndCount.get()>=this.totalAgentCount.get())
+					{
+						this.cycleEndCount.notifyAll();
+					}
+				}
 				synchronized (cycleEnd) {
 					while(cycleEnd.get()==false)
 					{
@@ -92,23 +89,14 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 							Thread.currentThread().interrupt();
+							//当检测到中断消息时，认为是结束线程的通知，所以直接跳出循环
+							break;
 						}
 					}
 				}
 			}
 		}
 		runFinished();
-	}
-	
-	private void notifyCycleEnd()
-	{
-		synchronized (cycleEndCount) {
-			if(cycleEndCount.incrementAndGet()>=this.totalAgentCount.get())
-			{
-				this.cycleEnd.set(true);
-				this.cycleEndCount.set(0);
-			}
-		}
 	}
 	
 	protected void initRun(){}

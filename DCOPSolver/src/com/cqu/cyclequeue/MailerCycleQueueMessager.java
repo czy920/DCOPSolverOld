@@ -12,7 +12,6 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
     private LinkedList<Message> msgQueue;
     
     protected AtomicBoolean cycleBegin;
-    protected AtomicInteger cycleBeginCount;
     protected AtomicBoolean cycleEnd;
     protected AtomicInteger cycleEndCount;
     protected AtomicInteger totalAgentCount;
@@ -25,9 +24,8 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 		this.msgQueue=new LinkedList<Message>();
 		this.totalAgentCount=new AtomicInteger(totalAgentCount);
 		this.cycleBegin=new AtomicBoolean(false);
-		this.cycleBeginCount=new AtomicInteger(0);
 		this.cycleEnd=new AtomicBoolean(false);
-		this.cycleEndCount=new AtomicInteger(0);
+		this.cycleEndCount=new AtomicInteger(this.totalAgentCount.get());
 		
 		this.cycleCount=0;
 	}
@@ -52,11 +50,11 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 		while(isRunning==true)
 		{
 			//wait for all agents notify arrivals and then put all messages to agents
-			synchronized (cycleEnd) {
-				while(cycleEnd.get()==false)
+			synchronized (cycleEndCount) {
+				while(cycleEndCount.get()<totalAgentCount.get())
 				{
 					try {
-						cycleEnd.wait();
+						cycleEndCount.wait();
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -66,8 +64,16 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 					}
 				}
 			}
-			if(cycleEnd.get()==true)
+			if(cycleEndCount.get()>=totalAgentCount.get())
 			{
+				cycleEndCount.set(0);
+				
+				cycleBegin.set(false);//close entrance
+				synchronized (cycleEnd) {
+					cycleEnd.set(true);//open exit
+					cycleEnd.notifyAll();
+				}
+				
 				while(msgQueue.isEmpty()==false)
 				{
 					Message msg=msgQueue.removeFirst();
@@ -76,11 +82,14 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 						disposeMessage(msg);
 					}
 				}
+				
+				cycleEnd.set(false);//close exit
 				synchronized (cycleBegin) {
-					cycleBegin.set(true);
+					cycleBegin.set(true);//open entrance
 					cycleBegin.notifyAll();
 				}
 				cycleCount++;
+				System.out.println("cycle: "+cycleCount);
 			}
 		}
 		runFinished();
