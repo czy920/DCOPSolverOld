@@ -198,16 +198,16 @@ public class MainFrame extends JFrame {
 			AgentManagerCycle agentManager=new AgentManagerCycle(problem, agentType);
 			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManager);
 			msgMailer.addEventListener(el);
-			agentManager.startAgents(msgMailer);
 			msgMailer.start();
+			agentManager.startAgents(msgMailer);
 		}else
 		{
 			//construct agents
 			AgentManager agentManager=new AgentManager(problem, agentType);
 			MessageMailer msgMailer=new MessageMailer(agentManager);
 			msgMailer.addEventListener(el);
-			agentManager.startAgents(msgMailer);
 			msgMailer.start();
+			agentManager.startAgents(msgMailer);
 		}
 	}
 }

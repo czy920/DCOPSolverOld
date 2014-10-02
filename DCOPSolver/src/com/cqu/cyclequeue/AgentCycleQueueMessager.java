@@ -12,7 +12,7 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
     private LinkedList<Message> msgQueue;
     private AtomicBoolean cycleBegin;
     private AtomicBoolean cycleEnd;
-    protected AtomicInteger cycleEndCount;
+    private AtomicInteger cycleEndCount;
     private AtomicInteger totalAgentCount;
 	
 	public AgentCycleQueueMessager(String threadName) {
@@ -37,15 +37,21 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 	 */
 	public void addMessage(Message msg)
 	{
-		synchronized (msgQueue) {
-			msgQueue.add(msg);
-		}
+		msgQueue.add(msg);
 	}
 
 	@Override
 	protected void runProcess() {
 		// TODO Auto-generated method stub
 		initRun();
+		synchronized (cycleEnd) {
+			if(this.cycleEnd.get()==false)
+			{
+				this.cycleEnd.set(true);
+				this.cycleEnd.notifyAll();
+			}
+		}
+		
 		while(isRunning==true)
 		{
 			//wait for mailer to put messages out to all agents
@@ -56,7 +62,6 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 						cycleBegin.wait();
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
 						Thread.currentThread().interrupt();
 						//当检测到中断消息时，认为是结束线程的通知，所以直接跳出循环
 						break;
@@ -65,33 +70,48 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 			}
 			if(cycleBegin.get()==true)
 			{
-				while(msgQueue.isEmpty()==false)
+				try
 				{
-					Message msg=msgQueue.removeFirst();
-					if(msg!=null)
+					while(msgQueue.isEmpty()==false)
 					{
-						disposeMessage(msg);
+						Message msg=msgQueue.removeFirst();
+						if(msg!=null)
+						{
+							disposeMessage(msg);
+						}
 					}
+				}catch(Exception e)
+				{
+					//e.printStackTrace();
 				}
+				
 				synchronized (cycleEndCount) {
 					cycleEndCount.incrementAndGet();
+					//System.out.println(Thread.currentThread().getName()+" cycleEndCount: "+cycleEndCount);
+					if(cycleEndCount.get()<totalAgentCount.get())
+					{
+						try {
+							cycleEndCount.wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							Thread.currentThread().interrupt();
+						}
+					}
 					if(cycleEndCount.get()>=this.totalAgentCount.get())
 					{
+						cycleEndCount.set(0);
 						this.cycleEndCount.notifyAll();
+						if(this.cycleBegin.get()==true)
+						{
+							this.cycleBegin.set(false);
+						}
 					}
 				}
 				synchronized (cycleEnd) {
-					while(cycleEnd.get()==false)
+					if(cycleEnd.get()==false)
 					{
-						try {
-							cycleEnd.wait();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-							Thread.currentThread().interrupt();
-							//当检测到中断消息时，认为是结束线程的通知，所以直接跳出循环
-							break;
-						}
+						cycleEnd.set(true);
+						cycleEnd.notifyAll();
 					}
 				}
 			}

@@ -83,7 +83,7 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		
 		for(AgentCycle agent : this.agentManager.getAgents().values())
 		{
-			agent.setLocks(cycleBegin, cycleEnd, cycleEndCount, cycleEndCount);
+			agent.setLocks(cycleBegin, cycleEnd, cycleEndCount, totalAgentCount);
 		}
 		
 		timeStart=System.currentTimeMillis();

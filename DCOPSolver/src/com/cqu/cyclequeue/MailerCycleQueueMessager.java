@@ -25,7 +25,7 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 		this.totalAgentCount=new AtomicInteger(totalAgentCount);
 		this.cycleBegin=new AtomicBoolean(false);
 		this.cycleEnd=new AtomicBoolean(false);
-		this.cycleEndCount=new AtomicInteger(this.totalAgentCount.get());
+		this.cycleEndCount=new AtomicInteger(0);
 		
 		this.cycleCount=0;
 	}
@@ -50,46 +50,43 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 		while(isRunning==true)
 		{
 			//wait for all agents notify arrivals and then put all messages to agents
-			synchronized (cycleEndCount) {
-				while(cycleEndCount.get()<totalAgentCount.get())
+			synchronized (cycleEnd) {
+				while(cycleEnd.get()==false)
 				{
 					try {
-						cycleEndCount.wait();
+						cycleEnd.wait();
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
-						e.printStackTrace();
 						Thread.currentThread().interrupt();
 						//当检测到中断消息时，认为是结束线程的通知，所以直接跳出循环
 						break;
 					}
 				}
 			}
-			if(cycleEndCount.get()>=totalAgentCount.get())
+			if(cycleEnd.get()==true)
 			{
-				cycleEndCount.set(0);
-				
-				cycleBegin.set(false);//close entrance
-				synchronized (cycleEnd) {
-					cycleEnd.set(true);//open exit
-					cycleEnd.notifyAll();
-				}
-				
-				while(msgQueue.isEmpty()==false)
+				try
 				{
-					Message msg=msgQueue.removeFirst();
-					if(msg!=null)
+					while(msgQueue.isEmpty()==false)
 					{
-						disposeMessage(msg);
+						Message msg=msgQueue.removeFirst();
+						if(msg!=null)
+						{
+							disposeMessage(msg);
+						}
 					}
+				}catch(Exception e)
+				{
+					//e.printStackTrace();
 				}
-				
-				cycleEnd.set(false);//close exit
+
+				cycleCount++;
+				//System.out.println(Thread.currentThread().getName()+" cycleCount: "+cycleCount);
+				cycleEnd.set(false);
 				synchronized (cycleBegin) {
 					cycleBegin.set(true);//open entrance
 					cycleBegin.notifyAll();
 				}
-				cycleCount++;
-				System.out.println("cycle: "+cycleCount);
 			}
 		}
 		runFinished();
