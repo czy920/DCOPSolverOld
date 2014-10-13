@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.adopt.AdoptAgent;
-import com.cqu.core.Agent;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.MessageNCCC;
+import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.test.Debugger;
 
-public class BnBAdoptAgent extends Agent {
+public class BnBAdoptAgent extends AgentCycle {
 	
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_COST_MESSAGE=1;
@@ -278,7 +278,7 @@ public class BnBAdoptAgent extends Agent {
 			{
 				TH=val[2];
 			}
-			if(this.Readytermintate==false)backtrack();
+			if(this.msgQueue.isEmpty()==true&&this.Readytermintate==false)backtrack();
 		}
 	}
 	
@@ -339,7 +339,7 @@ public class BnBAdoptAgent extends Agent {
 			InitSelf();
 
 		}
-		backtrack();
+		if(this.msgQueue.isEmpty()==true)backtrack();
 	}
 	
 	private void merge(Context c)
@@ -356,7 +356,7 @@ public class BnBAdoptAgent extends Agent {
 		valueMsg = (Message) mapValue.get(KEY_VALUE_MESSAGE);
 		disposeMessage(this.constructNcccMessage(valueMsg));
 		this.terminateReceivedFromParent = true;
-		backtrack();
+		if(this.msgQueue.isEmpty()==true)backtrack();
 
 	}
 	
@@ -595,7 +595,7 @@ public class BnBAdoptAgent extends Agent {
 	}
 
 	@Override
-	public String easyMessageContent(Message msg, Agent sender, Agent receiver) {
+	public String easyMessageContent(Message msg, AgentCycle sender, AgentCycle receiver) {
 		// TODO Auto-generated method stub
 		return "from "+sender.getName()+" to "+receiver.getName()+" type "+BnBAdoptAgent.messageContent(msg);
 	}

@@ -192,7 +192,9 @@ public class MainFrame extends JFrame {
 				enableUI(true);
 			}
 		};
-		if(agentType.equals("ADOPT"))
+		
+		//采用同步消息机制的算法
+		if(agentType.equals("BNBADOPT"))
 		{
 			//construct agents
 			AgentManagerCycle agentManager=new AgentManagerCycle(problem, agentType);
@@ -200,7 +202,9 @@ public class MainFrame extends JFrame {
 			msgMailer.addEventListener(el);
 			msgMailer.start();
 			agentManager.startAgents(msgMailer);
-		}else
+		}
+		//采用异步消息机制的算法
+		else
 		{
 			//construct agents
 			AgentManager agentManager=new AgentManager(problem, agentType);

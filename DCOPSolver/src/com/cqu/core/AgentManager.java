@@ -28,10 +28,6 @@ public class AgentManager {
 			{
 				agent=new DPOPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("BNBADOPT"))
-			{
-				agent=new BnBAdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
 			}else if(agentType.equals("BFSDPOP"))
 			{
 				agent=new BFSDPOPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
