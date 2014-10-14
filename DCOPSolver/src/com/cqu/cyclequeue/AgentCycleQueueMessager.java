@@ -47,8 +47,13 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 		synchronized (cycleEnd) {
 			if(this.cycleEnd.get()==false)
 			{
-				this.cycleEnd.set(true);
-				this.cycleEnd.notifyAll();
+				cycleEndCount.incrementAndGet();
+				if(cycleEndCount.get()>=totalAgentCount.get())
+				{
+					cycleEndCount.set(0);
+					this.cycleEnd.set(true);
+					this.cycleEnd.notifyAll();
+				}
 			}
 		}
 		while(isRunning==true)
