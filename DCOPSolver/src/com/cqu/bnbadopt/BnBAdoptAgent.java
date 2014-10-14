@@ -54,11 +54,12 @@ public class BnBAdoptAgent extends AgentCycle {
 		
 		valueID=0;
 		currentContext=new Context();
+		if(!this.isRootAgent())
+			currentContext.addOrUpdate(this.parent, 0, 0); //仅仅初始化为第1个取值
 		if(this.pseudoParents!=null)
 		{
 			for(int pseudoP:this.pseudoParents){
-				int[] cdomain = this.neighbourDomains.get(pseudoP);
-			    currentContext.addOrUpdate(pseudoP, cdomain[0], 0);
+			    currentContext.addOrUpdate(pseudoP, 0, 0); //仅仅初始化为第1个取值
 			}
 		}
 		lbs=new HashMap<Integer, int[]>();
@@ -109,10 +110,12 @@ public class BnBAdoptAgent extends AgentCycle {
 	void InitSelf(){
 		
 		TH=Infinity.INFINITY;
+		int oldvalueIndex=this.valueIndex;
 		valueIndex=this.computeMinimalLBAndUB()[0];
+		if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 		valueID = valueID + 1;
 		//Debugger.valueChanges.get(this.name).add(valueIndex);
-		currentContext.addOrUpdate(this.id, valueIndex, valueID);
+		currentContext.addOrUpdate(this.id, valueIndex, valueID);  //加入了自己的取值
 	}
 		
 
@@ -123,11 +126,11 @@ public class BnBAdoptAgent extends AgentCycle {
 		//do nccc local here
 		this.increaseNcccLocal();
 				
-		int oldValue = valueIndex;
+		int oldValueIndex = valueIndex;
 		int min = (TH>UB)?UB:TH;
 		if(compute[1]>=min){
 			valueIndex = compute[0];
-			if(valueIndex != oldValue){
+			if(valueIndex != oldValueIndex){
 				valueID = valueID + 1;
 				Debugger.valueChanges.get(this.name).add(valueIndex);
 			}
@@ -158,9 +161,7 @@ public class BnBAdoptAgent extends AgentCycle {
 		val[1]=valueID;
 		if(this.isLeafAgent() ==false)
 		{
-		
 		int childId=0;
-		
 		for(int i=0;i<this.children.length;i++)
 		{
 			childId=this.children[i];
@@ -356,7 +357,7 @@ public class BnBAdoptAgent extends AgentCycle {
 		valueMsg = (Message) mapValue.get(KEY_VALUE_MESSAGE);
 		disposeMessage(this.constructNcccMessage(valueMsg));
 		this.terminateReceivedFromParent = true;
-		if(this.msgQueue.isEmpty()==true)backtrack();
+		backtrack();
 
 	}
 	

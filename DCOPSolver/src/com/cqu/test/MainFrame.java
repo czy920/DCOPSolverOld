@@ -194,7 +194,7 @@ public class MainFrame extends JFrame {
 		};
 		
 		//采用同步消息机制的算法
-		if(agentType.equals("BNBADOPT"))
+		if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
 			//construct agents
 			AgentManagerCycle agentManager=new AgentManagerCycle(problem, agentType);
