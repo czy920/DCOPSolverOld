@@ -9,7 +9,7 @@ import com.cqu.core.ThreadEx;
 
 public abstract class AgentCycleQueueMessager extends ThreadEx{
 	
-    private LinkedList<Message> msgQueue;
+    protected LinkedList<Message> msgQueue;
     private AtomicBoolean cycleBegin;
     private AtomicBoolean cycleEnd;
     private AtomicInteger cycleEndCount;
@@ -56,7 +56,6 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 				}
 			}
 		}
-		
 		while(isRunning==true)
 		{
 			//wait for mailer to put messages out to all agents

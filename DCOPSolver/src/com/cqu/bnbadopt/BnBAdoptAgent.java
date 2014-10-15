@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.adopt.AdoptAgent;
-import com.cqu.core.Agent;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.MessageNCCC;
+import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.test.Debugger;
 
-public class BnBAdoptAgent extends Agent {
+public class BnBAdoptAgent extends AgentCycle {
 	
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_COST_MESSAGE=1;
@@ -54,11 +54,12 @@ public class BnBAdoptAgent extends Agent {
 		
 		valueID=0;
 		currentContext=new Context();
+		if(!this.isRootAgent())
+			currentContext.addOrUpdate(this.parent, 0, 0); //仅仅初始化为第1个取值
 		if(this.pseudoParents!=null)
 		{
 			for(int pseudoP:this.pseudoParents){
-				int[] cdomain = this.neighbourDomains.get(pseudoP);
-			    currentContext.addOrUpdate(pseudoP, cdomain[0], 0);
+			    currentContext.addOrUpdate(pseudoP, 0, 0); //仅仅初始化为第1个取值
 			}
 		}
 		lbs=new HashMap<Integer, int[]>();
@@ -109,10 +110,12 @@ public class BnBAdoptAgent extends Agent {
 	void InitSelf(){
 		
 		TH=Infinity.INFINITY;
+		int oldvalueIndex=this.valueIndex;
 		valueIndex=this.computeMinimalLBAndUB()[0];
+		if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 		valueID = valueID + 1;
 		//Debugger.valueChanges.get(this.name).add(valueIndex);
-		currentContext.addOrUpdate(this.id, valueIndex, valueID);
+		currentContext.addOrUpdate(this.id, valueIndex, valueID);  //加入了自己的取值
 	}
 		
 
@@ -123,11 +126,11 @@ public class BnBAdoptAgent extends Agent {
 		//do nccc local here
 		this.increaseNcccLocal();
 				
-		int oldValue = valueIndex;
+		int oldValueIndex = valueIndex;
 		int min = (TH>UB)?UB:TH;
 		if(compute[1]>=min){
 			valueIndex = compute[0];
-			if(valueIndex != oldValue){
+			if(valueIndex != oldValueIndex){
 				valueID = valueID + 1;
 				Debugger.valueChanges.get(this.name).add(valueIndex);
 			}
@@ -158,9 +161,7 @@ public class BnBAdoptAgent extends Agent {
 		val[1]=valueID;
 		if(this.isLeafAgent() ==false)
 		{
-		
 		int childId=0;
-		
 		for(int i=0;i<this.children.length;i++)
 		{
 			childId=this.children[i];
@@ -278,7 +279,7 @@ public class BnBAdoptAgent extends Agent {
 			{
 				TH=val[2];
 			}
-			if(this.Readytermintate==false)backtrack();
+			if(this.msgQueue.isEmpty()==true&&this.Readytermintate==false)backtrack();
 		}
 	}
 	
@@ -339,7 +340,7 @@ public class BnBAdoptAgent extends Agent {
 			InitSelf();
 
 		}
-		backtrack();
+		if(this.msgQueue.isEmpty()==true)backtrack();
 	}
 	
 	private void merge(Context c)
@@ -595,7 +596,7 @@ public class BnBAdoptAgent extends Agent {
 	}
 
 	@Override
-	public String easyMessageContent(Message msg, Agent sender, Agent receiver) {
+	public String easyMessageContent(Message msg, AgentCycle sender, AgentCycle receiver) {
 		// TODO Auto-generated method stub
 		return "from "+sender.getName()+" to "+receiver.getName()+" type "+BnBAdoptAgent.messageContent(msg);
 	}

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.adopt.AdoptAgentCycle;
+import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.core.Message;
 import com.cqu.core.Problem;
 import com.cqu.util.CollectionUtil;
@@ -20,9 +21,13 @@ public class AgentManagerCycle {
 		agents=new HashMap<Integer, AgentCycle>();
 		for(Integer agentId : problem.agentNames.keySet())
 		{
-			AdoptAgentCycle agent=null;;
+			AgentCycle agent=null;;
 			if(agentType.equals("DPOP"))
 			{
+			}else if(agentType.equals("BNBADOPT"))
+			{
+				agent=new BnBAdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
 			}else
 			{
 				agent=new AdoptAgentCycle(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
