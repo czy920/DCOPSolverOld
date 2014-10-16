@@ -316,7 +316,7 @@ public class BnBAdoptAgent extends AgentCycle {
 		}
 		Context temp = new Context(currentContext);
 		merge(c);
-		currentContext.getContext().remove(this.id);   //因为合并时将自己的取值加入，应该移除
+		currentContext.Remove(this.id);   //因为合并时将自己的取值加入，应该移除
 
 		if (!checkCompatible(currentContext, temp)) {  //不兼容表示引入了新的内容
 			checkCompatible();
