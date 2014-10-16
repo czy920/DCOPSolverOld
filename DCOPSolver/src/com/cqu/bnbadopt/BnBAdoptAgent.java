@@ -110,9 +110,9 @@ public class BnBAdoptAgent extends AgentCycle {
 	void InitSelf(){
 		
 		TH=Infinity.INFINITY;
-		int oldvalueIndex=this.valueIndex;
+		//int oldvalueIndex=this.valueIndex;
 		valueIndex=this.computeMinimalLBAndUB()[0];
-		if(oldvalueIndex!=this.valueIndex||this.valueID==0)
+		//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 		valueID = valueID + 1;
 		//Debugger.valueChanges.get(this.name).add(valueIndex);
 		currentContext.addOrUpdate(this.id, valueIndex, valueID);  //加入了自己的取值
