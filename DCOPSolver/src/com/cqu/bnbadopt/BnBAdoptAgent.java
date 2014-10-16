@@ -93,19 +93,17 @@ public class BnBAdoptAgent extends AgentCycle {
 		}
 	}
 	 
-	private void InitChild(int child)
+	private void InitChild(int child,int d)
 	{
 		if(this.isLeafAgent()==false)
 		{
-			
-			for(int j=0;j<this.domain.length;j++)
-			{
-				lbs.get(child)[j] = 0;
-				ubs.get(child)[j] = Infinity.INFINITY;
-				contexts.get(child)[j].reset();
-			}
+				lbs.get(child)[d] = 0;
+				ubs.get(child)[d] = Infinity.INFINITY;
+				contexts.get(child)[d].reset();
 		}
 	}
+	
+	
 	
 	void InitSelf(){
 		
@@ -115,7 +113,7 @@ public class BnBAdoptAgent extends AgentCycle {
 		//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 		valueID = valueID + 1;
 		//Debugger.valueChanges.get(this.name).add(valueIndex);
-		//currentContext.addOrUpdate(this.id, valueIndex, valueID);  //加入了自己的取值
+		
 	}
 		
 
@@ -134,7 +132,6 @@ public class BnBAdoptAgent extends AgentCycle {
 				valueID = valueID + 1;
 				Debugger.valueChanges.get(this.name).add(valueIndex);
 			}
-			//currentContext.addOrUpdate(this.id, valueIndex, valueID);
 		}
 		if(((isRootAgent()==true)&&(UB<=LB))||terminateReceivedFromParent==true)
 			{
@@ -302,7 +299,7 @@ public class BnBAdoptAgent extends AgentCycle {
 			{
 				if(currentContext.compatible(contexts.get(childId)[j])==false)
 				{
-					InitChild(childId);
+					InitChild(childId,j);
 				}
 			}
 		}
@@ -319,12 +316,13 @@ public class BnBAdoptAgent extends AgentCycle {
 		}
 		Context temp = new Context(currentContext);
 		merge(c);
+		currentContext.getContext().remove(this.id);   //因为合并时将自己的取值加入，应该移除
 
-		if (!checkCompatible(currentContext, temp)) {
+		if (!checkCompatible(currentContext, temp)) {  //不兼容表示引入了新的内容
 			checkCompatible();
 
 		}
-		if (checkCompatible(c, temp)) {
+		if (checkCompatible(c, currentContext)) {   //兼容表示这个信息可以利用
 			if (lbs.get(msg.getIdSender())[myValueIndex] < (Integer) cost
 					.get(BnBAdoptAgent.KEY_LB))
 				lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
@@ -345,7 +343,7 @@ public class BnBAdoptAgent extends AgentCycle {
 	
 	private void merge(Context c)
 	{
-		currentContext.union(c);
+		currentContext.union(c);  //这个合并会导致currentContext里面有自己的取值
 	}
 		
 	@SuppressWarnings("unchecked")
