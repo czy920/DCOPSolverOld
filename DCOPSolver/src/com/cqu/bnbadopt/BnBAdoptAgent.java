@@ -115,7 +115,7 @@ public class BnBAdoptAgent extends AgentCycle {
 		//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 		valueID = valueID + 1;
 		//Debugger.valueChanges.get(this.name).add(valueIndex);
-		currentContext.addOrUpdate(this.id, valueIndex, valueID);  //加入了自己的取值
+		//currentContext.addOrUpdate(this.id, valueIndex, valueID);  //加入了自己的取值
 	}
 		
 
@@ -134,7 +134,7 @@ public class BnBAdoptAgent extends AgentCycle {
 				valueID = valueID + 1;
 				Debugger.valueChanges.get(this.name).add(valueIndex);
 			}
-			currentContext.addOrUpdate(this.id, valueIndex, valueID);
+			//currentContext.addOrUpdate(this.id, valueIndex, valueID);
 		}
 		if(((isRootAgent()==true)&&(UB<=LB))||terminateReceivedFromParent==true)
 			{
