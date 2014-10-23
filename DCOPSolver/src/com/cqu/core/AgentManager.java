@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.cqu.adopt.AdoptAgent;
 import com.cqu.bfsdpop.BFSDPOPAgent;
-import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.dpop.DPOPAgent;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FileUtil;
