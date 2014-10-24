@@ -97,6 +97,8 @@ public class MessageMailer extends QueueMessager{
 		timeEnd=System.currentTimeMillis();
 		System.out.println("Mailer stopped, totalTime: "+(timeEnd-timeStart)+"ms");
 		
+		
+		
 		for(EventListener el : this.eventListeners)
 		{
 			el.onFinished();

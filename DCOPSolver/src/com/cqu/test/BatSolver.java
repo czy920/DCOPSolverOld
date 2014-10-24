@@ -2,6 +2,7 @@ package com.cqu.test;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.cqu.core.AgentManager;
@@ -14,6 +15,8 @@ import com.cqu.cyclequeue.AgentManagerCycle;
 import com.cqu.cyclequeue.MessageMailerCycle;
 
 public class BatSolver {
+	
+	private static Map<String, Object[]> results;
 
 	/**
 	 * @param args
