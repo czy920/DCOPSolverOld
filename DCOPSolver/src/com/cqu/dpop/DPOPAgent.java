@@ -8,6 +8,7 @@ import java.util.Map;
 import com.cqu.core.Agent;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
+import com.cqu.core.ResultDPOP;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FormatUtil;
 import com.cqu.util.StatisticUtil;
@@ -92,7 +93,7 @@ public class DPOPAgent extends Agent{
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void printResults(List<Map<String, Object>> results) {
+	public Object printResults(List<Map<String, Object>> results) {
 		// TODO Auto-generated method stub
 		int totalCost=-1;
 		Map<String, Object> result;
@@ -120,6 +121,14 @@ public class DPOPAgent extends Agent{
 		FormatUtil.format(minMaxAvg[2])+" utilMsgSizeAvg: "+FormatUtil.format(minMaxAvg[4]));
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy(totalCost));
+		
+		ResultDPOP ret=new ResultDPOP();
+		ret.totalCost=totalCost;
+		ret.utilMsgCount=sizeArr.length;
+		ret.utilMsgSizeMin=minMaxAvg[0];
+		ret.utilMsgSizeMax=minMaxAvg[2];
+		ret.utilMsgSizeAvg=minMaxAvg[4];
+		return ret;
 	}
 
 	@Override

@@ -12,20 +12,18 @@ import javax.swing.JCheckBox;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
-
 import javax.swing.SwingConstants;
 
 import com.cqu.core.AgentManager;
-import com.cqu.core.DFSTree;
 import com.cqu.core.EventListener;
-import com.cqu.core.MessageMailer;
-import com.cqu.core.Problem;
-import com.cqu.core.ProblemParser;
-import com.cqu.core.TreeGenerator;
-import com.cqu.cyclequeue.AgentManagerCycle;
-import com.cqu.cyclequeue.MessageMailerCycle;
-import com.cqu.visualtree.TreeFrame;
+import com.cqu.core.Solver;
+import com.cqu.util.DialogUtil;
+import javax.swing.JTextField;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 
 public class MainFrame extends JFrame {
 
@@ -41,6 +39,10 @@ public class MainFrame extends JFrame {
 	private JCheckBox cbDebug;
 	private JCheckBox cbTreeFrame;
 	private JButton btnSolve;
+	private JTextField tfDirPath;
+	private JCheckBox cbBatch;
+	private JLabel labelBatCounter;
+	private JSpinner spinnerRepeatTimes;
 
 	/**
 	 * Launch the application.
@@ -63,50 +65,49 @@ public class MainFrame extends JFrame {
 	 */
 	public MainFrame() {
 		setResizable(false);
-		setTitle("DPOPSolver");
+		setTitle("DCOPSolver");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 365, 290);
+		setBounds(100, 100, 400, 335);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
 		combobAgentType = new JComboBox();
-		combobAgentType.setBounds(100, 74, 236, 32);
+		combobAgentType.setBounds(73, 74, 311, 32);
 		contentPane.add(combobAgentType);
 		
 		JLabel lblAgenttype = new JLabel("AgentType");
-		lblAgenttype.setBounds(25, 83, 65, 15);
+		lblAgenttype.setBounds(10, 83, 65, 15);
 		contentPane.add(lblAgenttype);
 		
 		cbDebug = new JCheckBox("Debug");
-		cbDebug.setBounds(100, 135, 64, 23);
+		cbDebug.setBounds(73, 135, 64, 23);
 		contentPane.add(cbDebug);
 		
 		cbTreeFrame = new JCheckBox("Tree Frame");
-		cbTreeFrame.setSelected(true);
-		cbTreeFrame.setBounds(166, 135, 98, 23);
+		cbTreeFrame.setBounds(134, 135, 90, 23);
 		contentPane.add(cbTreeFrame);
 		
 		JLabel lblSwitch = new JLabel("Switch");
-		lblSwitch.setBounds(25, 139, 65, 15);
+		lblSwitch.setBounds(10, 139, 65, 15);
 		contentPane.add(lblSwitch);
 		
 		combobProblem = new JComboBox();
-		combobProblem.setBounds(100, 17, 236, 32);
+		combobProblem.setBounds(73, 17, 311, 32);
 		contentPane.add(combobProblem);
 		
 		JLabel lblProblem = new JLabel("Problem");
-		lblProblem.setBounds(25, 26, 65, 15);
+		lblProblem.setBounds(10, 26, 65, 15);
 		contentPane.add(lblProblem);
 		
 		btnSolve = new JButton("Solve");
-		btnSolve.setBounds(25, 182, 311, 55);
+		btnSolve.setBounds(10, 235, 374, 62);
 		contentPane.add(btnSolve);
 		
 		lbRunningFlag = new JLabel("New label");
 		lbRunningFlag.setHorizontalAlignment(SwingConstants.CENTER);
-		lbRunningFlag.setBounds(282, 116, 54, 56);
+		lbRunningFlag.setBounds(279, 116, 54, 56);
 		contentPane.add(lbRunningFlag);
 		
 		//init
@@ -130,7 +131,69 @@ public class MainFrame extends JFrame {
 		
 		lbRunningFlag.setText("");
 		lbRunningFlag.setIcon(new ImageIcon("resources/loading.gif"));
+		
+		cbBatch = new JCheckBox("Batch");
+		cbBatch.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent arg0) {
+				// TODO Auto-generated method stub
+				if(arg0.getStateChange()==ItemEvent.SELECTED)
+				{
+					enableBatch(true);
+					File f=DialogUtil.dialogOpenDir("Select Direcory", tfDirPath.getText().isEmpty()?"E:/":tfDirPath.getText());
+					if(f!=null&&f.isDirectory()==true)
+					{
+						tfDirPath.setText(f.getPath());
+					}else
+					{
+						cbBatch.setSelected(false);
+					}
+				}else if(arg0.getStateChange()==ItemEvent.DESELECTED)
+				{
+					enableBatch(cbBatch.isSelected());
+				}
+			}
+		});
+		cbBatch.setBounds(322, 178, 62, 23);
+		contentPane.add(cbBatch);
+		
+		tfDirPath = new JTextField();
+		tfDirPath.setBounds(10, 207, 374, 21);
+		contentPane.add(tfDirPath);
+		tfDirPath.setColumns(10);
+		
+		labelBatCounter = new JLabel("0/0/0");
+		labelBatCounter.setBounds(194, 182, 95, 15);
+		contentPane.add(labelBatCounter);
+		
+		spinnerRepeatTimes = new JSpinner();
+		spinnerRepeatTimes.setModel(new SpinnerNumberModel(5, 3, 10, 1));
+		spinnerRepeatTimes.setBounds(73, 179, 65, 22);
+		contentPane.add(spinnerRepeatTimes);
+		
+		JLabel lblTimes = new JLabel("times");
+		lblTimes.setBounds(10, 182, 54, 15);
+		contentPane.add(lblTimes);
 		lbRunningFlag.setVisible(false);
+		
+		enableBatch(false);
+	}
+	
+	private void enableBatch(boolean enable)
+	{
+		tfDirPath.setEditable(enable);
+		
+		combobProblem.setEnabled(!enable);
+		if(enable==true)
+		{
+			cbDebug.setSelected(false);
+			cbTreeFrame.setSelected(false);
+		}
+		cbDebug.setEnabled(!enable);
+		cbTreeFrame.setEnabled(!enable);
+		labelBatCounter.setEnabled(enable);
+		spinnerRepeatTimes.setEnabled(enable);
 	}
 	
 	private void enableUI(boolean enable)
@@ -140,6 +203,20 @@ public class MainFrame extends JFrame {
 		cbDebug.setEnabled(enable);
 		cbTreeFrame.setEnabled(enable);
 		btnSolve.setEnabled(enable);
+		cbBatch.setEnabled(enable);
+		tfDirPath.setEditable(enable);
+		labelBatCounter.setEnabled(enable);
+		spinnerRepeatTimes.setEnabled(enable);
+		if(enable==true)
+		{
+			enableBatch(cbBatch.isSelected());
+		}else
+		{
+			if(cbBatch.isSelected()==true)
+			{
+				labelBatCounter.setEnabled(true);
+			}
+		}
 		
 		lbRunningFlag.setVisible(!enable);
 	}
@@ -148,36 +225,7 @@ public class MainFrame extends JFrame {
 	{
 		this.enableUI(false);
 		
-		String instance="problems/"+combobProblem.getSelectedItem();
-		//parse problem xml
-		ProblemParser parser=new ProblemParser(instance);
-		
-		Problem problem=null;
-		String agentType=(String) combobAgentType.getSelectedItem();
-		if(agentType.equals("BFSDPOP"))
-		{
-			problem=parser.parse(TreeGenerator.TREE_GENERATOR_TYPE_BFS);
-		}else
-		{
-			problem=parser.parse(TreeGenerator.TREE_GENERATOR_TYPE_DFS);
-		}
-		if(problem==null)
-		{
-			return;
-		}
-		
-		//display DFS tree，back edges not included
-		if(cbTreeFrame.isSelected()==true)
-		{
-			TreeFrame treeFrame=new TreeFrame(DFSTree.toTreeString(problem.agentNames, problem.parentAgents, problem.childAgents));
-			treeFrame.showTreeFrame();
-		}
-		
-		//set whether to print running data records
-		Debugger.init(problem.agentNames);
-		Debugger.debugOn=cbDebug.isSelected();
-		
-		//start agents and MessageMailer
+		Solver solver=new Solver();
 		EventListener el=new EventListener() {
 			
 			@Override
@@ -187,31 +235,30 @@ public class MainFrame extends JFrame {
 			}
 			
 			@Override
-			public void onFinished() {
+			public void onFinished(Object result) {
 				// TODO Auto-generated method stub
 				enableUI(true);
 			}
 		};
-		
-		//采用同步消息机制的算法
-		if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
+		if(this.cbBatch.isSelected()==false)
 		{
-			//construct agents
-			AgentManagerCycle agentManager=new AgentManagerCycle(problem, agentType);
-			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManager);
-			msgMailer.addEventListener(el);
-			msgMailer.start();
-			agentManager.startAgents(msgMailer);
-		}
-		//采用异步消息机制的算法
-		else
+			solver.solve("problems/"+combobProblem.getSelectedItem(), (String) combobAgentType.getSelectedItem(), 
+					cbTreeFrame.isSelected(), cbDebug.isSelected(), el); 
+		}else
 		{
-			//construct agents
-			AgentManager agentManager=new AgentManager(problem, agentType);
-			MessageMailer msgMailer=new MessageMailer(agentManager);
-			msgMailer.addEventListener(el);
-			msgMailer.start();
-			agentManager.startAgents(msgMailer);
+			String problemDir=tfDirPath.getText();
+			if(problemDir.isEmpty()==true)
+			{
+				return;
+			}
+			solver.batSolve(problemDir, (String) combobAgentType.getSelectedItem(), (Integer)spinnerRepeatTimes.getValue(), el, new Solver.BatSolveListener(){
+
+						@Override
+						public void progressChanged(int problemTotalCount, int problemIndex, int timeIndex) {
+							// TODO Auto-generated method stub
+							labelBatCounter.setText((timeIndex+1)+"/"+(problemIndex+1)+"/"+problemTotalCount);
+						}
+			});
 		}
 	}
 }

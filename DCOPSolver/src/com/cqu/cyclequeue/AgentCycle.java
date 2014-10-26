@@ -94,7 +94,7 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 		}
 	}
 	
-    public abstract void printResults(List<Map<String, Object>> results);
+    public abstract Object printResults(List<Map<String, Object>> results);
     
 	public abstract String easyMessageContent(Message msg, AgentCycle sender, AgentCycle receiver);
 	

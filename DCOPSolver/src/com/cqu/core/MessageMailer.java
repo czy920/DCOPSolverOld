@@ -87,7 +87,7 @@ public class MessageMailer extends QueueMessager{
 		// TODO Auto-generated method stub
 		super.runFinished();
 		
-		this.agentManager.printResults(results);
+		Result resultReturned=(Result) this.agentManager.printResults(results);
 		System.out.println(
 				"messageQuantity: "+messageQuantity+
 				" messageLostQuantity: "+messageLostQuantity+
@@ -97,11 +97,12 @@ public class MessageMailer extends QueueMessager{
 		timeEnd=System.currentTimeMillis();
 		System.out.println("Mailer stopped, totalTime: "+(timeEnd-timeStart)+"ms");
 		
-		
-		
+		resultReturned.messageQuantity=messageQuantity;
+		resultReturned.lostRatio=(int)(messageLostQuantity*100.0/(messageQuantity+messageLostQuantity));
+		resultReturned.totalTime=timeEnd-timeStart;
 		for(EventListener el : this.eventListeners)
 		{
-			el.onFinished();
+			el.onFinished(resultReturned);
 		}
 	}
 	

@@ -98,7 +98,7 @@ public class AgentManagerCycle {
 		}
 	}
 	
-	public void printResults(List<Map<String, Object>> results)
+	public Object printResults(List<Map<String, Object>> results)
 	{
 		if(results.size()>0)
 		{
@@ -108,8 +108,9 @@ public class AgentManagerCycle {
 				agent=this.agents.get(agentId);
 				break;
 			}
-			agent.printResults(results);
+			return agent.printResults(results);
 		}
+		return null;
 	}
 	
 	public String easyMessageContent(Message msg)
