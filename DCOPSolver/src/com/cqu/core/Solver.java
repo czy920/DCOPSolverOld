@@ -49,7 +49,8 @@ public class Solver {
 		
 		
 		//采用同步消息机制的算法
-		if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
+		if(agentType.equals("BNBADOPT"))
+		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
 			//construct agents
 			AgentManagerCycle agentManager=new AgentManagerCycle(problem, agentType);
@@ -77,6 +78,7 @@ public class Solver {
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
+
 				final File[] files = new File(problemDir).listFiles(new FileFilter() {
 					
 					@Override
