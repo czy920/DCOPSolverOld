@@ -6,14 +6,13 @@ import java.util.Map;
 
 import com.cqu.adopt.AdoptAgent;
 import com.cqu.bfsdpop.BFSDPOPAgent;
-import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.dpop.DPOPAgent;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FileUtil;
 
 public class AgentManager {
 	
-	public static final String[] AGENT_TYPES=new String[]{"ADOPT", "BNBADOPT", "DPOP", "BFSDPOP"};
+	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "ADOPT", "BNBADOPT"};
 	
 	private Map<Integer, Agent> agents;
 	
@@ -97,7 +96,7 @@ public class AgentManager {
 		}
 	}
 	
-	public void printResults(List<Map<String, Object>> results)
+	public Object printResults(List<Map<String, Object>> results)
 	{
 		if(results.size()>0)
 		{
@@ -107,8 +106,9 @@ public class AgentManager {
 				agent=this.agents.get(agentId);
 				break;
 			}
-			agent.printResults(results);
+			return agent.printResults(results);
 		}
+		return null;
 	}
 	
 	public String easyMessageContent(Message msg)

@@ -101,7 +101,7 @@ public abstract class Agent extends QueueMessager{
 		}
 	}
 	
-    public abstract void printResults(List<Map<String, Object>> results);
+    public abstract Object printResults(List<Map<String, Object>> results);
     
 	public abstract String easyMessageContent(Message msg, Agent sender, Agent receiver);
 	

@@ -9,6 +9,7 @@ import com.cqu.core.Agent;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.MessageNCCC;
+import com.cqu.core.ResultAdopt;
 import com.cqu.test.Debugger;
 
 public class AgentModel extends Agent {
@@ -243,7 +244,7 @@ public class AgentModel extends Agent {
 	}
 
 	@Override
-	public void printResults(List<Map<String, Object>> results) {
+	public Object printResults(List<Map<String, Object>> results) {
 
 		int totalCost = -1;
 		int maxNccc=0;
@@ -270,6 +271,11 @@ public class AgentModel extends Agent {
 			System.out.println(displayStr);
 		}
 		System.out.println("totalCost: " + Infinity.infinityEasy(totalCost)+" NCCC: "+maxNccc);
+		
+		ResultAdopt ret=new ResultAdopt();
+		ret.totalCost=totalCost;
+		ret.nccc=maxNccc;
+		return ret;
 	}
 
 	@Override
