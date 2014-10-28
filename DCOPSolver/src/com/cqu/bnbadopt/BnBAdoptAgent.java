@@ -134,7 +134,7 @@ public class BnBAdoptAgent extends AgentCycle {
 				Debugger.valueChanges.get(this.name).add(valueIndex);
 			}
 		}
-		if(((isRootAgent()==true)&&(UB<=LB))||terminateReceivedFromParent==true)
+		if(((isRootAgent()==true)&&(UB<=LB))||this.Readytermintate==true&&this.LB==this.UB)
 			{
 				sendTerminateMessages();
 				this.stopRunning();
@@ -205,7 +205,7 @@ public class BnBAdoptAgent extends AgentCycle {
 		{
 			return;
 		}
-		
+	    this.terminateReceivedFromParent=true;
 		int childId=0;
 		for(int i=0;i<this.children.length;i++)
 		{
@@ -277,7 +277,7 @@ public class BnBAdoptAgent extends AgentCycle {
 			{
 				TH=val[2];
 			}
-			if(this.msgQueue.isEmpty()==true&&this.Readytermintate==false)backtrack();
+			if(this.msgQueue.isEmpty()==true)backtrack();
 		}
 	}
 	
@@ -347,16 +347,17 @@ public class BnBAdoptAgent extends AgentCycle {
 		currentContext.union(c);  //这个合并会导致currentContext里面有自己的取值
 	}
 		
+	//仅仅作一个记录，准备去停止，但并不是要停止。
 	@SuppressWarnings("unchecked")
 	private void disposeTerminateMessage(Message msg) {
-		Message valueMsg = null;
+		//Message valueMsg = null;
 		this.Readytermintate = true;
-		Map<String, Object> mapValue = (Map<String, Object>) msg.getValue();
-		currentContext = (Context) mapValue.get(KEY_CONTEXT);
-		valueMsg = (Message) mapValue.get(KEY_VALUE_MESSAGE);
-		disposeMessage(this.constructNcccMessage(valueMsg));
-		this.terminateReceivedFromParent = true;
-		backtrack();
+		//Map<String, Object> mapValue = (Map<String, Object>) msg.getValue();
+		//currentContext = (Context) mapValue.get(KEY_CONTEXT);  //不应该加入里，而要自己去处理判断。
+		//valueMsg = (Message) mapValue.get(KEY_VALUE_MESSAGE);
+		//disposeMessage(this.constructNcccMessage(valueMsg));
+		//this.terminateReceivedFromParent = true;
+		//backtrack();
 
 	}
 	
