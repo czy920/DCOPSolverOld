@@ -357,7 +357,7 @@ public class BnBAdoptAgent extends AgentCycle {
 		//valueMsg = (Message) mapValue.get(KEY_VALUE_MESSAGE);
 		//disposeMessage(this.constructNcccMessage(valueMsg));
 		//this.terminateReceivedFromParent = true;
-		//backtrack();
+		if(this.msgQueue.isEmpty())backtrack();
 
 	}
 	
