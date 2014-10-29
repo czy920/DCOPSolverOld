@@ -141,14 +141,14 @@ public class MainFrame extends JFrame {
 				if(arg0.getStateChange()==ItemEvent.SELECTED)
 				{
 					enableBatch(true);
-					File f=DialogUtil.dialogOpenDir("Select Direcory", tfDirPath.getText().isEmpty()?"E:/":tfDirPath.getText());
+					/*File f=DialogUtil.dialogOpenDir("Select Direcory", tfDirPath.getText().isEmpty()?"E:/":tfDirPath.getText());
 					if(f!=null&&f.isDirectory()==true)
 					{
 						tfDirPath.setText(f.getPath());
 					}else
 					{
 						cbBatch.setSelected(false);
-					}
+					}*/
 				}else if(arg0.getStateChange()==ItemEvent.DESELECTED)
 				{
 					enableBatch(cbBatch.isSelected());
