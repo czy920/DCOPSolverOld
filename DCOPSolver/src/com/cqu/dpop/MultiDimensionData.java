@@ -268,6 +268,30 @@ public class MultiDimensionData {
 		return new MultiDimensionData(dimensionsNew, dataNew);
 	}
 	
+	public MultiDimensionData testMergeDimension(MultiDimensionData mdDataB)
+	{
+		MultiDimensionData mdDataA = this;
+		
+		List<Dimension> dimensionsNew=new ArrayList<Dimension>();
+		for(Dimension dimen : mdDataA.dimensions)
+		{
+			dimensionsNew.add(new Dimension(dimen));
+		}
+		for(Dimension dimen : mdDataB.dimensions)
+		{
+			int index=MultiDimensionData.indexOf(dimensionsNew, dimen.getName());
+			if(index==-1)
+			{
+				dimensionsNew.add(dimen);
+			}else
+			{
+				dimensionsNew.get(index).mergeConstraintCount(dimen);
+			}
+		}
+		Collections.sort(dimensionsNew);
+		return new MultiDimensionData(dimensionsNew, null);
+	}
+	
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
