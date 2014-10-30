@@ -12,8 +12,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import javax.swing.SwingConstants;
 
@@ -133,25 +131,22 @@ public class MainFrame extends JFrame {
 		lbRunningFlag.setIcon(new ImageIcon("resources/loading.gif"));
 		
 		cbBatch = new JCheckBox("Batch");
-		cbBatch.addItemListener(new ItemListener() {
+		cbBatch.addActionListener(new ActionListener() {
 			
 			@Override
-			public void itemStateChanged(ItemEvent arg0) {
+			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				if(arg0.getStateChange()==ItemEvent.SELECTED)
+				if(cbBatch.isSelected()==true)
 				{
-					enableBatch(true);
 					File f=DialogUtil.dialogOpenDir("Select Direcory", tfDirPath.getText().isEmpty()?"E:/":tfDirPath.getText());
 					if(f!=null&&f.isDirectory()==true)
 					{
+						enableBatch(true);
 						tfDirPath.setText(f.getPath());
-					}else
-					{
-						cbBatch.setSelected(false);
 					}
-				}else if(arg0.getStateChange()==ItemEvent.DESELECTED)
+				}else
 				{
-					enableBatch(cbBatch.isSelected());
+					enableBatch(false);
 				}
 			}
 		});

@@ -153,34 +153,31 @@ public class BnBAdoptAgent extends AgentCycle {
 	
 	private void sendValueMessages()
 	{
-		if(this.isLeafAgent() == true &&this.NoPseudoChild()==true)
-		{
+		if (this.isLeafAgent() == true && this.NoPseudoChild() == true) {
 			return;
 		}
-		int[] val = new int[3];  //一个取值，一个ID，一个TH
-		val[0]=valueIndex;
-		val[1]=valueID;
-		if(this.isLeafAgent() ==false)
-		{
-		int childId=0;
-		for(int i=0;i<this.children.length;i++)
-		{
-			childId=this.children[i];
-			val[2]=computeTH(valueIndex,childId);
-			Message msg=new Message(this.id, childId, BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
-			this.sendMessage(this.constructNcccMessage(msg));
+		int[] val = new int[3]; // 一个取值，一个ID，一个TH
+		val[0] = valueIndex;
+		val[1] = valueID;
+		if (this.isLeafAgent() == false) {
+			int childId = 0;
+			for (int i = 0; i < this.children.length; i++) {
+				childId = this.children[i];
+				val[2] = computeTH(valueIndex, childId);
+				Message msg = new Message(this.id, childId,
+						BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
+				this.sendMessage(this.constructNcccMessage(msg));
+			}
 		}
-		}
-		if(this.NoPseudoChild()==false)
-		{
-		int pseudoChildId=0;
-		for(int i=0;i<this.pseudoChildren.length;i++)
-		{
-			pseudoChildId=this.pseudoChildren[i];
-			val[2]=Infinity.INFINITY;
-			Message msg=new Message(this.id, pseudoChildId, BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
-			this.sendMessage(this.constructNcccMessage(msg));
-		}
+		if (this.NoPseudoChild() == false) {
+			int pseudoChildId = 0;
+			for (int i = 0; i < this.pseudoChildren.length; i++) {
+				pseudoChildId = this.pseudoChildren[i];
+				val[2] = Infinity.INFINITY;
+				Message msg = new Message(this.id, pseudoChildId,
+						BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
+				this.sendMessage(this.constructNcccMessage(msg));
+			}
 		}
 	}
 	 	

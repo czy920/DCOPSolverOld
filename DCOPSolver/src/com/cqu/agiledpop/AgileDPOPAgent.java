@@ -1,4 +1,4 @@
-package com.cqu.AgileDPOP;
+package com.cqu.agiledpop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +24,8 @@ public class AgileDPOPAgent extends Agent{
 	
 	public final static String KEY_TOTAL_COST="KEY_TOTAL_COST";
 	public final static String KEY_UTIL_MESSAGE_SIZES="KEY_UTIL_MESSAGE_SIZES";
+	
+	public static int MAX_DIEMNSION_FEASIBLE=2;
 	
 	private Integer[] parentLevels;
 	private int disposedChildrenCount;
