@@ -119,7 +119,7 @@ public class BnBAdoptAgent extends AgentCycle {
 		
 
 	private void backtrack() {
-		// TODO Auto-generated method stub
+
 		int[] compute = computeMinimalLBAndUB();
 		
 		//do nccc local here
@@ -134,6 +134,7 @@ public class BnBAdoptAgent extends AgentCycle {
 				Debugger.valueChanges.get(this.name).add(valueIndex);
 			}
 		}
+		//System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH+"\t"+this.LB+"\t"+this.UB);
 		if(((isRootAgent()==true)&&(UB<=LB))||this.Readytermintate==true&&this.LB==this.UB)
 			{
 				sendTerminateMessages();
@@ -154,14 +155,14 @@ public class BnBAdoptAgent extends AgentCycle {
 		{
 			return;
 		}
-		int[] val = new int[3];  //一个取值，一个ID，一个TH
-		val[0]=valueIndex;
-		val[1]=valueID;
 		if(this.isLeafAgent() ==false)
 		{
 		int childId=0;
 		for(int i=0;i<this.children.length;i++)
 		{
+			int[] val = new int[3];  //一个取值，一个ID，一个TH
+			val[0]=valueIndex;
+			val[1]=valueID;
 			childId=this.children[i];
 			val[2]=computeTH(valueIndex,childId);
 			Message msg=new Message(this.id, childId, BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
@@ -174,6 +175,9 @@ public class BnBAdoptAgent extends AgentCycle {
 		for(int i=0;i<this.pseudoChildren.length;i++)
 		{
 			pseudoChildId=this.pseudoChildren[i];
+			int[] val = new int[3];  //一个取值，一个ID，一个TH
+			val[0]=valueIndex;
+			val[1]=valueID;
 			val[2]=Infinity.INFINITY;
 			Message msg=new Message(this.id, pseudoChildId, BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
 			this.sendMessage(this.constructNcccMessage(msg));
@@ -551,13 +555,13 @@ public class BnBAdoptAgent extends AgentCycle {
 		super.runFinished();
 		
 		Map<String, Object> result=new HashMap<String, Object>();
-		result.put(AdoptAgent.KEY_ID, this.id);
-		result.put(AdoptAgent.KEY_NAME, this.name);
-		result.put(AdoptAgent.KEY_VALUE, this.domain[valueIndex]);
-		result.put(AdoptAgent.KEY_LB, this.LB);
-		result.put(AdoptAgent.KEY_UB, this.UB);
-		result.put(AdoptAgent.KEY_TH, this.TH);
-		result.put(AdoptAgent.KEY_NCCC, this.nccc);
+		result.put(BnBAdoptAgent.KEY_ID, this.id);
+		result.put(BnBAdoptAgent.KEY_NAME, this.name);
+		result.put(BnBAdoptAgent.KEY_VALUE, this.domain[valueIndex]);
+		result.put(BnBAdoptAgent.KEY_LB, this.LB);
+		result.put(BnBAdoptAgent.KEY_UB, this.UB);
+		result.put(BnBAdoptAgent.KEY_TH, this.TH);
+		result.put(BnBAdoptAgent.KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
 		
@@ -571,13 +575,13 @@ public class BnBAdoptAgent extends AgentCycle {
 		int maxNccc=0;
 		for(Map<String, Object> result : results)
 		{
-			int id_=(Integer) result.get(AdoptAgent.KEY_ID);
-			String name_=(String) result.get(AdoptAgent.KEY_NAME);
-			int value_=(Integer) result.get(AdoptAgent.KEY_VALUE);
-			int LB_=(Integer) result.get(AdoptAgent.KEY_LB);
-			int UB_=(Integer) result.get(AdoptAgent.KEY_UB);
-			int TH_=(Integer) result.get(AdoptAgent.KEY_TH);
-			int ncccTemp=(Integer) result.get(AdoptAgent.KEY_NCCC);
+			int id_=(Integer) result.get(BnBAdoptAgent.KEY_ID);
+			String name_=(String) result.get(BnBAdoptAgent.KEY_NAME);
+			int value_=(Integer) result.get(BnBAdoptAgent.KEY_VALUE);
+			int LB_=(Integer) result.get(BnBAdoptAgent.KEY_LB);
+			int UB_=(Integer) result.get(BnBAdoptAgent.KEY_UB);
+			int TH_=(Integer) result.get(BnBAdoptAgent.KEY_TH);
+			int ncccTemp=(Integer) result.get(BnBAdoptAgent.KEY_NCCC);
 			if(maxNccc<ncccTemp)
 			{
 				maxNccc=ncccTemp;
