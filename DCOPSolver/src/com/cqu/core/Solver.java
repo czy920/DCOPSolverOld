@@ -49,7 +49,7 @@ public class Solver {
 		
 		
 		//采用同步消息机制的算法
-		if(agentType.equals("BNBADOPT"))
+		if(agentType.equals("BNBADOPT")||agentType.equals("BDADOPT")||agentType.equals("SynAdopt"))
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
 			//construct agents

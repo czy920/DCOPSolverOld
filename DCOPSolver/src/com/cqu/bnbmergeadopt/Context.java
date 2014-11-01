@@ -49,7 +49,7 @@ public class Context implements Cloneable{
 	    HashMap<Integer,Integer> val= new HashMap<Integer,Integer>();
 		val.put(value,ID);
 		if(!context.containsKey(key)||(context.containsKey(key)&&(this.get(key)!=value||this.getID(key)<ID)))
-			context.put(key,val);   //增加更新的内容，会不会旧的反而覆盖新的？
+			context.put(key,val);  
 	}
 	
 	public int get(int key)
@@ -78,8 +78,8 @@ public class Context implements Cloneable{
 		int value=-1;
 		if(context.containsKey(key)==true)
 		{
-			 val=(HashMap<Integer, Integer>) context.remove(key);
-			 value=val.keySet().iterator().next();
+			value=this.get(key);
+			context.remove(key);
 
 		}
 		
@@ -130,3 +130,4 @@ public class Context implements Cloneable{
 		return context.toString();
 	}
 }
+

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.cqu.adopt.AdoptAgentCycle;
 import com.cqu.bnbadopt.BnBAdoptAgent;
+import com.cqu.bnbmergeadopt.AgentModel;
 import com.cqu.core.Message;
 import com.cqu.core.Problem;
 import com.cqu.util.CollectionUtil;
@@ -27,6 +28,10 @@ public class AgentManagerCycle {
 			}else if(agentType.equals("BNBADOPT"))
 			{
 				agent=new BnBAdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}else if(agentType.equals("BDADOPT"))
+			{
+				agent=new AgentModel(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}else
 			{
