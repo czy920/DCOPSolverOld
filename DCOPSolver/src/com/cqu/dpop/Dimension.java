@@ -71,6 +71,16 @@ public class Dimension implements Comparable<Dimension>{
 		return this.priority.compareTo(o.priority);
 	}
 	
+	public boolean equals(Dimension dimen) {
+		// TODO Auto-generated method stub
+		return this.name.equals(dimen.name);
+	}
+	
+	public boolean equals(String dimenName) {
+		// TODO Auto-generated method stub
+		return this.name.equals(dimenName);
+	}
+	
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
