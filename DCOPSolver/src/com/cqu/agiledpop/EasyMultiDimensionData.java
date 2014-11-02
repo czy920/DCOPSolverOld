@@ -31,16 +31,6 @@ public class EasyMultiDimensionData {
 		this.data = data;
 	}
 	
-	public boolean isDimen1Reductable()
-	{
-		return this.dimen1.isReductable();
-	}
-	
-	public boolean isDimen2Reductable()
-	{
-		return this.dimen2.isReductable();
-	}
-	
 	public boolean exist(String dimenName)
 	{
 		return dimen1.equals(dimenName)||dimen2.equals(dimenName);
@@ -113,8 +103,7 @@ public class EasyMultiDimensionData {
 							dataNew[i*dimen2.getSize()+j]=data[i*dimen2.getSize()+j]+emdData2.data[i*dimen2.getSize()+j];
 						}
 					}
-					return new EasyMultiDimensionData(this.constructMergedDimension(dimen1, emdData2.dimen1), 
-							this.constructMergedDimension(dimen2, emdData2.dimen2), dataNew);
+					return new EasyMultiDimensionData(new Dimension(dimen1), new Dimension(dimen2), dataNew);
 				}
 			}else if(emdData2.dimen1!=null)
 			{
@@ -123,13 +112,13 @@ public class EasyMultiDimensionData {
 					//A1A2+A2=A1A2
 					int[] dataNew=this.mergeDataWithCondition(data, dimen1.getSize(), dimen2.getSize(), 
 							emdData2.data, emdData2.dimen1.getSize(), false);
-					return new EasyMultiDimensionData(new Dimension(dimen1), this.constructMergedDimension(dimen2, emdData2.dimen1), dataNew);
+					return new EasyMultiDimensionData(new Dimension(dimen1), new Dimension(dimen2), dataNew);
 				}else if(dimen1.equals(emdData2.dimen1)==true)
 				{
 					//A1A2+A1=A1A2
 					int[] dataNew=this.mergeDataWithCondition(data, dimen1.getSize(), dimen2.getSize(), 
 							emdData2.data, emdData2.dimen1.getSize(), true);
-					return new EasyMultiDimensionData(this.constructMergedDimension(dimen1, emdData2.dimen1), new Dimension(dimen2), dataNew);
+					return new EasyMultiDimensionData(new Dimension(dimen1), new Dimension(dimen2), dataNew);
 				}
 			}
 		}else if(dimen1!=null)
@@ -141,13 +130,13 @@ public class EasyMultiDimensionData {
 					//A2+A1A2=A1A2
 					int[] dataNew=this.mergeDataWithCondition(emdData2.data, emdData2.dimen1.getSize(), emdData2.dimen2.getSize(), 
 							data, dimen1.getSize(), false);
-					return new EasyMultiDimensionData(new Dimension(dimen1), this.constructMergedDimension(emdData2.dimen2, dimen1), dataNew);
+					return new EasyMultiDimensionData(new Dimension(dimen1), new Dimension(emdData2.dimen2), dataNew);
 				}else if(dimen1.equals(emdData2.dimen1)==true)
 				{
 					//A1+A1A2=A1A2
 					int[] dataNew=this.mergeDataWithCondition(emdData2.data, emdData2.dimen1.getSize(), emdData2.dimen2.getSize(), 
 							data, dimen1.getSize(), true);
-					return new EasyMultiDimensionData(this.constructMergedDimension(emdData2.dimen1, dimen1), new Dimension(dimen2), dataNew);
+					return new EasyMultiDimensionData(new Dimension(emdData2.dimen1), new Dimension(dimen2), dataNew);
 				}
 			}else if(emdData2.dimen1!=null)
 			{
@@ -159,7 +148,7 @@ public class EasyMultiDimensionData {
 					{
 						dataNew[i]=data[i]+emdData2.data[i];
 					}
-					return new EasyMultiDimensionData(this.constructMergedDimension(dimen1, emdData2.dimen1), null, dataNew);
+					return new EasyMultiDimensionData(new Dimension(dimen1), null, dataNew);
 				}
 			}
 		}
@@ -199,13 +188,6 @@ public class EasyMultiDimensionData {
 		return dataNew;
 	}
 	
-	private Dimension constructMergedDimension(Dimension base, Dimension toMerge)
-	{
-		Dimension dimenNew=new Dimension(base);
-		dimenNew.mergeConstraintCount(toMerge);
-		return dimenNew;
-	}
-	
 	/**
 	 * A1A2+A2A3=A1A2+A2A3 or A1A2+A1A3 or A1A3+A2A3
 	 * A1A2+A1A3=A1A2+A2A3 or A1A2+A1A3 or A1A3+A2A3
@@ -220,7 +202,9 @@ public class EasyMultiDimensionData {
 		{
 			if(emdData1.dimen1.equals(mutualDimension)==true)
 			{
-				
+				//A1A2+A2A3=A1A2+A1A3
+				int[] dataNew1=new int[emdData1.dimen1.getSize()*emdData1.dimen2.getSize()];
+				int[] dataNew2=new int[emdData1.dimen1.getSize()*emdData2.dimen2.getSize()];
 			}else if(emdData1.dimen2.equals(mutualDimension)==true)
 			{
 				
