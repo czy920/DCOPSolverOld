@@ -7,7 +7,7 @@ public class Dimension implements Comparable<Dimension>{
 	private Integer priority;
 	
 	private int constraintCountTotal;
-	private int constraintCount;
+	private double constraintCount;
 	
 	public Dimension(String name, int size, Integer priority) {
 		super();
@@ -19,7 +19,7 @@ public class Dimension implements Comparable<Dimension>{
 		this.constraintCount=0;
 	}
 	
-	public Dimension(String name, int size, Integer priority, int constraintCountTotal, int constraintCount) {
+	public Dimension(String name, int size, Integer priority, int constraintCountTotal, double constraintCount) {
 		super();
 		this.name = name;
 		this.size = size;
@@ -62,7 +62,7 @@ public class Dimension implements Comparable<Dimension>{
 
 	public boolean isReductable()
 	{
-		return this.constraintCount>=this.constraintCountTotal;
+		return ((int)Math.ceil(this.constraintCount))>=this.constraintCountTotal;
 	}
 
 	@Override

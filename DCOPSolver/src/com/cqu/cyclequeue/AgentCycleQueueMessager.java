@@ -89,11 +89,13 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 					//e.printStackTrace();
 				}
 				
+				boolean lastAgent=true;
 				synchronized (cycleEndCount) {
 					cycleEndCount.incrementAndGet();
 					//System.out.println(Thread.currentThread().getName()+" cycleEndCount: "+cycleEndCount);
 					if(cycleEndCount.get()<totalAgentCount.get())
 					{
+						lastAgent=false;
 						try {
 							cycleEndCount.wait();
 						} catch (InterruptedException e) {
@@ -103,6 +105,7 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 					}
 					if(cycleEndCount.get()>=this.totalAgentCount.get())
 					{
+						lastAgent=true;
 						cycleEndCount.set(0);
 						this.cycleEndCount.notifyAll();
 						if(this.cycleBegin.get()==true)
@@ -111,11 +114,14 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 						}
 					}
 				}
-				synchronized (cycleEnd) {
-					if(cycleEnd.get()==false)
-					{
-						cycleEnd.set(true);
-						cycleEnd.notifyAll();
+				if(lastAgent==true)
+				{
+					synchronized (cycleEnd) {
+						if(cycleEnd.get()==false)
+						{
+							cycleEnd.set(true);
+							cycleEnd.notifyAll();
+						}
 					}
 				}
 			}
