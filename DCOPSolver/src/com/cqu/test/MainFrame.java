@@ -65,47 +65,47 @@ public class MainFrame extends JFrame {
 		setResizable(false);
 		setTitle("DCOPSolver");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 400, 335);
+		setBounds(100, 100, 400, 299);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
 		combobAgentType = new JComboBox();
-		combobAgentType.setBounds(73, 74, 311, 32);
+		combobAgentType.setBounds(73, 52, 311, 32);
 		contentPane.add(combobAgentType);
 		
 		JLabel lblAgenttype = new JLabel("AgentType");
-		lblAgenttype.setBounds(10, 83, 65, 15);
+		lblAgenttype.setBounds(10, 61, 65, 15);
 		contentPane.add(lblAgenttype);
 		
 		cbDebug = new JCheckBox("Debug");
-		cbDebug.setBounds(73, 135, 64, 23);
+		cbDebug.setBounds(73, 99, 64, 23);
 		contentPane.add(cbDebug);
 		
 		cbTreeFrame = new JCheckBox("Tree Frame");
-		cbTreeFrame.setBounds(134, 135, 90, 23);
+		cbTreeFrame.setBounds(134, 99, 90, 23);
 		contentPane.add(cbTreeFrame);
 		
 		JLabel lblSwitch = new JLabel("Switch");
-		lblSwitch.setBounds(10, 139, 65, 15);
+		lblSwitch.setBounds(10, 103, 65, 15);
 		contentPane.add(lblSwitch);
 		
 		combobProblem = new JComboBox();
-		combobProblem.setBounds(73, 17, 311, 32);
+		combobProblem.setBounds(73, 10, 311, 32);
 		contentPane.add(combobProblem);
 		
 		JLabel lblProblem = new JLabel("Problem");
-		lblProblem.setBounds(10, 26, 65, 15);
+		lblProblem.setBounds(10, 19, 65, 15);
 		contentPane.add(lblProblem);
 		
 		btnSolve = new JButton("Solve");
-		btnSolve.setBounds(10, 235, 374, 62);
+		btnSolve.setBounds(10, 199, 374, 62);
 		contentPane.add(btnSolve);
 		
 		lbRunningFlag = new JLabel("New label");
 		lbRunningFlag.setHorizontalAlignment(SwingConstants.CENTER);
-		lbRunningFlag.setBounds(279, 116, 54, 56);
+		lbRunningFlag.setBounds(276, 82, 54, 56);
 		contentPane.add(lbRunningFlag);
 		
 		//init
@@ -134,11 +134,10 @@ public class MainFrame extends JFrame {
 		cbBatch.addActionListener(new ActionListener() {
 			
 			@Override
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				if(cbBatch.isSelected()==true)
 				{
-					
 					File f=DialogUtil.dialogOpenDir("Select Direcory", tfDirPath.getText().isEmpty()?"E:/":tfDirPath.getText());
 					if(f!=null&&f.isDirectory()==true)
 					{
@@ -151,25 +150,25 @@ public class MainFrame extends JFrame {
 				}
 			}
 		});
-		cbBatch.setBounds(322, 178, 62, 23);
+		cbBatch.setBounds(322, 135, 62, 23);
 		contentPane.add(cbBatch);
 		
 		tfDirPath = new JTextField();
-		tfDirPath.setBounds(10, 207, 374, 21);
+		tfDirPath.setBounds(10, 168, 374, 21);
 		contentPane.add(tfDirPath);
 		tfDirPath.setColumns(10);
 		
 		labelBatCounter = new JLabel("0/0/0");
-		labelBatCounter.setBounds(194, 182, 95, 15);
+		labelBatCounter.setBounds(194, 139, 95, 15);
 		contentPane.add(labelBatCounter);
 		
 		spinnerRepeatTimes = new JSpinner();
 		spinnerRepeatTimes.setModel(new SpinnerNumberModel(5, 3, 10, 1));
-		spinnerRepeatTimes.setBounds(73, 179, 65, 22);
+		spinnerRepeatTimes.setBounds(73, 136, 65, 22);
 		contentPane.add(spinnerRepeatTimes);
 		
 		JLabel lblTimes = new JLabel("times");
-		lblTimes.setBounds(10, 182, 54, 15);
+		lblTimes.setBounds(10, 139, 54, 15);
 		contentPane.add(lblTimes);
 		lbRunningFlag.setVisible(false);
 		

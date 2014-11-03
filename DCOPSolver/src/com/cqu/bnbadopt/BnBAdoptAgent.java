@@ -151,8 +151,7 @@ public class BnBAdoptAgent extends AgentCycle {
 	
 	private void sendValueMessages()
 	{
-		if(this.isLeafAgent() == true &&this.NoPseudoChild()==true)
-		{
+		if (this.isLeafAgent() == true && this.NoPseudoChild() == true) {
 			return;
 		}
 		if(this.isLeafAgent() ==false)
@@ -181,7 +180,7 @@ public class BnBAdoptAgent extends AgentCycle {
 			val[2]=Infinity.INFINITY;
 			Message msg=new Message(this.id, pseudoChildId, BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
 			this.sendMessage(this.constructNcccMessage(msg));
-		}
+			}
 		}
 	}
 	 	
