@@ -143,6 +143,9 @@ public class MainFrame extends JFrame {
 					{
 						enableBatch(true);
 						tfDirPath.setText(f.getPath());
+					}else
+					{
+						cbBatch.setSelected(false);
 					}
 				}else
 				{
