@@ -61,14 +61,14 @@ public class AgentModel extends AgentCycle {
 		//this.boundary=(int) Math.floor(this.height*this.scaleArg);
 		
 		// a sole bnbadopt
-		method = new BnBMethod(this);
-		typeMethod = "bnbadopt";
-		this.strategy="bnbadopt";
+		//method = new BnBMethod(this);
+		//typeMethod = "bnbadopt";
+		//this.strategy="bnbadopt";
 
 		// a sole adopt
-		// method=new AdoptMethod(this);
-		// typeMethod="adopt";
-		//strategy="adopt";
+		 method=new AdoptMethod(this);
+		 typeMethod="adopt";
+		strategy="adopt";
 
 
 		// union adopt and bnbadopt
@@ -392,17 +392,28 @@ public class AgentModel extends AgentCycle {
 			this.agent=agent;
 		}
 
-		public void initRun() {
-
-			agent.TH = 0;
-			agent.valueID = 0;
-			agent.currentContext = new Context();
-
-			agent.lbs = new HashMap<Integer, int[]>();
-			agent.ubs = new HashMap<Integer, int[]>();
-			agent.ths = new HashMap<Integer, int[]>();
-			agent.contexts = new HashMap<Integer, Context[]>();
-
+		private void InitSelf(){
+			
+			agent.TH=0;
+			//int oldvalueIndex=this.valueIndex;
+			agent.valueIndex=agent.computeMinimalLBAndUB()[0];
+			//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
+			agent.valueID = agent.valueID + 1;
+			//Debugger.valueChanges.get(this.name).add(valueIndex);			
+		}
+		
+		private void InitChild(int child,int d)
+		{
+			if(agent.isLeafAgent()==false)
+			{
+					agent.lbs.get(child)[d] = 0;
+					agent.ubs.get(child)[d] = Infinity.INFINITY;
+					agent.ths.get(child)[d] = 0;
+					agent.contexts.get(child)[d].reset();
+			}
+		}
+		
+		private void InitChild() {
 			if (agent.isLeafAgent() == false) {
 				int childId = 0;
 				for (int i = 0; i < agent.children.length; i++) {
@@ -423,18 +434,37 @@ public class AgentModel extends AgentCycle {
 					agent.contexts.put(childId, childContexts);
 				}
 			}
+		}
+		
+		public void initRun() {
 
-			agent.valueIndex = agent.computeMinimalLBAndUB()[0];
-			//agent.valueID = agent.valueID + 1;
-			Debugger.valueChanges.get(agent.getName()).add(agent.valueIndex);
+			agent.TH = 0;
+			agent.valueID = 0;
+			agent.currentContext = new Context();
+			
+			if(!agent.isRootAgent())
+				agent.currentContext.addOrUpdate(agent.parent, 0, 0); //仅仅初始化为第1个取值
+			if(agent.pseudoParents!=null)
+			{
+				for(int pseudoP:agent.pseudoParents){
+				    agent.currentContext.addOrUpdate(pseudoP, 0, 0); //仅仅初始化为第1个取值
+				}
+			}
 
+			agent.lbs = new HashMap<Integer, int[]>();
+			agent.ubs = new HashMap<Integer, int[]>();
+			agent.ths = new HashMap<Integer, int[]>();
+			agent.contexts = new HashMap<Integer, Context[]>();
+			InitChild();
+			InitSelf();
 			backtrack();
 		}
 		
 		protected void merge(Context c) {
-			Context temp = new Context(c);
-			temp.remove(agent.neighbours);
-			agent.currentContext.union(temp);
+			agent.currentContext.union(c);
+			//Context temp = new Context(c);
+			//temp.remove(agent.neighbours);
+			//agent.currentContext.union(temp);
 		}
 
 		private void checkCompatible() {  //两个方法可以用一个吗？
@@ -446,14 +476,15 @@ public class AgentModel extends AgentCycle {
 				childId = agent.children[i];
 				for (int j = 0; j < agent.children.length; j++) {
 					if (agent.contexts.get(childId)[j].compatible(agent.currentContext) == false) {
-						agent.lbs.get(childId)[j] = 0;
-						agent.ths.get(childId)[j] = 0;
-						agent.ubs.get(childId)[j] = Infinity.INFINITY;
-						agent.contexts.get(childId)[j].reset();
+						InitChild(childId,j);
 					}
 				}
 			}
 		}
+		
+		private boolean checkCompatible(Context c1,Context c2){
+			return c1.compatible(c2);	
+			}
 
 		@Override
 		public void sendValueMessages() {
@@ -534,7 +565,7 @@ public class AgentModel extends AgentCycle {
 			if (agent.isLeafAgent() == true) {
 				return;
 			}
-
+			agent.terminateReceivedFromParent=true;
 			int childId = 0;
 			for (int i = 0; i < agent.children.length; i++) {
 				childId = agent.children[i];
@@ -556,34 +587,40 @@ public class AgentModel extends AgentCycle {
 				agent.sendMessage(agent.constructNcccMessage(msg));
 			}
 
-			if (agent.pseudoChildren != null) {
-				int pseudoChildId = 0;
-				for (int i = 0; i < agent.pseudoChildren.length; i++) {
-					pseudoChildId = agent.pseudoChildren[i];
-					int[] val = new int[3];
-					val[0] = agent.valueIndex;
-					val[1] = agent.valueID;
-					val[2] = -1;  //a virtual th
-					Message valueMsg = new Message(agent.getId(), pseudoChildId,
-							AgentModel.TYPE_VALUE_MESSAGE, val);
-
-					Message msg = new Message(agent.getId(), pseudoChildId,
-							AgentModel.TYPE_TERMINATE_MESSAGE, valueMsg);
-					agent.sendMessage(agent.constructNcccMessage(msg));
-				}
-			}
+			//不发送终止给伪孩子
+//			if (agent.pseudoChildren != null) {  
+//				int pseudoChildId = 0;
+//				for (int i = 0; i < agent.pseudoChildren.length; i++) {
+//					pseudoChildId = agent.pseudoChildren[i];
+//					int[] val = new int[3];
+//					val[0] = agent.valueIndex;
+//					val[1] = agent.valueID;
+//					val[2] = -1;  //a virtual th
+//					Message valueMsg = new Message(agent.getId(), pseudoChildId,
+//							AgentModel.TYPE_VALUE_MESSAGE, val);
+//
+//					Message msg = new Message(agent.getId(), pseudoChildId,
+//							AgentModel.TYPE_TERMINATE_MESSAGE, valueMsg);
+//					agent.sendMessage(agent.constructNcccMessage(msg));
+//				}
+//			}
 		}
 
 		@Override
 		public void disposeValueMessage(Message msg) {   //阈值一起处理
 			if (agent.terminateReceivedFromParent == false) {
-				int[] val = new int[3];
-				val=(int[]) msg.getValue();
+				Context temp = new Context(agent.currentContext);
+				int[] val =(int[]) msg.getValue();
 				agent.currentContext.addOrUpdate(msg.getIdSender(), val[0], val[1]);
-				checkCompatible();
+				
+				if(!checkCompatible(agent.currentContext,temp))
+				{
+					checkCompatible();
+					InitSelf();
+				}
 				if (msg.getIdSender() == agent.parent && val[2] != (-1)) 
 					agent.TH = val[2];
-				maintainThresholdInvariant();
+				//maintainThresholdInvariant();  //放在backtrack函数里面一次性做
 				if(agent.msgQueue.isEmpty()&&agent.Readytermintate==false)backtrack();
 			}
 		}
@@ -592,25 +629,32 @@ public class AgentModel extends AgentCycle {
 		public void disposeCostMessage(Message msg) {
 			Map<String, Object> cost=(Map<String, Object>) msg.getValue();
 			Context c = (Context) cost.get(AgentModel.KEY_CONTEXT);
-			int myValueIndex = c.Remove(agent.getId());
+			int myValueIndex = c.get(agent.id);
 
 			if (myValueIndex == -1) {
 				return;
-			}
+			}			
 
+			Context temp = new Context(agent.currentContext);
 			if (agent.terminateReceivedFromParent == false) {
 				merge(c);
-				checkCompatible();
+				agent.currentContext.Remove(agent.id);   //因为合并时将自己的取值加入，应该移除
+				if (!checkCompatible(agent.currentContext, temp)) {  //不兼容表示引入了新的内容
+					checkCompatible();
+				}
 			}
-			if (c.compatible(agent.currentContext) == true) {
+			if (checkCompatible(c,agent.currentContext) == true) {
 				agent.lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
 						.get(AgentModel.KEY_LB);
 				agent.ubs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
 						.get(AgentModel.KEY_UB);
 				agent.contexts.get(msg.getIdSender())[myValueIndex] = c;
 
-				maintainChildThresholdInvariant();
-				maintainThresholdInvariant();
+				//maintainChildThresholdInvariant();
+				//maintainThresholdInvariant();
+			}
+			if (!checkCompatible(agent.currentContext, temp)) {
+				InitSelf();
 			}
 			if(agent.msgQueue.isEmpty())backtrack();
 
@@ -630,29 +674,30 @@ public class AgentModel extends AgentCycle {
 
 		@SuppressWarnings("unchecked")
 		public void disposeTerminateMessage(Message msg) {
-			Message valueMsg = null;
+			
 			agent.Readytermintate=true;
+			if(agent.msgQueue.isEmpty())backtrack();
+//			Message valueMsg = null;
 			//父agent发过来的terminate消息为包含了基本的terminate消息和value消息
-			if (msg.getIdSender() == agent.parent) {
-				Map<String, Object> mapValue = (Map<String, Object>) msg.getValue();
-				agent.currentContext = (Context) mapValue
-						.get(AgentModel.KEY_CONTEXT);
-				valueMsg = (Message) mapValue.get(AgentModel.KEY_VALUE_MESSAGE);
-				agent.disposeMessage(agent.constructNcccMessage(valueMsg));
-
-				agent.terminateReceivedFromParent = true;
-
-				//此处与Adopt:Pragnesh Jay Modi et al.中的伪代码不一样
-	            //terminateReceivedFromParent变为true，再次调用maintainThresholdInvariant()
-	            //防止TH==UB失败导致agent不能终止
-				maintainThresholdInvariant();
-				if(agent.msgQueue.isEmpty())backtrack();
-			} else {
-				//pseudo父agent发过来的terminate消息仅包含了value消息
-				valueMsg = (Message) msg.getValue();
-				agent.disposeMessage(agent.constructNcccMessage(valueMsg));
-			}
-
+//			if (msg.getIdSender() == agent.parent) {
+//				Map<String, Object> mapValue = (Map<String, Object>) msg.getValue();
+//				agent.currentContext = (Context) mapValue
+//						.get(AgentModel.KEY_CONTEXT);
+//				valueMsg = (Message) mapValue.get(AgentModel.KEY_VALUE_MESSAGE);
+//				agent.disposeMessage(agent.constructNcccMessage(valueMsg));
+//
+//				agent.terminateReceivedFromParent = true;
+//
+//				//此处与Adopt:Pragnesh Jay Modi et al.中的伪代码不一样
+//	            //terminateReceivedFromParent变为true，再次调用maintainThresholdInvariant()
+//	            //防止TH==UB失败导致agent不能终止
+//				maintainThresholdInvariant();
+//				if(agent.msgQueue.isEmpty())backtrack();
+//			} else {
+//				//pseudo父agent发过来的terminate消息仅包含了value消息
+//				valueMsg = (Message) msg.getValue();
+//				agent.disposeMessage(agent.constructNcccMessage(valueMsg));
+//			}
 		}
 
 		private void backtrack() {
@@ -664,6 +709,10 @@ public class AgentModel extends AgentCycle {
 			//do nccc local here
 		    agent.increaseNcccLocal();
 		    
+		    if(agent.strategy.equals("adopt"))
+		    	this.maintainThresholdInvariant();
+		    if(agent.strategy.equals("bnbandadopt"))
+		    	this.BDmaintainThresholdInvariant();	    
 		    int oldValue=agent.valueIndex;
 		    
 			if (agent.TH == agent.UB) {
@@ -684,10 +733,12 @@ public class AgentModel extends AgentCycle {
 				agent.valueID = agent.valueID + 1;
 			}
 
-			maintainAllocationInvariant();   //必须将这个放在发送VALUE信息之前
+			System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
+			this.maintainChildThresholdInvariant();
+			this.maintainAllocationInvariant();   //必须将这个放在发送VALUE信息之前
 			sendValueMessages();
 			if (agent.TH == agent.UB) {
-				if (agent.terminateReceivedFromParent == true
+				if (agent.Readytermintate == true
 						|| agent.isRootAgent() == true) {
 					sendTerminateMessages();
 					agent.stopRunning();
@@ -705,6 +756,21 @@ public class AgentModel extends AgentCycle {
 			}
 		}
 		 
+		private void BDmaintainThresholdInvariant() {
+			if(agent.level+1==agent.boundary)
+			{
+				agent.TH=agent.LB;
+			}
+			else{
+			if (agent.TH < agent.LB) {
+				agent.TH = agent.LB;
+			}
+			if (agent.TH > agent.UB) {
+				agent.TH = agent.UB;
+			}
+			}
+		}
+		
 		//一个用来测试TH的变化的函数，可以注释掉
 //		private void checkThresholdInvariant(String typeMethod) {
 //			if (typeMethod.equals("bnbadopt")) {

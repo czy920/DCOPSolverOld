@@ -81,7 +81,7 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 				}
 
 				cycleCount++;
-				//System.out.println("cycleCount: "+cycleCount);
+				System.out.println("cycleCount: "+cycleCount);
 				cycleEnd.set(false);
 				synchronized (cycleBegin) {
 					cycleBegin.set(true);//open entrance
