@@ -76,6 +76,7 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 			}
 			if(cycleBegin.get()==true)
 			{
+				this.totalAgentCount.set(this.totalAgentCountTemp.get());
 				try
 				{
 					while(msgQueue.isEmpty()==false)
@@ -123,7 +124,6 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 						if(cycleEnd.get()==false)
 						{
 							cycleEnd.set(true);
-							this.totalAgentCount.set(this.totalAgentCountTemp.get());
 							cycleEnd.notifyAll();
 						}
 					}
