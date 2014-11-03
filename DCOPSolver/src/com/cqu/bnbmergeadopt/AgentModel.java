@@ -4,19 +4,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cqu.adopt.AdoptAgent;
-import com.cqu.core.Agent;
+import com.cqu.bnbadopt.BnBAdoptAgent;
+import com.cqu.bnbadopt.Context;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.MessageNCCC;
 import com.cqu.core.ResultAdopt;
+import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.test.Debugger;
 
-public class AgentModel extends Agent {
+public class AgentModel extends AgentCycle {
 
 	public final static int TYPE_VALUE_MESSAGE = 0;
 	public final static int TYPE_COST_MESSAGE = 1;
-	public final static int TYPE_THRESHOLD_MESSAGE = 2;
+	//public final static int TYPE_THRESHOLD_MESSAGE = 2;
 	public final static int TYPE_TERMINATE_MESSAGE = Message.TYPE_TERMINATE_MESSAGE;
 
 	public final static String KEY_CONTEXT = "KEY_CONTEXT";
@@ -24,53 +25,59 @@ public class AgentModel extends Agent {
 	public final static String KEY_UB = "KEY_UB";
 	public final static String KEY_TH = "KEY_TH";
 	public final static String KEY_NCCC="KEY_NCCC";
-	//public final static String STRATEGY = "Strategy";
+	public final static  String STRATEGY ="STRATEGY";
 
 	public final static String KEY_VALUE_MESSAGE = "KEY_VALUE_MESSAGE";
+	
 
-	public Map<Integer, int[]> lbs;
-	public Map<Integer, int[]> ubs;
-	public Map<Integer, int[]> ths;
-	public int LB;
-	public int UB;
-	public int TH;
+	private Map<Integer, int[]> lbs;
+	private Map<Integer, int[]> ubs;
+	private Map<Integer, int[]> ths;
+	private int LB;
+	private int UB;
+	private int TH;
 
-	public Map<Integer, Context[]> contexts;
-	public Context currentContext;
+	private Map<Integer, Context[]> contexts;
+	private Context currentContext;
 
-	//public String strategy;
-	public String typeMethod;
+	private String strategy;
+	private String typeMethod;
+	private int boundary;    //方法的分界，可以由比例求得，这里设为3
+	private float scaleArg;    //两个方法的比例参数
 
-	public int valueID;
-	public boolean terminateReceivedFromParent = false;
-	public boolean Readytermintate = false;
+	private int valueID;
+	private boolean terminateReceivedFromParent = false;
+	private boolean Readytermintate = false;
 	
 	private int nccc;
 
-	public Method method;
+	private Method method;
 	
 	public AgentModel(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 		this.nccc = 0;
 		
+		this.boundary=3;
+		//this.boundary=(int) Math.floor(this.height*this.scaleArg);
+		
 		// a sole bnbadopt
-		method = new BnBMethod(this);
-		typeMethod = "bnbadopt";
-		// strategy = "bnbadopt";
+		//method = new BnBMethod(this);
+		//typeMethod = "bnbadopt";
+		//this.strategy="bnbadopt";
 
 		// a sole adopt
-		// method=new AdoptMethod(this);
-		// typeMethod="adopt";
-		// strategy="adopt";
+		 method=new AdoptMethod(this);
+		 typeMethod="adopt";
+		strategy="adopt";
+
 
 		// union adopt and bnbadopt
-		/*
-		 * if(this.level==0||this.level==1||this.level==2){ //前三层用bnbadopt策略
-		 * method=new BnBMethod(this); typeMethod="bnbadopt";
-		 * 
-		 * } else { //其他层用adopt策略 method=new AdoptMethod(this);
-		 * typeMethod="adopt"; }
-		 */
+//		if (this.level <= this.boundary) { // 前三层用bnbadopt策略
+//			method = new BnBMethod(this);
+//			typeMethod = "bnbadopt";
+//		} else { // 其他层用adopt策略 method=new AdoptMethod(this);
+//			typeMethod = "adopt";
+//		}		 
 		// strategy="bnbandadopt";
 	}
 
@@ -82,16 +89,6 @@ public class AgentModel extends Agent {
 
 	public boolean NoPseudoChild() {
 		return this.pseudoChildren == null;
-	}
-
-	protected void merge(Context c) {
-		Context temp = new Context(c);
-		temp.remove(this.neighbours);
-		currentContext.union(temp);
-	}
-	
-	protected void merge2(Context c){
-		currentContext.union(c);
 	}
 
 	// return int[]{dMinimizesLB, LB(curValue), dMinimizesUB}
@@ -236,9 +233,11 @@ public class AgentModel extends Agent {
 			method.disposeValueMessage(msg);
 		} else if (msg.getType() == AgentModel.TYPE_COST_MESSAGE) {
 			method.disposeCostMessage(msg);
-		} else if (msg.getType() == AgentModel.TYPE_THRESHOLD_MESSAGE) {
-			method.disposeThresholdMessage(msg);
-		} else if (msg.getType() == AgentModel.TYPE_TERMINATE_MESSAGE) {
+		} 
+//		else if (msg.getType() == AgentModel.TYPE_THRESHOLD_MESSAGE) {
+//			method.disposeThresholdMessage(msg);
+//		} 
+		else if (msg.getType() == AgentModel.TYPE_TERMINATE_MESSAGE) {
 			method.disposeTerminateMessage(msg);
 		}
 	}
@@ -279,7 +278,7 @@ public class AgentModel extends Agent {
 	}
 
 	@Override
-	public String easyMessageContent(Message msg, Agent sender, Agent receiver) {
+	public String easyMessageContent(Message msg, AgentCycle sender, AgentCycle receiver) {
 
 		return "from " + sender.getName() + " to " + receiver.getName()
 				+ " type " + AgentModel.messageContent(msg);
@@ -297,12 +296,12 @@ public class AgentModel extends Agent {
 		result.put(AgentModel.KEY_LB, this.LB);
 		result.put(AgentModel.KEY_UB, this.UB);
 		result.put(AgentModel.KEY_TH, this.TH);
-		result.put(AdoptAgent.KEY_NCCC, this.nccc);
-		//result.put(AgentModel.STRATEGY, this.strategy);
+		result.put(AgentModel.KEY_NCCC, this.nccc);
+		result.put(AgentModel.STRATEGY, this.strategy);
 		
 		this.msgMailer.setResult(result);
 
-		// System.out.println("Agent "+this.name+" stopped!");
+	    System.out.println("Agent "+this.name+" stopped!");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -320,12 +319,12 @@ public class AgentModel extends Agent {
 			return "cost[LB=" + LB_ + " UB=" + UB_ + " context=" + c.toString()
 					+ "]";
 		}
-		case AgentModel.TYPE_THRESHOLD_MESSAGE: {
-			Map<String, Object> msgValue = (Map<String, Object>) msg.getValue();
-			int TH_ = (Integer) msgValue.get(KEY_TH);
-			Context c = (Context) msgValue.get(KEY_CONTEXT);
-			return "threshold[TH=" + TH_ + " context=" + c.toString() + "]";
-		}
+//		case AgentModel.TYPE_THRESHOLD_MESSAGE: {
+//			Map<String, Object> msgValue = (Map<String, Object>) msg.getValue();
+//			int TH_ = (Integer) msgValue.get(KEY_TH);
+//			Context c = (Context) msgValue.get(KEY_CONTEXT);
+//			return "threshold[TH=" + TH_ + " context=" + c.toString() + "]";
+//		}
 		case AgentModel.TYPE_TERMINATE_MESSAGE: {
 			return "terminate[]";
 		}
@@ -361,79 +360,69 @@ public class AgentModel extends Agent {
 	
 	
 	
-	public static interface Method {
-		
-		 public  void disposeValueMessage(Message msg);
+	public abstract class Method {
 
-		 public  void disposeCostMessage(Message msg);
+		protected abstract void disposeValueMessage(Message msg);
 
-		 public  void disposeThresholdMessage(Message msg);
+		protected abstract void disposeCostMessage(Message msg);
 
-		 public  void disposeTerminateMessage(Message msg);
+		// public void disposeThresholdMessage(Message msg);
 
-		public  void initRun();
-		 
-		public  void sendValueMessages();
-		
-		public  void sendCostMessages();
-		
-		public  void sendTerminateMessages();
-		
-		public  void sendThresholdMessages();
+		protected abstract void disposeTerminateMessage(Message msg);
+
+		protected abstract void initRun();
+
+		protected abstract void merge(Context c);
+
+		protected abstract void sendValueMessages();
+
+		protected abstract void sendCostMessage();
+
+		protected abstract void sendTerminateMessages();
+
+		// public abstracted void sendThresholdMessages();
 	}
+
 	
-	public int[] getChildren()
-	{
-		return this.children;
-	}
 	
-	public int[] getPseudoChildren()
-	{
-		return this.pseudoChildren;
-	}
-	
-	public int[] getDomain()
-	{
-		return this.domain;
-	}
-	
-	public int getParent()
-	{
-		return this.parent;
-	}
-	
-	public int[] getPseudoParents()
-	{
-		return this.pseudoParents;
-	}
-	
-	public class AdoptMethod implements Method {
+	public class AdoptMethod extends Method {
 
 		private AgentModel agent;
 		AdoptMethod(AgentModel agent) {
 			this.agent=agent;
 		}
 
-		public void initRun() {
-
-			agent.TH = 0;
-			agent.valueID = 0;
-			agent.currentContext = new Context();
-
-			agent.lbs = new HashMap<Integer, int[]>();
-			agent.ubs = new HashMap<Integer, int[]>();
-			agent.ths = new HashMap<Integer, int[]>();
-			agent.contexts = new HashMap<Integer, Context[]>();
-
+		private void InitSelf(){
+			
+			agent.TH=0;
+			//int oldvalueIndex=this.valueIndex;
+			agent.valueIndex=agent.computeMinimalLBAndUB()[0];
+			//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
+			agent.valueID = agent.valueID + 1;
+			//Debugger.valueChanges.get(this.name).add(valueIndex);			
+		}
+		
+		private void InitChild(int child,int d)
+		{
+			if(agent.isLeafAgent()==false)
+			{
+					agent.lbs.get(child)[d] = 0;
+					agent.ubs.get(child)[d] = Infinity.INFINITY;
+					agent.ths.get(child)[d] = 0;
+					agent.contexts.get(child)[d].reset();
+			}
+		}
+		
+		private void InitChild() {
 			if (agent.isLeafAgent() == false) {
 				int childId = 0;
-				for (int i = 0; i < agent.getChildren().length; i++) {
-					childId = agent.getChildren()[i];
-					int[] childLbs = new int[agent.getDomain().length];
-					int[] childUbs = new int[agent.getDomain().length];
-					int[] childThs = new int[agent.getDomain().length];
-					Context[] childContexts = new Context[agent.getDomain().length];
-					for (int j = 0; j < agent.getDomain().length; j++) {
+				for (int i = 0; i < agent.children.length; i++) {
+					childId = agent.children[i];
+					int[] childLbs = new int[agent.domain.length];
+					int[] childUbs = new int[agent.domain.length];
+					int[] childThs = new int[agent.domain.length];
+					Context[] childContexts = new Context[agent.domain.length];
+					for (int j = 0; j < agent.domain.length; j++) {
 						childLbs[j] = 0;
 						childUbs[j] = Infinity.INFINITY;
 						childThs[j] = 0;
@@ -445,31 +434,57 @@ public class AgentModel extends Agent {
 					agent.contexts.put(childId, childContexts);
 				}
 			}
+		}
+		
+		public void initRun() {
 
-			agent.valueIndex = agent.computeMinimalLBAndUB()[0];
-			//agent.valueID = agent.valueID + 1;
-			Debugger.valueChanges.get(agent.getName()).add(agent.valueIndex);
+			agent.TH = 0;
+			agent.valueID = 0;
+			agent.currentContext = new Context();
+			
+			if(!agent.isRootAgent())
+				agent.currentContext.addOrUpdate(agent.parent, 0, 0); //仅仅初始化为第1个取值
+			if(agent.pseudoParents!=null)
+			{
+				for(int pseudoP:agent.pseudoParents){
+				    agent.currentContext.addOrUpdate(pseudoP, 0, 0); //仅仅初始化为第1个取值
+				}
+			}
 
+			agent.lbs = new HashMap<Integer, int[]>();
+			agent.ubs = new HashMap<Integer, int[]>();
+			agent.ths = new HashMap<Integer, int[]>();
+			agent.contexts = new HashMap<Integer, Context[]>();
+			InitChild();
+			InitSelf();
 			backtrack();
 		}
+		
+		protected void merge(Context c) {
+			agent.currentContext.union(c);
+			//Context temp = new Context(c);
+			//temp.remove(agent.neighbours);
+			//agent.currentContext.union(temp);
+		}
 
-		private void checkCompatible() {
+		private void checkCompatible() {  //两个方法可以用一个吗？
 			if (agent.isLeafAgent() == true) {
 				return;
 			}
 			int childId = 0;
-			for (int i = 0; i < agent.getChildren().length; i++) {
-				childId = agent.getChildren()[i];
-				for (int j = 0; j < agent.getDomain().length; j++) {
+			for (int i = 0; i < agent.children.length; i++) {
+				childId = agent.children[i];
+				for (int j = 0; j < agent.children.length; j++) {
 					if (agent.contexts.get(childId)[j].compatible(agent.currentContext) == false) {
-						agent.lbs.get(childId)[j] = 0;
-						agent.ths.get(childId)[j] = 0;
-						agent.ubs.get(childId)[j] = Infinity.INFINITY;
-						agent.contexts.get(childId)[j].reset();
+						InitChild(childId,j);
 					}
 				}
 			}
 		}
+		
+		private boolean checkCompatible(Context c1,Context c2){
+			return c1.compatible(c2);	
+			}
 
 		@Override
 		public void sendValueMessages() {
@@ -478,11 +493,11 @@ public class AgentModel extends Agent {
 			}
 
 			int ChildId = 0;
-			int[] val = new int[3];
-			val[0] = agent.valueIndex;
-			val[1] = agent.valueID;
-			val[2] = -1; // a virtural th
+			
 			for (int i = 0; i < agent.children.length; i++) {
+				int[] val = new int[3];
+				val[0] = agent.valueIndex;
+				val[1] = agent.valueID;
 				ChildId = agent.children[i];
 				val[2] = agent.ths.get(ChildId)[agent.valueIndex];
 				Message msg = new Message(agent.getId(), ChildId,
@@ -493,9 +508,12 @@ public class AgentModel extends Agent {
 				return;
 			}
 			int pseudoChildId=0;
-			for (int i = 0; i < agent.getPseudoChildren().length; i++) {
-				pseudoChildId = agent.getPseudoChildren()[i];
-				val[2]=-1;
+			for (int i = 0; i < agent.pseudoChildren.length; i++) {
+				int[] val = new int[3];
+				val[0] = agent.valueIndex;
+				val[1] = agent.valueID;
+				val[2] = -1;   // a virtural th
+				pseudoChildId = agent.pseudoChildren[i];
 				Message msg = new Message(agent.getId(), pseudoChildId,
 						AgentModel.TYPE_VALUE_MESSAGE,val);
 				agent.sendMessage(this.agent.constructNcccMessage(msg));
@@ -503,60 +521,60 @@ public class AgentModel extends Agent {
 		}
 
 		@Override
-		public void sendCostMessages() {
+		protected void sendCostMessage() {
 			if (agent.isRootAgent() == true) {
 				return;
 			}
 
 			Map<String, Object> cost = new HashMap<String, Object>();
 			Context context = new Context(agent.currentContext);
-			context.Remove(agent.getId());
+			//context.Remove(agent.getId());    //在处理cost信息时应该执行这个
 			cost.put(AgentModel.KEY_CONTEXT, new Context(context));
 			cost.put(AgentModel.KEY_LB, agent.LB);
 			cost.put(AgentModel.KEY_UB, agent.UB);
 
-			Message msg = new Message(agent.getId(), agent.getParent(),
+			Message msg = new Message(agent.getId(), agent.parent,
 					AgentModel.TYPE_COST_MESSAGE, cost);
 			agent.sendMessage(agent.constructNcccMessage(msg));
 		}
 
 		//don't been used instead of inputing the th into value message
+//		@Override
+//		protected void sendThresholdMessages() {
+//			if (agent.isLeafAgent() == true) {
+//				return;
+//			}
+//
+//			int childId = 0;
+//			for (int i = 0; i < agent.children.length; i++) {
+//				childId = agent.children[i];
+//				Map<String, Object> thresh = new HashMap<String, Object>();
+//				thresh.put(AgentModel.KEY_CONTEXT,
+//						new Context(agent.currentContext));
+//				thresh.put(AgentModel.KEY_TH,
+//						agent.ths.get(childId)[agent.valueIndex]);
+//
+//				Message msg = new Message(agent.getId(), childId,
+//						AgentModel.TYPE_THRESHOLD_MESSAGE, thresh);
+//				agent.sendMessage(agent.constructNcccMessage(msg));
+//			}
+//		}
+
 		@Override
-		public void sendThresholdMessages() {
+		protected void sendTerminateMessages() {
 			if (agent.isLeafAgent() == true) {
 				return;
 			}
-
+			agent.terminateReceivedFromParent=true;
 			int childId = 0;
-			for (int i = 0; i < agent.getChildren().length; i++) {
-				childId = agent.getChildren()[i];
-				Map<String, Object> thresh = new HashMap<String, Object>();
-				thresh.put(AgentModel.KEY_CONTEXT,
-						new Context(agent.currentContext));
-				thresh.put(AgentModel.KEY_TH,
-						agent.ths.get(childId)[agent.valueIndex]);
-
-				Message msg = new Message(agent.getId(), childId,
-						AgentModel.TYPE_THRESHOLD_MESSAGE, thresh);
-				agent.sendMessage(agent.constructNcccMessage(msg));
-			}
-		}
-
-		@Override
-		public void sendTerminateMessages() {
-			if (agent.isLeafAgent() == true) {
-				return;
-			}
-
-			int childId = 0;
-			for (int i = 0; i < agent.getChildren().length; i++) {
-				childId = agent.getChildren()[i];
+			for (int i = 0; i < agent.children.length; i++) {
+				childId = agent.children[i];
 				Context c = new Context(agent.currentContext);
-				c.addOrUpdate(agent.getId(), agent.valueIndex, agent.valueID);
+				c.addOrUpdate(agent.id, agent.valueIndex, agent.valueID);
 				int[] val = new int[3];
 				val[0] = agent.valueIndex;
 				val[1] = agent.valueID;
-				val[2] = -1;
+				val[2] = agent.ths.get(childId)[agent.valueIndex];
 				Message valueMsg = new Message(agent.getId(), childId,
 						AgentModel.TYPE_VALUE_MESSAGE,val);
 
@@ -569,39 +587,41 @@ public class AgentModel extends Agent {
 				agent.sendMessage(agent.constructNcccMessage(msg));
 			}
 
-			if (agent.getPseudoChildren() != null) {
-				int pseudoChildId = 0;
-				for (int i = 0; i < agent.getPseudoChildren().length; i++) {
-					pseudoChildId = agent.getPseudoChildren()[i];
-					int[] val = new int[3];
-					val[0] = agent.valueIndex;
-					val[1] = agent.valueID;
-					val[2] = -1;
-					Message valueMsg = new Message(agent.getId(), pseudoChildId,
-							AgentModel.TYPE_VALUE_MESSAGE, val);
-
-					Message msg = new Message(agent.getId(), pseudoChildId,
-							AgentModel.TYPE_TERMINATE_MESSAGE, valueMsg);
-					agent.sendMessage(agent.constructNcccMessage(msg));
-				}
-			}
+			//不发送终止给伪孩子
+//			if (agent.pseudoChildren != null) {  
+//				int pseudoChildId = 0;
+//				for (int i = 0; i < agent.pseudoChildren.length; i++) {
+//					pseudoChildId = agent.pseudoChildren[i];
+//					int[] val = new int[3];
+//					val[0] = agent.valueIndex;
+//					val[1] = agent.valueID;
+//					val[2] = -1;  //a virtual th
+//					Message valueMsg = new Message(agent.getId(), pseudoChildId,
+//							AgentModel.TYPE_VALUE_MESSAGE, val);
+//
+//					Message msg = new Message(agent.getId(), pseudoChildId,
+//							AgentModel.TYPE_TERMINATE_MESSAGE, valueMsg);
+//					agent.sendMessage(agent.constructNcccMessage(msg));
+//				}
+//			}
 		}
 
 		@Override
-		public void disposeValueMessage(Message msg) {
+		public void disposeValueMessage(Message msg) {   //阈值一起处理
 			if (agent.terminateReceivedFromParent == false) {
-				int[] val = new int[3];
-				val=(int[]) msg.getValue();
-				if (msg.getIdSender() == agent.getParent() && val[2] != (-1)) {
-					agent.TH = val[2];
-					maintainThresholdInvariant();
-				}
-
+				Context temp = new Context(agent.currentContext);
+				int[] val =(int[]) msg.getValue();
 				agent.currentContext.addOrUpdate(msg.getIdSender(), val[0], val[1]);
-				checkCompatible();
-				maintainThresholdInvariant();
-				//checkThresholdInvariant(valuemsg.gettypeMethod());
-				backtrack();
+				
+				if(!checkCompatible(agent.currentContext,temp))
+				{
+					checkCompatible();
+					InitSelf();
+				}
+				if (msg.getIdSender() == agent.parent && val[2] != (-1)) 
+					agent.TH = val[2];
+				//maintainThresholdInvariant();  //放在backtrack函数里面一次性做
+				if(agent.msgQueue.isEmpty()&&agent.Readytermintate==false)backtrack();
 			}
 		}
 
@@ -609,67 +629,75 @@ public class AgentModel extends Agent {
 		public void disposeCostMessage(Message msg) {
 			Map<String, Object> cost=(Map<String, Object>) msg.getValue();
 			Context c = (Context) cost.get(AgentModel.KEY_CONTEXT);
-			int myValueIndex = c.Remove(agent.getId());
+			int myValueIndex = c.get(agent.id);
 
 			if (myValueIndex == -1) {
 				return;
-			}
+			}			
 
+			Context temp = new Context(agent.currentContext);
 			if (agent.terminateReceivedFromParent == false) {
-				agent.merge(c);
-				checkCompatible();
+				merge(c);
+				agent.currentContext.Remove(agent.id);   //因为合并时将自己的取值加入，应该移除
+				if (!checkCompatible(agent.currentContext, temp)) {  //不兼容表示引入了新的内容
+					checkCompatible();
+				}
 			}
-			if (c.compatible(agent.currentContext) == true) {
+			if (checkCompatible(c,agent.currentContext) == true) {
 				agent.lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
 						.get(AgentModel.KEY_LB);
 				agent.ubs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
 						.get(AgentModel.KEY_UB);
 				agent.contexts.get(msg.getIdSender())[myValueIndex] = c;
 
-				maintainChildThresholdInvariant();
-				maintainThresholdInvariant();
-				//checkThresholdInvariant(costmsg.gettypeMethod());
+				//maintainChildThresholdInvariant();
+				//maintainThresholdInvariant();
 			}
-			backtrack();
+			if (!checkCompatible(agent.currentContext, temp)) {
+				InitSelf();
+			}
+			if(agent.msgQueue.isEmpty())backtrack();
 
 		}
 
 		//don't been used instead of simple handle during disposing value message
-		@SuppressWarnings("unchecked")
-		public void disposeThresholdMessage(Message msg) {
-			Map<String, Object> thresh = (Map<String, Object>) msg.getValue();
-			if (((Context) thresh.get(AgentModel.KEY_CONTEXT))
-					.compatible(agent.currentContext) == true) {
-				agent.TH = (Integer) thresh.get(AgentModel.KEY_TH);
-				maintainThresholdInvariant();
-				backtrack();
-			}
-		}
+//		@SuppressWarnings("unchecked")
+//		public void disposeThresholdMessage(Message msg) {
+//			Map<String, Object> thresh = (Map<String, Object>) msg.getValue();
+//			if (((Context) thresh.get(AgentModel.KEY_CONTEXT))
+//					.compatible(agent.currentContext) == true) {
+//				agent.TH = (Integer) thresh.get(AgentModel.KEY_TH);
+//				maintainThresholdInvariant();
+//				backtrack();
+//			}
+//		}
 
 		@SuppressWarnings("unchecked")
 		public void disposeTerminateMessage(Message msg) {
-			Message valueMsg = null;
-			// 鐖禷gent鍙戣繃鏉ョ殑terminate娑堟伅涓哄寘鍚簡鍩烘湰鐨則erminate娑堟伅鍜寁alue娑堟伅
-			if (msg.getIdSender() == agent.getParent()) {
-				Map<String, Object> mapValue = (Map<String, Object>) msg.getValue();
-				agent.currentContext = (Context) mapValue
-						.get(AgentModel.KEY_CONTEXT);
-				valueMsg = (Message) mapValue.get(AgentModel.KEY_VALUE_MESSAGE);
-				agent.disposeMessage(agent.constructNcccMessage(valueMsg));
-
-				agent.terminateReceivedFromParent = true;
-
-				// 姝ゅ涓嶢dopt:Pragnesh Jay Modi et al.涓殑浼唬鐮佷笉涓�牱
-				// terminateReceivedFromParent鍙樹负true锛屽啀娆¤皟鐢╩aintainThresholdInvariant()
-				// 闃叉TH==UB澶辫触瀵艰嚧agent涓嶈兘缁堟
-				maintainThresholdInvariant();
-				backtrack();
-			} else {
-				// pseudo鐖禷gent鍙戣繃鏉ョ殑terminate娑堟伅浠呭寘鍚簡value娑堟伅
-				valueMsg = (Message) msg.getValue();
-				agent.disposeMessage(agent.constructNcccMessage(valueMsg));
-			}
-
+			
+			agent.Readytermintate=true;
+			if(agent.msgQueue.isEmpty())backtrack();
+//			Message valueMsg = null;
+			//父agent发过来的terminate消息为包含了基本的terminate消息和value消息
+//			if (msg.getIdSender() == agent.parent) {
+//				Map<String, Object> mapValue = (Map<String, Object>) msg.getValue();
+//				agent.currentContext = (Context) mapValue
+//						.get(AgentModel.KEY_CONTEXT);
+//				valueMsg = (Message) mapValue.get(AgentModel.KEY_VALUE_MESSAGE);
+//				agent.disposeMessage(agent.constructNcccMessage(valueMsg));
+//
+//				agent.terminateReceivedFromParent = true;
+//
+//				//此处与Adopt:Pragnesh Jay Modi et al.中的伪代码不一样
+//	            //terminateReceivedFromParent变为true，再次调用maintainThresholdInvariant()
+//	            //防止TH==UB失败导致agent不能终止
+//				maintainThresholdInvariant();
+//				if(agent.msgQueue.isEmpty())backtrack();
+//			} else {
+//				//pseudo父agent发过来的terminate消息仅包含了value消息
+//				valueMsg = (Message) msg.getValue();
+//				agent.disposeMessage(agent.constructNcccMessage(valueMsg));
+//			}
 		}
 
 		private void backtrack() {
@@ -681,32 +709,42 @@ public class AgentModel extends Agent {
 			//do nccc local here
 		    agent.increaseNcccLocal();
 		    
+		    if(agent.strategy.equals("adopt"))
+		    	this.maintainThresholdInvariant();
+		    if(agent.strategy.equals("bnbandadopt"))
+		    	this.BDmaintainThresholdInvariant();	    
+		    int oldValue=agent.valueIndex;
+		    
 			if (agent.TH == agent.UB) {
 				if (agent.valueIndex != dMinimizesUB) {
 					Debugger.valueChanges.get(agent.getName()).add(dMinimizesUB);
 				}
 
 				agent.valueIndex = dMinimizesUB;
-				//agent.valueID = agent.valueID + 1;
+				if(agent.valueIndex!=oldValue)
+				agent.valueID = agent.valueID + 1;
 			} else if (LB_CurValue > agent.TH) {
 				if (agent.valueIndex != dMinimizesLB) {
 					Debugger.valueChanges.get(agent.getName()).add(dMinimizesLB);
 				}
 
 				agent.valueIndex = dMinimizesLB;
-				//agent.valueID = agent.valueID + 1;
+				if(agent.valueIndex!=oldValue)
+				agent.valueID = agent.valueID + 1;
 			}
 
-			maintainAllocationInvariant();
+			System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
+			this.maintainChildThresholdInvariant();
+			this.maintainAllocationInvariant();   //必须将这个放在发送VALUE信息之前
 			sendValueMessages();
 			if (agent.TH == agent.UB) {
-				if (agent.terminateReceivedFromParent == true
+				if (agent.Readytermintate == true
 						|| agent.isRootAgent() == true) {
 					sendTerminateMessages();
 					agent.stopRunning();
 				}
 			}
-			sendCostMessages();
+			sendCostMessage();
 		}
 
 		private void maintainThresholdInvariant() {
@@ -718,18 +756,10 @@ public class AgentModel extends Agent {
 			}
 		}
 		 
-		/*private void checkThresholdInvariant(String typeMethod){
-			if(typeMethod.equals("bnbadopt"))
+		private void BDmaintainThresholdInvariant() {
+			if(agent.level+1==agent.boundary)
 			{
-				//System.out.println("have execute this part");
-				if (agent.TH < agent.LB) {
-					System.out.println(agent.getName()+" parent is bnbadopt " + "TH= " + agent.TH + " LB= " + agent.LB + " TH<LB");
-					agent.TH = agent.LB;
-				}
-				if (agent.TH > agent.UB) {
-					System.out.println(agent.getName()+" parent is bnbadopt " + "TH= " + agent.TH + " UB= " + agent.UB + " TH>UB");
-					agent.TH = agent.UB;
-				}
+				agent.TH=agent.LB;
 			}
 			else{
 			if (agent.TH < agent.LB) {
@@ -739,7 +769,36 @@ public class AgentModel extends Agent {
 				agent.TH = agent.UB;
 			}
 			}
-		}*/
+		}
+		
+		//一个用来测试TH的变化的函数，可以注释掉
+//		private void checkThresholdInvariant(String typeMethod) {
+//			if (typeMethod.equals("bnbadopt")) {
+//				// System.out.println("have execute this part");
+//				if (agent.TH < agent.LB) {
+//					System.out
+//							.println(agent.getName() + " parent is bnbadopt "
+//									+ "TH= " + agent.TH + " LB= " + agent.LB
+//									+ " TH<LB");
+//					agent.TH = agent.LB;
+//				}
+//				if (agent.TH > agent.UB) {
+//					System.out
+//							.println(agent.getName() + " parent is bnbadopt "
+//									+ "TH= " + agent.TH + " UB= " + agent.UB
+//									+ " TH>UB");
+//					agent.TH = agent.UB;
+//				}
+//			} else {
+//				if (agent.TH < agent.LB) {
+//					agent.TH = agent.LB;
+//				}
+//				if (agent.TH > agent.UB) {
+//					agent.TH = agent.UB;
+//				}
+//			}
+//		}
+		
 
 		private void maintainAllocationInvariant() {
 			if (agent.isLeafAgent() == true) {
@@ -751,8 +810,8 @@ public class AgentModel extends Agent {
 			if (diff > 0) {
 				while (diff != 0) {
 					diffOriginalValue = diff;
-					for (int i = 0; i < agent.getChildren().length; i++) {
-						childId = agent.getChildren()[i];
+					for (int i = 0; i < agent.children.length; i++) {
+						childId = agent.children[i];
 						int availDiff = Infinity.minus(
 								agent.ubs.get(childId)[agent.valueIndex],
 								agent.ths.get(childId)[agent.valueIndex]);
@@ -772,14 +831,14 @@ public class AgentModel extends Agent {
 						}
 					}
 					if (diff == diffOriginalValue) {
-						break;// 鏃犳硶浣縟iff涓�锛屼篃閫�嚭
+						break;  //无法使diff为0，也退出
 					}
 				}
 			} else if (diff < 0) {
 				while (diff != 0) {
 					diffOriginalValue = diff;
-					for (int i = 0; i < agent.getChildren().length; i++) {
-						childId = agent.getChildren()[i];
+					for (int i = 0; i < agent.children.length; i++) {
+						childId = agent.children[i];
 						int availDiff = Infinity.minus(
 								agent.ths.get(childId)[agent.valueIndex],
 								agent.lbs.get(childId)[agent.valueIndex]);
@@ -799,18 +858,18 @@ public class AgentModel extends Agent {
 						}
 					}
 					if (diff == diffOriginalValue) {
-						break;// 鏃犳硶浣縟iff涓�锛屼篃閫�嚭
+						break;       //无法使diff为0，也退出
 					}
 				}
 			}
-			// sendThresholdMessages();
+			// sendThresholdMessages();    //不发送癫狂的阈值信息，而是放阈值在VALUE信息里
 		}
 
 		private void maintainChildThresholdInvariant() {
 			int childId = 0;
-			for (int i = 0; i < agent.getChildren().length; i++) {
-				childId = agent.getChildren()[i];
-				for (int j = 0; j < agent.getDomain().length; j++) {
+			for (int i = 0; i < agent.children.length; i++) {
+				childId = agent.children[i];
+				for (int j = 0; j < agent.domain.length; j++) {
 					if (agent.lbs.get(childId)[j] > agent.ths.get(childId)[j]) {
 						agent.ths.get(childId)[j] = agent.lbs.get(childId)[j];
 					}
@@ -830,8 +889,8 @@ public class AgentModel extends Agent {
 
 			int TH_di = 0;
 			int childId = 0;
-			for (int i = 0; i < agent.getChildren().length; i++) {
-				childId = agent.getChildren()[i];
+			for (int i = 0; i < agent.children.length; i++) {
+				childId = agent.children[i];
 				TH_di = Infinity.add(TH_di, agent.ths.get(childId)[di]);
 			}
 			TH_di = Infinity.add(TH_di, localCost_);
@@ -843,35 +902,39 @@ public class AgentModel extends Agent {
 
 	}
 	
-	public class BnBMethod implements Method {
+	public class BnBMethod extends Method {
 
 		private AgentModel agent;
+
 		BnBMethod(AgentModel agent) {
-			this.agent=agent;
+			this.agent = agent;
 
 		}
 
+		// @Override
+		// public void disposeThresholdMessage(Message msg) {
+		// // TODO Auto-generated method stub
+		//
+		// }
+		//
+		// @Override
+		// public void sendThresholdMessages() {
+		// // TODO Auto-generated method stub
+		//
+		// }
+
 		@Override
-		public void disposeThresholdMessage(Message msg) {
+		protected void initRun() {
 			// TODO Auto-generated method stub
 
-		}
-
-		@Override
-		public void sendThresholdMessages() {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public void initRun() {
 			agent.valueID = 0;
 			agent.currentContext = new Context();
-			if(agent.pseudoParents!=null){
-			for (int pseudoP : agent.getPseudoParents()) {
-
-				agent.currentContext.addOrUpdate(pseudoP, 0, 0);
-			}
+			if (!agent.isRootAgent())
+				agent.currentContext.addOrUpdate(agent.parent, 0, 0); // 仅仅初始化为第1个取值
+			if (agent.pseudoParents != null) {
+				for (int pseudoP : agent.pseudoParents) {
+					agent.currentContext.addOrUpdate(pseudoP, 0, 0); // 仅仅初始化为第1个取值
+				}
 			}
 			agent.lbs = new HashMap<Integer, int[]>();
 			agent.ubs = new HashMap<Integer, int[]>();
@@ -881,31 +944,15 @@ public class AgentModel extends Agent {
 			backtrack();
 		}
 
-		private void checkCompatible() {
-			if (agent.isLeafAgent() == true) {
-				return;
-			}
-
-			int childId = 0;
-			for (int i = 0; i < agent.getChildren().length; i++) {
-				childId = agent.getChildren()[i];
-				for (int j = 0; j < agent.getDomain().length; j++) {
-					if (agent.currentContext.compatible(agent.contexts.get(childId)[j]) == false) {
-						InitChild(childId);
-					}
-				}
-			}
-		}
-
 		private void InitChild() {
 			if (agent.isLeafAgent() == false) {
 				int childId = 0;
-				for (int i = 0; i < agent.getChildren().length; i++) {
-					childId = agent.getChildren()[i];
-					int[] childLbs = new int[agent.getDomain().length];
-					int[] childUbs = new int[agent.getDomain().length];
-					Context[] childContexts = new Context[agent.getDomain().length];
-					for (int j = 0; j < agent.getDomain().length; j++) {
+				for (int i = 0; i < agent.children.length; i++) {
+					childId = agent.children[i];
+					int[] childLbs = new int[agent.domain.length];
+					int[] childUbs = new int[agent.domain.length];
+					Context[] childContexts = new Context[agent.domain.length];
+					for (int j = 0; j < agent.domain.length; j++) {
 						childLbs[j] = 0;
 						childUbs[j] = Infinity.INFINITY;
 						childContexts[j] = new Context();
@@ -917,160 +964,162 @@ public class AgentModel extends Agent {
 			}
 		}
 
-		private void InitChild(int child) {
+		private void InitChild(int child, int d) {
 			if (agent.isLeafAgent() == false) {
-				for (int j = 0; j < agent.getDomain().length; j++) {
-					agent.lbs.get(child)[j] = 0;
-					agent.ubs.get(child)[j] = Infinity.INFINITY;
-					agent.contexts.get(child)[j].reset();
-				}
+				agent.lbs.get(child)[d] = 0;
+				agent.ubs.get(child)[d] = Infinity.INFINITY;
+				agent.contexts.get(child)[d].reset();
 			}
 		}
 
 		private void InitSelf() {
 
 			agent.TH = Infinity.INFINITY;
+			// int oldvalueIndex=this.valueIndex;
 			agent.valueIndex = agent.computeMinimalLBAndUB()[0];
-			
-			agent.valueID = agent.valueID + 1;
-			// Debugger.valueChanges.get(agent.getName()).add(agent.valueIndex);
-			agent.currentContext.addOrUpdate(agent.getId(), agent.valueIndex,    
-					agent.valueID);
+			// if(oldvalueIndex!=this.valueIndex||this.valueID==0)
+			agent.valueID = valueID + 1;
+			// Debugger.valueChanges.get(this.name).add(valueIndex);
+
 		}
 
 		private void backtrack() {
-			int[] compute = agent.computeMinimalLBAndUB();
-			
-			//do nccc local here
+
+			int[] compute = computeMinimalLBAndUB();
+
+			// do nccc local here
 			agent.increaseNcccLocal();
-					
-			int oldValue = agent.valueIndex;
+
+			int oldValueIndex = agent.valueIndex;
 			int min = (agent.TH > agent.UB) ? agent.UB : agent.TH;
 			if (compute[1] >= min) {
 				agent.valueIndex = compute[0];
-				if (agent.valueIndex != oldValue) {
+				if (agent.valueIndex != oldValueIndex) {
 					agent.valueID = agent.valueID + 1;
-					Debugger.valueChanges.get(agent.getName())
-							.add(agent.valueIndex);
+					Debugger.valueChanges.get(agent.name).add(agent.valueIndex);
 				}
-
-				agent.currentContext.addOrUpdate(agent.getId(), agent.valueIndex,
-						agent.valueID);
 			}
-			if (((agent.isRootAgent() == true) && (agent.UB <= agent.LB))
-					|| agent.terminateReceivedFromParent == true) {
+			System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
+			if (((isRootAgent() == true) && (agent.UB <= agent.LB))
+					|| agent.Readytermintate == true && agent.LB == agent.UB) {
 				sendTerminateMessages();
 				agent.stopRunning();
 			}
 			sendValueMessages();
-			sendCostMessages();
+			sendCostMessage();
 
 		}
 
-		@Override
-		public void sendValueMessages() {
+		protected void sendValueMessages() {
 			if (agent.isLeafAgent() == true && agent.NoPseudoChild() == true) {
 				return;
 			}
-			int[] val = new int[3]; // 一个取值，一个ID，一个TH
-			val[0] = agent.valueIndex;
-			val[1] = agent.valueID;
 			if (agent.isLeafAgent() == false) {
-
 				int childId = 0;
-
-				for (int i = 0; i < agent.getChildren().length; i++) {
-					childId = agent.getChildren()[i];
+				for (int i = 0; i < agent.children.length; i++) {
+					int[] val = new int[3]; // 一个取值，一个ID，一个TH
+					val[0] = agent.valueIndex;
+					val[1] = agent.valueID;
+					childId =agent.children[i];
 					val[2] = computeTH(agent.valueIndex, childId);
-					
-					//to tracking the relation TH,LB,UB
-					//System.out.println(agent.getName() + " send a end to a child " + childId +" = " + val[2]);
-					
-					Message msg = new Message(agent.getId(), childId,
+					Message msg = new Message(agent.id, childId,
 							AgentModel.TYPE_VALUE_MESSAGE, val);
 					agent.sendMessage(agent.constructNcccMessage(msg));
 				}
 			}
 			if (agent.NoPseudoChild() == false) {
 				int pseudoChildId = 0;
-				for (int i = 0; i < agent.getPseudoChildren().length; i++) {
-					pseudoChildId = agent.getPseudoChildren()[i];
+				for (int i = 0; i < agent.pseudoChildren.length; i++) {
+					pseudoChildId = agent.pseudoChildren[i];
+					int[] val = new int[3]; // 一个取值，一个ID，一个TH
+					val[0] = agent.valueIndex;
+					val[1] = agent.valueID;
 					val[2] = Infinity.INFINITY;
-					
-					//to tracking the relation TH,LB,UB
-					//System.out.println(agent.getName() + " send a end to a child " + pseudoChildId + " = " + val[2]);
-					
-					Message msg = new Message(agent.getId(), pseudoChildId,
+					Message msg = new Message(agent.id, pseudoChildId,
 							AgentModel.TYPE_VALUE_MESSAGE, val);
-					agent.sendMessage(agent.constructNcccMessage(msg));
+					agent.sendMessage(this.agent.constructNcccMessage(msg));
 				}
 			}
 		}
 
-		@Override
-		public void sendCostMessages() {
+		protected void sendCostMessage() {
 			if (agent.isRootAgent() == true) {
 				return;
 			}
 
 			Map<String, Object> cost = new HashMap<String, Object>();
 			Context context = new Context(agent.currentContext);
-			context.Remove(agent.getId());
+			context.Remove(agent.id);
 			cost.put(AgentModel.KEY_CONTEXT, context);
 			cost.put(AgentModel.KEY_LB, agent.LB);
 			cost.put(AgentModel.KEY_UB, agent.UB);
 
-			Message msg = new Message(agent.getId(), agent.getParent(),
+			Message msg = new Message(agent.id, agent.parent,
 					AgentModel.TYPE_COST_MESSAGE, cost);
 			agent.sendMessage(agent.constructNcccMessage(msg));
 		}
 
-		@Override
-		public void sendTerminateMessages() {
+		protected void sendTerminateMessages() {
 			if (agent.isLeafAgent() == true) {
 				return;
 			}
-
+			agent.terminateReceivedFromParent = true;
 			int childId = 0;
-			for (int i = 0; i < agent.getChildren().length; i++) {
-				childId = agent.getChildren()[i];
+			for (int i = 0; i < agent.children.length; i++) {
+				childId = agent.children[i];
 				Context c = new Context(agent.currentContext);
 				int[] val = new int[3];
 				val[0] = agent.valueIndex;
 				val[1] = agent.valueID;
 				val[2] = computeTH(agent.valueIndex, childId);
-				
-				//to tracking the relation TH,LB,UB
-				//System.out.println(agent.getName() + " send a end to a child " + childId +" = " + val[2]);
-				
-				Message valueMsg = new Message(agent.getId(), childId,
+				Message valueMsg = new Message(agent.id, childId,
 						AgentModel.TYPE_VALUE_MESSAGE, val);
 
 				Map<String, Object> mapValue = new HashMap<String, Object>();
 				mapValue.put(AgentModel.KEY_CONTEXT, c);
 				mapValue.put(AgentModel.KEY_VALUE_MESSAGE, valueMsg);
 
-				Message msg = new Message(agent.getId(), childId,
+				Message msg = new Message(this.agent.id, childId,
 						AgentModel.TYPE_TERMINATE_MESSAGE, mapValue);
-				agent.sendMessage(agent.constructNcccMessage(msg));
+				this.agent.sendMessage(this.agent.constructNcccMessage(msg));
 			}
 		}
+		
+		protected int computeTH(int di,int child)
+		{
+			int localCost_=localCost(di);
+			
+			if(agent.isLeafAgent()==true)
+			{
+				return localCost_;
+			}
+			
+			int TH_di=0;
+			int childId=0;
+			for(int i=0;i<agent.children.length;i++)
+			{
+				childId=agent.children[i];
+				if(childId!=child)TH_di=TH_di+agent.lbs.get(childId)[di];
+			}
+			TH_di=Infinity.add(TH_di, localCost_);
+			
+			return (agent.TH>agent.UB)?(agent.UB-TH_di):(agent.TH-TH_di);
+		}
 
-		@Override
-		public void disposeValueMessage(Message msg) {
+		protected void disposeValueMessage(Message msg) {
 			if (agent.terminateReceivedFromParent == false) {
 				Context temp = new Context(agent.currentContext);
-				int[] val =(int[]) msg.getValue();
+				int[] val = (int[]) msg.getValue();
 				agent.currentContext.addOrUpdate(msg.getIdSender(), val[0], val[1]);
 
-				if (!checkCompatible(agent.currentContext, temp)) {  //新上下文的与旧的上下文是否兼容
+				if (!checkCompatible(agent.currentContext, temp)) {
 					checkCompatible();
 					InitSelf();
 				}
-				if (msg.getIdSender() == agent.getParent()) {
+				if (msg.getIdSender() == agent.parent) {
 					agent.TH = val[2];
 				}
-				if (agent.Readytermintate == false)
+				if (agent.msgQueue.isEmpty() == true)
 					backtrack();
 			}
 		}
@@ -1079,75 +1128,78 @@ public class AgentModel extends Agent {
 			return c1.compatible(c2);
 		}
 
+		private void checkCompatible() {
+			if (agent.isLeafAgent() == true) {
+				return;
+			}
+
+			int childId = 0;
+			for (int i = 0; i < agent.children.length; i++) {
+				childId = agent.children[i];
+				for (int j = 0; j < agent.domain.length; j++) {
+					if (agent.currentContext.compatible(agent.contexts.get(childId)[j]) == false) {
+						InitChild(childId, j);
+					}
+				}
+			}
+		}
+
 		@SuppressWarnings("unchecked")
-		@Override
-		public void disposeCostMessage(Message msg) {
-			Map<String, Object> cost=(Map<String, Object>) msg.getValue();
+		protected void disposeCostMessage(Message msg) {
+			Map<String, Object> cost = (Map<String, Object>) msg.getValue();
 			Context c = (Context) cost.get(AgentModel.KEY_CONTEXT);
-			int myValueIndex = c.get(agent.getId());
+			int myValueIndex = c.get(agent.id);
 
 			if (myValueIndex == -1) {
 				return;
 			}
-			Context temp =new Context(agent.currentContext);
-			
-			agent.merge2(c);
+			Context temp = new Context(agent.currentContext);
+			merge(c);
+			agent.currentContext.Remove(agent.id); // 因为合并时将自己的取值加入，应该移除
 
-			if (!checkCompatible(agent.currentContext, temp)) {
-				checkCompatible();    //是否会出现问题？如蚨有一个与自己无关的上下文不兼容，也是初始化吗？
+			if (!checkCompatible(agent.currentContext, temp)) { // 不兼容表示引入了新的内容
+				checkCompatible();
+
 			}
-			if(checkCompatible(c,temp))
-			{
-				if (agent.lbs.get(msg.getIdSender())[myValueIndex] < (Integer) cost.get(AgentModel.KEY_LB))
-				{
-					agent.lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost.get(AgentModel.KEY_LB);
-				}
-				if (agent.ubs.get(msg.getIdSender())[myValueIndex] > (Integer) cost.get(AgentModel.KEY_UB))
-				{
-					agent.ubs.get(msg.getIdSender())[myValueIndex] = (Integer) cost.get(AgentModel.KEY_UB);
-				}
+			if (checkCompatible(c, agent.currentContext)) { // 兼容表示这个信息可以利用
+				if (agent.lbs.get(msg.getIdSender())[myValueIndex] < (Integer) cost
+						.get(AgentModel.KEY_LB))
+					agent.lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
+							.get(AgentModel.KEY_LB);
+				if (agent.ubs.get(msg.getIdSender())[myValueIndex] > (Integer) cost
+						.get(AgentModel.KEY_UB))
+					agent.ubs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
+							.get(AgentModel.KEY_UB);
 				agent.contexts.get(msg.getIdSender())[myValueIndex] = c;
 			}
-			if(!checkCompatible(agent.currentContext,temp)){
+
+			if (!checkCompatible(agent.currentContext, temp)) {
 				InitSelf();
-			}
-			backtrack();
 
+			}
+			if (agent.msgQueue.isEmpty() == true)
+				backtrack();
 		}
 
-		@SuppressWarnings("unchecked")
-		@Override
-		public void disposeTerminateMessage(Message msg) {
-			Message valueMsg = null;
+		// 仅仅作一个记录，准备去停止，但并不是要停止。
+		protected void disposeTerminateMessage(Message msg) {
+			// Message valueMsg = null;
 			agent.Readytermintate = true;
-			Map<String, Object> mapValue = (Map<String, Object>) msg.getValue();
-			agent.currentContext = (Context) mapValue.get(AgentModel.KEY_CONTEXT);
-			valueMsg = (Message) mapValue.get(AgentModel.KEY_VALUE_MESSAGE);
-			agent.disposeMessage(agent.constructNcccMessage(valueMsg));
-			agent.terminateReceivedFromParent = true;
-			backtrack();
-
+			// Map<String, Object> mapValue = (Map<String, Object>)
+			// msg.getValue();
+			// currentContext = (Context) mapValue.get(KEY_CONTEXT);
+			// //不应该加入里，而要自己去处理判断。
+			// valueMsg = (Message) mapValue.get(KEY_VALUE_MESSAGE);
+			// disposeMessage(this.constructNcccMessage(valueMsg));
+			// this.terminateReceivedFromParent = true;
+			if (agent.msgQueue.isEmpty())
+				backtrack();
 		}
 
-		private int computeTH(int di, int child) {
-			int localCost_ = agent.localCost(di);
+		protected void merge(Context c) {
+			agent.currentContext.union(c);
+		}			
 
-			if (agent.isLeafAgent() == true) {
-				return localCost_;
-			}
-
-			int TH_di = 0;
-			int childId = 0;
-			for (int i = 0; i < agent.getChildren().length; i++) {
-				childId = agent.getChildren()[i];
-				if (childId != child)
-					TH_di = TH_di + agent.lbs.get(childId)[di];
-			}
-			TH_di = Infinity.add(TH_di, localCost_);
-			return (agent.TH > agent.UB) ? (agent.UB - TH_di) : (agent.TH - TH_di);
-		}
 	}
-
-
 
 }

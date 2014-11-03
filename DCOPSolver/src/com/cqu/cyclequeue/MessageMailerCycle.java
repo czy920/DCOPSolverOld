@@ -44,8 +44,7 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 				this.stopRunning();
 			}
 		}
-		//one agent terminated
-		this.totalAgentCount.decrementAndGet();
+		
 	}
 	
 	public List<Map<String, Object>> getResults()
@@ -84,7 +83,7 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		
 		for(AgentCycle agent : this.agentManager.getAgents().values())
 		{
-			agent.setLocks(cycleBegin, cycleEnd, cycleEndCount, totalAgentCount);
+			agent.setLocks(cycleBegin, cycleEnd, cycleEndCount, totalAgentCount, totalAgentCountTemp);
 		}
 		
 		timeStart=System.currentTimeMillis();

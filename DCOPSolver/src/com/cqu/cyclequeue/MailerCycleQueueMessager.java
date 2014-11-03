@@ -15,6 +15,7 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
     protected AtomicBoolean cycleEnd;
     protected AtomicInteger cycleEndCount;
     protected AtomicInteger totalAgentCount;
+    protected AtomicInteger totalAgentCountTemp;
     
     protected int cycleCount;
 	
@@ -23,6 +24,7 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 		// TODO Auto-generated constructor stub
 		this.msgQueue=new LinkedList<Message>();
 		this.totalAgentCount=new AtomicInteger(totalAgentCount);
+		this.totalAgentCountTemp=new AtomicInteger(totalAgentCount);
 		this.cycleBegin=new AtomicBoolean(false);
 		this.cycleEnd=new AtomicBoolean(false);
 		this.cycleEndCount=new AtomicInteger(0);
@@ -81,7 +83,7 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 				}
 
 				cycleCount++;
-				//System.out.println(Thread.currentThread().getName()+" cycleCount: "+cycleCount);
+				System.out.println("cycleCount: "+cycleCount);
 				cycleEnd.set(false);
 				synchronized (cycleBegin) {
 					cycleBegin.set(true);//open entrance

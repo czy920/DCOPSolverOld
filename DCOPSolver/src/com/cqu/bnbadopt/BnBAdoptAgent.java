@@ -94,34 +94,32 @@ public class BnBAdoptAgent extends AgentCycle {
 		}
 	}
 	 
-	private void InitChild(int child)
+	private void InitChild(int child,int d)
 	{
 		if(this.isLeafAgent()==false)
 		{
-			
-			for(int j=0;j<this.domain.length;j++)
-			{
-				lbs.get(child)[j] = 0;
-				ubs.get(child)[j] = Infinity.INFINITY;
-				contexts.get(child)[j].reset();
-			}
+				lbs.get(child)[d] = 0;
+				ubs.get(child)[d] = Infinity.INFINITY;
+				contexts.get(child)[d].reset();
 		}
 	}
+	
+	
 	
 	void InitSelf(){
 		
 		TH=Infinity.INFINITY;
-		int oldvalueIndex=this.valueIndex;
+		//int oldvalueIndex=this.valueIndex;
 		valueIndex=this.computeMinimalLBAndUB()[0];
-		if(oldvalueIndex!=this.valueIndex||this.valueID==0)
+		//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 		valueID = valueID + 1;
 		//Debugger.valueChanges.get(this.name).add(valueIndex);
-		currentContext.addOrUpdate(this.id, valueIndex, valueID);  //加入了自己的取值
+		
 	}
 		
 
 	private void backtrack() {
-		// TODO Auto-generated method stub
+
 		int[] compute = computeMinimalLBAndUB();
 		
 		//do nccc local here
@@ -135,9 +133,9 @@ public class BnBAdoptAgent extends AgentCycle {
 				valueID = valueID + 1;
 				Debugger.valueChanges.get(this.name).add(valueIndex);
 			}
-			currentContext.addOrUpdate(this.id, valueIndex, valueID);
 		}
-		if(((isRootAgent()==true)&&(UB<=LB))||terminateReceivedFromParent==true)
+		System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH+"\t"+this.LB+"\t"+this.UB);
+		if(((isRootAgent()==true)&&(UB<=LB))||this.Readytermintate==true&&this.LB==this.UB)
 			{
 				sendTerminateMessages();
 				this.stopRunning();
@@ -156,27 +154,32 @@ public class BnBAdoptAgent extends AgentCycle {
 		if (this.isLeafAgent() == true && this.NoPseudoChild() == true) {
 			return;
 		}
-		int[] val = new int[3]; // 一个取值，一个ID，一个TH
-		val[0] = valueIndex;
-		val[1] = valueID;
-		if (this.isLeafAgent() == false) {
-			int childId = 0;
-			for (int i = 0; i < this.children.length; i++) {
-				childId = this.children[i];
-				val[2] = computeTH(valueIndex, childId);
-				Message msg = new Message(this.id, childId,
-						BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
-				this.sendMessage(this.constructNcccMessage(msg));
-			}
+		if(this.isLeafAgent() ==false)
+		{
+		int childId=0;
+		for(int i=0;i<this.children.length;i++)
+		{
+			int[] val = new int[3];  //一个取值，一个ID，一个TH
+			val[0]=valueIndex;
+			val[1]=valueID;
+			childId=this.children[i];
+			val[2]=computeTH(valueIndex,childId);
+			Message msg=new Message(this.id, childId, BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
+			this.sendMessage(this.constructNcccMessage(msg));
 		}
-		if (this.NoPseudoChild() == false) {
-			int pseudoChildId = 0;
-			for (int i = 0; i < this.pseudoChildren.length; i++) {
-				pseudoChildId = this.pseudoChildren[i];
-				val[2] = Infinity.INFINITY;
-				Message msg = new Message(this.id, pseudoChildId,
-						BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
-				this.sendMessage(this.constructNcccMessage(msg));
+		}
+		if(this.NoPseudoChild()==false)
+		{
+		int pseudoChildId=0;
+		for(int i=0;i<this.pseudoChildren.length;i++)
+		{
+			pseudoChildId=this.pseudoChildren[i];
+			int[] val = new int[3];  //一个取值，一个ID，一个TH
+			val[0]=valueIndex;
+			val[1]=valueID;
+			val[2]=Infinity.INFINITY;
+			Message msg=new Message(this.id, pseudoChildId, BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
+			this.sendMessage(this.constructNcccMessage(msg));
 			}
 		}
 	}
@@ -205,7 +208,7 @@ public class BnBAdoptAgent extends AgentCycle {
 		{
 			return;
 		}
-		
+	    this.terminateReceivedFromParent=true;
 		int childId=0;
 		for(int i=0;i<this.children.length;i++)
 		{
@@ -277,7 +280,7 @@ public class BnBAdoptAgent extends AgentCycle {
 			{
 				TH=val[2];
 			}
-			if(this.msgQueue.isEmpty()==true&&this.Readytermintate==false)backtrack();
+			if(this.msgQueue.isEmpty()==true)backtrack();
 		}
 	}
 	
@@ -300,7 +303,7 @@ public class BnBAdoptAgent extends AgentCycle {
 			{
 				if(currentContext.compatible(contexts.get(childId)[j])==false)
 				{
-					InitChild(childId);
+					InitChild(childId,j);
 				}
 			}
 		}
@@ -317,12 +320,13 @@ public class BnBAdoptAgent extends AgentCycle {
 		}
 		Context temp = new Context(currentContext);
 		merge(c);
+		currentContext.Remove(this.id);   //因为合并时将自己的取值加入，应该移除
 
-		if (!checkCompatible(currentContext, temp)) {
+		if (!checkCompatible(currentContext, temp)) {  //不兼容表示引入了新的内容
 			checkCompatible();
 
 		}
-		if (checkCompatible(c, temp)) {
+		if (checkCompatible(c, currentContext)) {   //兼容表示这个信息可以利用
 			if (lbs.get(msg.getIdSender())[myValueIndex] < (Integer) cost
 					.get(BnBAdoptAgent.KEY_LB))
 				lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
@@ -343,19 +347,20 @@ public class BnBAdoptAgent extends AgentCycle {
 	
 	private void merge(Context c)
 	{
-		currentContext.union(c);
+		currentContext.union(c);  //这个合并会导致currentContext里面有自己的取值
 	}
 		
+	//仅仅作一个记录，准备去停止，但并不是要停止。
 	@SuppressWarnings("unchecked")
 	private void disposeTerminateMessage(Message msg) {
-		Message valueMsg = null;
+		//Message valueMsg = null;
 		this.Readytermintate = true;
-		Map<String, Object> mapValue = (Map<String, Object>) msg.getValue();
-		currentContext = (Context) mapValue.get(KEY_CONTEXT);
-		valueMsg = (Message) mapValue.get(KEY_VALUE_MESSAGE);
-		disposeMessage(this.constructNcccMessage(valueMsg));
-		this.terminateReceivedFromParent = true;
-		backtrack();
+		//Map<String, Object> mapValue = (Map<String, Object>) msg.getValue();
+		//currentContext = (Context) mapValue.get(KEY_CONTEXT);  //不应该加入里，而要自己去处理判断。
+		//valueMsg = (Message) mapValue.get(KEY_VALUE_MESSAGE);
+		//disposeMessage(this.constructNcccMessage(valueMsg));
+		//this.terminateReceivedFromParent = true;
+		if(this.msgQueue.isEmpty())backtrack();
 
 	}
 	
@@ -549,13 +554,13 @@ public class BnBAdoptAgent extends AgentCycle {
 		super.runFinished();
 		
 		Map<String, Object> result=new HashMap<String, Object>();
-		result.put(AdoptAgent.KEY_ID, this.id);
-		result.put(AdoptAgent.KEY_NAME, this.name);
-		result.put(AdoptAgent.KEY_VALUE, this.domain[valueIndex]);
-		result.put(AdoptAgent.KEY_LB, this.LB);
-		result.put(AdoptAgent.KEY_UB, this.UB);
-		result.put(AdoptAgent.KEY_TH, this.TH);
-		result.put(AdoptAgent.KEY_NCCC, this.nccc);
+		result.put(BnBAdoptAgent.KEY_ID, this.id);
+		result.put(BnBAdoptAgent.KEY_NAME, this.name);
+		result.put(BnBAdoptAgent.KEY_VALUE, this.domain[valueIndex]);
+		result.put(BnBAdoptAgent.KEY_LB, this.LB);
+		result.put(BnBAdoptAgent.KEY_UB, this.UB);
+		result.put(BnBAdoptAgent.KEY_TH, this.TH);
+		result.put(BnBAdoptAgent.KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
 		
@@ -569,13 +574,13 @@ public class BnBAdoptAgent extends AgentCycle {
 		int maxNccc=0;
 		for(Map<String, Object> result : results)
 		{
-			int id_=(Integer) result.get(AdoptAgent.KEY_ID);
-			String name_=(String) result.get(AdoptAgent.KEY_NAME);
-			int value_=(Integer) result.get(AdoptAgent.KEY_VALUE);
-			int LB_=(Integer) result.get(AdoptAgent.KEY_LB);
-			int UB_=(Integer) result.get(AdoptAgent.KEY_UB);
-			int TH_=(Integer) result.get(AdoptAgent.KEY_TH);
-			int ncccTemp=(Integer) result.get(AdoptAgent.KEY_NCCC);
+			int id_=(Integer) result.get(BnBAdoptAgent.KEY_ID);
+			String name_=(String) result.get(BnBAdoptAgent.KEY_NAME);
+			int value_=(Integer) result.get(BnBAdoptAgent.KEY_VALUE);
+			int LB_=(Integer) result.get(BnBAdoptAgent.KEY_LB);
+			int UB_=(Integer) result.get(BnBAdoptAgent.KEY_UB);
+			int TH_=(Integer) result.get(BnBAdoptAgent.KEY_TH);
+			int ncccTemp=(Integer) result.get(BnBAdoptAgent.KEY_NCCC);
 			if(maxNccc<ncccTemp)
 			{
 				maxNccc=ncccTemp;

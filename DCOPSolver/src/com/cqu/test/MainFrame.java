@@ -143,9 +143,6 @@ public class MainFrame extends JFrame {
 					{
 						enableBatch(true);
 						tfDirPath.setText(f.getPath());
-					}else
-					{
-						cbBatch.setSelected(false);
 					}
 				}else
 				{
@@ -238,6 +235,7 @@ public class MainFrame extends JFrame {
 				enableUI(true);
 			}
 		};
+
 		if(this.cbBatch.isSelected()==false)
 		{
 			solver.solve("problems/"+combobProblem.getSelectedItem(), (String) combobAgentType.getSelectedItem(), 
