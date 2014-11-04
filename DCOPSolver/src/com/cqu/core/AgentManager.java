@@ -15,6 +15,7 @@ public class AgentManager {
 	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "ADOPT", "BNBADOPT","BDADOPT","SynAdopt"};
 	
 	private Map<Integer, Agent> agents;
+	private int treeHeight=0;
 	
 	public AgentManager(Problem problem, String agentType) {
 		// TODO Auto-generated constructor stub
@@ -22,7 +23,7 @@ public class AgentManager {
 		agents=new HashMap<Integer, Agent>();
 		for(Integer agentId : problem.agentNames.keySet())
 		{
-			Agent agent=null;;
+			Agent agent=null;
 			if(agentType.equals("DPOP"))
 			{
 				agent=new DPOPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
@@ -60,6 +61,12 @@ public class AgentManager {
 			
 			agents.put(agent.getId(), agent);
 			
+			//get tree height
+			if(treeHeight<problem.agentLevels.get(agentId))
+			{
+				treeHeight=problem.agentLevels.get(agentId);
+			}
+			
 			{
 				String str="-----------"+agent.name+"-----------\n";
 				str+="Parent: "+agent.parent+"\n";
@@ -69,6 +76,12 @@ public class AgentManager {
 				FileUtil.writeStringAppend(str, "dfsTree.txt");
 			}
 		}
+		treeHeight++;
+	}
+	
+	public int getTreeHeight()
+	{
+		return this.treeHeight;
 	}
 	
 	public Agent getAgent(int agentId)

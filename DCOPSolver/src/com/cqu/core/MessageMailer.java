@@ -95,15 +95,22 @@ public class MessageMailer extends QueueMessager{
 		//Debugger.printValueChanges();
 		
 		timeEnd=System.currentTimeMillis();
-		System.out.println("Mailer stopped, totalTime: "+(timeEnd-timeStart)+"ms");
 		
 		resultReturned.messageQuantity=messageQuantity;
 		resultReturned.lostRatio=(int)(messageLostQuantity*100.0/(messageQuantity+messageLostQuantity));
-		resultReturned.totalTime=timeEnd-timeStart;
+		resultReturned.totalTime+=(timeEnd-timeStart);
+		
+		System.out.println("Mailer stopped, totalTime: "+resultReturned.totalTime+"ms");
+
 		for(EventListener el : this.eventListeners)
 		{
 			el.onFinished(resultReturned);
 		}
+	}
+	
+	public AgentManager getAgentManager()
+	{
+		return this.agentManager;
 	}
 	
 	public void addEventListener(EventListener el)
