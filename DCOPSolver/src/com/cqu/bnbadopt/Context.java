@@ -74,7 +74,6 @@ public class Context implements Cloneable{
 	
 	public int Remove(int key)
 	{
-		HashMap<Integer,Integer> val=new HashMap<Integer,Integer>();
 		int value=-1;
 		if(context.containsKey(key)==true)
 		{

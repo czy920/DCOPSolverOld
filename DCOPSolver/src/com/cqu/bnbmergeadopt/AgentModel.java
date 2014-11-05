@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.bnbadopt.Context;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
@@ -40,7 +39,7 @@ public class AgentModel extends AgentCycle {
 	private Map<Integer, Context[]> contexts;
 	private Context currentContext;
 
-	private String strategy;
+	//private String strategy;
 	private String typeMethod;
 	private int boundary;    //方法的分界，可以由比例求得，这里设为3
 	private float scaleArg;    //两个方法的比例参数
@@ -57,28 +56,29 @@ public class AgentModel extends AgentCycle {
 		super(id, name, level, domain);
 		this.nccc = 0;
 		
-		this.boundary=3;
+		this.boundary=2;   //对问题12_2_1进行测试，前两层为bnb,后三层为ADOPT
 		//this.boundary=(int) Math.floor(this.height*this.scaleArg);
 		
 		// a sole bnbadopt
-		//method = new BnBMethod(this);
-		//typeMethod = "bnbadopt";
-		//this.strategy="bnbadopt";
+//		method = new BnBMethod(this);
+//		typeMethod = "bnbadopt";
+//		this.strategy="bnbadopt";
 
 		// a sole adopt
-		 method=new AdoptMethod(this);
-		 typeMethod="adopt";
-		strategy="adopt";
+//		 method=new AdoptMethod(this);
+//		 typeMethod="adopt";
+//		 strategy="adopt";
 
 
 		// union adopt and bnbadopt
-//		if (this.level <= this.boundary) { // 前三层用bnbadopt策略
-//			method = new BnBMethod(this);
-//			typeMethod = "bnbadopt";
-//		} else { // 其他层用adopt策略 method=new AdoptMethod(this);
-//			typeMethod = "adopt";
-//		}		 
-		// strategy="bnbandadopt";
+		if (this.level < this.boundary) { // 前三层用bnbadopt策略
+			method = new BnBMethod(this);
+			typeMethod = "bnbadopt";
+		} else { // 其他层用adopt策略
+			method=new AdoptMethod(this);
+			typeMethod = "adopt";
+		}		 
+		 //strategy="bnbandadopt";
 	}
 
 	@Override
@@ -297,7 +297,7 @@ public class AgentModel extends AgentCycle {
 		result.put(AgentModel.KEY_UB, this.UB);
 		result.put(AgentModel.KEY_TH, this.TH);
 		result.put(AgentModel.KEY_NCCC, this.nccc);
-		result.put(AgentModel.STRATEGY, this.strategy);
+		//result.put(AgentModel.STRATEGY, this.strategy);
 		
 		this.msgMailer.setResult(result);
 
@@ -502,7 +502,7 @@ public class AgentModel extends AgentCycle {
 				val[2] = agent.ths.get(ChildId)[agent.valueIndex];
 				Message msg = new Message(agent.getId(), ChildId,
 						AgentModel.TYPE_VALUE_MESSAGE, val);
-				agent.sendMessage(msg);
+				agent.sendMessage(this.agent.constructNcccMessage(msg));
 			}
 			if (agent.NoPseudoChild() == true) {
 				return;
@@ -528,7 +528,7 @@ public class AgentModel extends AgentCycle {
 
 			Map<String, Object> cost = new HashMap<String, Object>();
 			Context context = new Context(agent.currentContext);
-			//context.Remove(agent.getId());    //在处理cost信息时应该执行这个
+			context.Remove(agent.getId());    
 			cost.put(AgentModel.KEY_CONTEXT, new Context(context));
 			cost.put(AgentModel.KEY_LB, agent.LB);
 			cost.put(AgentModel.KEY_UB, agent.UB);
@@ -569,18 +569,18 @@ public class AgentModel extends AgentCycle {
 			int childId = 0;
 			for (int i = 0; i < agent.children.length; i++) {
 				childId = agent.children[i];
-				Context c = new Context(agent.currentContext);
-				c.addOrUpdate(agent.id, agent.valueIndex, agent.valueID);
-				int[] val = new int[3];
-				val[0] = agent.valueIndex;
-				val[1] = agent.valueID;
-				val[2] = agent.ths.get(childId)[agent.valueIndex];
-				Message valueMsg = new Message(agent.getId(), childId,
-						AgentModel.TYPE_VALUE_MESSAGE,val);
+//				int[] val = new int[3];
+//				val[0] = agent.valueIndex;
+//				val[1] = agent.valueID;
+//				val[2] = agent.ths.get(childId)[agent.valueIndex];
+//				Message valueMsg = new Message(agent.getId(), childId,
+//						AgentModel.TYPE_VALUE_MESSAGE,val);
 
 				Map<String, Object> mapValue = new HashMap<String, Object>();
-				mapValue.put(AgentModel.KEY_CONTEXT, c);
-				mapValue.put(AgentModel.KEY_VALUE_MESSAGE, valueMsg);
+//				Context c = new Context(agent.currentContext);
+//				c.addOrUpdate(agent.id, agent.valueIndex, agent.valueID);
+//				mapValue.put(AgentModel.KEY_CONTEXT, c);
+//				mapValue.put(AgentModel.KEY_VALUE_MESSAGE, valueMsg);
 
 				Message msg = new Message(agent.getId(), childId,
 						AgentModel.TYPE_TERMINATE_MESSAGE, mapValue);
@@ -621,7 +621,7 @@ public class AgentModel extends AgentCycle {
 				if (msg.getIdSender() == agent.parent && val[2] != (-1)) 
 					agent.TH = val[2];
 				//maintainThresholdInvariant();  //放在backtrack函数里面一次性做
-				if(agent.msgQueue.isEmpty()&&agent.Readytermintate==false)backtrack();
+				if(agent.msgQueue.isEmpty())backtrack();
 			}
 		}
 
@@ -672,7 +672,6 @@ public class AgentModel extends AgentCycle {
 //			}
 //		}
 
-		@SuppressWarnings("unchecked")
 		public void disposeTerminateMessage(Message msg) {
 			
 			agent.Readytermintate=true;
@@ -709,10 +708,7 @@ public class AgentModel extends AgentCycle {
 			//do nccc local here
 		    agent.increaseNcccLocal();
 		    
-		    if(agent.strategy.equals("adopt"))
-		    	this.maintainThresholdInvariant();
-		    if(agent.strategy.equals("bnbandadopt"))
-		    	this.BDmaintainThresholdInvariant();	    
+		    BDmaintainThresholdInvariant();	    
 		    int oldValue=agent.valueIndex;
 		    
 			if (agent.TH == agent.UB) {
@@ -747,17 +743,17 @@ public class AgentModel extends AgentCycle {
 			sendCostMessage();
 		}
 
-		private void maintainThresholdInvariant() {
-			if (agent.TH < agent.LB) {
-				agent.TH = agent.LB;
-			}
-			if (agent.TH > agent.UB) {
-				agent.TH = agent.UB;
-			}
-		}
+//		private void maintainThresholdInvariant() {
+//			if (agent.TH < agent.LB) {
+//				agent.TH = agent.LB;
+//			}
+//			if (agent.TH > agent.UB) {
+//				agent.TH = agent.UB;
+//			}
+//		}
 		 
 		private void BDmaintainThresholdInvariant() {
-			if(agent.level+1==agent.boundary)
+			if(agent.level==agent.boundary)
 			{
 				agent.TH=agent.LB;
 			}
@@ -769,36 +765,7 @@ public class AgentModel extends AgentCycle {
 				agent.TH = agent.UB;
 			}
 			}
-		}
-		
-		//一个用来测试TH的变化的函数，可以注释掉
-//		private void checkThresholdInvariant(String typeMethod) {
-//			if (typeMethod.equals("bnbadopt")) {
-//				// System.out.println("have execute this part");
-//				if (agent.TH < agent.LB) {
-//					System.out
-//							.println(agent.getName() + " parent is bnbadopt "
-//									+ "TH= " + agent.TH + " LB= " + agent.LB
-//									+ " TH<LB");
-//					agent.TH = agent.LB;
-//				}
-//				if (agent.TH > agent.UB) {
-//					System.out
-//							.println(agent.getName() + " parent is bnbadopt "
-//									+ "TH= " + agent.TH + " UB= " + agent.UB
-//									+ " TH>UB");
-//					agent.TH = agent.UB;
-//				}
-//			} else {
-//				if (agent.TH < agent.LB) {
-//					agent.TH = agent.LB;
-//				}
-//				if (agent.TH > agent.UB) {
-//					agent.TH = agent.UB;
-//				}
-//			}
-//		}
-		
+		}	
 
 		private void maintainAllocationInvariant() {
 			if (agent.isLeafAgent() == true) {
@@ -911,18 +878,6 @@ public class AgentModel extends AgentCycle {
 
 		}
 
-		// @Override
-		// public void disposeThresholdMessage(Message msg) {
-		// // TODO Auto-generated method stub
-		//
-		// }
-		//
-		// @Override
-		// public void sendThresholdMessages() {
-		// // TODO Auto-generated method stub
-		//
-		// }
-
 		@Override
 		protected void initRun() {
 			// TODO Auto-generated method stub
@@ -1001,7 +956,7 @@ public class AgentModel extends AgentCycle {
 			}
 			System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
 			if (((isRootAgent() == true) && (agent.UB <= agent.LB))
-					|| agent.Readytermintate == true && agent.LB == agent.UB) {
+					|| agent.Readytermintate == true && (agent.LB == agent.UB||agent.TH==agent.UB)) {
 				sendTerminateMessages();
 				agent.stopRunning();
 			}
@@ -1067,17 +1022,17 @@ public class AgentModel extends AgentCycle {
 			int childId = 0;
 			for (int i = 0; i < agent.children.length; i++) {
 				childId = agent.children[i];
-				Context c = new Context(agent.currentContext);
-				int[] val = new int[3];
-				val[0] = agent.valueIndex;
-				val[1] = agent.valueID;
-				val[2] = computeTH(agent.valueIndex, childId);
-				Message valueMsg = new Message(agent.id, childId,
-						AgentModel.TYPE_VALUE_MESSAGE, val);
+//				int[] val = new int[3];
+//				val[0] = agent.valueIndex;
+//				val[1] = agent.valueID;
+//				val[2] = computeTH(agent.valueIndex, childId);
+//				Message valueMsg = new Message(agent.id, childId,
+//						AgentModel.TYPE_VALUE_MESSAGE, val);
 
 				Map<String, Object> mapValue = new HashMap<String, Object>();
-				mapValue.put(AgentModel.KEY_CONTEXT, c);
-				mapValue.put(AgentModel.KEY_VALUE_MESSAGE, valueMsg);
+//				Context c = new Context(agent.currentContext);
+//				mapValue.put(AgentModel.KEY_CONTEXT, c);
+//				mapValue.put(AgentModel.KEY_VALUE_MESSAGE, valueMsg);
 
 				Message msg = new Message(this.agent.id, childId,
 						AgentModel.TYPE_TERMINATE_MESSAGE, mapValue);

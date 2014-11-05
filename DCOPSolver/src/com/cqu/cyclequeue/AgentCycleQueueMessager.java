@@ -89,7 +89,7 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 					}
 				}catch(Exception e)
 				{
-					//e.printStackTrace();
+					e.printStackTrace();
 				}
 				
 				boolean lastAgent=true;

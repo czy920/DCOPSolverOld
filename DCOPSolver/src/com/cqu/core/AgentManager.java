@@ -12,7 +12,7 @@ import com.cqu.util.FileUtil;
 
 public class AgentManager {
 	
-	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "ADOPT", "BNBADOPT","BDADOPT","SynAdopt"};
+	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "ADOPT", "BNBADOPT","BDADOPT","SynAdopt","SynAdopt2"};
 	
 	private Map<Integer, Agent> agents;
 	private int treeHeight=0;

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cqu.adopt.AdoptAgent;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.MessageNCCC;
@@ -134,8 +133,8 @@ public class BnBAdoptAgent extends AgentCycle {
 				Debugger.valueChanges.get(this.name).add(valueIndex);
 			}
 		}
-		System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH+"\t"+this.LB+"\t"+this.UB);
-		if(((isRootAgent()==true)&&(UB<=LB))||this.Readytermintate==true&&this.LB==this.UB)
+		//System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH+"\t"+this.LB+"\t"+this.UB);
+		if(((isRootAgent()==true)&&(UB<=LB))||this.Readytermintate==true&&(this.TH==this.UB||this.LB==this.UB))
 			{
 				sendTerminateMessages();
 				this.stopRunning();
@@ -212,17 +211,10 @@ public class BnBAdoptAgent extends AgentCycle {
 		int childId=0;
 		for(int i=0;i<this.children.length;i++)
 		{
-			childId=this.children[i];
-			Context c=new Context(currentContext);
-			int[] val = new int[3];
-			val[0]=valueIndex;
-			val[1]=valueID;
-			val[2]=computeTH(valueIndex,childId);
-			Message valueMsg=new Message(this.id, childId, BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
-			
+			childId=this.children[i];		
 			Map<String, Object> mapValue=new HashMap<String, Object>();
-			mapValue.put(KEY_CONTEXT, c);
-			mapValue.put(KEY_VALUE_MESSAGE, valueMsg);
+			//Context c=new Context(currentContext);
+			//mapValue.put(KEY_CONTEXT, c);
 			
 			Message msg=new Message(this.id, childId, BnBAdoptAgent.TYPE_TERMINATE_MESSAGE, mapValue);
 			this.sendMessage(this.constructNcccMessage(msg));
@@ -351,7 +343,6 @@ public class BnBAdoptAgent extends AgentCycle {
 	}
 		
 	//仅仅作一个记录，准备去停止，但并不是要停止。
-	@SuppressWarnings("unchecked")
 	private void disposeTerminateMessage(Message msg) {
 		//Message valueMsg = null;
 		this.Readytermintate = true;
