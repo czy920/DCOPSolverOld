@@ -474,7 +474,7 @@ public class AgentModel extends AgentCycle {
 			int childId = 0;
 			for (int i = 0; i < agent.children.length; i++) {
 				childId = agent.children[i];
-				for (int j = 0; j < agent.children.length; j++) {
+				for (int j = 0; j < agent.domain.length; j++) {
 					if (agent.contexts.get(childId)[j].compatible(agent.currentContext) == false) {
 						InitChild(childId,j);
 					}
