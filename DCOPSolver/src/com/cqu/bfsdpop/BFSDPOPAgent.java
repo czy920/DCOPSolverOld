@@ -145,6 +145,9 @@ public class BFSDPOPAgent extends Agent{
 		ret.utilMsgSizeMin=minMaxAvg[0];
 		ret.utilMsgSizeMax=minMaxAvg[2];
 		ret.utilMsgSizeAvg=minMaxAvg[4];
+		
+		ret.totalTime=this.msgMailer.getAgentManager().getTreeHeight()*DPOPAgent.COMMUNICATION_TIME_EXPENSE;
+		
 		return ret;
 	}
 

@@ -10,6 +10,10 @@ public class Result {
 	
 	public Result() {
 		// TODO Auto-generated constructor stub
+		this.totalCost=0;
+		this.messageQuantity=0;
+		this.lostRatio=0;
+		this.totalTime=0;
 	}
 	
 	public Result(Result rs)

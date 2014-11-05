@@ -21,6 +21,8 @@ public class DPOPAgent extends Agent{
 	public final static String KEY_TOTAL_COST="KEY_TOTAL_COST";
 	public final static String KEY_UTIL_MESSAGE_SIZES="KEY_UTIL_MESSAGE_SIZES";
 	
+	public final static int COMMUNICATION_TIME_EXPENSE=100;
+	
 	private Integer[] parentLevels;
 	private int disposedChildrenCount;
 	private int[] reductDimensionResultIndexes;
@@ -128,6 +130,8 @@ public class DPOPAgent extends Agent{
 		ret.utilMsgSizeMin=minMaxAvg[0];
 		ret.utilMsgSizeMax=minMaxAvg[2];
 		ret.utilMsgSizeAvg=minMaxAvg[4];
+		
+		ret.totalTime=this.msgMailer.getAgentManager().getTreeHeight()*DPOPAgent.COMMUNICATION_TIME_EXPENSE;
 		return ret;
 	}
 
