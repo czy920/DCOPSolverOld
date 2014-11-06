@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<instance>
+  <presentation name="instance1" type="DCOP" benchmark="RandomDCOP" model="Simple" constraintModel="TKC" format="XDisCSP 1.0" />
+  <agents nbAgents="11">
+    <agent name="A1" id="1" description="agent 1" />
+    <agent name="A2" id="2" description="agent 2" />
+    <agent name="A3" id="3" description="agent 3" />
+    <agent name="A4" id="4" description="agent 4" />
+	<agent name="A5" id="5" description="agent 5" />
+	<agent name="A6" id="6" description="agent 6" />
+	<agent name="A7" id="7" description="agent 7" />
+	<agent name="A8" id="8" description="agent 8" />
+	<agent name="A9" id="9" description="agent 9" />
+	<agent name="A10" id="10" description="agent 10" />
+	<agent name="A11" id="11" description="agent 11" />
+  </agents>
+  <domains nbDomains="1">
+    <domain name="D1" nbValues="2">0..1</domain>
+  </domains>
+  <variables nbVariables="11">
+    <variable agent="A1" name="X1.1" id="1" domain="D1" description="variable 1.1" />
+    <variable agent="A2" name="X2.1" id="1" domain="D1" description="variable 2.1" />
+    <variable agent="A3" name="X3.1" id="1" domain="D1" description="variable 3.1" />
+    <variable agent="A4" name="X4.1" id="1" domain="D1" description="variable 4.1" />
+	<variable agent="A5" name="X5.1" id="1" domain="D1" description="variable 5.1" />
+	<variable agent="A6" name="X6.1" id="1" domain="D1" description="variable 6.1" />
+	<variable agent="A7" name="X7.1" id="1" domain="D1" description="variable 7.1" />
+	<variable agent="A8" name="X8.1" id="1" domain="D1" description="variable 8.1" />
+	<variable agent="A9" name="X9.1" id="1" domain="D1" description="variable 9.1" />
+	<variable agent="A10" name="X10.1" id="1" domain="D1" description="variable 10.1" />
+	<variable agent="A11" name="X11.1" id="1" domain="D1" description="variable 11.1" />
+  </variables>
+  <constraints nbConstraints="15" initialCost="1" maximalCost="infinity">
+    <constraint name="C0" model="TKC" arity="2" scope="X2.1 X1.1" reference="R0" />
+    <constraint name="C1" model="TKC" arity="2" scope="X2.1 X3.1" reference="R0" />
+    <constraint name="C2" model="TKC" arity="2" scope="X2.1 X4.1" reference="R0" />
+    <constraint name="C3" model="TKC" arity="2" scope="X2.1 X5.1" reference="R0" />	    
+	<constraint name="C4" model="TKC" arity="2" scope="X3.1 X8.1" reference="R0" />		    
+	<constraint name="C5" model="TKC" arity="2" scope="X3.1 X9.1" reference="R0" />
+    <constraint name="C6" model="TKC" arity="2" scope="X8.1 X9.1" reference="R0" />
+    <constraint name="C7" model="TKC" arity="2" scope="X1.1 X10.1" reference="R0" />
+    <constraint name="C8" model="TKC" arity="2" scope="X1.1 X11.1" reference="R0" />
+    <constraint name="C9" model="TKC" arity="2" scope="X10.1 X11.1" reference="R0" />
+	<constraint name="C10" model="TKC" arity="2" scope="X5.1 X6.1" reference="R0" />
+	<constraint name="C11" model="TKC" arity="2" scope="X6.1 X7.1" reference="R0" />
+	<constraint name="C12" model="TKC" arity="2" scope="X5.1 X7.1" reference="R0" />
+	<constraint name="C13" model="TKC" arity="2" scope="X1.1 X3.1" reference="R0" />
+	<constraint name="C14" model="TKC" arity="2" scope="X2.1 X6.1" reference="R0" />
+  </constraints>
+  <relations nbRelations="1">
+    <relation name="R0" arity="2" nbTuples="4" semantics="soft" defaultCost="infinity">1:0 0|2:0 1|2:1 0|0:1 1</relation>
+  </relations>
+  <GuiPresentation type="DCOP" benchmark="RandomDCOP" name="instance1" model="TKC" nbAgents="4" domainSize="2" density="50" tightness="0" nbConstraints="4" nbTuples="4" />
+</instance>

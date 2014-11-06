@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<instance>
+  <presentation name="instance1" type="DCOP" benchmark="RandomDCOP" model="Simple" constraintModel="TKC" format="XDisCSP 1.0" />
+  <agents nbAgents="4">
+    <agent name="A1" id="1" description="agent 1" />
+    <agent name="A2" id="2" description="agent 2" />
+    <agent name="A3" id="3" description="agent 3" />
+    <agent name="A4" id="4" description="agent 4" />
+  </agents>
+  <domains nbDomains="1">
+    <domain name="D1" nbValues="2">0..1</domain>
+  </domains>
+  <variables nbVariables="4">
+    <variable agent="A1" name="X1.1" id="1" domain="D1" description="variable 1.1" />
+    <variable agent="A2" name="X2.1" id="1" domain="D1" description="variable 2.1" />
+    <variable agent="A3" name="X3.1" id="1" domain="D1" description="variable 3.1" />
+    <variable agent="A4" name="X4.1" id="1" domain="D1" description="variable 4.1" />
+  </variables>
+  <constraints nbConstraints="4" initialCost="1" maximalCost="infinity">
+    <constraint name="C0" model="TKC" arity="2" scope="X1.1 X2.1" reference="R0" />
+    <constraint name="C1" model="TKC" arity="2" scope="X1.1 X3.1" reference="R1" />
+    <constraint name="C2" model="TKC" arity="2" scope="X2.1 X3.1" reference="R2" />
+    <constraint name="C3" model="TKC" arity="2" scope="X2.1 X4.1" reference="R3" />
+  </constraints>
+  <relations nbRelations="4">
+    <relation name="R0" arity="2" nbTuples="4" semantics="soft" defaultCost="infinity">5:0 0|8:0 1|20:1 0|3:1 1</relation>
+    <relation name="R1" arity="2" nbTuples="4" semantics="soft" defaultCost="infinity">5:0 0|10:0 1|20:1 0|3:1 1</relation>
+    <relation name="R2" arity="2" nbTuples="4" semantics="soft" defaultCost="infinity">5:0 0|4:0 1|3:1 0|3:1 1</relation>
+    <relation name="R3" arity="2" nbTuples="4" semantics="soft" defaultCost="infinity">3:0 0|8:0 1|10:1 0|3:1 1</relation>
+  </relations>
+  <GuiPresentation type="DCOP" benchmark="RandomDCOP" name="instance1" model="TKC" nbAgents="4" domainSize="2" density="50" tightness="0" nbConstraints="4" nbTuples="4" />
+</instance>
