@@ -448,7 +448,7 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 	@Override
 	public String easyMessageContent(Message msg, AgentCycle sender, AgentCycle receiver) {
 	
-		return "from "+sender.getName()+" to "+receiver.getName()+" type "+AdoptAgent.messageContent(msg);
+		return "from "+sender.getName()+" to "+receiver.getName()+" type "+AdoptAgentCycle_2.messageContent(msg);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -457,8 +457,8 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 		switch (msg.getType()) {
 		case AdoptAgentCycle_2.TYPE_VALUE_MESSAGE:
 		{
-			int valueIndex=(Integer) msg.getValue();
-			return "value["+valueIndex+"]";
+			int[] val=(int[]) msg.getValue();
+			return "value["+val[0]+"]";
 		}
 		case AdoptAgentCycle_2.TYPE_COST_MESSAGE:
 		{

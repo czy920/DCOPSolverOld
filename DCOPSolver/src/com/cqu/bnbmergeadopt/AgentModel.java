@@ -308,8 +308,8 @@ public class AgentModel extends AgentCycle {
 	public static String messageContent(Message msg) {
 		switch (msg.getType()) {
 		case AgentModel.TYPE_VALUE_MESSAGE: {
-			int valueIndex = (Integer) msg.getValue();
-			return "value[" + valueIndex + "]";
+			int[] valueIndex = (int[]) msg.getValue();
+			return "value[" + valueIndex[0] + "]";
 		}
 		case AgentModel.TYPE_COST_MESSAGE: {
 			Map<String, Object> msgValue = (Map<String, Object>) msg.getValue();
