@@ -123,6 +123,11 @@ public class MainFrame extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
+				String selectedProblem=combobProblem.getSelectedItem()+"";
+				if(selectedProblem.equals("browse...")==false)
+				{
+					
+				}
 				File f=DialogUtil.dialogOpenFile(new String[]{".xml"}, "Select A Problem", selectedProblem);
 				if(f!=null)
 				{
@@ -157,11 +162,6 @@ public class MainFrame extends JFrame {
 				// TODO Auto-generated method stub
 				if(cbBatch.isSelected()==true)
 				{
-					String selectedProblem=combobProblem.getSelectedItem()+"";
-					if(selectedProblem.equals("browse...")==false)
-					{
-						
-					}
 					File f=DialogUtil.dialogOpenDir("Select Direcory", tfDirPath.getText().isEmpty()?"E:/":tfDirPath.getText());
 					if(f!=null&&f.isDirectory()==true)
 					{
