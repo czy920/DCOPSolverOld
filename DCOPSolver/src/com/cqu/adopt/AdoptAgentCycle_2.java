@@ -445,7 +445,7 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 	@Override
 	public String easyMessageContent(Message msg, AgentCycle sender, AgentCycle receiver) {
 	
-		return "from "+sender.getName()+" to "+receiver.getName()+" type "+AdoptAgent.messageContent(msg);
+		return "from "+sender.getName()+" to "+receiver.getName()+" type "+AdoptAgentCycle_2.messageContent(msg);
 	}
 	
 	@SuppressWarnings("unchecked")
