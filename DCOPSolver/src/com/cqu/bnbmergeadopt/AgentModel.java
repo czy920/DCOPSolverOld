@@ -399,7 +399,7 @@ public class AgentModel extends AgentCycle {
 			agent.valueIndex=agent.computeMinimalLBAndUB()[0];
 			//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 			agent.valueID = agent.valueID + 1;
-			//Debugger.valueChanges.get(this.name).add(valueIndex);			
+			Debugger.valueChanges.get(agent.name).add(agent.valueIndex);			
 		}
 		
 		private void InitChild(int child,int d)
@@ -729,7 +729,7 @@ public class AgentModel extends AgentCycle {
 				agent.valueID = agent.valueID + 1;
 			}
 
-			System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
+			//System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
 			this.maintainChildThresholdInvariant();
 			this.maintainAllocationInvariant();   //必须将这个放在发送VALUE信息之前
 			sendValueMessages();
@@ -934,7 +934,7 @@ public class AgentModel extends AgentCycle {
 			agent.valueIndex = agent.computeMinimalLBAndUB()[0];
 			// if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 			agent.valueID = valueID + 1;
-			// Debugger.valueChanges.get(this.name).add(valueIndex);
+			Debugger.valueChanges.get(agent.name).add(agent.valueIndex);
 
 		}
 
@@ -954,7 +954,7 @@ public class AgentModel extends AgentCycle {
 					Debugger.valueChanges.get(agent.name).add(agent.valueIndex);
 				}
 			}
-			System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
+			//System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
 			if (((isRootAgent() == true) && (agent.UB <= agent.LB))
 					|| agent.Readytermintate == true && (agent.LB == agent.UB||agent.TH==agent.UB)) {
 				sendTerminateMessages();

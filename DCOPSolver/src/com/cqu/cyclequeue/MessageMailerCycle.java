@@ -93,7 +93,8 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 	protected void runFinished() {
 		// TODO Auto-generated method stub
 		super.runFinished();
-		
+	
+		Debugger.printValueChanges();
 		Result resultReturned=(Result) this.agentManager.printResults(results);
 		System.out.println(
 				"messageQuantity: "+messageQuantity+

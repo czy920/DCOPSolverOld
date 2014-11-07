@@ -112,7 +112,7 @@ public class BnBAdoptAgent extends AgentCycle {
 		valueIndex=this.computeMinimalLBAndUB()[0];
 		//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 		valueID = valueID + 1;
-		//Debugger.valueChanges.get(this.name).add(valueIndex);
+		Debugger.valueChanges.get(this.name).add(valueIndex);
 		
 	}
 		
