@@ -12,6 +12,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import javax.swing.SwingConstants;
 
@@ -109,11 +111,33 @@ public class MainFrame extends JFrame {
 		contentPane.add(lbRunningFlag);
 		
 		//init
+		combobProblem.addItem("browse...");
 		File[] files=new File("problems/").listFiles();
 		for(int i=0;i<files.length;i++)
 		{
 			combobProblem.addItem(files[i].getName());
 		}
+		
+		combobProblem.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				String selectedProblem=combobProblem.getSelectedItem()+"";
+				if(selectedProblem.equals("browse...")==false)
+				{
+					
+				}
+				File f=DialogUtil.dialogOpenFile(new String[]{".xml"}, "Select A Problem", selectedProblem);
+				if(f!=null)
+				{
+					
+				}else
+				{
+					
+				}
+			}
+		});
 		
 		String[] agentTypes=AgentManager.AGENT_TYPES;
 		for(int i=0;i<agentTypes.length;i++)
@@ -143,6 +167,9 @@ public class MainFrame extends JFrame {
 					{
 						enableBatch(true);
 						tfDirPath.setText(f.getPath());
+					}else
+					{
+						cbBatch.setSelected(false);
 					}
 				}else
 				{
@@ -238,7 +265,12 @@ public class MainFrame extends JFrame {
 
 		if(this.cbBatch.isSelected()==false)
 		{
-			solver.solve("problems/"+combobProblem.getSelectedItem(), (String) combobAgentType.getSelectedItem(), 
+			String selectedProblem=combobProblem.getSelectedItem()+"";
+			if(selectedProblem.equals("browse...")==false)
+			{
+				selectedProblem="problems/"+selectedProblem;
+			}
+			solver.solve(selectedProblem, (String) combobAgentType.getSelectedItem(), 
 					cbTreeFrame.isSelected(), cbDebug.isSelected(), el); 
 		}else
 		{

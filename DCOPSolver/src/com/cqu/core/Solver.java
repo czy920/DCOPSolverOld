@@ -11,6 +11,7 @@ import com.cqu.cyclequeue.AgentManagerCycle;
 import com.cqu.cyclequeue.MessageMailerCycle;
 import com.cqu.test.Debugger;
 import com.cqu.util.FileUtil;
+import com.cqu.visualtree.GraphFrame;
 import com.cqu.visualtree.TreeFrame;
 
 public class Solver {
@@ -36,6 +37,11 @@ public class Solver {
 			return;
 		}
 		
+		{
+			//display constraint graph
+			GraphFrame graphFrame=new GraphFrame(problem.neighbourAgents);
+			graphFrame.showGraphFrame();
+		}
 		//display DFS tree，back edges not included
 		if(showTreeFrame==true)
 		{
