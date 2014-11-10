@@ -12,8 +12,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import javax.swing.SwingConstants;
 
@@ -111,12 +109,12 @@ public class MainFrame extends JFrame {
 		contentPane.add(lbRunningFlag);
 		
 		//init
-		combobProblem.addItem("browse...");
 		File[] files=new File("problems/").listFiles();
 		for(int i=0;i<files.length;i++)
 		{
 			combobProblem.addItem(files[i].getName());
 		}
+		combobProblem.addItem("browse...");
 		
 		combobProblem.addActionListener(new ActionListener() {
 			
@@ -124,17 +122,27 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				String selectedProblem=combobProblem.getSelectedItem()+"";
-				if(selectedProblem.equals("browse...")==false)
+				if(selectedProblem.equals("browse...")==true)
 				{
-					
-				}
-				File f=DialogUtil.dialogOpenFile(new String[]{".xml"}, "Select A Problem", selectedProblem);
-				if(f!=null)
-				{
-					
-				}else
-				{
-					
+					String lastItem=combobProblem.getItemAt(combobProblem.getItemCount()-1)+"";
+					String defaultDir="";
+					if(lastItem.equals("browse...")==false)
+					{
+						defaultDir=lastItem.substring(0, lastItem.lastIndexOf('\\'));
+					}
+					File f=DialogUtil.dialogOpenFile(new String[]{".xml"}, "Select A Problem", defaultDir);
+					if(f!=null)
+					{
+						if(lastItem.equals("browse...")==false)
+						{
+							combobProblem.removeItemAt(combobProblem.getItemCount()-1);
+						}
+						combobProblem.addItem(f.getPath());
+						combobProblem.setSelectedIndex(combobProblem.getItemCount()-1);
+					}else
+					{
+						combobProblem.setSelectedIndex(0);
+					}
 				}
 			}
 		});
@@ -266,7 +274,7 @@ public class MainFrame extends JFrame {
 		if(this.cbBatch.isSelected()==false)
 		{
 			String selectedProblem=combobProblem.getSelectedItem()+"";
-			if(selectedProblem.equals("browse...")==false)
+			if(combobProblem.getSelectedIndex()<(combobProblem.getItemCount()-1))
 			{
 				selectedProblem="problems/"+selectedProblem;
 			}
