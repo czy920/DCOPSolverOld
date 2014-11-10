@@ -9,6 +9,7 @@ import com.cqu.core.Agent;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.ResultDPOP;
+import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FormatUtil;
 import com.cqu.util.StatisticUtil;
@@ -20,8 +21,6 @@ public class DPOPAgent extends Agent{
 	
 	public final static String KEY_TOTAL_COST="KEY_TOTAL_COST";
 	public final static String KEY_UTIL_MESSAGE_SIZES="KEY_UTIL_MESSAGE_SIZES";
-	
-	public final static int COMMUNICATION_TIME_EXPENSE=100;
 	
 	private Integer[] parentLevels;
 	private int disposedChildrenCount;
@@ -131,7 +130,7 @@ public class DPOPAgent extends Agent{
 		ret.utilMsgSizeMax=minMaxAvg[2];
 		ret.utilMsgSizeAvg=minMaxAvg[4];
 		
-		ret.totalTime=(this.msgMailer.getAgentManager().getTreeHeight()-1)*DPOPAgent.COMMUNICATION_TIME_EXPENSE;
+		ret.totalTime=(this.msgMailer.getAgentManager().getTreeHeight()-1)*Settings.settings.getCommunicationTimeInDPOPs();
 		return ret;
 	}
 

@@ -18,10 +18,16 @@ import javax.swing.SwingConstants;
 import com.cqu.core.AgentManager;
 import com.cqu.core.EventListener;
 import com.cqu.core.Solver;
+import com.cqu.settings.Settings;
 import com.cqu.util.DialogUtil;
 import javax.swing.JTextField;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.JPopupMenu;
+import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JMenuItem;
 
 public class MainFrame extends JFrame {
 
@@ -66,6 +72,17 @@ public class MainFrame extends JFrame {
 		setTitle("DCOPSolver");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 400, 299);
+		
+		JPopupMenu popupMenu = new JPopupMenu();
+		addPopup(this, popupMenu);
+		
+		JMenuItem miSetSettings = new JMenuItem("设置");
+		miSetSettings.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Settings.showSettingsDialog();
+			}
+		});
+		popupMenu.add(miSetSettings);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -296,5 +313,22 @@ public class MainFrame extends JFrame {
 						}
 			});
 		}
+	}
+	private static void addPopup(Component component, final JPopupMenu popup) {
+		component.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			private void showMenu(MouseEvent e) {
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		});
 	}
 }

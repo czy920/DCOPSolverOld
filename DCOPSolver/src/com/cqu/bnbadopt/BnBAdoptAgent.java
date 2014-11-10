@@ -9,6 +9,7 @@ import com.cqu.core.Message;
 import com.cqu.core.MessageNCCC;
 import com.cqu.core.ResultAdopt;
 import com.cqu.cyclequeue.AgentCycle;
+import com.cqu.settings.Settings;
 import com.cqu.test.Debugger;
 
 public class BnBAdoptAgent extends AgentCycle {
@@ -530,7 +531,7 @@ public class BnBAdoptAgent extends AgentCycle {
 	
 	private void increaseNcccFromMessage(MessageNCCC mn)
 	{
-		int t=0;
+		int t=Settings.settings.getCommunicationNCCCInAdopts();
 		this.nccc=Math.max(mn.getNccc()+t, this.nccc);
 	}
 	

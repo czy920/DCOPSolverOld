@@ -13,6 +13,7 @@ import com.cqu.dpop.DPOPAgent;
 import com.cqu.dpop.Dimension;
 import com.cqu.dpop.MultiDimensionData;
 import com.cqu.dpop.ReductDimensionResult;
+import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FormatUtil;
 import com.cqu.util.StatisticUtil;
@@ -146,7 +147,7 @@ public class BFSDPOPAgent extends Agent{
 		ret.utilMsgSizeMax=minMaxAvg[2];
 		ret.utilMsgSizeAvg=minMaxAvg[4];
 		
-		ret.totalTime=(this.msgMailer.getAgentManager().getTreeHeight()-1)*DPOPAgent.COMMUNICATION_TIME_EXPENSE;
+		ret.totalTime=(this.msgMailer.getAgentManager().getTreeHeight()-1)*Settings.settings.getCommunicationTimeInDPOPs();
 		
 		return ret;
 	}
