@@ -62,6 +62,11 @@ public class ProblemParser {
 		Problem problem=new Problem();
 		
 		Document doc=XmlUtil.openXmlDocument(this.xmlPath);
+		
+		String docURL=doc.getBaseURI();
+		String[] docName=docURL.split("/");
+		System.out.println(docName[docName.length-1]);
+		
 		Element root=doc.getRootElement();
 		
 		if(parsePresentation(root.getChild(PRESENTATION))==false)

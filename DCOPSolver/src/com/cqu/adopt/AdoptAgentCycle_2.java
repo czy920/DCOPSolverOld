@@ -1,12 +1,15 @@
 package com.cqu.adopt;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import com.cqu.bnbadopt.Context;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
+
 import java.util.List;
+
 import com.cqu.core.MessageNCCC;
 import com.cqu.core.ResultAdopt;
 import com.cqu.cyclequeue.AgentCycle;
@@ -455,8 +458,8 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 		switch (msg.getType()) {
 		case AdoptAgentCycle_2.TYPE_VALUE_MESSAGE:
 		{
-			int valueIndex=(Integer) msg.getValue();
-			return "value["+valueIndex+"]";
+			int[] val=(int[]) msg.getValue();
+			return "value["+val[0]+"]";
 		}
 		case AdoptAgentCycle_2.TYPE_COST_MESSAGE:
 		{
@@ -615,7 +618,7 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 		valueIndex=this.computeMinimalLBAndUB()[0];
 		//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 		valueID = valueID + 1;
-		//Debugger.valueChanges.get(this.name).add(valueIndex);			
+		Debugger.valueChanges.get(this.name).add(valueIndex);			
 	}
 	
 	private void InitChild(int child,int d)
@@ -666,7 +669,7 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 		int childId = 0;
 		for (int i = 0; i < this.children.length; i++) {
 			childId = this.children[i];
-			for (int j = 0; j < this.children.length; j++) {
+			for (int j = 0; j < this.domain.length; j++) {
 				if (contexts.get(childId)[j].compatible(currentContext) == false) {
 					InitChild(childId,j);
 				}
@@ -706,7 +709,7 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 
 			valueIndex = dMinimizesLB;
 			if(valueIndex!=oldValue)
-			valueID = valueID + 1;
+				valueID = valueID + 1;
 		}
 
 		//System.out.println("agent"+id+": "+valueIndex+"\t"+valueID+"\t"+TH+"\t"+LB+"\t"+UB);
