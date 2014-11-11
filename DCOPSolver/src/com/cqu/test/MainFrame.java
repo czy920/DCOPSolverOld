@@ -12,18 +12,22 @@ import javax.swing.JCheckBox;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.io.File;
 import javax.swing.SwingConstants;
 
 import com.cqu.core.AgentManager;
 import com.cqu.core.EventListener;
 import com.cqu.core.Solver;
+import com.cqu.settings.Settings;
 import com.cqu.util.DialogUtil;
 import javax.swing.JTextField;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.JPopupMenu;
+import java.awt.Component;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JMenuItem;
 
 public class MainFrame extends JFrame {
 
@@ -68,6 +72,17 @@ public class MainFrame extends JFrame {
 		setTitle("DCOPSolver");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 400, 299);
+		
+		JPopupMenu popupMenu = new JPopupMenu();
+		addPopup(this, popupMenu);
+		
+		JMenuItem miSetSettings = new JMenuItem("设置");
+		miSetSettings.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Settings.showSettingsDialog();
+			}
+		});
+		popupMenu.add(miSetSettings);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -111,12 +126,12 @@ public class MainFrame extends JFrame {
 		contentPane.add(lbRunningFlag);
 		
 		//init
-		combobProblem.addItem("browse...");
 		File[] files=new File("problems/").listFiles();
 		for(int i=0;i<files.length;i++)
 		{
 			combobProblem.addItem(files[i].getName());
 		}
+		combobProblem.addItem("browse...");
 		
 		combobProblem.addActionListener(new ActionListener() {
 			
@@ -124,17 +139,27 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				String selectedProblem=combobProblem.getSelectedItem()+"";
-				if(selectedProblem.equals("browse...")==false)
+				if(selectedProblem.equals("browse...")==true)
 				{
-					
-				}
-				File f=DialogUtil.dialogOpenFile(new String[]{".xml"}, "Select A Problem", selectedProblem);
-				if(f!=null)
-				{
-					
-				}else
-				{
-					
+					String lastItem=combobProblem.getItemAt(combobProblem.getItemCount()-1)+"";
+					String defaultDir="";
+					if(lastItem.equals("browse...")==false)
+					{
+						defaultDir=lastItem.substring(0, lastItem.lastIndexOf('\\'));
+					}
+					File f=DialogUtil.dialogOpenFile(new String[]{".xml"}, "Select A Problem", defaultDir);
+					if(f!=null)
+					{
+						if(lastItem.equals("browse...")==false)
+						{
+							combobProblem.removeItemAt(combobProblem.getItemCount()-1);
+						}
+						combobProblem.addItem(f.getPath());
+						combobProblem.setSelectedIndex(combobProblem.getItemCount()-1);
+					}else
+					{
+						combobProblem.setSelectedIndex(0);
+					}
 				}
 			}
 		});
@@ -266,7 +291,7 @@ public class MainFrame extends JFrame {
 		if(this.cbBatch.isSelected()==false)
 		{
 			String selectedProblem=combobProblem.getSelectedItem()+"";
-			if(selectedProblem.equals("browse...")==false)
+			if(combobProblem.getSelectedIndex()<(combobProblem.getItemCount()-1))
 			{
 				selectedProblem="problems/"+selectedProblem;
 			}
@@ -288,5 +313,22 @@ public class MainFrame extends JFrame {
 						}
 			});
 		}
+	}
+	private static void addPopup(Component component, final JPopupMenu popup) {
+		component.addMouseListener(new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			public void mouseReleased(MouseEvent e) {
+				if (e.isPopupTrigger()) {
+					showMenu(e);
+				}
+			}
+			private void showMenu(MouseEvent e) {
+				popup.show(e.getComponent(), e.getX(), e.getY());
+			}
+		});
 	}
 }

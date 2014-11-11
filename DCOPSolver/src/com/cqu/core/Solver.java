@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.cqu.cyclequeue.AgentManagerCycle;
 import com.cqu.cyclequeue.MessageMailerCycle;
+import com.cqu.settings.Settings;
 import com.cqu.test.Debugger;
 import com.cqu.util.FileUtil;
 import com.cqu.visualtree.GraphFrame;
@@ -37,6 +38,7 @@ public class Solver {
 			return;
 		}
 		
+		if(Settings.settings.isDisplayGraphFrame()==true)
 		{
 			//display constraint graph
 			GraphFrame graphFrame=new GraphFrame(problem.neighbourAgents);
