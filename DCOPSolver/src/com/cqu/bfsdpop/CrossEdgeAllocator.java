@@ -57,6 +57,10 @@ public class CrossEdgeAllocator {
 	
 	public void allocate()
 	{
+		if(crossEdges.size()<=0)
+		{
+			return;
+		}
 		Integer[] keys=new ListSizeComparator<Edge>(crossEdges).sort();
 		List<Edge> edgeList=crossEdges.get(keys[keys.length-1]);
 		while(edgeList.size()>0)
