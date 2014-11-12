@@ -126,9 +126,9 @@ public class ProblemParser {
 		
 		if(treeGeneratorType.equals(TreeGenerator.TREE_GENERATOR_TYPE_BFS))
 		{
-			CrossEdgeAllocator crossEdgeAllocator=new CrossEdgeAllocator(problem);
-			crossEdgeAllocator.allocate();
-			problem.crossConstraintAllocation=crossEdgeAllocator.getConsideredConstraint();
+			CrossEdgeAllocator allocator=new CrossEdgeAllocator(problem);
+			allocator.allocate();
+			problem.crossConstraintAllocation=allocator.getConsideredConstraint();
 		}
 		
 		return problem;

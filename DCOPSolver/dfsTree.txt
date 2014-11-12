@@ -1,50 +1,100 @@
 -----------A1-----------
-Parent: -1
-Children: [9]
-AllParents: 
-AllChildren: [10,6,9,4,8,3]
------------A2-----------
-Parent: 3
+Parent: 14
 Children: 
-AllParents: [3,7,9,5]
+AllParents: 
+AllChildren: 
+-----------A2-----------
+Parent: 17
+Children: 
+AllParents: 
 AllChildren: 
 -----------A3-----------
-Parent: 5
-Children: [2]
-AllParents: [7,5,1]
-AllChildren: [2]
+Parent: -1
+Children: [14,12,17,6,16,4,5,8,18,19,11]
+AllParents: 
+AllChildren: 
 -----------A4-----------
-Parent: 6
-Children: [10]
-AllParents: [9,1,6]
-AllChildren: [10]
------------A5-----------
-Parent: 6
-Children: [3]
-AllParents: [9,6]
-AllChildren: [3,2]
------------A6-----------
-Parent: 7
-Children: [5,4]
-AllParents: [1,7,9]
-AllChildren: [5,4]
------------A7-----------
-Parent: 9
-Children: [6,8]
-AllParents: [9]
-AllChildren: [2,8,6,3,10]
------------A8-----------
-Parent: 7
+Parent: 3
 Children: 
-AllParents: [7,1]
+AllParents: 
+AllChildren: 
+-----------A5-----------
+Parent: 3
+Children: 
+AllParents: 
+AllChildren: 
+-----------A6-----------
+Parent: 3
+Children: [20]
+AllParents: 
+AllChildren: 
+-----------A7-----------
+Parent: 12
+Children: 
+AllParents: 
+AllChildren: 
+-----------A8-----------
+Parent: 3
+Children: 
+AllParents: 
 AllChildren: 
 -----------A9-----------
-Parent: 1
-Children: [7]
-AllParents: [1]
-AllChildren: [4,5,2,7,6]
------------A10-----------
-Parent: 4
+Parent: 17
 Children: 
-AllParents: [1,4,7]
+AllParents: 
+AllChildren: 
+-----------A10-----------
+Parent: 12
+Children: 
+AllParents: 
+AllChildren: 
+-----------A11-----------
+Parent: 3
+Children: 
+AllParents: 
+AllChildren: 
+-----------A12-----------
+Parent: 3
+Children: [7,10]
+AllParents: 
+AllChildren: 
+-----------A13-----------
+Parent: 14
+Children: 
+AllParents: 
+AllChildren: 
+-----------A14-----------
+Parent: 3
+Children: [1,13]
+AllParents: 
+AllChildren: 
+-----------A15-----------
+Parent: 17
+Children: 
+AllParents: 
+AllChildren: 
+-----------A17-----------
+Parent: 3
+Children: [2,9,15]
+AllParents: 
+AllChildren: 
+-----------A16-----------
+Parent: 3
+Children: 
+AllParents: 
+AllChildren: 
+-----------A19-----------
+Parent: 3
+Children: 
+AllParents: 
+AllChildren: 
+-----------A18-----------
+Parent: 3
+Children: 
+AllParents: 
+AllChildren: 
+-----------A20-----------
+Parent: 6
+Children: 
+AllParents: 
 AllChildren: 

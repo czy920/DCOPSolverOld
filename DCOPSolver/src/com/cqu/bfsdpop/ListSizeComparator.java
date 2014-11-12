@@ -28,6 +28,10 @@ public class ListSizeComparator<T> implements Comparator<Integer>{
 		return new Integer(objectLists.get(arg0).size()).compareTo(new Integer(objectLists.get(arg1).size()));
 	}
 	
+	/**
+	 * 
+	 * @return keys sorted by the list sizes corresponding to the keys
+	 */
 	public Integer[] sort()
 	{
 		Arrays.sort(keys, this);
