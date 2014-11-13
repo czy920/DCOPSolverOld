@@ -116,6 +116,18 @@ public class BnBAdoptAgent extends AgentCycle {
 		Debugger.valueChanges.get(this.name).add(valueIndex);
 		
 	}
+	
+	private void maintainTHInvariant()
+	{
+		if(this.TH<this.LB)
+		{
+			this.TH=this.LB;
+		}
+		if(this.TH>this.UB)
+		{
+			this.TH=this.UB;
+		}
+	}
 		
 
 	private void backtrack() {
@@ -126,16 +138,24 @@ public class BnBAdoptAgent extends AgentCycle {
 		this.increaseNcccLocal();
 				
 		int oldValueIndex = valueIndex;
-		int min = (TH>UB)?UB:TH;
-		if(compute[1]>=min){
-			valueIndex = compute[0];
-			if(valueIndex != oldValueIndex){
-				valueID = valueID + 1;
+		maintainTHInvariant();
+		if(this.Readytermintate==true&&this.TH==this.UB){
+			valueIndex=compute[2];
+			if(valueIndex!=oldValueIndex){
+				valueID=valueID+1;
 				Debugger.valueChanges.get(this.name).add(valueIndex);
 			}
+		} else {
+			if (compute[1] >= this.TH) {
+				valueIndex = compute[0];
+				if (valueIndex != oldValueIndex) {
+					valueID = valueID + 1;
+					Debugger.valueChanges.get(this.name).add(valueIndex);
+				}
+			}
 		}
-		//System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH+"\t"+this.LB+"\t"+this.UB);
-		if(((isRootAgent()==true)&&(UB<=LB))||this.Readytermintate==true&&(this.TH==this.UB||this.LB==this.UB))
+		System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH+"\t"+this.LB+"\t"+this.UB);
+		if(((isRootAgent()==true)&&(UB<=LB))||this.Readytermintate==true&&this.TH==this.UB)
 			{
 				sendTerminateMessages();
 				this.stopRunning();
