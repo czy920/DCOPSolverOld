@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cqu.bnbadopt.Context;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.MessageNCCC;
@@ -644,15 +645,12 @@ public class AgentModel extends AgentCycle {
 				}
 			}
 			if (checkCompatible(c,agent.currentContext) == true) {
-				if (agent.lbs.get(msg.getIdSender())[myValueIndex] < (Integer) cost
-						.get(AgentModel.KEY_LB))
-					agent.lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
-							.get(AgentModel.KEY_LB);
-				if (agent.ubs.get(msg.getIdSender())[myValueIndex] > (Integer) cost
-						.get(AgentModel.KEY_UB))
-					agent.ubs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
-							.get(AgentModel.KEY_UB);
+				agent.lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
+						.get(AgentModel.KEY_LB);
+				agent.ubs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
+						.get(AgentModel.KEY_UB);
 				agent.contexts.get(msg.getIdSender())[myValueIndex] = c;
+
 				//maintainChildThresholdInvariant();
 				//maintainThresholdInvariant();
 			}
@@ -949,25 +947,17 @@ public class AgentModel extends AgentCycle {
 			agent.increaseNcccLocal();
 
 			int oldValueIndex = agent.valueIndex;
-			if (agent.Readytermintate == true && agent.TH == agent.UB) {
-				agent.valueIndex = compute[2];
+			int min = (agent.TH > agent.UB) ? agent.UB : agent.TH;
+			if (compute[1] >= min) {
+				agent.valueIndex = compute[0];
 				if (agent.valueIndex != oldValueIndex) {
 					agent.valueID = agent.valueID + 1;
 					Debugger.valueChanges.get(agent.name).add(agent.valueIndex);
 				}
-			} else {
-				if (compute[1] >= agent.TH) {
-					agent.valueIndex = compute[0];
-					if (agent.valueIndex != oldValueIndex) {
-						agent.valueID = agent.valueID + 1;
-						Debugger.valueChanges.get(agent.name).add(
-								agent.valueIndex);
-					}
-				}
 			}
 			//System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
 			if (((isRootAgent() == true) && (agent.UB <= agent.LB))
-					|| agent.Readytermintate == true &&agent.TH==agent.UB) {
+					|| agent.Readytermintate == true && (agent.LB == agent.UB||agent.TH==agent.UB)) {
 				sendTerminateMessages();
 				agent.stopRunning();
 			}
