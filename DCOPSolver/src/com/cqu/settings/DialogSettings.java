@@ -63,7 +63,7 @@ public class DialogSettings extends JDialog {
 		contentPanel.add(spinnerCommunicationNCCC);
 		
 		spinnerBNBmergeADOPTarg = new JSpinner();
-		spinnerBNBmergeADOPTarg.setModel(new SpinnerNumberModel(0, 0, 1000, 10));
+		spinnerBNBmergeADOPTarg.setModel(new SpinnerNumberModel(0, 0, 1, 0.1));
 		spinnerBNBmergeADOPTarg.setBounds(187, 80, 101, 22);
 		contentPanel.add(spinnerBNBmergeADOPTarg);
 		
@@ -116,7 +116,7 @@ public class DialogSettings extends JDialog {
 	{
 		settings.setCommunicationTimeInDPOPs((Integer)spinnerDPOPCommunicationTime.getValue());
 		settings.setCommunicationNCCCInAdopts((Integer)spinnerCommunicationNCCC.getValue());
-		settings.setBNBmergeADOPTboundArg((Integer)spinnerBNBmergeADOPTarg.getValue());
+		settings.setBNBmergeADOPTboundArg((Double)spinnerBNBmergeADOPTarg.getValue());
 		settings.setDisplayGraphFrame(cbDisplayGraphFrame.isSelected());
 	}
 }

@@ -713,7 +713,7 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 				valueID = valueID + 1;
 		}
 
-		System.out.println("agent"+id+": "+valueIndex+"\t"+valueID+"\t"+TH+"\t"+LB+"\t"+UB);
+		//System.out.println("agent"+id+": "+valueIndex+"\t"+valueID+"\t"+TH+"\t"+LB+"\t"+UB);
 		maintainChildThresholdInvariant();
 		maintainAllocationInvariant();   //必须将这个放在发送VALUE信息之前
 		sendValueMessages();

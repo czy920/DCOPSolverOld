@@ -8,22 +8,22 @@ public class Settings {
 	
 	private int communicationTimeInDPOPs;
 	private int communicationNCCCInAdopts;
-	private int BNBmergeADOPTboundArg;
+	private double BNBmergeADOPTboundArg;
 	private boolean displayGraphFrame;
 	
 	public Settings() {
 		// TODO Auto-generated constructor stub
 		this.communicationTimeInDPOPs=0;
 		this.communicationNCCCInAdopts=0;
-		this.BNBmergeADOPTboundArg=2;
+		this.BNBmergeADOPTboundArg=0.5;
 		this.displayGraphFrame=true;
 	}
 	
-	public int getBNBmergeADOPTboundArg() {
+	public double getBNBmergeADOPTboundArg() {
 		return BNBmergeADOPTboundArg;
 	}
 
-	public void setBNBmergeADOPTboundArg(int bNBmergeADOPTboundArg) {
+	public void setBNBmergeADOPTboundArg(double bNBmergeADOPTboundArg) {
 		BNBmergeADOPTboundArg = bNBmergeADOPTboundArg;
 	}
 

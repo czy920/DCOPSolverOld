@@ -41,8 +41,8 @@ public class AgentModel extends AgentCycle {
 
 	//private String strategy;
 	private String typeMethod;
-	private int boundary;    //方法的分界，可以由比例求得，这里设为3
-	private float scaleArg;    //两个方法的比例参数
+	private long boundary;    //方法的分界，可以由比例求得，这里设为3
+	private double scaleArg;    //两个方法的比例参数
 
 	private int valueID;
 	private boolean terminateReceivedFromParent = false;
@@ -58,7 +58,7 @@ public class AgentModel extends AgentCycle {
 		
 		//this.boundary=Settings.settings.getBNBmergeADOPTboundArg();	//初始为2 
 		this.scaleArg=Settings.settings.getBNBmergeADOPTboundArg();
-		this.boundary=(int) Math.ceil(treeDepth*this.scaleArg/4);
+		this.boundary=(long) Math.ceil(treeDepth*this.scaleArg);
 		
 		// a sole bnbadopt
 //		method = new BnBMethod(this);
@@ -1002,8 +1002,10 @@ public class AgentModel extends AgentCycle {
 					val[0] = agent.valueIndex;
 					val[1] = agent.valueID;
 					childId =agent.children[i];
-					if(agent.Readytermintate==true&&agent.TH==agent.UB)val[2]=computeTH2(agent.valueIndex,childId);
-					val[2] = computeTH(agent.valueIndex, childId);
+					if(agent.Readytermintate==true&&agent.TH==agent.UB)
+						val[2]=computeTH2(agent.valueIndex,childId);
+					else
+						val[2] = computeTH(agent.valueIndex, childId);
 					Message msg = new Message(agent.id, childId,
 							AgentModel.TYPE_VALUE_MESSAGE, val);
 					agent.sendMessage(agent.constructNcccMessage(msg));

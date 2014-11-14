@@ -154,7 +154,7 @@ public class BnBAdoptAgent extends AgentCycle {
 				}
 			}
 		}
-		System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH+"\t"+this.LB+"\t"+this.UB);
+		//System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH+"\t"+this.LB+"\t"+this.UB);
 		if(((isRootAgent()==true)&&(UB<=LB))||this.Readytermintate==true&&this.TH==this.UB)
 			{
 				sendTerminateMessages();
