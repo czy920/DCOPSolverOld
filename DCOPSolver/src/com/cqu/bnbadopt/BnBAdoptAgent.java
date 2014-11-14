@@ -116,6 +116,18 @@ public class BnBAdoptAgent extends AgentCycle {
 		Debugger.valueChanges.get(this.name).add(valueIndex);
 		
 	}
+	
+	private void maintainTHInvariant()
+	{
+		if(this.TH<this.LB)
+		{
+			this.TH=this.LB;
+		}
+		if(this.TH>this.UB)
+		{
+			this.TH=this.UB;
+		}
+	}
 		
 
 	private void backtrack() {
@@ -126,16 +138,24 @@ public class BnBAdoptAgent extends AgentCycle {
 		this.increaseNcccLocal();
 				
 		int oldValueIndex = valueIndex;
-		int min = (TH>UB)?UB:TH;
-		if(compute[1]>=min){
-			valueIndex = compute[0];
-			if(valueIndex != oldValueIndex){
-				valueID = valueID + 1;
+		maintainTHInvariant();
+		if(this.Readytermintate==true&&this.TH==this.UB){
+			valueIndex=compute[2];
+			if(valueIndex!=oldValueIndex){
+				valueID=valueID+1;
 				Debugger.valueChanges.get(this.name).add(valueIndex);
 			}
+		} else {
+			if (compute[1] >= this.TH) {
+				valueIndex = compute[0];
+				if (valueIndex != oldValueIndex) {
+					valueID = valueID + 1;
+					Debugger.valueChanges.get(this.name).add(valueIndex);
+				}
+			}
 		}
-		//System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH+"\t"+this.LB+"\t"+this.UB);
-		if(((isRootAgent()==true)&&(UB<=LB))||this.Readytermintate==true&&(this.TH==this.UB||this.LB==this.UB))
+		System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH+"\t"+this.LB+"\t"+this.UB);
+		if(((isRootAgent()==true)&&(UB<=LB))||this.Readytermintate==true&&this.TH==this.UB)
 			{
 				sendTerminateMessages();
 				this.stopRunning();
@@ -163,7 +183,10 @@ public class BnBAdoptAgent extends AgentCycle {
 			val[0]=valueIndex;
 			val[1]=valueID;
 			childId=this.children[i];
-			val[2]=computeTH(valueIndex,childId);
+			if(this.Readytermintate==true && this.UB==this.TH)
+				val[2]=computeTH2(valueIndex,childId);
+			else 
+				val[2]=computeTH(valueIndex,childId);
 			Message msg=new Message(this.id, childId, BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
 			this.sendMessage(this.constructNcccMessage(msg));
 		}
@@ -446,6 +469,29 @@ public class BnBAdoptAgent extends AgentCycle {
 		
 		return (TH>UB)?(UB-TH_di):(TH-TH_di);
 	}
+	
+	private int computeTH2(int di,int child)
+	{
+		int localCost_=localCost(di);
+		
+		if(this.isLeafAgent()==true)
+		{
+			return localCost_;
+		}
+		
+		int TH_di=0;
+		int childId=0;
+		for(int i=0;i<this.children.length;i++)
+		{
+			childId=this.children[i];
+			if(childId!=child)TH_di=TH_di+this.ubs.get(childId)[di];
+		}
+		TH_di=Infinity.add(TH_di, localCost_);
+		
+		return (TH-TH_di);
+	}
+	
+	
 	
 	private int[] localCosts()
 	{

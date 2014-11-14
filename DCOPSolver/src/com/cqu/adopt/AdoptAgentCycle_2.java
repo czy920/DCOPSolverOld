@@ -3,13 +3,10 @@ package com.cqu.adopt;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-
 import com.cqu.bnbadopt.Context;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
-
 import java.util.List;
-
 import com.cqu.core.MessageNCCC;
 import com.cqu.core.ResultAdopt;
 import com.cqu.cyclequeue.AgentCycle;
@@ -501,11 +498,15 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 				checkCompatible();
 			}
 		}
-		if (checkCompatible(c,currentContext) == true) {
-			lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
-					.get(AdoptAgentCycle_2.KEY_LB);
-			ubs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
-					.get(AdoptAgentCycle_2.KEY_UB);
+		if (checkCompatible(c,currentContext) == true) {	
+			if (lbs.get(msg.getIdSender())[myValueIndex] < (Integer) cost
+					.get(AdoptAgentCycle_2.KEY_LB))
+				lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
+						.get(AdoptAgentCycle_2.KEY_LB);
+			if (ubs.get(msg.getIdSender())[myValueIndex] > (Integer) cost
+					.get(AdoptAgentCycle_2.KEY_UB))
+				ubs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
+						.get(AdoptAgentCycle_2.KEY_UB);
 			contexts.get(msg.getIdSender())[myValueIndex] = c;
 
 			//maintainChildThresholdInvariant();
@@ -712,7 +713,7 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 				valueID = valueID + 1;
 		}
 
-		//System.out.println("agent"+id+": "+valueIndex+"\t"+valueID+"\t"+TH+"\t"+LB+"\t"+UB);
+		System.out.println("agent"+id+": "+valueIndex+"\t"+valueID+"\t"+TH+"\t"+LB+"\t"+UB);
 		maintainChildThresholdInvariant();
 		maintainAllocationInvariant();   //必须将这个放在发送VALUE信息之前
 		sendValueMessages();

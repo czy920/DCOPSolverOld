@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cqu.bnbadopt.Context;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.MessageNCCC;
@@ -53,12 +52,13 @@ public class AgentModel extends AgentCycle {
 
 	private Method method;
 	
-	public AgentModel(int id, String name, int level, int[] domain) {
+	public AgentModel(int id, String name, int level, int[] domain,long treeDepth) {
 		super(id, name, level, domain);
 		this.nccc = 0;
 		
-		this.boundary=2;   //对问题12_2_1进行测试，前两层为bnb,后三层为ADOPT
-		//this.boundary=(int) Math.floor(this.height*this.scaleArg);
+		//this.boundary=Settings.settings.getBNBmergeADOPTboundArg();	//初始为2 
+		this.scaleArg=Settings.settings.getBNBmergeADOPTboundArg();
+		this.boundary=(int) Math.ceil(treeDepth*this.scaleArg/4);
 		
 		// a sole bnbadopt
 //		method = new BnBMethod(this);
@@ -645,12 +645,15 @@ public class AgentModel extends AgentCycle {
 				}
 			}
 			if (checkCompatible(c,agent.currentContext) == true) {
-				agent.lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
-						.get(AgentModel.KEY_LB);
-				agent.ubs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
-						.get(AgentModel.KEY_UB);
+				if (agent.lbs.get(msg.getIdSender())[myValueIndex] < (Integer) cost
+						.get(AgentModel.KEY_LB))
+					agent.lbs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
+							.get(AgentModel.KEY_LB);
+				if (agent.ubs.get(msg.getIdSender())[myValueIndex] > (Integer) cost
+						.get(AgentModel.KEY_UB))
+					agent.ubs.get(msg.getIdSender())[myValueIndex] = (Integer) cost
+							.get(AgentModel.KEY_UB);
 				agent.contexts.get(msg.getIdSender())[myValueIndex] = c;
-
 				//maintainChildThresholdInvariant();
 				//maintainThresholdInvariant();
 			}
@@ -938,6 +941,19 @@ public class AgentModel extends AgentCycle {
 			Debugger.valueChanges.get(agent.name).add(agent.valueIndex);
 
 		}
+		
+		private void maintainTHInvariant()
+		{
+			if(agent.TH<agent.LB)
+			{
+				agent.TH=agent.LB;
+			}
+			if(agent.TH>agent.UB)
+			{
+				agent.TH=agent.UB;
+			}
+		}
+			
 
 		private void backtrack() {
 
@@ -947,17 +963,26 @@ public class AgentModel extends AgentCycle {
 			agent.increaseNcccLocal();
 
 			int oldValueIndex = agent.valueIndex;
-			int min = (agent.TH > agent.UB) ? agent.UB : agent.TH;
-			if (compute[1] >= min) {
-				agent.valueIndex = compute[0];
+			maintainTHInvariant();
+			if (agent.Readytermintate == true && agent.TH == agent.UB) {
+				agent.valueIndex = compute[2];
 				if (agent.valueIndex != oldValueIndex) {
 					agent.valueID = agent.valueID + 1;
 					Debugger.valueChanges.get(agent.name).add(agent.valueIndex);
 				}
+			} else {
+				if (compute[1] >= agent.TH) {
+					agent.valueIndex = compute[0];
+					if (agent.valueIndex != oldValueIndex) {
+						agent.valueID = agent.valueID + 1;
+						Debugger.valueChanges.get(agent.name).add(
+								agent.valueIndex);
+					}
+				}
 			}
 			//System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
 			if (((isRootAgent() == true) && (agent.UB <= agent.LB))
-					|| agent.Readytermintate == true && (agent.LB == agent.UB||agent.TH==agent.UB)) {
+					|| agent.Readytermintate == true &&agent.TH==agent.UB) {
 				sendTerminateMessages();
 				agent.stopRunning();
 			}
@@ -977,6 +1002,7 @@ public class AgentModel extends AgentCycle {
 					val[0] = agent.valueIndex;
 					val[1] = agent.valueID;
 					childId =agent.children[i];
+					if(agent.Readytermintate==true&&agent.TH==agent.UB)val[2]=computeTH2(agent.valueIndex,childId);
 					val[2] = computeTH(agent.valueIndex, childId);
 					Message msg = new Message(agent.id, childId,
 							AgentModel.TYPE_VALUE_MESSAGE, val);
@@ -1060,6 +1086,27 @@ public class AgentModel extends AgentCycle {
 			TH_di=Infinity.add(TH_di, localCost_);
 			
 			return (agent.TH>agent.UB)?(agent.UB-TH_di):(agent.TH-TH_di);
+		}
+		
+		private int computeTH2(int di,int child)
+		{
+			int localCost_=localCost(di);
+			
+			if(agent.isLeafAgent()==true)
+			{
+				return localCost_;
+			}
+			
+			int TH_di=0;
+			int childId=0;
+			for(int i=0;i<agent.children.length;i++)
+			{
+				childId=agent.children[i];
+				if(childId!=child)TH_di=TH_di+agent.ubs.get(childId)[di];
+			}
+			TH_di=Infinity.add(TH_di, localCost_);
+			
+			return (agent.TH-TH_di);
 		}
 
 		protected void disposeValueMessage(Message msg) {

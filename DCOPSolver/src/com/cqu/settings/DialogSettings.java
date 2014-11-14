@@ -25,6 +25,7 @@ public class DialogSettings extends JDialog {
 	
 	private JSpinner spinnerDPOPCommunicationTime;
 	private JSpinner spinnerCommunicationNCCC;
+	private JSpinner spinnerBNBmergeADOPTarg;
 	private JCheckBox cbDisplayGraphFrame;
 	
 	private Settings settings;
@@ -52,14 +53,23 @@ public class DialogSettings extends JDialog {
 		lblnccc.setBounds(10, 48, 167, 15);
 		contentPanel.add(lblnccc);
 		
+		JLabel bdarg = new JLabel("BNB合并算法分层：");
+		bdarg.setBounds(10, 83, 167, 15);
+		contentPanel.add(bdarg);
+		
 		spinnerCommunicationNCCC = new JSpinner();
 		spinnerCommunicationNCCC.setModel(new SpinnerNumberModel(0, 0, 1000, 10));
 		spinnerCommunicationNCCC.setBounds(187, 42, 101, 22);
 		contentPanel.add(spinnerCommunicationNCCC);
 		
+		spinnerBNBmergeADOPTarg = new JSpinner();
+		spinnerBNBmergeADOPTarg.setModel(new SpinnerNumberModel(0, 0, 1000, 10));
+		spinnerBNBmergeADOPTarg.setBounds(187, 80, 101, 22);
+		contentPanel.add(spinnerBNBmergeADOPTarg);
+		
 		cbDisplayGraphFrame = new JCheckBox("每次显示GraphFrame");
 		cbDisplayGraphFrame.setSelected(true);
-		cbDisplayGraphFrame.setBounds(6, 82, 282, 23);
+		cbDisplayGraphFrame.setBounds(6, 110, 282, 23);
 		contentPanel.add(cbDisplayGraphFrame);
 		{
 			JPanel buttonPane = new JPanel();
@@ -98,13 +108,15 @@ public class DialogSettings extends JDialog {
 	{
 		spinnerDPOPCommunicationTime.setValue(settings.getCommunicationTimeInDPOPs());
 		spinnerCommunicationNCCC.setValue(settings.getCommunicationNCCCInAdopts());
-		cbDisplayGraphFrame.setSelected(settings.isDisplayGraphFrame());
+		spinnerBNBmergeADOPTarg.setValue(settings.getBNBmergeADOPTboundArg());
+		cbDisplayGraphFrame.setSelected(settings.isDisplayGraphFrame());	
 	}
 	
 	private void setValues()
 	{
 		settings.setCommunicationTimeInDPOPs((Integer)spinnerDPOPCommunicationTime.getValue());
 		settings.setCommunicationNCCCInAdopts((Integer)spinnerCommunicationNCCC.getValue());
+		settings.setBNBmergeADOPTboundArg((Integer)spinnerBNBmergeADOPTarg.getValue());
 		settings.setDisplayGraphFrame(cbDisplayGraphFrame.isSelected());
 	}
 }
