@@ -183,7 +183,10 @@ public class BnBAdoptAgent extends AgentCycle {
 			val[0]=valueIndex;
 			val[1]=valueID;
 			childId=this.children[i];
-			val[2]=computeTH(valueIndex,childId);
+			if(this.Readytermintate==true && this.UB==this.TH)
+				val[2]=computeTH2(valueIndex,childId);
+			else 
+				val[2]=computeTH(valueIndex,childId);
 			Message msg=new Message(this.id, childId, BnBAdoptAgent.TYPE_VALUE_MESSAGE, val);
 			this.sendMessage(this.constructNcccMessage(msg));
 		}
@@ -466,6 +469,29 @@ public class BnBAdoptAgent extends AgentCycle {
 		
 		return (TH>UB)?(UB-TH_di):(TH-TH_di);
 	}
+	
+	private int computeTH2(int di,int child)
+	{
+		int localCost_=localCost(di);
+		
+		if(this.isLeafAgent()==true)
+		{
+			return localCost_;
+		}
+		
+		int TH_di=0;
+		int childId=0;
+		for(int i=0;i<this.children.length;i++)
+		{
+			childId=this.children[i];
+			if(childId!=child)TH_di=TH_di+this.ubs.get(childId)[di];
+		}
+		TH_di=Infinity.add(TH_di, localCost_);
+		
+		return (TH-TH_di);
+	}
+	
+	
 	
 	private int[] localCosts()
 	{

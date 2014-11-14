@@ -940,6 +940,19 @@ public class AgentModel extends AgentCycle {
 			Debugger.valueChanges.get(agent.name).add(agent.valueIndex);
 
 		}
+		
+		private void maintainTHInvariant()
+		{
+			if(agent.TH<agent.LB)
+			{
+				agent.TH=agent.LB;
+			}
+			if(agent.TH>agent.UB)
+			{
+				agent.TH=agent.UB;
+			}
+		}
+			
 
 		private void backtrack() {
 
@@ -949,6 +962,7 @@ public class AgentModel extends AgentCycle {
 			agent.increaseNcccLocal();
 
 			int oldValueIndex = agent.valueIndex;
+			maintainTHInvariant();
 			if (agent.Readytermintate == true && agent.TH == agent.UB) {
 				agent.valueIndex = compute[2];
 				if (agent.valueIndex != oldValueIndex) {
@@ -987,6 +1001,7 @@ public class AgentModel extends AgentCycle {
 					val[0] = agent.valueIndex;
 					val[1] = agent.valueID;
 					childId =agent.children[i];
+					if(agent.Readytermintate==true&&agent.TH==agent.UB)val[2]=computeTH2(agent.valueIndex,childId);
 					val[2] = computeTH(agent.valueIndex, childId);
 					Message msg = new Message(agent.id, childId,
 							AgentModel.TYPE_VALUE_MESSAGE, val);
@@ -1070,6 +1085,27 @@ public class AgentModel extends AgentCycle {
 			TH_di=Infinity.add(TH_di, localCost_);
 			
 			return (agent.TH>agent.UB)?(agent.UB-TH_di):(agent.TH-TH_di);
+		}
+		
+		private int computeTH2(int di,int child)
+		{
+			int localCost_=localCost(di);
+			
+			if(agent.isLeafAgent()==true)
+			{
+				return localCost_;
+			}
+			
+			int TH_di=0;
+			int childId=0;
+			for(int i=0;i<agent.children.length;i++)
+			{
+				childId=agent.children[i];
+				if(childId!=child)TH_di=TH_di+agent.ubs.get(childId)[di];
+			}
+			TH_di=Infinity.add(TH_di, localCost_);
+			
+			return (agent.TH-TH_di);
 		}
 
 		protected void disposeValueMessage(Message msg) {
