@@ -10,21 +10,24 @@ import com.cqu.util.CollectionUtil;
 
 public class CrossEdgeAllocator {
 	
+	private Map<Integer, int[]> neighbourAgents;
+	
 	private Map<Integer, boolean[]> isCrossNeighbours;
 	private Map<Integer, boolean[]> considerCrossConstraint;
-	private Problem problem;
-	private Map<Integer, Map<Integer, List<Edge>>> branchCrossConstraints;
+
+	private Map<Integer, List<Edge>> crossEdges;
 	
 	public CrossEdgeAllocator(Problem problem) {
 		// TODO Auto-generated constructor stub
-		this.problem=problem;
+		this.neighbourAgents=problem.neighbourAgents;
+		
 		isCrossNeighbours=new HashMap<Integer, boolean[]>();
 		considerCrossConstraint=new HashMap<Integer, boolean[]>();
-		branchCrossConstraints=new HashMap<Integer, Map<Integer, List<Edge>>>();
+		crossEdges=new HashMap<Integer, List<Edge>>();
 		
-		for(Integer agentId : problem.neighbourAgents.keySet())
+		for(Integer agentId : neighbourAgents.keySet())
 		{
-			int[] neighbours=problem.neighbourAgents.get(agentId);
+			int[] neighbours=neighbourAgents.get(agentId);
 			boolean[] crossNeighbours=new boolean[neighbours.length];
 			boolean[] considered=new boolean[neighbours.length];
 			Integer parent=problem.parentAgents.get(agentId);
@@ -39,6 +42,12 @@ public class CrossEdgeAllocator {
 				{
 					crossNeighbours[i]=true;
 					considered[i]=false;
+					
+					if(crossEdges.containsKey(agentId)==false)
+					{
+						crossEdges.put(agentId, new ArrayList<Edge>());
+					}
+					crossEdges.get(agentId).add(new Edge(agentId, neighbours[i]));
 				}
 			}
 			isCrossNeighbours.put(agentId, crossNeighbours);
@@ -48,73 +57,28 @@ public class CrossEdgeAllocator {
 	
 	public void allocate()
 	{
-		for(Integer agentId : this.isCrossNeighbours.keySet())
+		if(crossEdges.size()<=0)
 		{
-			int[] neighbours=problem.neighbourAgents.get(agentId);
-			boolean[] crossNeighbours=this.isCrossNeighbours.get(agentId);
-			for(int i=0;i<neighbours.length;i++)
-			{
-				if(crossNeighbours[i]==true)
-				{
-					Edge edge=new Edge(agentId, neighbours[i]);
-					this.findFirstMutualAncestor(edge);
-					if(branchCrossConstraints.containsKey(edge.getMutualAncestor())==false)
-					{
-						Map<Integer, List<Edge>> crossConstraints=new HashMap<Integer, List<Edge>>();
-						branchCrossConstraints.put(edge.getMutualAncestor(), crossConstraints);
-					}
-					Map<Integer, List<Edge>> crossConstraints=branchCrossConstraints.get(edge.getMutualAncestor());
-					if(crossConstraints.containsKey(edge.getBranchA())==false)
-					{
-						List<Edge> constraints=new ArrayList<Edge>();
-						crossConstraints.put(edge.getBranchA(), constraints);
-					}
-					if(crossConstraints.containsKey(edge.getBranchB())==false)
-					{
-						List<Edge> constraints=new ArrayList<Edge>();
-						crossConstraints.put(edge.getBranchB(), constraints);
-					}
-					List<Edge> constraints=crossConstraints.get(edge.getBranchA());
-					this.addIfNotExist(constraints, edge);
-					constraints=crossConstraints.get(edge.getBranchB());
-					this.addIfNotExist(constraints, edge);
-				}
-			}
+			return;
 		}
-		for(Integer agentId : this.branchCrossConstraints.keySet())
+		Integer[] keys=new ListSizeComparator<Edge>(crossEdges).sort();
+		List<Edge> edgeList=crossEdges.get(keys[keys.length-1]);
+		while(edgeList.size()>0)
 		{
-			Map<Integer, List<Edge>> crossConstraints=branchCrossConstraints.get(agentId);
-			Integer maxKey=this.maxEdgesItemKey(crossConstraints);
-			while(crossConstraints.get(maxKey).size()>0)
+			for(int i=0;i<edgeList.size();i++)
 			{
-				for(Edge edge : crossConstraints.get(maxKey))
-				{
-					boolean[] considered=considerCrossConstraint.get(edge.getNodeA());
-					int[] neighbours=problem.neighbourAgents.get(edge.getNodeA());
-					considered[this.indexInNeighbours(neighbours, edge.getNodeB())]=true;
-				}
-				List<Edge> edges=crossConstraints.get(maxKey);
-				for(int i=0;i<edges.size();i++)
-				{
-					this.removeEdge(crossConstraints.get(edges.get(i).getBranchB()), edges.get(i));
-				}
-				crossConstraints.get(maxKey).clear();
-				maxKey=this.maxEdgesItemKey(crossConstraints);
+				Edge edge=edgeList.get(i);
+				
+				int index=CollectionUtil.indexOf(neighbourAgents.get(edge.getNodeB()), edge.getNodeA());
+				considerCrossConstraint.get(edge.getNodeB())[index]=true;
+				
+				this.removeEdge(crossEdges.get(edge.getNodeB()), edge);
 			}
+			edgeList.clear();
+			
+			keys=new ListSizeComparator<Edge>(crossEdges).sort();
+			edgeList=crossEdges.get(keys[keys.length-1]);
 		}
-	}
-	
-	private boolean addIfNotExist(List<Edge> edgeList, Edge target)
-	{
-		for(Edge edge : edgeList)
-		{
-			if(edge.equals(target)==true)
-			{
-				return false;
-			}
-		}
-		edgeList.add(target);
-		return true;
 	}
 	
 	private boolean removeEdge(List<Edge> edgeList, Edge target)
@@ -128,63 +92,6 @@ public class CrossEdgeAllocator {
 			}
 		}
 		return false;
-	}
-	
-	private Integer indexInNeighbours(int[] neighbours, Integer nodeA)
-	{
-		for(int i=0;i<neighbours.length;i++)
-		{
-			if(nodeA==neighbours[i])
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
-	
-	private Integer maxEdgesItemKey(Map<Integer, List<Edge>> crossConstraints)
-	{
-		int maxCount=-1;
-		int maxKey=-1;
-		for(Integer key : crossConstraints.keySet())
-		{
-			if(crossConstraints.get(key).size()>maxCount)
-			{
-				maxCount=crossConstraints.get(key).size();
-				maxKey=key;
-			}
-		}
-		return maxKey;
-	}
-	
-	private void findFirstMutualAncestor(Edge edge)
-	{
-		Integer branchNodeA=edge.getNodeA();
-		Integer branchNodeB=edge.getNodeB();
-		int branchLevelA=problem.agentLevels.get(branchNodeA);
-		int branchLevelB=problem.agentLevels.get(branchNodeB);
-		if(branchLevelA>branchLevelB)
-		{
-			branchNodeA=problem.parentAgents.get(branchNodeA);
-			branchLevelA=problem.agentLevels.get(branchNodeA);
-		}else if(branchLevelA<branchLevelB)
-		{
-			branchNodeB=problem.parentAgents.get(branchNodeB);
-			branchLevelB=problem.agentLevels.get(branchNodeB);
-		}
-		Integer branchNodeABuf=branchNodeA;
-		Integer branchNodeBBuf=branchNodeB;
-		while(branchNodeA.equals(branchNodeB)==false)
-		{
-			branchNodeABuf=branchNodeA;
-			branchNodeA=problem.parentAgents.get(branchNodeA);
-			branchLevelA=problem.agentLevels.get(branchNodeA);
-			
-			branchNodeBBuf=branchNodeB;
-			branchNodeB=problem.parentAgents.get(branchNodeB);
-			branchLevelB=problem.agentLevels.get(branchNodeB);
-		}
-		edge.setMutualAncestorAndBranches(branchNodeA, branchNodeABuf, branchNodeBBuf);
 	}
 	
 	public Map<Integer, boolean[]> getConsideredConstraint()

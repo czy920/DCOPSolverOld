@@ -130,7 +130,7 @@ public class DPOPAgent extends Agent{
 		ret.utilMsgSizeMax=minMaxAvg[2];
 		ret.utilMsgSizeAvg=minMaxAvg[4];
 		
-		ret.totalTime=(this.msgMailer.getAgentManager().getTreeHeight()-1)*Settings.settings.getCommunicationTimeInDPOPs();
+		ret.totalTime=2*(this.msgMailer.getAgentManager().getTreeHeight()-1)*Settings.settings.getCommunicationTimeInDPOPs();
 		return ret;
 	}
 
