@@ -52,12 +52,13 @@ public class AgentModel extends AgentCycle {
 
 	private Method method;
 	
-	public AgentModel(int id, String name, int level, int[] domain) {
+	public AgentModel(int id, String name, int level, int[] domain,long treeDepth) {
 		super(id, name, level, domain);
 		this.nccc = 0;
 		
-		this.boundary=2;   //对问题12_2_1进行测试，前两层为bnb,后三层为ADOPT
-		//this.boundary=(int) Math.floor(this.height*this.scaleArg);
+		//this.boundary=Settings.settings.getBNBmergeADOPTboundArg();	//初始为2 
+		this.scaleArg=Settings.settings.getBNBmergeADOPTboundArg();
+		this.boundary=(int) Math.ceil(treeDepth*this.scaleArg/4);
 		
 		// a sole bnbadopt
 //		method = new BnBMethod(this);

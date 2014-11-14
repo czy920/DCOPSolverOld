@@ -33,7 +33,7 @@ public class AgentManagerCycle {
 			}else if(agentType.equals("BDADOPT"))
 			{
 				agent=new AgentModel(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
+						problem.domains.get(problem.agentDomains.get(agentId)),problem.treeDepth);
 			}else if(agentType.equals("SynAdopt2"))
 			{
 				agent=new AdoptAgentCycle_2(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
