@@ -9,8 +9,8 @@ import com.cqu.core.Message;
 import com.cqu.core.MessageNCCC;
 import com.cqu.core.ResultAdopt;
 import com.cqu.cyclequeue.AgentCycle;
+import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
-import com.cqu.test.Debugger;
 
 public class BnBAdoptAgent extends AgentCycle {
 	

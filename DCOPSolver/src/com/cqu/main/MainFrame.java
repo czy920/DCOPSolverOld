@@ -1,4 +1,4 @@
-package com.cqu.test;
+package com.cqu.main;
 
 import java.awt.EventQueue;
 
