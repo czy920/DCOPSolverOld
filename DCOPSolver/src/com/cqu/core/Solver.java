@@ -57,7 +57,7 @@ public class Solver {
 		
 		
 		//采用同步消息机制的算法
-		if(agentType.equals("BNBADOPT")||agentType.equals("BDADOPT")||agentType.equals("SynAdopt1")||agentType.equals("SynAdopt2"))
+		if(agentType.equals("BNBADOPT")||agentType.equals("BDADOPT")||agentType.equals("ADOPT_K")||agentType.equals("SynAdopt1")||agentType.equals("SynAdopt2"))
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
 			//construct agents
@@ -280,7 +280,7 @@ public class Solver {
 		};
 		
 		//采用同步消息机制的算法
-		if(algorithmType.equals("BNBADOPT")||algorithmType.equals("BDADOPT")||algorithmType.equals("SynAdopt1")||algorithmType.equals("SynAdopt2"))
+		if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT_K")||algorithmType.equals("BDADOPT")||algorithmType.equals("SynAdopt1")||algorithmType.equals("SynAdopt2"))
 		//if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT"))
 		{
 			//construct agents

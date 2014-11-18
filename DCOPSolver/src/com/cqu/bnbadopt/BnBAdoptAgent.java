@@ -38,7 +38,6 @@ public class BnBAdoptAgent extends AgentCycle {
 	
 	private int valueID;
 	private boolean Readytermintate=false;
-	//public String strategy="bnbadopt";      //表示采用的是bnbadopt策略
 	
 	private int nccc;
 

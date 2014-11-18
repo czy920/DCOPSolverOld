@@ -1,7 +1,6 @@
 package com.cqu.adopt;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import com.cqu.bnbadopt.Context;
 import com.cqu.core.Infinity;

@@ -10,8 +10,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
 import javax.swing.JCheckBox;
 
 public class DialogSettings extends JDialog {
@@ -26,6 +28,7 @@ public class DialogSettings extends JDialog {
 	private JSpinner spinnerDPOPCommunicationTime;
 	private JSpinner spinnerCommunicationNCCC;
 	private JSpinner spinnerBNBmergeADOPTarg;
+	private JSpinner spinnerADOPT_K;
 	private JCheckBox cbDisplayGraphFrame;
 	
 	private Settings settings;
@@ -54,8 +57,12 @@ public class DialogSettings extends JDialog {
 		contentPanel.add(lblnccc);
 		
 		JLabel bdarg = new JLabel("BNB合并算法分层：");
-		bdarg.setBounds(10, 83, 167, 15);
+		bdarg.setBounds(10, 76, 167, 15);
 		contentPanel.add(bdarg);
+		
+		JLabel adoptk = new JLabel("ADOPT_k算法的K：");
+		adoptk.setBounds(10, 108, 167, 15);
+		contentPanel.add(adoptk);
 		
 		spinnerCommunicationNCCC = new JSpinner();
 		spinnerCommunicationNCCC.setModel(new SpinnerNumberModel(0, 0, 1000, 10));
@@ -64,12 +71,17 @@ public class DialogSettings extends JDialog {
 		
 		spinnerBNBmergeADOPTarg = new JSpinner();
 		spinnerBNBmergeADOPTarg.setModel(new SpinnerNumberModel(0, 0, 1, 0.1));
-		spinnerBNBmergeADOPTarg.setBounds(187, 80, 101, 22);
+		spinnerBNBmergeADOPTarg.setBounds(187, 74, 101, 22);
 		contentPanel.add(spinnerBNBmergeADOPTarg);
+		
+		spinnerADOPT_K = new JSpinner();
+		spinnerADOPT_K.setModel(new SpinnerNumberModel(0, 0, 100, 1));
+		spinnerADOPT_K.setBounds(187, 106, 101, 22);
+		contentPanel.add(spinnerADOPT_K);
 		
 		cbDisplayGraphFrame = new JCheckBox("每次显示GraphFrame");
 		cbDisplayGraphFrame.setSelected(true);
-		cbDisplayGraphFrame.setBounds(6, 110, 282, 23);
+		cbDisplayGraphFrame.setBounds(6, 138, 282, 23);
 		contentPanel.add(cbDisplayGraphFrame);
 		{
 			JPanel buttonPane = new JPanel();
@@ -109,6 +121,7 @@ public class DialogSettings extends JDialog {
 		spinnerDPOPCommunicationTime.setValue(settings.getCommunicationTimeInDPOPs());
 		spinnerCommunicationNCCC.setValue(settings.getCommunicationNCCCInAdopts());
 		spinnerBNBmergeADOPTarg.setValue(settings.getBNBmergeADOPTboundArg());
+		spinnerADOPT_K.setValue(settings.getADOPT_K());
 		cbDisplayGraphFrame.setSelected(settings.isDisplayGraphFrame());	
 	}
 	
@@ -117,6 +130,7 @@ public class DialogSettings extends JDialog {
 		settings.setCommunicationTimeInDPOPs((Integer)spinnerDPOPCommunicationTime.getValue());
 		settings.setCommunicationNCCCInAdopts((Integer)spinnerCommunicationNCCC.getValue());
 		settings.setBNBmergeADOPTboundArg((Double)spinnerBNBmergeADOPTarg.getValue());
+		settings.setADOPT_K((Integer) spinnerADOPT_K.getValue());
 		settings.setDisplayGraphFrame(cbDisplayGraphFrame.isSelected());
 	}
 }

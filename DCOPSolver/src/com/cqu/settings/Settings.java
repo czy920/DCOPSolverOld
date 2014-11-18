@@ -9,6 +9,8 @@ public class Settings {
 	private int communicationTimeInDPOPs;
 	private int communicationNCCCInAdopts;
 	private double BNBmergeADOPTboundArg;
+	private int ADOPT_K;
+
 	private boolean displayGraphFrame;
 	
 	public Settings() {
@@ -16,6 +18,7 @@ public class Settings {
 		this.communicationTimeInDPOPs=0;
 		this.communicationNCCCInAdopts=0;
 		this.BNBmergeADOPTboundArg=0.5;
+		this.ADOPT_K=2;
 		this.displayGraphFrame=true;
 	}
 	
@@ -25,6 +28,14 @@ public class Settings {
 
 	public void setBNBmergeADOPTboundArg(double bNBmergeADOPTboundArg) {
 		BNBmergeADOPTboundArg = bNBmergeADOPTboundArg;
+	}
+	
+	public int getADOPT_K() {
+		return ADOPT_K;
+	}
+
+	public void setADOPT_K(int aDOPT_K) {
+		ADOPT_K = aDOPT_K;
 	}
 
 	public int getCommunicationTimeInDPOPs() {
