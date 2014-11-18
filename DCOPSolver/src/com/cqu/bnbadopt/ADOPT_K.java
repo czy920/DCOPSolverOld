@@ -3,13 +3,14 @@ package com.cqu.bnbadopt;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.MessageNCCC;
 import com.cqu.core.ResultAdopt;
 import com.cqu.cyclequeue.AgentCycle;
+import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
-import com.cqu.test.Debugger;
 
 public class ADOPT_K extends AgentCycle {
 	public final static int TYPE_VALUE_MESSAGE = 0;
