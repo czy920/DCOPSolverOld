@@ -75,7 +75,7 @@ public class DialogSettings extends JDialog {
 		contentPanel.add(spinnerBNBmergeADOPTarg);
 		
 		spinnerADOPT_K = new JSpinner();
-		spinnerADOPT_K.setModel(new SpinnerNumberModel(0, 0, 100, 1));
+		spinnerADOPT_K.setModel(new SpinnerNumberModel(0, 0, 5000, 1));
 		spinnerADOPT_K.setBounds(187, 106, 101, 22);
 		contentPanel.add(spinnerADOPT_K);
 		

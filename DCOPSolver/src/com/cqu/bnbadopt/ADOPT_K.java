@@ -190,12 +190,12 @@ public class ADOPT_K extends AgentCycle {
 		this.increaseNcccLocal();
 		int oldValueIndex = valueIndex;
 		maintainTHInvariant();
-		if(this.TH1==this.UB)
-			this.valueIndex=compute[2];
+		if(compute[1]>=Math.min(this.TH2, this.UB))
+			this.valueIndex=compute[0];
+		else if(this.TH1==this.UB)
+			{this.valueIndex=compute[2];System.out.println("th1=ub");}
 		else if(compute[1]>this.TH1+(this.K-1))
-			this.valueIndex=compute[0];
-		else if(compute[1]>Math.min(this.TH2, this.UB))
-			this.valueIndex=compute[0];
+			{this.valueIndex=compute[0];System.out.println("lbi>th1");}
 		if(valueIndex!=oldValueIndex){
 			valueID++;
 			Debugger.valueChanges.get(this.name).add(valueIndex);
@@ -203,7 +203,7 @@ public class ADOPT_K extends AgentCycle {
 		this.maintainChildThresholdInvariant();
 		this.maintainCurrentTHInvariant();
 		this.maintainAllocationInvariant();
-		System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH1+"\t"+this.TH2+"\t"+this.LB+"\t"+this.UB);
+		//System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH1+"\t"+this.TH2+"\t"+this.LB+"\t"+this.UB);
 		if(this.TH1==this.UB)
 			if(this.isRootAgent()||this.Readytermintate==true){
 				sendTerminateMessages();
@@ -560,7 +560,7 @@ public class ADOPT_K extends AgentCycle {
 			childId = this.children[j];
 			sumub = Infinity.add(sumub, this.ubs.get(childId)[valueIndex]);
 		}
-		UBTEMP+=sumub;
+		UBTEMP=Infinity.add(sumub, UBTEMP);
 		return UBTEMP;
 	}
 	
@@ -571,7 +571,7 @@ public class ADOPT_K extends AgentCycle {
 			childId = this.children[j];
 			sumlb += this.lbs.get(childId)[valueIndex];
 		}
-		LBTEMP+=sumlb;
+		LBTEMP=Infinity.add(sumlb, LBTEMP);
 		return LBTEMP;
 	}
 
@@ -702,7 +702,8 @@ public class ADOPT_K extends AgentCycle {
 		}
 		TH_di=Infinity.add(TH_di, localCost_);
 		
-		return (TH2>UB)?(UB-TH_di):(TH2-TH_di);
+		//return (TH2>UB)?(UB-TH_di):(TH2-TH_di);
+		return Infinity.minus(Math.min(TH2, UB),TH_di);
 	}
 
 	private int localCost(int di) {
