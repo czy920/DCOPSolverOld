@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.cqu.test.Debugger;
+import com.cqu.main.Debugger;
 import com.cqu.util.FormatUtil;
 
 public class MessageMailer extends QueueMessager{

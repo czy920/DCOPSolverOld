@@ -7,7 +7,7 @@ import java.util.Map;
 import com.cqu.core.EventListener;
 import com.cqu.core.Message;
 import com.cqu.core.Result;
-import com.cqu.test.Debugger;
+import com.cqu.main.Debugger;
 import com.cqu.util.FormatUtil;
 
 public class MessageMailerCycle extends MailerCycleQueueMessager{
