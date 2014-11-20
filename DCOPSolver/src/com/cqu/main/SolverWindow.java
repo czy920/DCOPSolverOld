@@ -16,11 +16,29 @@ import javax.swing.SwingConstants;
 import javax.swing.JEditorPane;
 import javax.swing.border.EtchedBorder;
 import javax.swing.SpinnerNumberModel;
+
+import com.cqu.core.AgentManager;
+import com.cqu.core.EventListener;
+import com.cqu.core.Result;
+import com.cqu.core.ResultAdopt;
+import com.cqu.core.ResultDPOP;
+import com.cqu.core.Solver;
+import com.cqu.settings.Settings;
+import com.cqu.util.DialogUtil;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FilenameFilter;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.ImageIcon;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 public class SolverWindow {
+	
+	private static final String INIT_PROBLEM_PATH="problems/";
 
 	private JFrame frmDcopsolver;
 	
@@ -28,7 +46,7 @@ public class SolverWindow {
 	
 	private JTextField tfProblemPath;
 	private JComboBox combAlgorithmType;
-	private JSpinner spinnerRunTimes;
+	private JSpinner spinnerRepeatTimes;
 	private JLabel labelRunProgress;
 	private JLabel labelFlagRunning;
 	
@@ -42,6 +60,8 @@ public class SolverWindow {
 	private JTextField tfTotalTime;
 	private JTextField tfTotalCost;
 	private JEditorPane epResultDetails;
+	
+	private Map<String, Boolean> componentStatus;
 	
 
 	/**
@@ -87,7 +107,25 @@ public class SolverWindow {
 		JMenuItem miOpen = new JMenuItem("打开");
 		miOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				boolean isBatchOld=isBatch();
+				String defaultDir=tfProblemPath.getText().trim();
+				if(defaultDir.isEmpty()==true)
+				{
+					defaultDir=INIT_PROBLEM_PATH;
+				}else if(isBatchOld==false)
+				{
+					defaultDir=defaultDir.substring(0, defaultDir.lastIndexOf('\\'));
+				}
 				
+				File f=DialogUtil.dialogOpenFile(new String[]{".xml"}, "Select A Problem", defaultDir);
+				if(f!=null)
+				{
+					tfProblemPath.setText(f.getPath());
+					if(isBatchOld==true)
+					{
+						setBatch(false);
+					}
+				}
 			}
 		});
 		mnf.add(miOpen);
@@ -95,7 +133,33 @@ public class SolverWindow {
 		JMenuItem miOpenDir = new JMenuItem("打开目录");
 		miOpenDir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				boolean isBatchOld=isBatch();
+				String defaultDir=tfProblemPath.getText().trim();
+				if(defaultDir.isEmpty()==true)
+				{
+					defaultDir=INIT_PROBLEM_PATH;
+				}else if(isBatchOld==false)
+				{
+					defaultDir=defaultDir.substring(0, defaultDir.lastIndexOf('\\'));
+				}
 				
+				File f=DialogUtil.dialogOpenDir("Select Direcory", defaultDir);
+				if(f!=null&&f.isDirectory()==true)
+				{
+					tfProblemPath.setText(f.getPath());
+					if(isBatchOld==false)
+					{
+						setBatch(true);
+						labelRunProgress.setText(((Integer)spinnerRepeatTimes.getValue())+"/0/"+f.list(new FilenameFilter() {
+							
+							@Override
+							public boolean accept(File dir, String name) {
+								// TODO Auto-generated method stub
+								return name.endsWith(".xml");
+							}
+						}).length);
+					}
+				}
 			}
 		});
 		mnf.add(miOpenDir);
@@ -107,7 +171,7 @@ public class SolverWindow {
 		JMenuItem miRun = new JMenuItem("运行");
 		miRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				solve();
 			}
 		});
 		mnr.add(miRun);
@@ -119,7 +183,7 @@ public class SolverWindow {
 		JMenuItem miAbout = new JMenuItem("关于");
 		miAbout.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+				new DialogAbout().setVisible(true);
 			}
 		});
 		mnh.add(miAbout);
@@ -148,11 +212,24 @@ public class SolverWindow {
 		combAlgorithmType.setBounds(64, 41, 385, 32);
 		panel.add(combAlgorithmType);
 		
-		spinnerRunTimes = new JSpinner();
-		spinnerRunTimes.setBounds(64, 83, 65, 22);
-		panel.add(spinnerRunTimes);
+		String[] agentTypes=AgentManager.AGENT_TYPES;
+		for(int i=0;i<agentTypes.length;i++)
+		{
+			combAlgorithmType.addItem(agentTypes[i]);
+		}
 		
-		labelRunProgress = new JLabel("0/0/0");
+		spinnerRepeatTimes = new JSpinner();
+		spinnerRepeatTimes.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				String oldText=labelRunProgress.getText();
+				labelRunProgress.setText(spinnerRepeatTimes.getValue()+oldText.substring(oldText.indexOf('/')));
+			}
+		});
+		spinnerRepeatTimes.setModel(new SpinnerNumberModel(5, 3, 10, 1));
+		spinnerRepeatTimes.setBounds(64, 83, 65, 22);
+		panel.add(spinnerRepeatTimes);
+		
+		labelRunProgress = new JLabel(spinnerRepeatTimes.getValue()+"/0/0");
 		labelRunProgress.setBounds(207, 86, 118, 15);
 		panel.add(labelRunProgress);
 		
@@ -161,6 +238,7 @@ public class SolverWindow {
 		panel.add(label_3);
 		
 		labelFlagRunning = new JLabel("");
+		labelFlagRunning.setIcon(new ImageIcon("E:\\hz\\java\\workspace\\DCOPSolver\\DCOPSolver\\resources\\loading.gif"));
 		labelFlagRunning.setHorizontalAlignment(SwingConstants.CENTER);
 		labelFlagRunning.setBounds(196, 150, 54, 56);
 		panel.add(labelFlagRunning);
@@ -194,7 +272,7 @@ public class SolverWindow {
 		panel_1.add(label_7);
 		
 		spinnerBnbLayer = new JSpinner();
-		spinnerBnbLayer.setModel(new SpinnerNumberModel(1, 1, 10, 1));
+		spinnerBnbLayer.setModel(new SpinnerNumberModel(2, 2, 10, 1));
 		spinnerBnbLayer.setBounds(161, 42, 70, 22);
 		panel_1.add(spinnerBnbLayer);
 		
@@ -240,6 +318,31 @@ public class SolverWindow {
 		epResultDetails = new JEditorPane();
 		epResultDetails.setBounds(10, 72, 173, 292);
 		panel_2.add(epResultDetails);
+		
+		initStatus();
+		setSettingValues();
+	}
+	
+	private void initStatus()
+	{
+		componentStatus=new HashMap<String, Boolean>();
+		
+		componentStatus.put("tfProblemPath", tfProblemPath.isEnabled());
+		componentStatus.put("combAlgorithmType", combAlgorithmType.isEnabled());
+		componentStatus.put("spinnerRepeatTimes", spinnerRepeatTimes.isEnabled());
+		componentStatus.put("labelRunProgress", labelRunProgress.isEnabled());
+		componentStatus.put("labelFlagRunning", labelFlagRunning.isEnabled());
+		
+		componentStatus.put("spinnerMessageTransmissionTime", spinnerMessageTransmissionTime.isEnabled());
+		componentStatus.put("spinnerMessageTransmissionNCCC", spinnerMessageTransmissionNCCC.isEnabled());
+		componentStatus.put("spinnerBnbLayer", spinnerBnbLayer.isEnabled());
+		componentStatus.put("cbGraphFrame", cbGraphFrame.isEnabled());
+		componentStatus.put("cbDebug", cbDebug.isEnabled());
+		componentStatus.put("cbTreeFrame", cbTreeFrame.isEnabled());
+		
+		tfProblemPath.setText(new File(INIT_PROBLEM_PATH).listFiles()[0].getPath());
+		setBatch(isBatch());
+		labelFlagRunning.setVisible(false);
 	}
 	
 	private boolean isBatch()
@@ -247,20 +350,37 @@ public class SolverWindow {
 		return new File(tfProblemPath.getText().trim()).isDirectory();
 	}
 	
-	private void enableBatch(boolean enable)
+	private void setBatch(boolean batch)
 	{
-		cbDebug.setEnabled(!enable);
-		cbTreeFrame.setEnabled(!enable);
-		labelRunProgress.setEnabled(enable);
-		spinnerRunTimes.setEnabled(enable);
+		cbDebug.setEnabled(!batch);
+		cbTreeFrame.setEnabled(!batch);
+		cbGraphFrame.setEnabled(!batch);
+		spinnerRepeatTimes.setEnabled(batch);
+		labelRunProgress.setEnabled(batch);
+		
+		componentStatus.put("cbDebug", cbDebug.isEnabled());
+		componentStatus.put("cbTreeFrame", cbTreeFrame.isEnabled());
+		componentStatus.put("cbGraphFrame", cbGraphFrame.isEnabled());
+		componentStatus.put("spinnerRepeatTimes", spinnerRepeatTimes.isEnabled());
+		componentStatus.put("labelRunProgress", labelRunProgress.isEnabled());
 	}
 	
 	private void enableMainPanel(boolean enable)
 	{
 		tfProblemPath.setEnabled(enable);
 		combAlgorithmType.setEnabled(enable);
-		spinnerRunTimes.setEnabled(enable);
+		spinnerRepeatTimes.setEnabled(enable);
 		labelRunProgress.setEnabled(enable);
+		labelFlagRunning.setVisible(!enable);
+	}
+	
+	private void resumeMainPanel()
+	{
+		tfProblemPath.setEnabled(componentStatus.get("tfProblemPath"));
+		combAlgorithmType.setEnabled(componentStatus.get("combAlgorithmType"));
+		spinnerRepeatTimes.setEnabled(componentStatus.get("spinnerRepeatTimes"));
+		labelRunProgress.setEnabled(componentStatus.get("labelRunProgress"));
+		labelFlagRunning.setVisible(!componentStatus.get("labelFlagRunning"));
 	}
 	
 	private void enableSettingPanel(boolean enable)
@@ -273,46 +393,34 @@ public class SolverWindow {
 		cbTreeFrame.setEnabled(enable);
 	}
 	
-	private void enableStatisticsPanel(boolean enable)
+	private void resumeSettingPanel()
 	{
-		tfTotalTime.setEnabled(enable);
-		tfTotalCost.setEnabled(enable);
-		epResultDetails.setEnabled(enable);
+		spinnerMessageTransmissionTime.setEnabled(componentStatus.get("spinnerMessageTransmissionTime"));
+		spinnerMessageTransmissionNCCC.setEnabled(componentStatus.get("spinnerMessageTransmissionNCCC"));
+		spinnerBnbLayer.setEnabled(componentStatus.get("spinnerBnbLayer"));
+		cbGraphFrame.setEnabled(componentStatus.get("cbGraphFrame"));
+		cbDebug.setEnabled(componentStatus.get("cbDebug"));
+		cbTreeFrame.setEnabled(componentStatus.get("cbTreeFrame"));
 	}
 	
-	/*private void enableUI(boolean enable, boolean batch)
+	private void enableUI(boolean enable)
 	{
 		menuBar.setEnabled(enable);
-		
-		tfProblemPath.setEnabled(enable);
-		combAlgorithmType.setEnabled(enable);
-		
-		combobProblem.setEnabled(enable);
-		combobAgentType.setEnabled(enable);
-		cbDebug.setEnabled(enable);
-		cbTreeFrame.setEnabled(enable);
-		btnSolve.setEnabled(enable);
-		cbBatch.setEnabled(enable);
-		tfDirPath.setEditable(enable);
-		labelBatCounter.setEnabled(enable);
-		spinnerRepeatTimes.setEnabled(enable);
-		if(enable==true)
+		if(enable==false)
 		{
-			enableBatch(cbBatch.isSelected());
+			enableMainPanel(false);
+			enableSettingPanel(false);
 		}else
 		{
-			if(cbBatch.isSelected()==true)
-			{
-				labelBatCounter.setEnabled(true);
-			}
+			resumeMainPanel();
+			resumeSettingPanel();
 		}
-		
-		lbRunningFlag.setVisible(!enable);
 	}
 	
 	private void solve()
 	{
 		this.enableUI(false);
+		this.setSettingValues();
 		
 		Solver solver=new Solver();
 		EventListener el=new EventListener() {
@@ -326,34 +434,59 @@ public class SolverWindow {
 			@Override
 			public void onFinished(Object result) {
 				// TODO Auto-generated method stub
+				Result ret=(Result) result;
+				if(ret==null)
+				{
+					return;
+				}
+				
+				tfTotalCost.setText(ret.totalCost+"");
+				tfTotalTime.setText(ret.totalTime+"");
+				
+				String detailedResult="messageQuantity: "+ret.messageQuantity+"\n";
+				detailedResult+="lostRatio: "+ret.lostRatio+"%"+"\n";
+				if(ret instanceof ResultAdopt)
+				{
+					detailedResult+="NCCC: "+((ResultAdopt)ret).nccc;
+				}else if(ret instanceof ResultDPOP)
+				{
+					detailedResult+="utilMsgSizeMin: "+((ResultDPOP)ret).utilMsgSizeMin+"\n";
+					detailedResult+="utilMsgSizeMax: "+((ResultDPOP)ret).utilMsgSizeMax+"\n";
+					detailedResult+="utilMsgSizeAvg: "+((ResultDPOP)ret).utilMsgSizeAvg;
+				}
+				epResultDetails.setText(detailedResult);
+				
 				enableUI(true);
 			}
 		};
 
-		if(this.cbBatch.isSelected()==false)
+		String problemPath=tfProblemPath.getText().trim();
+		if(problemPath.isEmpty()==true)
 		{
-			String selectedProblem=combobProblem.getSelectedItem()+"";
-			if(combobProblem.getSelectedIndex()<(combobProblem.getItemCount()-1))
-			{
-				selectedProblem="problems/"+selectedProblem;
-			}
-			solver.solve(selectedProblem, (String) combobAgentType.getSelectedItem(), 
+			return;
+		}
+		if(this.isBatch()==false)
+		{
+			solver.solve(problemPath, (String) combAlgorithmType.getSelectedItem(), 
 					cbTreeFrame.isSelected(), cbDebug.isSelected(), el); 
 		}else
 		{
-			String problemDir=tfDirPath.getText();
-			if(problemDir.isEmpty()==true)
-			{
-				return;
-			}
-			solver.batSolve(problemDir, (String) combobAgentType.getSelectedItem(), (Integer)spinnerRepeatTimes.getValue(), el, new Solver.BatSolveListener(){
+			solver.batSolve(problemPath, (String) combAlgorithmType.getSelectedItem(), (Integer)spinnerRepeatTimes.getValue(), el, new Solver.BatSolveListener(){
 
 						@Override
 						public void progressChanged(int problemTotalCount, int problemIndex, int timeIndex) {
 							// TODO Auto-generated method stub
-							labelBatCounter.setText((timeIndex+1)+"/"+(problemIndex+1)+"/"+problemTotalCount);
+							labelRunProgress.setText((timeIndex+1)+"/"+(problemIndex+1)+"/"+problemTotalCount);
 						}
 			});
 		}
-	}*/
+	}
+	
+	private void setSettingValues()
+	{
+		Settings.settings.setCommunicationTimeInDPOPs((Integer)spinnerMessageTransmissionTime.getValue());
+		Settings.settings.setCommunicationNCCCInAdopts((Integer)spinnerMessageTransmissionNCCC.getValue());
+		Settings.settings.setBNBmergeADOPTboundArg((Integer)spinnerBnbLayer.getValue());
+		Settings.settings.setDisplayGraphFrame(cbGraphFrame.isSelected());
+	}
 }
