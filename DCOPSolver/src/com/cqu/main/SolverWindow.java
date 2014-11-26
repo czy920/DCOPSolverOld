@@ -150,15 +150,15 @@ public class SolverWindow {
 					if(isBatchOld==false)
 					{
 						setBatch(true);
-						labelRunProgress.setText(((Integer)spinnerRepeatTimes.getValue())+"/0/"+f.list(new FilenameFilter() {
-							
-							@Override
-							public boolean accept(File dir, String name) {
-								// TODO Auto-generated method stub
-								return name.endsWith(".xml");
-							}
-						}).length);
 					}
+					labelRunProgress.setText(((Integer)spinnerRepeatTimes.getValue())+"/0/"+f.list(new FilenameFilter() {
+						
+						@Override
+						public boolean accept(File dir, String name) {
+							// TODO Auto-generated method stub
+							return name.endsWith(".xml");
+						}
+					}).length);
 				}
 			}
 		});
@@ -370,7 +370,13 @@ public class SolverWindow {
 		tfProblemPath.setEnabled(enable);
 		combAlgorithmType.setEnabled(enable);
 		spinnerRepeatTimes.setEnabled(enable);
-		labelRunProgress.setEnabled(enable);
+		if(isBatch()==true)
+		{
+			labelRunProgress.setEnabled(!enable);
+		}else
+		{
+			labelRunProgress.setEnabled(enable);
+		}
 		labelFlagRunning.setVisible(!enable);
 	}
 	
@@ -435,27 +441,24 @@ public class SolverWindow {
 			public void onFinished(Object result) {
 				// TODO Auto-generated method stub
 				Result ret=(Result) result;
-				if(ret==null)
+				if(ret!=null)
 				{
-					return;
+					tfTotalCost.setText(ret.totalCost+"");
+					tfTotalTime.setText(ret.totalTime+"");
+					
+					String detailedResult="messageQuantity: "+ret.messageQuantity+"\n";
+					detailedResult+="lostRatio: "+ret.lostRatio+"%"+"\n";
+					if(ret instanceof ResultAdopt)
+					{
+						detailedResult+="NCCC: "+((ResultAdopt)ret).nccc;
+					}else if(ret instanceof ResultDPOP)
+					{
+						detailedResult+="utilMsgSizeMin: "+((ResultDPOP)ret).utilMsgSizeMin+"\n";
+						detailedResult+="utilMsgSizeMax: "+((ResultDPOP)ret).utilMsgSizeMax+"\n";
+						detailedResult+="utilMsgSizeAvg: "+((ResultDPOP)ret).utilMsgSizeAvg;
+					}
+					epResultDetails.setText(detailedResult);
 				}
-				
-				tfTotalCost.setText(ret.totalCost+"");
-				tfTotalTime.setText(ret.totalTime+"");
-				
-				String detailedResult="messageQuantity: "+ret.messageQuantity+"\n";
-				detailedResult+="lostRatio: "+ret.lostRatio+"%"+"\n";
-				if(ret instanceof ResultAdopt)
-				{
-					detailedResult+="NCCC: "+((ResultAdopt)ret).nccc;
-				}else if(ret instanceof ResultDPOP)
-				{
-					detailedResult+="utilMsgSizeMin: "+((ResultDPOP)ret).utilMsgSizeMin+"\n";
-					detailedResult+="utilMsgSizeMax: "+((ResultDPOP)ret).utilMsgSizeMax+"\n";
-					detailedResult+="utilMsgSizeAvg: "+((ResultDPOP)ret).utilMsgSizeAvg;
-				}
-				epResultDetails.setText(detailedResult);
-				
 				enableUI(true);
 			}
 		};
