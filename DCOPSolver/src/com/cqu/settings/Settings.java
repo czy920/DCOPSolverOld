@@ -1,7 +1,5 @@
 package com.cqu.settings;
 
-import javax.swing.JDialog;
-
 public class Settings {
 	
 	public static Settings settings=new Settings();
@@ -60,14 +58,5 @@ public class Settings {
 
 	public void setDisplayGraphFrame(boolean displayGraphFrame) {
 		this.displayGraphFrame = displayGraphFrame;
-	}
-
-	public static Settings showSettingsDialog()
-	{
-		DialogSettings dialog = new DialogSettings(settings);
-		dialog.setDefaultCloseOperation(JDialog.HIDE_ON_CLOSE);
-		dialog.setModal(true);
-		dialog.setVisible(true);
-		return settings;
 	}
 }
