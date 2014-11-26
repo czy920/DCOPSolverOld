@@ -11,9 +11,11 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JCheckBox;
 import javax.swing.JButton;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
+
 import javax.swing.SwingConstants;
 
 import com.cqu.core.AgentManager;
@@ -21,13 +23,16 @@ import com.cqu.core.EventListener;
 import com.cqu.core.Solver;
 import com.cqu.settings.Settings;
 import com.cqu.util.DialogUtil;
+
 import javax.swing.JTextField;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.JPopupMenu;
+
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import javax.swing.JMenuItem;
 
 public class MainFrame extends JFrame {
@@ -38,8 +43,8 @@ public class MainFrame extends JFrame {
 	private static final long serialVersionUID = 8603036412745950029L;
 	private JPanel contentPane;
 	
-	private JComboBox combobProblem;
-	private JComboBox combobAgentType;
+	private JComboBox<String> combobProblem;
+	private JComboBox<String> combobAgentType;
 	private JLabel lbRunningFlag;
 	private JCheckBox cbDebug;
 	private JCheckBox cbTreeFrame;
@@ -89,7 +94,7 @@ public class MainFrame extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
-		combobAgentType = new JComboBox();
+		combobAgentType = new JComboBox<String>();
 		combobAgentType.setBounds(73, 52, 311, 32);
 		contentPane.add(combobAgentType);
 		
@@ -109,7 +114,7 @@ public class MainFrame extends JFrame {
 		lblSwitch.setBounds(10, 103, 65, 15);
 		contentPane.add(lblSwitch);
 		
-		combobProblem = new JComboBox();
+		combobProblem = new JComboBox<String>();
 		combobProblem.setBounds(73, 10, 311, 32);
 		contentPane.add(combobProblem);
 		
