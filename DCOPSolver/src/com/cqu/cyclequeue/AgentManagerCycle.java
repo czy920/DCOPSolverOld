@@ -6,10 +6,12 @@ import java.util.Map;
 
 import com.cqu.adopt.AdoptAgentCycle;
 import com.cqu.adopt.AdoptAgentCycle_2;
+import com.cqu.bnbadopt.ADOPT_K;
 import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.bnbmergeadopt.AgentModel;
 import com.cqu.core.Message;
 import com.cqu.core.Problem;
+import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FileUtil;
 
@@ -34,6 +36,10 @@ public class AgentManagerCycle {
 			{
 				agent=new AgentModel(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)),problem.treeDepth);
+			}else if(agentType.equals("ADOPT_K"))
+			{
+				agent=new ADOPT_K(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)),Settings.settings.getADOPT_K());
 			}else if(agentType.equals("SynAdopt2"))
 			{
 				agent=new AdoptAgentCycle_2(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
