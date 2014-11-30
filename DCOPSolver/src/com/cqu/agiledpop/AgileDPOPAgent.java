@@ -1,6 +1,8 @@
 package com.cqu.agiledpop;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +32,8 @@ public class AgileDPOPAgent extends Agent{
 	private Integer[] parentLevels;
 	private int disposedChildrenCount;
 	private int[] reductDimensionResultIndexes;
-	private MultiDimensionData rawMDData;
-	private List<Dimension> dimensions;
+	private MultiDimensionData[] rawMDDatas;
+	private List<Dimension> dimensionsList;
 	
 	private List<Integer> utilMsgSizes;
 	
@@ -64,16 +66,16 @@ public class AgileDPOPAgent extends Agent{
 		
 		if(this.isRootAgent()==false)
 		{
-			rawMDData=this.computeLocalUtils();
+			rawMDDatas=this.computeLocalUtils();
 		}
 		if(this.isLeafAgent()==true)
 		{
-			ReductDimensionResult result=rawMDData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
-			rawMDData=result.getMdData();
+			/*ReductDimensionResult result=rawMDData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
+			rawMDDatas=result.getMdData();
 			dimensions=rawMDData.getDimensions();
 			reductDimensionResultIndexes=result.getResultIndex();
 			
-			sendUtilMessage(rawMDData);
+			sendUtilMessage(rawMDData);*/
 		}
 	}
 	
@@ -192,62 +194,93 @@ public class AgileDPOPAgent extends Agent{
 		this.sendMessage(utilMsg);
 	}
 	
-	private MultiDimensionData computeLocalUtils()
+	private MultiDimensionData[] computeLocalUtils()
 	{
-		int dataLength=1;
-		List<Dimension> dimensions=new ArrayList<Dimension>();
-		for(int i=0;i<allParents.length;i++)
+		MultiDimensionData[] ret=new MultiDimensionData[allParents.length];
+		Arrays.fill(ret, null);
+		if(allParents.length>MAX_DIEMNSION_FEASIBLE)
 		{
-			int parentId=allParents[i];
-			int dimensionSize=neighbourDomains.get(parentId).length;
-			dimensions.add(new Dimension(parentId+"", dimensionSize, parentLevels[i]));
-			dataLength=dataLength*dimensionSize;
-		}
-		dimensions.add(new Dimension(this.id+"", this.domain.length, this.level));
-		dataLength=dataLength*this.domain.length;
-		//set data
-		int[] agentValueIndexes=new int[allParents.length+1];
-		int[] data=new int[dataLength];
-		int dataIndex=0;
-		int curDimention=agentValueIndexes.length-1;
-		while(dataIndex<data.length)
-		{
-			int costSum=0;
 			for(int i=0;i<allParents.length;i++)
 			{
-				//保证id小的为行，id大的为列
-				if(this.id<allParents[i])
+				List<Dimension> dimensions=new ArrayList<Dimension>();
+				
+				int parentId=allParents[i];
+				int row=neighbourDomains.get(parentId).length;
+				int col=this.domain.length;
+				dimensions.add(new Dimension(parentId+"", row, parentLevels[i]));
+				dimensions.add(new Dimension(this.id+"", this.domain.length, this.level));
+				
+				int[] data=new int[row*col];
+				int[][] costs=this.constraintCosts.get(allParents[i]);
+				for(int j=0;j<row;j++)
 				{
-					costSum+=this.constraintCosts.get(allParents[i])[agentValueIndexes[agentValueIndexes.length-1]][agentValueIndexes[i]];
-				}else
-				{
-					costSum+=this.constraintCosts.get(allParents[i])[agentValueIndexes[i]][agentValueIndexes[agentValueIndexes.length-1]];
+					for(int k=0;k<col;k++)
+					{
+						data[j*col+k]=costs[j][k];
+					}
 				}
+				
+				ret[i]=new MultiDimensionData(dimensions, data);
 			}
-			data[dataIndex]=costSum;
-			
-			agentValueIndexes[curDimention]+=1;
-			while(agentValueIndexes[curDimention]>=dimensions.get(curDimention).getSize())
+			return ret;
+		}else
+		{
+			int dataLength=1;
+			List<Dimension> dimensions=new ArrayList<Dimension>();
+			for(int i=0;i<allParents.length;i++)
 			{
-				agentValueIndexes[curDimention]=0;
-				curDimention-=1;
-				if(curDimention==-1)
-				{
-					//all data has been set
-					break;
-				}
-				agentValueIndexes[curDimention]+=1;
+				int parentId=allParents[i];
+				int dimensionSize=neighbourDomains.get(parentId).length;
+				dimensions.add(new Dimension(parentId+"", dimensionSize, parentLevels[i]));
+				dataLength=dataLength*dimensionSize;
 			}
-			curDimention=agentValueIndexes.length-1;
-			dataIndex++;
+			dimensions.add(new Dimension(this.id+"", this.domain.length, this.level));
+			dataLength=dataLength*this.domain.length;
+			//set data
+			int[] agentValueIndexes=new int[allParents.length+1];
+			int[] data=new int[dataLength];
+			int dataIndex=0;
+			int curDimention=agentValueIndexes.length-1;
+			while(dataIndex<data.length)
+			{
+				int costSum=0;
+				for(int i=0;i<allParents.length;i++)
+				{
+					//保证id小的为行，id大的为列
+					if(this.id<allParents[i])
+					{
+						costSum+=this.constraintCosts.get(allParents[i])[agentValueIndexes[agentValueIndexes.length-1]][agentValueIndexes[i]];
+					}else
+					{
+						costSum+=this.constraintCosts.get(allParents[i])[agentValueIndexes[i]][agentValueIndexes[agentValueIndexes.length-1]];
+					}
+				}
+				data[dataIndex]=costSum;
+				
+				agentValueIndexes[curDimention]+=1;
+				while(agentValueIndexes[curDimention]>=dimensions.get(curDimention).getSize())
+				{
+					agentValueIndexes[curDimention]=0;
+					curDimention-=1;
+					if(curDimention==-1)
+					{
+						//all data has been set
+						break;
+					}
+					agentValueIndexes[curDimention]+=1;
+				}
+				curDimention=agentValueIndexes.length-1;
+				dataIndex++;
+			}
+			
+			ret[CollectionUtil.indexOf(allParents, this.parent)]=new MultiDimensionData(dimensions, data);
+			return ret;
 		}
-		
-		return new MultiDimensionData(dimensions, data);
 	}
 	
 	private void disposeUtilMessage(Message msg)
 	{
-		if(this.isRootAgent()==true&&rawMDData==null)
+		/*if(this.isRootAgent()==true&&rawMDData==null)
 		{
 			rawMDData=(MultiDimensionData) msg.getValue();
 		}else
@@ -262,7 +295,7 @@ public class AgileDPOPAgent extends Agent{
 			//则可以进行针对本节点的降维，将最终得到的UtilMessage再往父节点发送
 			ReductDimensionResult result=rawMDData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
 			this.reductDimensionResultIndexes=result.getResultIndex();
-			dimensions=result.getMdData().getDimensions();
+			dimensionsList=result.getMdData().getDimensions();
 			
 			if(this.isRootAgent()==true)
 			{
@@ -278,7 +311,7 @@ public class AgileDPOPAgent extends Agent{
 			{
 				this.sendUtilMessage(result.getMdData());
 			}
-		}
+		}*/
 	}
 	
 	private void sendValueMessage(Map<Integer, Integer> valueIndexes)
@@ -300,20 +333,20 @@ public class AgileDPOPAgent extends Agent{
 	{
 		Map<Integer, Integer> valueIndexes=(Map<Integer, Integer>) msg.getValue();
 		
-		int[] periods=new int[dimensions.size()];
-		for(int i=0;i<dimensions.size();i++)
+		int[] periods=new int[dimensionsList.size()];
+		for(int i=0;i<dimensionsList.size();i++)
 		{
 			int temp=1;
-			for(int j=i+1;j<dimensions.size();j++)
+			for(int j=i+1;j<dimensionsList.size();j++)
 			{
-				temp*=dimensions.get(j).getSize();
+				temp*=dimensionsList.get(j).getSize();
 			}
 			periods[i]=temp;
 		}
 		int index=0;
 		for(int i=0;i<periods.length;i++)
 		{
-			index+=valueIndexes.get(Integer.parseInt(dimensions.get(i).getName()))*periods[i];
+			index+=valueIndexes.get(Integer.parseInt(dimensionsList.get(i).getName()))*periods[i];
 		}
 		this.valueIndex=this.reductDimensionResultIndexes[index];
 		
