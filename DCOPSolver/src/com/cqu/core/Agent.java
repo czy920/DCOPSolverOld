@@ -45,6 +45,8 @@ public abstract class Agent extends QueueMessager{
 		this.level=level;
 		this.name = name;
 		this.domain=domain;
+		
+		this.valueIndex=0;
 	}
 	
 	public int getId() {
@@ -53,6 +55,11 @@ public abstract class Agent extends QueueMessager{
 
 	public String getName() {
 		return name;
+	}
+	
+	public int getValue()
+	{
+		return this.domain[this.valueIndex];
 	}
 	
 	public void setNeibours(int[] neighbours, int parent, int[] children, int[] allParents, 

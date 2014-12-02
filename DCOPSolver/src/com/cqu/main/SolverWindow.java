@@ -30,11 +30,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.JButton;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.JTextArea;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class SolverWindow {
 	
@@ -49,6 +56,7 @@ public class SolverWindow {
 	private JSpinner spinnerRepeatTimes;
 	private JLabel labelRunProgress;
 	private JLabel labelFlagRunning;
+	private JButton btnOpen;
 	
 	private JSpinner spinnerMessageTransmissionTime;
 	private JSpinner spinnerMessageTransmissionNCCC;
@@ -56,10 +64,13 @@ public class SolverWindow {
 	private JCheckBox cbGraphFrame;
 	private JCheckBox cbDebug;
 	private JCheckBox cbTreeFrame;
-	
-	private JTextField tfTotalTime;
-	private JTextField tfTotalCost;
 	private JEditorPane epResultDetails;
+	
+	private JTextArea epConsoleLines;
+	private ConsoleRedirectThread consoleRedirectThread;
+	private String consoleOutput="";
+	private int consoleOutputLineCount=0;
+	private static final int MAX_CONSOLE_LINE_COUNT=100;
 	
 	private Map<String, Boolean> componentStatus;
 	
@@ -85,6 +96,32 @@ public class SolverWindow {
 	 */
 	public SolverWindow() {
 		initialize();
+		
+		consoleRedirectThread=new ConsoleRedirectThread(new ConsoleRedirectThread.NewLineListener() {
+			
+			@Override
+			public void newLineAvailable(final String newLine) {
+				// TODO Auto-generated method stub
+				EventQueue.invokeLater(new Runnable() {
+					
+					@Override
+					public void run() {
+						// TODO Auto-generated method stub
+						consoleOutputLineCount++;
+						consoleOutput+=newLine+"\n";
+						if(consoleOutputLineCount>MAX_CONSOLE_LINE_COUNT)
+						{
+							consoleOutputLineCount=MAX_CONSOLE_LINE_COUNT;
+							consoleOutput=consoleOutput.substring(consoleOutput.indexOf('\n')+1, consoleOutput.length());
+						}
+						epConsoleLines.setText(consoleOutput);
+					}
+				});
+			}
+		});
+		System.setOut(new PrintStream(consoleRedirectThread.getOut(), true));
+		consoleRedirectThread.start();
+		System.out.println("DCOPSolver starts working...");
 	}
 
 	/**
@@ -92,9 +129,15 @@ public class SolverWindow {
 	 */
 	private void initialize() {
 		frmDcopsolver = new JFrame();
+		frmDcopsolver.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent e) {
+				consoleRedirectThread.stopRunning();
+			}
+		});
 		frmDcopsolver.setResizable(false);
 		frmDcopsolver.setTitle("DCOPSolver");
-		frmDcopsolver.setBounds(100, 100, 687, 443);
+		frmDcopsolver.setBounds(100, 100, 687, 489);
 		frmDcopsolver.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		menuBar = new JMenuBar();
@@ -107,25 +150,7 @@ public class SolverWindow {
 		JMenuItem miOpen = new JMenuItem("打开");
 		miOpen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				boolean isBatchOld=isBatch();
-				String defaultDir=tfProblemPath.getText().trim();
-				if(defaultDir.isEmpty()==true)
-				{
-					defaultDir=INIT_PROBLEM_PATH;
-				}else if(isBatchOld==false)
-				{
-					defaultDir=defaultDir.substring(0, defaultDir.lastIndexOf('\\'));
-				}
-				
-				File f=DialogUtil.dialogOpenFile(new String[]{".xml"}, "Select A Problem", defaultDir);
-				if(f!=null)
-				{
-					tfProblemPath.setText(f.getPath());
-					if(isBatchOld==true)
-					{
-						setBatch(false);
-					}
-				}
+				openProblemFile();
 			}
 		});
 		mnf.add(miOpen);
@@ -192,7 +217,7 @@ public class SolverWindow {
 		JPanel panel = new JPanel();
 		panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		panel.setLayout(null);
-		panel.setBounds(10, 10, 459, 259);
+		panel.setBounds(10, 10, 459, 132);
 		frmDcopsolver.getContentPane().add(panel);
 		
 		JLabel label = new JLabel("路径：");
@@ -201,7 +226,7 @@ public class SolverWindow {
 		
 		tfProblemPath = new JTextField();
 		tfProblemPath.setColumns(10);
-		tfProblemPath.setBounds(64, 10, 385, 21);
+		tfProblemPath.setBounds(64, 10, 314, 21);
 		panel.add(tfProblemPath);
 		
 		JLabel label_1 = new JLabel("算法：");
@@ -240,12 +265,24 @@ public class SolverWindow {
 		labelFlagRunning = new JLabel("");
 		labelFlagRunning.setIcon(new ImageIcon("E:\\hz\\java\\workspace\\DCOPSolver\\DCOPSolver\\resources\\loading.gif"));
 		labelFlagRunning.setHorizontalAlignment(SwingConstants.CENTER);
-		labelFlagRunning.setBounds(196, 150, 54, 56);
+		labelFlagRunning.setBounds(404, 83, 45, 38);
 		panel.add(labelFlagRunning);
+		
+		btnOpen = new JButton("打开");
+		btnOpen.setBounds(388, 9, 61, 23);
+		btnOpen.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				openProblemFile();
+			}
+		});
+		panel.add(btnOpen);
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		panel_1.setBounds(10, 278, 459, 106);
+		panel_1.setBounds(10, 152, 459, 106);
 		frmDcopsolver.getContentPane().add(panel_1);
 		panel_1.setLayout(null);
 		
@@ -291,36 +328,46 @@ public class SolverWindow {
 		cbTreeFrame.setBounds(241, 76, 210, 23);
 		panel_1.add(cbTreeFrame);
 		
-		JPanel panel_2 = new JPanel();
-		panel_2.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		panel_2.setLayout(null);
-		panel_2.setBounds(478, 10, 193, 374);
-		frmDcopsolver.getContentPane().add(panel_2);
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 268, 459, 162);
+		frmDcopsolver.getContentPane().add(scrollPane);
 		
-		JLabel label_8 = new JLabel("Total Time：");
-		label_8.setBounds(10, 10, 80, 15);
-		panel_2.add(label_8);
+		epConsoleLines = new JTextArea();
+		scrollPane.setViewportView(epConsoleLines);
 		
-		tfTotalTime = new JTextField();
-		tfTotalTime.setColumns(10);
-		tfTotalTime.setBounds(100, 7, 83, 21);
-		panel_2.add(tfTotalTime);
-		
-		JLabel label_9 = new JLabel("Total Cost：");
-		label_9.setBounds(10, 47, 80, 15);
-		panel_2.add(label_9);
-		
-		tfTotalCost = new JTextField();
-		tfTotalCost.setColumns(10);
-		tfTotalCost.setBounds(100, 44, 83, 21);
-		panel_2.add(tfTotalCost);
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(479, 10, 192, 420);
+		frmDcopsolver.getContentPane().add(scrollPane_1);
+		scrollPane_1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
 		epResultDetails = new JEditorPane();
-		epResultDetails.setBounds(10, 72, 173, 292);
-		panel_2.add(epResultDetails);
+		scrollPane_1.setViewportView(epResultDetails);
 		
 		initStatus();
 		setSettingValues();
+	}
+	
+	private void openProblemFile()
+	{
+		boolean isBatchOld=isBatch();
+		String defaultDir=tfProblemPath.getText().trim();
+		if(defaultDir.isEmpty()==true)
+		{
+			defaultDir=INIT_PROBLEM_PATH;
+		}else if(isBatchOld==false)
+		{
+			defaultDir=defaultDir.substring(0, defaultDir.lastIndexOf('\\'));
+		}
+		
+		File f=DialogUtil.dialogOpenFile(new String[]{".xml"}, "Select A Problem", defaultDir);
+		if(f!=null)
+		{
+			tfProblemPath.setText(f.getPath());
+			if(isBatchOld==true)
+			{
+				setBatch(false);
+			}
+		}
 	}
 	
 	private void initStatus()
@@ -332,6 +379,7 @@ public class SolverWindow {
 		componentStatus.put("spinnerRepeatTimes", spinnerRepeatTimes.isEnabled());
 		componentStatus.put("labelRunProgress", labelRunProgress.isEnabled());
 		componentStatus.put("labelFlagRunning", labelFlagRunning.isEnabled());
+		componentStatus.put("btnOpen", btnOpen.isEnabled());
 		
 		componentStatus.put("spinnerMessageTransmissionTime", spinnerMessageTransmissionTime.isEnabled());
 		componentStatus.put("spinnerMessageTransmissionNCCC", spinnerMessageTransmissionNCCC.isEnabled());
@@ -370,6 +418,7 @@ public class SolverWindow {
 		tfProblemPath.setEnabled(enable);
 		combAlgorithmType.setEnabled(enable);
 		spinnerRepeatTimes.setEnabled(enable);
+		btnOpen.setEnabled(enable);
 		if(isBatch()==true)
 		{
 			labelRunProgress.setEnabled(!enable);
@@ -387,6 +436,7 @@ public class SolverWindow {
 		spinnerRepeatTimes.setEnabled(componentStatus.get("spinnerRepeatTimes"));
 		labelRunProgress.setEnabled(componentStatus.get("labelRunProgress"));
 		labelFlagRunning.setVisible(!componentStatus.get("labelFlagRunning"));
+		btnOpen.setEnabled(componentStatus.get("btnOpen"));
 	}
 	
 	private void enableSettingPanel(boolean enable)
@@ -443,10 +493,9 @@ public class SolverWindow {
 				Result ret=(Result) result;
 				if(ret!=null)
 				{
-					tfTotalCost.setText(ret.totalCost+"");
-					tfTotalTime.setText(ret.totalTime+"");
-					
-					String detailedResult="messageQuantity: "+ret.messageQuantity+"\n";
+					String detailedResult="totalCost: "+ret.totalCost+"\n";
+					detailedResult+="totalTime: "+ret.totalTime+"ms\n";
+					detailedResult+="messageQuantity: "+ret.messageQuantity+"\n";
 					detailedResult+="lostRatio: "+ret.lostRatio+"%"+"\n";
 					if(ret instanceof ResultAdopt)
 					{
@@ -457,6 +506,11 @@ public class SolverWindow {
 						detailedResult+="utilMsgSizeMax: "+((ResultDPOP)ret).utilMsgSizeMax+"\n";
 						detailedResult+="utilMsgSizeAvg: "+((ResultDPOP)ret).utilMsgSizeAvg;
 					}
+					for(Integer key : ret.agentValues.keySet())
+					{
+						detailedResult+="agent "+key+": "+ret.agentValues.get(key)+"\n";
+					}
+					detailedResult=detailedResult.substring(0, detailedResult.length()-1);
 					epResultDetails.setText(detailedResult);
 				}
 				enableUI(true);

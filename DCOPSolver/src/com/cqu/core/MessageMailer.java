@@ -99,6 +99,7 @@ public class MessageMailer extends QueueMessager{
 		resultReturned.messageQuantity=messageQuantity;
 		resultReturned.lostRatio=(int)(messageLostQuantity*100.0/(messageQuantity+messageLostQuantity));
 		resultReturned.totalTime+=(timeEnd-timeStart);
+		resultReturned.agentValues=agentManager.getAgentValues();
 		
 		System.out.println("Mailer stopped, totalTime: "+resultReturned.totalTime+"ms");
 

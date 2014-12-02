@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.adopt.AdoptAgent;
+import com.cqu.agiledpop.AgileDPOPAgent;
 import com.cqu.bfsdpop.BFSDPOPAgent;
 import com.cqu.dpop.DPOPAgent;
 import com.cqu.util.CollectionUtil;
@@ -12,7 +13,7 @@ import com.cqu.util.FileUtil;
 
 public class AgentManager {
 	
-	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "ADOPT", "BNBADOPT","ADOPT_K","BDADOPT","SynAdopt","SynAdopt2"};
+	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "AgileDPOP", "ADOPT", "BNBADOPT","ADOPT_K","BDADOPT","SynAdopt","SynAdopt2"};
 	
 	private Map<Integer, Agent> agents;
 	private int treeHeight=0;
@@ -27,6 +28,10 @@ public class AgentManager {
 			if(agentType.equals("DPOP"))
 			{
 				agent=new DPOPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}else if(agentType.equals("AgileDPOP"))
+			{
+				agent=new AgileDPOPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}else if(agentType.equals("BFSDPOP"))
 			{
@@ -82,6 +87,16 @@ public class AgentManager {
 	public int getTreeHeight()
 	{
 		return this.treeHeight;
+	}
+	
+	public Map<Integer, Integer> getAgentValues()
+	{
+		Map<Integer, Integer> agentValues=new HashMap<Integer, Integer>();
+		for(Agent agent : agents.values())
+		{
+			agentValues.put(agent.getId(), agent.getValue());
+		}
+		return agentValues;
 	}
 	
 	public Agent getAgent(int agentId)
