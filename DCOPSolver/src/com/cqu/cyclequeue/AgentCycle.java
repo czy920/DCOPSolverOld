@@ -48,6 +48,11 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 		return name;
 	}
 	
+	public int getValue()
+	{
+		return this.domain[this.valueIndex];
+	}
+	
 	public void setNeibours(int[] neighbours, int parent, int[] children, int[] allParents, 
 			int[] allChildren, Map<Integer, int[]> neighbourDomains, Map<Integer, 
 			int[][]> constraintCosts, Map<Integer, Integer> neighbourLevels)

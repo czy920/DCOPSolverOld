@@ -103,12 +103,15 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		//Debugger.printValueChanges();
 		
 		timeEnd=System.currentTimeMillis();
-		System.out.println("Mailer stopped, totalTime: "+(timeEnd-timeStart)+"ms");
-		System.out.println("Cycle Count: "+this.cycleCount);
 		
 		resultReturned.messageQuantity=messageQuantity;
 		resultReturned.lostRatio=(int)(messageLostQuantity*100.0/(messageQuantity+messageLostQuantity));
 		resultReturned.totalTime=timeEnd-timeStart;
+		resultReturned.agentValues=agentManager.getAgentValues();
+		
+		System.out.println("Mailer stopped, totalTime: "+resultReturned.totalTime+"ms");
+		System.out.println("Cycle Count: "+this.cycleCount);
+		
 		for(EventListener el : this.eventListeners)
 		{
 			el.onFinished(resultReturned);

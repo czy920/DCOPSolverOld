@@ -502,7 +502,7 @@ public class SolverWindow {
 					detailedResult+="lostRatio: "+ret.lostRatio+"%"+"\n";
 					if(ret instanceof ResultAdopt)
 					{
-						detailedResult+="NCCC: "+((ResultAdopt)ret).nccc;
+						detailedResult+="NCCC: "+((ResultAdopt)ret).nccc+"\n";
 					}else if(ret instanceof ResultDPOP)
 					{
 						detailedResult+="utilMsgSizeMin: "+((ResultDPOP)ret).utilMsgSizeMin+"\n";

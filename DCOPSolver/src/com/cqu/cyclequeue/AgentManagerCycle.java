@@ -95,6 +95,16 @@ public class AgentManagerCycle {
 		}
 	}
 	
+	public Map<Integer, Integer> getAgentValues()
+	{
+		Map<Integer, Integer> agentValues=new HashMap<Integer, Integer>();
+		for(AgentCycle agent : agents.values())
+		{
+			agentValues.put(agent.getId(), agent.getValue());
+		}
+		return agentValues;
+	}
+	
 	public Map<Integer, AgentCycle> getAgents()
 	{
 		return this.agents;
