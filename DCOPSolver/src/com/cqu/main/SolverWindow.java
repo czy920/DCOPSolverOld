@@ -132,7 +132,10 @@ public class SolverWindow {
 		frmDcopsolver.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosed(WindowEvent e) {
-				consoleRedirectThread.stopRunning();
+				/*if(consoleRedirectThread!=null)
+				{
+					consoleRedirectThread.stopRunning();
+				}*/
 			}
 		});
 		frmDcopsolver.setResizable(false);
@@ -504,14 +507,23 @@ public class SolverWindow {
 					{
 						detailedResult+="utilMsgSizeMin: "+((ResultDPOP)ret).utilMsgSizeMin+"\n";
 						detailedResult+="utilMsgSizeMax: "+((ResultDPOP)ret).utilMsgSizeMax+"\n";
-						detailedResult+="utilMsgSizeAvg: "+((ResultDPOP)ret).utilMsgSizeAvg;
+						detailedResult+="utilMsgSizeAvg: "+((ResultDPOP)ret).utilMsgSizeAvg+"\n";
 					}
 					for(Integer key : ret.agentValues.keySet())
 					{
 						detailedResult+="agent "+key+": "+ret.agentValues.get(key)+"\n";
 					}
 					detailedResult=detailedResult.substring(0, detailedResult.length()-1);
-					epResultDetails.setText(detailedResult);
+					
+					final String resultToShow=detailedResult;
+					EventQueue.invokeLater(new Runnable() {
+						
+						@Override
+						public void run() {
+							// TODO Auto-generated method stub
+							epResultDetails.setText(resultToShow);
+						}
+					});
 				}
 				enableUI(true);
 			}

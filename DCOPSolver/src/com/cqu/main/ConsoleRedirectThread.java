@@ -34,18 +34,17 @@ public class ConsoleRedirectThread extends ThreadEx{
 	@Override
 	protected void runProcess() {
 		// TODO Auto-generated method stub
-		String newLine = null;
+		char[] buf=new char[4096];
+		int readCount=0;
 		while (isRunning==true) {
 			try {
-				newLine = reader.readLine();
+			    readCount=reader.read(buf);
 			} catch (IOException ioe) {
 				break;
 			}
-			if (newLine == null) {
-				break;
-			} else {
+			/*if (newLine != null) {
 				listener.newLineAvailable(newLine);
-			}
+			}*/
 		}
 		try {
 			pos.close();
