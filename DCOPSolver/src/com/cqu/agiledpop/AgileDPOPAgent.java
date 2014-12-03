@@ -444,12 +444,15 @@ public class AgileDPOPAgent extends Agent{
 		}else if(type==TYPE_UTIL_MESSAGE)
 		{
 			List<MultiDimensionData> datas=(List<MultiDimensionData>) msg.getValue();
-			int size=0;
+			int maxSize=Integer.MIN_VALUE;
 			for(MultiDimensionData data : datas)
 			{
-				size+=data.size();
+				if(maxSize<data.size())
+				{
+					maxSize=data.size();
+				}
 			}
-			utilMsgSizes.add(size);
+			utilMsgSizes.add(maxSize);
 			
 			disposeUtilMessage(msg);
 		}
@@ -486,14 +489,26 @@ public class AgileDPOPAgent extends Agent{
 			
 			int[] data=new int[row*col];
 			int[][] costs=this.constraintCosts.get(allParents[i]);
-			for(int j=0;j<row;j++)
+			//原始数据中id小的为行，id大的为列
+			if(this.id<parentId)
 			{
-				for(int k=0;k<col;k++)
+				for(int j=0;j<row;j++)
 				{
-					data[j*col+k]=costs[j][k];
+					for(int k=0;k<col;k++)
+					{
+						data[j*col+k]=costs[k][j];
+					}
+				}
+			}else
+			{
+				for(int j=0;j<row;j++)
+				{
+					for(int k=0;k<col;k++)
+					{
+						data[j*col+k]=costs[j][k];
+					}
 				}
 			}
-			
 			ret.add(new MultiDimensionData(dimensions, data));
 		}
 		return ret;
@@ -623,6 +638,13 @@ public class AgileDPOPAgent extends Agent{
 		}
 		otherDimensionValueIndexes.put(agentId, reductDimensionResultIndexes[index]);
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return this.id+"";
+		//return super.toString();
 	}
 
 }
