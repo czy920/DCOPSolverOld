@@ -11,9 +11,9 @@ public class MultiDimensionData {
 	private List<Dimension> dimensions;
 	private int[] data;
 
-	public MultiDimensionData(List<Dimension> dimentions, int[] data) {
+	public MultiDimensionData(List<Dimension> dimensions, int[] data) {
 		super();
-		this.dimensions = dimentions;
+		this.dimensions = dimensions;
 		this.data = data;
 	}
 
@@ -23,6 +23,11 @@ public class MultiDimensionData {
 
 	public int[] getData() {
 		return data;
+	}
+	
+	public boolean isNull()
+	{
+		return this.data==null;
 	}
 	
 	public int indexOf(String dimensionName)
@@ -300,6 +305,10 @@ public class MultiDimensionData {
 	
 	public int size()
 	{
+		if(this.data==null)
+		{
+			return 0;
+		}
 		return this.data.length*4;
 	}
 	
@@ -311,17 +320,21 @@ public class MultiDimensionData {
 		MultiDimensionData mdDataA, mdDataB;
 		{
 			List<Dimension> dimensions=new ArrayList<Dimension>();
-			dimensions.add(new Dimension("A1", 2, 0));
+			dimensions.add(new Dimension("A1", 3, 0));
 			dimensions.add(new Dimension("A2", 3, 1));
-			mdDataA=new MultiDimensionData(dimensions, new int[]{1, 0, 5, 3, 4, 2});
+			mdDataA=new MultiDimensionData(dimensions, new int[]{6, 4, 3, 9, 2, 8, 0, 1, 7});
 		}
 		{
 			List<Dimension> dimensions=new ArrayList<Dimension>();
-			dimensions.add(new Dimension("A2", 3, 1));
-			dimensions.add(new Dimension("A3", 2, 2));
-			mdDataB=new MultiDimensionData(dimensions, new int[]{3, 4, 2, 5, 1, 2});
+			dimensions.add(new Dimension("A1", 3, 0));
+			dimensions.add(new Dimension("A3", 3, 2));
+			mdDataB=new MultiDimensionData(dimensions, new int[]{6, 5, 2, 7, 3, 6, 7, 9, 4});
 		}
 
 		System.out.println(mdDataA.mergeDimension(mdDataB).toString());
+		int[] reductIndex=mdDataA.mergeDimension(mdDataB).
+		reductDimension("A3", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN).getMdData().
+		reductDimension("A2", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN).getResultIndex();
+		System.out.println(CollectionUtil.arrayToString(reductIndex));
 	}
 }
