@@ -108,7 +108,7 @@ public class SolverWindow {
 					public void run() {
 						// TODO Auto-generated method stub
 						consoleOutputLineCount++;
-						consoleOutput+=newLine+"\n";
+						consoleOutput+=newLine;
 						if(consoleOutputLineCount>MAX_CONSOLE_LINE_COUNT)
 						{
 							consoleOutputLineCount=MAX_CONSOLE_LINE_COUNT;

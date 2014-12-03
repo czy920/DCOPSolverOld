@@ -100,7 +100,8 @@ public class AgileDPOPAgent extends Agent{
 	private void allMDDataReceived()
 	{
 		List<Dimension> receivedMDDatasDimensions=this.fakeMergedDimensions(receivedMDDatas);
-		if(receivedMDDatasDimensions.get(0).getName().equals(this.id+"")==true)
+		if(receivedMDDatasDimensions.size()>1&&
+				receivedMDDatasDimensions.get(0).getName().equals(this.id+"")==true)
 		{
 			boolean agileReduct=false;
 			if(this.isRootAgent()==true)
@@ -187,13 +188,6 @@ public class AgileDPOPAgent extends Agent{
 				}
 			}
 			
-			if(curDimension==0)
-			{
-				//表示本agent value index 变化
-				dataNew[dimensionValueIndexes[curDimension]]=minCostSum;
-				reductDimensionsResult.add(minCostDimensionValueIndexes);
-				minCostDimensionValueIndexes=new int[dimensionValueIndexes.length-1];
-			}
 			dimensionValueIndexes[curDimension]+=1;
 			for(int i=0;i<receivedMDDatas.size();i++)
 			{
@@ -217,6 +211,7 @@ public class AgileDPOPAgent extends Agent{
 				{
 					//表示本agent value index 变化
 					dataNew[dimensionValueIndexes[curDimension]]=minCostSum;
+					minCostSum=Integer.MAX_VALUE;
 					reductDimensionsResult.add(minCostDimensionValueIndexes);
 					minCostDimensionValueIndexes=new int[dimensionValueIndexes.length-1];
 				}
@@ -239,6 +234,39 @@ public class AgileDPOPAgent extends Agent{
 	
 	private void mergeAndReduct(List<MultiDimensionData> allDatas)
 	{
+		//先尝试merge
+		if(allDatas.size()>1)
+		{
+			while(true)
+			{
+				int i=0;
+				for(i=0;i<allDatas.size();i++)
+				{
+					MultiDimensionData mdDataA=allDatas.get(i);
+					int j=0;
+					for(j=i+1;j<allDatas.size();j++)
+					{
+						MultiDimensionData mdDataB=allDatas.get(j);
+						if(tryMerge(mdDataA, mdDataB)==true)
+						{
+							allDatas.remove(mdDataA);
+							allDatas.remove(mdDataB);
+							allDatas.add(mdDataA.mergeDimension(mdDataB));
+							break;
+						}
+					}
+					if(j<allDatas.size())
+					{
+						break;
+					}
+				}
+				if(i>=allDatas.size())
+				{
+					break;
+				}
+			}
+		}
+		//再尝试reduct
 		boolean reductable=true;
 		while(reductable==true)
 		{
@@ -260,6 +288,19 @@ public class AgileDPOPAgent extends Agent{
 			{
 				reductable=false;
 			}
+		}
+	}
+	
+	private boolean tryMerge(MultiDimensionData mdDataA, MultiDimensionData mdDataB)
+	{
+		MultiDimensionData mdDataTest=mdDataA.testMergeDimension(mdDataB);
+		if(mdDataTest.getDimensions().size()<=
+				Math.max(mdDataA.getDimensions().size(), mdDataB.getDimensions().size()))
+		{
+			return true;
+		}else
+		{
+			return false;
 		}
 	}
 	
