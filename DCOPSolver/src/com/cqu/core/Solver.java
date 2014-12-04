@@ -19,6 +19,8 @@ public class Solver {
 	
 	private List<Result> results=new ArrayList<Result>();
 	private List<Result> resultsRepeated;
+	private AgentManagerCycle agentManagerCycle;
+	private AgentManager agentManager;
 
 	public void solve(String problemPath, String agentType, boolean showTreeFrame, boolean debug, EventListener el)
 	{
@@ -55,23 +57,22 @@ public class Solver {
 		Debugger.init(problem.agentNames);
 		Debugger.debugOn=debug;
 		
-		
 		//采用同步消息机制的算法
 		if(agentType.equals("BNBADOPT")||agentType.equals("BDADOPT")||agentType.equals("ADOPT_K")||agentType.equals("SynAdopt1")||agentType.equals("SynAdopt2"))
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
 			//construct agents
-			AgentManagerCycle agentManager=new AgentManagerCycle(problem, agentType);
-			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManager);
+			agentManagerCycle=new AgentManagerCycle(problem, agentType);
+			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManagerCycle);
 			msgMailer.addEventListener(el);
 			msgMailer.start();
-			agentManager.startAgents(msgMailer);
+			agentManagerCycle.startAgents(msgMailer);
 		}
 		//采用异步消息机制的算法
 		else
 		{
 			//construct agents
-			AgentManager agentManager=new AgentManager(problem, agentType);
+			agentManager=new AgentManager(problem, agentType);
 			MessageMailer msgMailer=new MessageMailer(agentManager);
 			msgMailer.addEventListener(el);
 			msgMailer.start();
@@ -101,10 +102,12 @@ public class Solver {
 				});
 				
 				AtomicBoolean problemSolved=new AtomicBoolean(false);
-				for(int i=0;i<files.length;i++)
+				int i=0;
+				for(i=0;i<files.length;i++)
 				{
 					resultsRepeated=new ArrayList<Result>();
-					for(int k=0;k<repeatTimes;k++)
+					int k=0;
+					for(k=0;k<repeatTimes;k++)
 					{
 						batSolveEach(files[i].getPath(), agentType, problemSolved);
 						
@@ -139,13 +142,19 @@ public class Solver {
 							
 						});
 					}
+					if(k<repeatTimes)
+					{
+						break;
+					}
 					results.add(disposeRepeated(repeatTimes));
 				}
-				
-				//write results to storage
-				writeResultToStorage(problemDir);
-				
-				el.onFinished(null);
+				if(i>=files.length)
+				{
+					//write results to storage
+					writeResultToStorage(problemDir);
+					
+					el.onFinished(null);
+				}
 			}
 			
 		}).start();
@@ -284,21 +293,33 @@ public class Solver {
 		//if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT"))
 		{
 			//construct agents
-			AgentManagerCycle agentManager=new AgentManagerCycle(problem, algorithmType);
-			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManager);
+			agentManagerCycle=new AgentManagerCycle(problem, algorithmType);
+			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManagerCycle);
 			msgMailer.addEventListener(el);
 			msgMailer.start();
-			agentManager.startAgents(msgMailer);
+			agentManagerCycle.startAgents(msgMailer);
 		}
 		//采用异步消息机制的算法
 		else
 		{
 			//construct agents
-			AgentManager agentManager=new AgentManager(problem, algorithmType);
+			agentManager=new AgentManager(problem, algorithmType);
 			MessageMailer msgMailer=new MessageMailer(agentManager);
 			msgMailer.addEventListener(el);
 			msgMailer.start();
 			agentManager.startAgents(msgMailer);
+		}
+	}
+	
+	public void stopSolving()
+	{
+		if(this.agentManager!=null)
+		{
+			this.agentManager.stopAgents();
+		}
+		if(this.agentManagerCycle!=null)
+		{
+			this.agentManagerCycle.stopAgents();
 		}
 	}
 	

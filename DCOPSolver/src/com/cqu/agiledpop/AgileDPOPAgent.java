@@ -14,6 +14,7 @@ import com.cqu.dpop.DPOPAgent;
 import com.cqu.dpop.Dimension;
 import com.cqu.dpop.MultiDimensionData;
 import com.cqu.dpop.ReductDimensionResult;
+import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FormatUtil;
 import com.cqu.util.StatisticUtil;
@@ -25,8 +26,6 @@ public class AgileDPOPAgent extends Agent{
 	
 	public final static String KEY_TOTAL_COST="KEY_TOTAL_COST";
 	public final static String KEY_UTIL_MESSAGE_SIZES="KEY_UTIL_MESSAGE_SIZES";
-	
-	public static int MAX_DIEMNSION_FEASIBLE=2;
 	
 	private Integer[] parentLevels;
 	private int disposedChildrenCount;
@@ -315,7 +314,7 @@ public class AgileDPOPAgent extends Agent{
 			}
 		}
 		List<Dimension> involvedDatasDimensions=this.fakeMergedDimensions(involvedDatas);
-		if(involvedDatasDimensions.size()>(MAX_DIEMNSION_FEASIBLE+1))
+		if(involvedDatasDimensions.size()>(Settings.settings.getMaxDimensionsInAgileDPOP()+1))
 		{
 			return false;
 		}else

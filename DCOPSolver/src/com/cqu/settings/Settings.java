@@ -10,6 +10,7 @@ public class Settings {
 	private int communicationNCCCInAdopts;
 	private double BNBmergeADOPTboundArg;
 	private int ADOPT_K;
+	private int maxDimensionsInAgileDPOP;
 
 	private boolean displayGraphFrame;
 	
@@ -20,6 +21,7 @@ public class Settings {
 		this.BNBmergeADOPTboundArg=0.5;
 		this.ADOPT_K=2;
 		this.displayGraphFrame=true;
+		this.maxDimensionsInAgileDPOP=3;
 	}
 	
 	public double getBNBmergeADOPTboundArg() {
@@ -62,6 +64,14 @@ public class Settings {
 		this.displayGraphFrame = displayGraphFrame;
 	}
 	
+	public int getMaxDimensionsInAgileDPOP() {
+		return maxDimensionsInAgileDPOP;
+	}
+
+	public void setMaxDimensionsInAgileDPOP(int maxDimensionsInAgileDPOP) {
+		this.maxDimensionsInAgileDPOP = maxDimensionsInAgileDPOP;
+	}
+
 	public static Settings showSettingsDialog()
 	{
 		DialogSettings dialog = new DialogSettings(settings);

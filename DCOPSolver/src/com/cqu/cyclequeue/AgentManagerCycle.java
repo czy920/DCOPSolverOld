@@ -124,6 +124,14 @@ public class AgentManagerCycle {
 		}
 	}
 	
+	public void stopAgents()
+	{
+		for(AgentCycle agent : agents.values())
+		{
+			agent.stopRunning();
+		}
+	}
+	
 	public Object printResults(List<Map<String, Object>> results)
 	{
 		if(results.size()>0)

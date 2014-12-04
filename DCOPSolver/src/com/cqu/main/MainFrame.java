@@ -307,12 +307,12 @@ public class MainFrame extends JFrame {
 			}
 			solver.batSolve(problemDir, (String) combobAgentType.getSelectedItem(), (Integer)spinnerRepeatTimes.getValue(), el, new Solver.BatSolveListener(){
 
-						@Override
-						public void progressChanged(int problemTotalCount, int problemIndex, int timeIndex) {
-							// TODO Auto-generated method stub
-							labelBatCounter.setText((timeIndex+1)+"/"+(problemIndex+1)+"/"+problemTotalCount);
-						}
-			});
+				@Override
+				public void progressChanged(int problemTotalCount, int problemIndex, int timeIndex) {
+					// TODO Auto-generated method stub
+					labelBatCounter.setText((timeIndex+1)+"/"+(problemIndex+1)+"/"+problemTotalCount);
+				}
+	});
 		}
 	}
 	private static void addPopup(Component component, final JPopupMenu popup) {
