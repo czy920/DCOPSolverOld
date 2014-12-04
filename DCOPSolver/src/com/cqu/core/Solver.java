@@ -19,8 +19,6 @@ public class Solver {
 	
 	private List<Result> results=new ArrayList<Result>();
 	private List<Result> resultsRepeated;
-	private AgentManagerCycle agentManagerCycle;
-	private AgentManager agentManager;
 
 	public void solve(String problemPath, String agentType, boolean showTreeFrame, boolean debug, EventListener el)
 	{
@@ -62,7 +60,7 @@ public class Solver {
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
 			//construct agents
-			agentManagerCycle=new AgentManagerCycle(problem, agentType);
+			AgentManagerCycle agentManagerCycle=new AgentManagerCycle(problem, agentType);
 			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManagerCycle);
 			msgMailer.addEventListener(el);
 			msgMailer.start();
@@ -72,7 +70,7 @@ public class Solver {
 		else
 		{
 			//construct agents
-			agentManager=new AgentManager(problem, agentType);
+			AgentManager agentManager=new AgentManager(problem, agentType);
 			MessageMailer msgMailer=new MessageMailer(agentManager);
 			msgMailer.addEventListener(el);
 			msgMailer.start();
@@ -293,7 +291,7 @@ public class Solver {
 		//if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT"))
 		{
 			//construct agents
-			agentManagerCycle=new AgentManagerCycle(problem, algorithmType);
+			AgentManagerCycle agentManagerCycle=new AgentManagerCycle(problem, algorithmType);
 			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManagerCycle);
 			msgMailer.addEventListener(el);
 			msgMailer.start();
@@ -303,23 +301,11 @@ public class Solver {
 		else
 		{
 			//construct agents
-			agentManager=new AgentManager(problem, algorithmType);
+			AgentManager agentManager=new AgentManager(problem, algorithmType);
 			MessageMailer msgMailer=new MessageMailer(agentManager);
 			msgMailer.addEventListener(el);
 			msgMailer.start();
 			agentManager.startAgents(msgMailer);
-		}
-	}
-	
-	public void stopSolving()
-	{
-		if(this.agentManager!=null)
-		{
-			this.agentManager.stopAgents();
-		}
-		if(this.agentManagerCycle!=null)
-		{
-			this.agentManagerCycle.stopAgents();
 		}
 	}
 	
