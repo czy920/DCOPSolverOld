@@ -159,7 +159,7 @@ public class AgileDPOPAgent extends Agent{
 			periodsList.add(periods);
 		}
 		
-		int totalSize=1;
+		double totalSize=1.0;
 		for(int i=0;i<allDimensions.size();i++)
 		{
 			totalSize=totalSize*allDimensions.get(i).getSize();
@@ -169,7 +169,7 @@ public class AgileDPOPAgent extends Agent{
 		int curDimension=dimensionValueIndexes.length-1;
 		int[] receivedMDDatasIndexes=new int[receivedMDDatas.size()];
 		Arrays.fill(receivedMDDatasIndexes, 0);
-		int dataIndex=0;
+		double dataIndex=0.0;
 		int[] minCostDimensionValueIndexes=new int[dimensionValueIndexes.length-1];
 		while(dataIndex<totalSize)
 		{
@@ -221,7 +221,7 @@ public class AgileDPOPAgent extends Agent{
 				}
 			}
 			curDimension=dimensionValueIndexes.length-1;
-			dataIndex++;
+			dataIndex+=1.0;
 		}
 		
 		receivedMDDatas=new ArrayList<MultiDimensionData>();
