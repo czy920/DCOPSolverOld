@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.cqu.cyclequeue.AgentManagerCycle;
 import com.cqu.cyclequeue.MessageMailerCycle;
 import com.cqu.main.Debugger;
+import com.cqu.parser.DCOPParser;
 import com.cqu.settings.Settings;
 import com.cqu.util.FileUtil;
 import com.cqu.visualtree.GraphFrame;
@@ -23,7 +24,7 @@ public class Solver {
 	public void solve(String problemPath, String agentType, boolean showTreeFrame, boolean debug, EventListener el)
 	{
 		//parse problem xml
-		ProblemParser parser=new ProblemParser(problemPath);
+		DCOPParser parser=new DCOPParser(problemPath);
 		
 		Problem problem=null;
 		if(agentType.equals("BFSDPOP"))
@@ -244,7 +245,7 @@ public class Solver {
 	
 	private void batSolveEach(String problemPath, String algorithmType, final AtomicBoolean problemSolved)
 	{
-		ProblemParser parser = new ProblemParser(problemPath);
+		DCOPParser parser = new DCOPParser(problemPath);
 		
 		Problem problem=null;
 		if(algorithmType.equals("BFSDPOP"))
