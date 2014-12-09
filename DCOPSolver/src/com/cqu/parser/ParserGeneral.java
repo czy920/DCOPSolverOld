@@ -7,57 +7,18 @@ import java.util.List;
 import java.util.Map;
 import org.jdom2.Element;
 
-import com.cqu.bfsdpop.CrossEdgeAllocator;
-import com.cqu.core.BFSTree;
-import com.cqu.core.DFSTree;
-import com.cqu.core.Problem;
-import com.cqu.core.TreeGenerator;
 import com.cqu.util.CollectionUtil;
 
-public class ProblemParserGeneral {
-	
-	public static final String ID="id";
-	public static final String NAME="name";
-	public static final String ARITY="arity";
-	
-	public static final String AGENTS="agents";
-	public static final String NBAGENTS="nbAgents";
-	public static final String AGENT="agent";
-	
-	public static final String DOMAINS="domains";
-	public static final String DOMAIN="domain";
-	public static final String NBDOMAINS="nbDomains";
-	public static final String NBVALUES="nbValues";
-	
-	public static final String VARIABLES="variables";
-	public static final String NBVARIABLES="nbVariables";
-	
-	public static final String CONSTRAINTS="constraints";
-	public static final String NBCONSTRAINTS="nbConstraints";
-	public static final String SCOPE="scope";
-	public static final String REFERENCE="reference";
-	
-	public static final String RELATIONS="relations";
-	public static final String NBRELATIONS="nbRelations";
-	public static final String NBTUPLES="nbTuples";
-	
-	public static final String TYPE_DCOP="DCOP";
-	public static final String TYPE_GRAPH_COLORING="DisCSP";
-	
-	private Element root;
-	private String treeGeneratorType;
-	private String problemType;
-	
-	public ProblemParserGeneral(Element root, String treeGeneratorType, String problemType) {
+public class ParserGeneral extends ContentParser{
+
+	public ParserGeneral(Element root, String problemType) {
+		super(root, problemType);
 		// TODO Auto-generated constructor stub
-		this.root=root;
-		this.treeGeneratorType=treeGeneratorType;
-		this.problemType=problemType;
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Problem parse(Problem problem)
-	{
+	@Override
+	protected Problem parseContent(Problem problem) {
+		// TODO Auto-generated method stub
 		Map<String, Integer> agentNameIds=parseAgents(root.getChild(AGENTS), problem);
 		if(agentNameIds==null)
 		{
@@ -90,35 +51,9 @@ public class ProblemParserGeneral {
 			return null;
 		}
 		
-		TreeGenerator treeGenerator;
-		if(treeGeneratorType.equals(TreeGenerator.TREE_GENERATOR_TYPE_DFS))
-		{
-			treeGenerator=new DFSTree(problem.neighbourAgents);
-		}else
-		{
-			treeGenerator=new BFSTree(problem.neighbourAgents);
-		}
-		treeGenerator.generate();
-		
-		problem.agentLevels=treeGenerator.getNodeLevels();
-		for(Integer level:problem.agentLevels.values())
-			if(problem.treeDepth<(level+1))problem.treeDepth=level+1;
-		problem.parentAgents=treeGenerator.getParentNode();
-		problem.childAgents=treeGenerator.getChildrenNodes();
-		Map[] allParentsAndChildren=treeGenerator.getAllChildrenAndParentNodes();
-		problem.allParentAgents=allParentsAndChildren[0];
-		problem.allChildrenAgents=allParentsAndChildren[1];
-		
-		if(treeGeneratorType.equals(TreeGenerator.TREE_GENERATOR_TYPE_BFS))
-		{
-			CrossEdgeAllocator allocator=new CrossEdgeAllocator(problem);
-			allocator.allocate();
-			problem.crossConstraintAllocation=allocator.getConsideredConstraint();
-		}
-		
 		return problem;
 	}
-	
+
 	private Map<String, Integer> parseAgents(Element element, Problem problem)
 	{
 		if(element==null)
@@ -411,10 +346,5 @@ public class ProblemParserGeneral {
 		}
 		
 		return true;
-	}
-	
-	private void printMessage(String msg)
-	{
-		System.out.println(msg);
 	}
 }

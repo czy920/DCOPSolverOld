@@ -1,4 +1,4 @@
-package com.cqu.core;
+package com.cqu.parser;
 
 import java.util.HashMap;
 import java.util.Map;

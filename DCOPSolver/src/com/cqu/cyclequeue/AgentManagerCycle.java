@@ -10,7 +10,7 @@ import com.cqu.bnbadopt.ADOPT_K;
 import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.bnbmergeadopt.AgentModel;
 import com.cqu.core.Message;
-import com.cqu.core.Problem;
+import com.cqu.parser.Problem;
 import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FileUtil;

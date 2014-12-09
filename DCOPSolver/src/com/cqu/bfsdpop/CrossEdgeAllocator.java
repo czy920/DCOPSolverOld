@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.cqu.core.Problem;
+import com.cqu.parser.Problem;
 import com.cqu.util.CollectionUtil;
 
 public class CrossEdgeAllocator {
