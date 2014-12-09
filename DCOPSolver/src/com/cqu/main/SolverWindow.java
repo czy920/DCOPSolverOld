@@ -60,6 +60,7 @@ public class SolverWindow {
 	
 	private JSpinner spinnerMessageTransmissionTime;
 	private JSpinner spinnerMessageTransmissionNCCC;
+	private JSpinner spinnerADOPT_K;
 	private JSpinner spinnerBnbLayer;
 	private JCheckBox cbGraphFrame;
 	private JCheckBox cbDebug;
@@ -285,7 +286,7 @@ public class SolverWindow {
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		panel_1.setBounds(10, 152, 459, 106);
+		panel_1.setBounds(10, 152, 459, 130);
 		frmDcopsolver.getContentPane().add(panel_1);
 		panel_1.setLayout(null);
 		
@@ -299,12 +300,12 @@ public class SolverWindow {
 		panel_1.add(spinnerMessageTransmissionTime);
 		
 		JLabel label_6 = new JLabel("每次消息通信NCCC：");
-		label_6.setBounds(241, 16, 130, 15);
+		label_6.setBounds(241, 13, 130, 15);
 		panel_1.add(label_6);
 		
 		spinnerMessageTransmissionNCCC = new JSpinner();
 		spinnerMessageTransmissionNCCC.setModel(new SpinnerNumberModel(0, 0, 1000, 10));
-		spinnerMessageTransmissionNCCC.setBounds(381, 13, 70, 22);
+		spinnerMessageTransmissionNCCC.setBounds(381, 10, 70, 22);
 		panel_1.add(spinnerMessageTransmissionNCCC);
 		
 		JLabel label_7 = new JLabel("BNB合并算法分层：");
@@ -312,27 +313,37 @@ public class SolverWindow {
 		panel_1.add(label_7);
 		
 		spinnerBnbLayer = new JSpinner();
-		spinnerBnbLayer.setModel(new SpinnerNumberModel(2, 2, 10, 1));
+		spinnerBnbLayer.setModel(new SpinnerNumberModel(0.5, 0, 1, 0.1));
 		spinnerBnbLayer.setBounds(161, 42, 70, 22);
 		panel_1.add(spinnerBnbLayer);
 		
+		JLabel adoptk = new JLabel("ADOPT_K算法的K：");
+		adoptk.setBounds(241, 45, 130, 15);
+		panel_1.add(adoptk);
+		
+		spinnerADOPT_K = new JSpinner();
+		spinnerADOPT_K.setModel(new SpinnerNumberModel(0, 0, 5000, 1));
+		spinnerADOPT_K.setBounds(381, 42, 70, 22);
+		panel_1.add(spinnerADOPT_K);
+		
 		cbGraphFrame = new JCheckBox("每次显示GraphFrame");
 		cbGraphFrame.setSelected(true);
-		cbGraphFrame.setBounds(241, 41, 210, 23);
+		cbGraphFrame.setBounds(10, 75, 230, 15);
 		panel_1.add(cbGraphFrame);
-		
-		cbDebug = new JCheckBox("输出Debug信息");
-		cbDebug.setEnabled(true);
-		cbDebug.setBounds(6, 76, 225, 23);
-		panel_1.add(cbDebug);
 		
 		cbTreeFrame = new JCheckBox("每次显示Tree Frame");
 		cbTreeFrame.setEnabled(true);
-		cbTreeFrame.setBounds(241, 76, 210, 23);
+		cbTreeFrame.setBounds(241, 75, 230, 15);
 		panel_1.add(cbTreeFrame);
 		
+		cbDebug = new JCheckBox("输出Debug信息");
+		cbDebug.setEnabled(true);
+		cbDebug.setBounds(10, 105, 225, 15);
+		panel_1.add(cbDebug);
+		
+		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(10, 268, 459, 162);
+		scrollPane.setBounds(10, 283, 459, 142);
 		frmDcopsolver.getContentPane().add(scrollPane);
 		
 		epConsoleLines = new JTextArea();
@@ -387,6 +398,7 @@ public class SolverWindow {
 		componentStatus.put("spinnerMessageTransmissionTime", spinnerMessageTransmissionTime.isEnabled());
 		componentStatus.put("spinnerMessageTransmissionNCCC", spinnerMessageTransmissionNCCC.isEnabled());
 		componentStatus.put("spinnerBnbLayer", spinnerBnbLayer.isEnabled());
+		componentStatus.put("spinnerADOPT_K",spinnerADOPT_K.isEnabled());
 		componentStatus.put("cbGraphFrame", cbGraphFrame.isEnabled());
 		componentStatus.put("cbDebug", cbDebug.isEnabled());
 		componentStatus.put("cbTreeFrame", cbTreeFrame.isEnabled());
@@ -447,6 +459,7 @@ public class SolverWindow {
 		spinnerMessageTransmissionTime.setEnabled(enable);
 		spinnerMessageTransmissionNCCC.setEnabled(enable);
 		spinnerBnbLayer.setEnabled(enable);
+		spinnerADOPT_K.setEnabled(enable);
 		cbGraphFrame.setEnabled(enable);
 		cbDebug.setEnabled(enable);
 		cbTreeFrame.setEnabled(enable);
@@ -457,6 +470,7 @@ public class SolverWindow {
 		spinnerMessageTransmissionTime.setEnabled(componentStatus.get("spinnerMessageTransmissionTime"));
 		spinnerMessageTransmissionNCCC.setEnabled(componentStatus.get("spinnerMessageTransmissionNCCC"));
 		spinnerBnbLayer.setEnabled(componentStatus.get("spinnerBnbLayer"));
+		spinnerADOPT_K.setEnabled(componentStatus.get("spinnerADOPT_K"));
 		cbGraphFrame.setEnabled(componentStatus.get("cbGraphFrame"));
 		cbDebug.setEnabled(componentStatus.get("cbDebug"));
 		cbTreeFrame.setEnabled(componentStatus.get("cbTreeFrame"));
@@ -555,7 +569,8 @@ public class SolverWindow {
 	{
 		Settings.settings.setCommunicationTimeInDPOPs((Integer)spinnerMessageTransmissionTime.getValue());
 		Settings.settings.setCommunicationNCCCInAdopts((Integer)spinnerMessageTransmissionNCCC.getValue());
-		Settings.settings.setBNBmergeADOPTboundArg((Integer)spinnerBnbLayer.getValue());
+		Settings.settings.setBNBmergeADOPTboundArg((Double)spinnerBnbLayer.getValue());
+		Settings.settings.setADOPT_K((Integer)spinnerADOPT_K.getValue());
 		Settings.settings.setDisplayGraphFrame(cbGraphFrame.isSelected());
 	}
 }

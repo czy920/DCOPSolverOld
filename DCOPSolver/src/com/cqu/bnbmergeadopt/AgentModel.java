@@ -39,7 +39,6 @@ public class AgentModel extends AgentCycle {
 	private Map<Integer, Context[]> contexts;
 	private Context currentContext;
 
-	//private String strategy;
 	private String typeMethod;
 	private long boundary;    //方法的分界，可以由比例求得，这里设为3
 	private double scaleArg;    //两个方法的比例参数
@@ -58,28 +57,16 @@ public class AgentModel extends AgentCycle {
 		
 		//this.boundary=Settings.settings.getBNBmergeADOPTboundArg();	//初始为2 
 		this.scaleArg=Settings.settings.getBNBmergeADOPTboundArg();
-		this.boundary=(long) Math.ceil(treeDepth*this.scaleArg);
-		
-		// a sole bnbadopt
-//		method = new BnBMethod(this);
-//		typeMethod = "bnbadopt";
-//		this.strategy="bnbadopt";
-
-		// a sole adopt
-//		 method=new AdoptMethod(this);
-//		 typeMethod="adopt";
-//		 strategy="adopt";
-
+		this.boundary=(long) Math.ceil(treeDepth*this.scaleArg);		
 
 		// union adopt and bnbadopt
-		if (this.level < this.boundary) { // 前三层用bnbadopt策略
+		if (this.level < this.boundary) { 
 			method = new BnBMethod(this);
 			typeMethod = "bnbadopt";
 		} else { // 其他层用adopt策略
 			method=new AdoptMethod(this);
 			typeMethod = "adopt";
 		}		 
-		 //strategy="bnbandadopt";
 	}
 
 	@Override
