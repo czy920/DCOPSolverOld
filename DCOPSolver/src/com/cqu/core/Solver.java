@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.cqu.cyclequeue.AgentManagerCycle;
 import com.cqu.cyclequeue.MessageMailerCycle;
 import com.cqu.main.Debugger;
+import com.cqu.parser.DCOPParser;
 import com.cqu.settings.Settings;
 import com.cqu.util.FileUtil;
 import com.cqu.visualtree.GraphFrame;
@@ -23,7 +24,7 @@ public class Solver {
 	public void solve(String problemPath, String agentType, boolean showTreeFrame, boolean debug, EventListener el)
 	{
 		//parse problem xml
-		ProblemParser parser=new ProblemParser(problemPath);
+		DCOPParser parser=new DCOPParser(problemPath);
 		
 		Problem problem=null;
 		if(agentType.equals("BFSDPOP"))
@@ -55,17 +56,16 @@ public class Solver {
 		Debugger.init(problem.agentNames);
 		Debugger.debugOn=debug;
 		
-		
 		//采用同步消息机制的算法
 		if(agentType.equals("BNBADOPT")||agentType.equals("BDADOPT")||agentType.equals("ADOPT_K")||agentType.equals("SynAdopt1")||agentType.equals("SynAdopt2"))
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
 			//construct agents
-			AgentManagerCycle agentManager=new AgentManagerCycle(problem, agentType);
-			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManager);
+			AgentManagerCycle agentManagerCycle=new AgentManagerCycle(problem, agentType);
+			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManagerCycle);
 			msgMailer.addEventListener(el);
 			msgMailer.start();
-			agentManager.startAgents(msgMailer);
+			agentManagerCycle.startAgents(msgMailer);
 		}
 		//采用异步消息机制的算法
 		else
@@ -101,10 +101,12 @@ public class Solver {
 				});
 				
 				AtomicBoolean problemSolved=new AtomicBoolean(false);
-				for(int i=0;i<files.length;i++)
+				int i=0;
+				for(i=0;i<files.length;i++)
 				{
 					resultsRepeated=new ArrayList<Result>();
-					for(int k=0;k<repeatTimes;k++)
+					int k=0;
+					for(k=0;k<repeatTimes;k++)
 					{
 						batSolveEach(files[i].getPath(), agentType, problemSolved);
 						
@@ -139,13 +141,19 @@ public class Solver {
 							
 						});
 					}
+					if(k<repeatTimes)
+					{
+						break;
+					}
 					results.add(disposeRepeated(repeatTimes));
 				}
-				
-				//write results to storage
-				writeResultToStorage(problemDir);
-				
-				el.onFinished(null);
+				if(i>=files.length)
+				{
+					//write results to storage
+					writeResultToStorage(problemDir);
+					
+					el.onFinished(null);
+				}
 			}
 			
 		}).start();
@@ -237,7 +245,7 @@ public class Solver {
 	
 	private void batSolveEach(String problemPath, String algorithmType, final AtomicBoolean problemSolved)
 	{
-		ProblemParser parser = new ProblemParser(problemPath);
+		DCOPParser parser = new DCOPParser(problemPath);
 		
 		Problem problem=null;
 		if(algorithmType.equals("BFSDPOP"))
@@ -284,11 +292,11 @@ public class Solver {
 		//if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT"))
 		{
 			//construct agents
-			AgentManagerCycle agentManager=new AgentManagerCycle(problem, algorithmType);
-			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManager);
+			AgentManagerCycle agentManagerCycle=new AgentManagerCycle(problem, algorithmType);
+			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManagerCycle);
 			msgMailer.addEventListener(el);
 			msgMailer.start();
-			agentManager.startAgents(msgMailer);
+			agentManagerCycle.startAgents(msgMailer);
 		}
 		//采用异步消息机制的算法
 		else

@@ -1,27 +1,24 @@
-package com.cqu.core;
+package com.cqu.parser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.jdom2.Document;
 import org.jdom2.Element;
 
 import com.cqu.bfsdpop.CrossEdgeAllocator;
+import com.cqu.core.BFSTree;
+import com.cqu.core.DFSTree;
+import com.cqu.core.Problem;
+import com.cqu.core.TreeGenerator;
 import com.cqu.util.CollectionUtil;
-import com.cqu.util.XmlUtil;
 
-public class ProblemParser {
+public class ProblemParserGeneral {
 	
 	public static final String ID="id";
 	public static final String NAME="name";
-	public static final String TYPE="type";
 	public static final String ARITY="arity";
-	
-	public static final String INSTANCE="instance";
-	
-	public static final String PRESENTATION="presentation";
 	
 	public static final String AGENTS="agents";
 	public static final String NBAGENTS="nbAgents";
@@ -44,37 +41,23 @@ public class ProblemParser {
 	public static final String NBRELATIONS="nbRelations";
 	public static final String NBTUPLES="nbTuples";
 	
-	
 	public static final String TYPE_DCOP="DCOP";
 	public static final String TYPE_GRAPH_COLORING="DisCSP";
 	
-	private String xmlPath;
+	private Element root;
+	private String treeGeneratorType;
 	private String problemType;
 	
-	public ProblemParser(String path) {
+	public ProblemParserGeneral(Element root, String treeGeneratorType, String problemType) {
 		// TODO Auto-generated constructor stub
-		this.xmlPath=path;
+		this.root=root;
+		this.treeGeneratorType=treeGeneratorType;
+		this.problemType=problemType;
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public Problem parse(String treeGeneratorType)
+	public Problem parse(Problem problem)
 	{
-		Problem problem=new Problem();
-		
-		Document doc=XmlUtil.openXmlDocument(this.xmlPath);
-		
-		String docURL=doc.getBaseURI();
-		String[] docName=docURL.split("/");
-		System.out.println(docName[docName.length-1]);
-		
-		Element root=doc.getRootElement();
-		
-		if(parsePresentation(root.getChild(PRESENTATION))==false)
-		{
-			this.printMessage("parsePresentation()=false");
-			return null;
-		}
-		
 		Map<String, Integer> agentNameIds=parseAgents(root.getChild(AGENTS), problem);
 		if(agentNameIds==null)
 		{
@@ -134,20 +117,6 @@ public class ProblemParser {
 		}
 		
 		return problem;
-	}
-	
-	private boolean parsePresentation(Element element)
-	{
-		if(element==null)
-		{
-			return false;
-		}
-		problemType=element.getAttributeValue(TYPE);
-		if(problemType.equals(TYPE_DCOP)==true||problemType.equals(TYPE_GRAPH_COLORING)==true)
-		{
-			return true;
-		}
-		return true;
 	}
 	
 	private Map<String, Integer> parseAgents(Element element, Problem problem)

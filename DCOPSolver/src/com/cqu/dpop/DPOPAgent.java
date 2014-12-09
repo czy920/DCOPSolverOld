@@ -212,7 +212,7 @@ public class DPOPAgent extends Agent{
 			int costSum=0;
 			for(int i=0;i<allParents.length;i++)
 			{
-				//保证id小的为行，id大的为列
+				//原始数据中id小的为行，id大的为列
 				if(this.id<allParents[i])
 				{
 					costSum+=this.constraintCosts.get(allParents[i])[agentValueIndexes[agentValueIndexes.length-1]][agentValueIndexes[i]];

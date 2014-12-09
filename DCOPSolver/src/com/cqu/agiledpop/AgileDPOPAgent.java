@@ -14,6 +14,7 @@ import com.cqu.dpop.DPOPAgent;
 import com.cqu.dpop.Dimension;
 import com.cqu.dpop.MultiDimensionData;
 import com.cqu.dpop.ReductDimensionResult;
+import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FormatUtil;
 import com.cqu.util.StatisticUtil;
@@ -25,8 +26,6 @@ public class AgileDPOPAgent extends Agent{
 	
 	public final static String KEY_TOTAL_COST="KEY_TOTAL_COST";
 	public final static String KEY_UTIL_MESSAGE_SIZES="KEY_UTIL_MESSAGE_SIZES";
-	
-	public static int MAX_DIEMNSION_FEASIBLE=2;
 	
 	private Integer[] parentLevels;
 	private int disposedChildrenCount;
@@ -160,7 +159,7 @@ public class AgileDPOPAgent extends Agent{
 			periodsList.add(periods);
 		}
 		
-		int totalSize=1;
+		double totalSize=1.0;
 		for(int i=0;i<allDimensions.size();i++)
 		{
 			totalSize=totalSize*allDimensions.get(i).getSize();
@@ -170,7 +169,7 @@ public class AgileDPOPAgent extends Agent{
 		int curDimension=dimensionValueIndexes.length-1;
 		int[] receivedMDDatasIndexes=new int[receivedMDDatas.size()];
 		Arrays.fill(receivedMDDatasIndexes, 0);
-		int dataIndex=0;
+		double dataIndex=0.0;
 		int[] minCostDimensionValueIndexes=new int[dimensionValueIndexes.length-1];
 		while(dataIndex<totalSize)
 		{
@@ -222,7 +221,7 @@ public class AgileDPOPAgent extends Agent{
 				}
 			}
 			curDimension=dimensionValueIndexes.length-1;
-			dataIndex++;
+			dataIndex+=1.0;
 		}
 		
 		receivedMDDatas=new ArrayList<MultiDimensionData>();
@@ -315,7 +314,7 @@ public class AgileDPOPAgent extends Agent{
 			}
 		}
 		List<Dimension> involvedDatasDimensions=this.fakeMergedDimensions(involvedDatas);
-		if(involvedDatasDimensions.size()>(MAX_DIEMNSION_FEASIBLE+1))
+		if(involvedDatasDimensions.size()>(Settings.settings.getMaxDimensionsInAgileDPOP()+1))
 		{
 			return false;
 		}else
@@ -444,12 +443,15 @@ public class AgileDPOPAgent extends Agent{
 		}else if(type==TYPE_UTIL_MESSAGE)
 		{
 			List<MultiDimensionData> datas=(List<MultiDimensionData>) msg.getValue();
-			int size=0;
+			int maxSize=Integer.MIN_VALUE;
 			for(MultiDimensionData data : datas)
 			{
-				size+=data.size();
+				if(maxSize<data.size())
+				{
+					maxSize=data.size();
+				}
 			}
-			utilMsgSizes.add(size);
+			utilMsgSizes.add(maxSize);
 			
 			disposeUtilMessage(msg);
 		}
@@ -486,14 +488,26 @@ public class AgileDPOPAgent extends Agent{
 			
 			int[] data=new int[row*col];
 			int[][] costs=this.constraintCosts.get(allParents[i]);
-			for(int j=0;j<row;j++)
+			//原始数据中id小的为行，id大的为列
+			if(this.id<parentId)
 			{
-				for(int k=0;k<col;k++)
+				for(int j=0;j<row;j++)
 				{
-					data[j*col+k]=costs[j][k];
+					for(int k=0;k<col;k++)
+					{
+						data[j*col+k]=costs[k][j];
+					}
+				}
+			}else
+			{
+				for(int j=0;j<row;j++)
+				{
+					for(int k=0;k<col;k++)
+					{
+						data[j*col+k]=costs[j][k];
+					}
 				}
 			}
-			
 			ret.add(new MultiDimensionData(dimensions, data));
 		}
 		return ret;
@@ -623,6 +637,13 @@ public class AgileDPOPAgent extends Agent{
 		}
 		otherDimensionValueIndexes.put(agentId, reductDimensionResultIndexes[index]);
 		return true;
+	}
+	
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return this.id+"";
+		//return super.toString();
 	}
 
 }
