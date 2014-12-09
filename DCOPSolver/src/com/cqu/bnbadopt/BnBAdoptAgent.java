@@ -55,11 +55,11 @@ public class BnBAdoptAgent extends AgentCycle {
 		valueID=0;
 		currentContext=new Context();
 		if(!this.isRootAgent())
-			currentContext.addOrUpdate(this.parent, 0, 1); //仅仅初始化为第1个取值
+			currentContext.addOrUpdate(this.parent, 0, 0); //仅仅初始化为第1个取值
 		if(this.pseudoParents!=null)
 		{
 			for(int pseudoP:this.pseudoParents){
-			    currentContext.addOrUpdate(pseudoP, 0, 1); //仅仅初始化为第1个取值
+			    currentContext.addOrUpdate(pseudoP, 0, 0); //仅仅初始化为第1个取值
 			}
 		}
 		lbs=new HashMap<Integer, int[]>();
@@ -108,9 +108,9 @@ public class BnBAdoptAgent extends AgentCycle {
 	void InitSelf(){
 		
 		TH=Infinity.INFINITY;
-		int oldvalueIndex=this.valueIndex;
+		//int oldvalueIndex=this.valueIndex;
 		valueIndex=this.computeMinimalLBAndUB()[0];
-		if(oldvalueIndex!=this.valueIndex||this.valueID==0)
+		//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 		valueID = valueID + 1;
 		Debugger.valueChanges.get(this.name).add(valueIndex);
 		

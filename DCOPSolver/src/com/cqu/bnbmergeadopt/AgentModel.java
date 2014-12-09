@@ -39,6 +39,7 @@ public class AgentModel extends AgentCycle {
 	private Map<Integer, Context[]> contexts;
 	private Context currentContext;
 
+	//private String strategy;
 	private String typeMethod;
 	private long boundary;    //方法的分界，可以由比例求得，这里设为3
 	private double scaleArg;    //两个方法的比例参数
@@ -57,16 +58,28 @@ public class AgentModel extends AgentCycle {
 		
 		//this.boundary=Settings.settings.getBNBmergeADOPTboundArg();	//初始为2 
 		this.scaleArg=Settings.settings.getBNBmergeADOPTboundArg();
-		this.boundary=(long) Math.ceil(treeDepth*this.scaleArg);		
+		this.boundary=(long) Math.ceil(treeDepth*this.scaleArg);
+		
+		// a sole bnbadopt
+//		method = new BnBMethod(this);
+//		typeMethod = "bnbadopt";
+//		this.strategy="bnbadopt";
+
+		// a sole adopt
+//		 method=new AdoptMethod(this);
+//		 typeMethod="adopt";
+//		 strategy="adopt";
+
 
 		// union adopt and bnbadopt
-		if (this.level < this.boundary) { 
+		if (this.level < this.boundary) { // 前三层用bnbadopt策略
 			method = new BnBMethod(this);
 			typeMethod = "bnbadopt";
 		} else { // 其他层用adopt策略
 			method=new AdoptMethod(this);
 			typeMethod = "adopt";
 		}		 
+		 //strategy="bnbandadopt";
 	}
 
 	@Override
@@ -383,9 +396,9 @@ public class AgentModel extends AgentCycle {
 		private void InitSelf(){
 			
 			agent.TH=0;
-			int oldvalueIndex=agent.valueIndex;
+			//int oldvalueIndex=this.valueIndex;
 			agent.valueIndex=agent.computeMinimalLBAndUB()[0];
-			if(oldvalueIndex!=agent.valueIndex||agent.valueID==0)
+			//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 			agent.valueID = agent.valueID + 1;
 			Debugger.valueChanges.get(agent.name).add(agent.valueIndex);			
 		}
@@ -431,11 +444,11 @@ public class AgentModel extends AgentCycle {
 			agent.currentContext = new Context();
 			
 			if(!agent.isRootAgent())
-				agent.currentContext.addOrUpdate(agent.parent, 0, 1); //仅仅初始化为第1个取值
+				agent.currentContext.addOrUpdate(agent.parent, 0, 0); //仅仅初始化为第1个取值
 			if(agent.pseudoParents!=null)
 			{
 				for(int pseudoP:agent.pseudoParents){
-				    agent.currentContext.addOrUpdate(pseudoP, 0, 1); //仅仅初始化为第1个取值
+				    agent.currentContext.addOrUpdate(pseudoP, 0, 0); //仅仅初始化为第1个取值
 				}
 			}
 
@@ -720,7 +733,7 @@ public class AgentModel extends AgentCycle {
 				agent.valueID = agent.valueID + 1;
 			}
 
-			System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
+			//System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
 			this.maintainChildThresholdInvariant();
 			this.maintainAllocationInvariant();   //必须将这个放在发送VALUE信息之前
 			sendValueMessages();
@@ -876,10 +889,10 @@ public class AgentModel extends AgentCycle {
 			agent.valueID = 0;
 			agent.currentContext = new Context();
 			if (!agent.isRootAgent())
-				agent.currentContext.addOrUpdate(agent.parent, 0, 1); // 仅仅初始化为第1个取值
+				agent.currentContext.addOrUpdate(agent.parent, 0, 0); // 仅仅初始化为第1个取值
 			if (agent.pseudoParents != null) {
 				for (int pseudoP : agent.pseudoParents) {
-					agent.currentContext.addOrUpdate(pseudoP, 0, 1); // 仅仅初始化为第1个取值
+					agent.currentContext.addOrUpdate(pseudoP, 0, 0); // 仅仅初始化为第1个取值
 				}
 			}
 			agent.lbs = new HashMap<Integer, int[]>();
@@ -921,9 +934,9 @@ public class AgentModel extends AgentCycle {
 		private void InitSelf() {
 
 			agent.TH = Infinity.INFINITY;
-			int oldvalueIndex=agent.valueIndex;
+			// int oldvalueIndex=this.valueIndex;
 			agent.valueIndex = agent.computeMinimalLBAndUB()[0];
-			if(oldvalueIndex!=agent.valueIndex||agent.valueID==0)
+			// if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 			agent.valueID = valueID + 1;
 			Debugger.valueChanges.get(agent.name).add(agent.valueIndex);
 
@@ -967,7 +980,7 @@ public class AgentModel extends AgentCycle {
 					}
 				}
 			}
-			System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
+			//System.out.println("agent"+agent.id+": "+agent.valueIndex+"\t"+agent.valueID+"\t"+agent.TH+"\t"+agent.LB+"\t"+agent.UB+"\t"+agent.nccc);
 			if (((isRootAgent() == true) && (agent.UB <= agent.LB))
 					|| agent.Readytermintate == true &&agent.TH==agent.UB) {
 				sendTerminateMessages();

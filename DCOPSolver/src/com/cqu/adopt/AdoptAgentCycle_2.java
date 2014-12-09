@@ -614,9 +614,9 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 	private void InitSelf(){
 		
 		TH=0;
-		int oldvalueIndex=this.valueIndex;
+		//int oldvalueIndex=this.valueIndex;
 		valueIndex=this.computeMinimalLBAndUB()[0];
-		if(oldvalueIndex!=this.valueIndex||this.valueID==0)
+		//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 		valueID = valueID + 1;
 		Debugger.valueChanges.get(this.name).add(valueIndex);			
 	}
