@@ -55,11 +55,11 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 		currentContext = new Context();
 		
 		if(!isRootAgent())
-			currentContext.addOrUpdate(this.parent, 0, 0); //仅仅初始化为第1个取值
+			currentContext.addOrUpdate(this.parent, 0, 1); //仅仅初始化为第1个取值
 		if(this.pseudoParents!=null)
 		{
 			for(int pseudoP:this.pseudoParents){
-			    currentContext.addOrUpdate(pseudoP, 0, 0); //仅仅初始化为第1个取值
+			    currentContext.addOrUpdate(pseudoP, 0, 1); //仅仅初始化为第1个取值
 			}
 		}
 
@@ -614,9 +614,9 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 	private void InitSelf(){
 		
 		TH=0;
-		//int oldvalueIndex=this.valueIndex;
+		int oldvalueIndex=this.valueIndex;
 		valueIndex=this.computeMinimalLBAndUB()[0];
-		//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
+		if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 		valueID = valueID + 1;
 		Debugger.valueChanges.get(this.name).add(valueIndex);			
 	}

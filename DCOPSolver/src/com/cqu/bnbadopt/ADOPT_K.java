@@ -20,8 +20,8 @@ public class ADOPT_K extends AgentCycle {
 	public final static String KEY_CONTEXT = "KEY_CONTEXT";
 	public final static String KEY_LB = "KEY_LB";
 	public final static String KEY_UB = "KEY_UB";
-	public final static String KEY_TH_1 = "KEY_TH_1";
-	public final static String KEY_TH_2 = "KEY_TH_2";
+	public final static String KEY_TH_A = "KEY_TH_A";
+	public final static String KEY_TH_B = "KEY_TH_B";
 	public final static String KEY_NCCC = "KEY_NCCC";
 
 	//public final static String KEY_VALUE_MESSAGE = "KEY_VALUE_MESSAGE";
@@ -31,8 +31,8 @@ public class ADOPT_K extends AgentCycle {
 	private Map<Integer, int[]> ths;
 	private int LB;
 	private int UB;
-	private int TH1;
-	private int TH2;
+	private int TH_A;
+	private int TH_B;
 	private int TH_curr;
 	private int UB_curr;
 	private int LB_curr;
@@ -62,10 +62,10 @@ public class ADOPT_K extends AgentCycle {
 		valueID = 0;
 		currentContext = new Context();
 		if (!this.isRootAgent())
-			currentContext.addOrUpdate(this.parent, 0, 0); // 仅仅初始化为第1个取值
+			currentContext.addOrUpdate(this.parent, 0, 1); // 仅仅初始化为第1个取值
 		if (this.pseudoParents != null) {
 			for (int pseudoP : this.pseudoParents) {
-				currentContext.addOrUpdate(pseudoP, 0, 0); // 仅仅初始化为第1个取值
+				currentContext.addOrUpdate(pseudoP, 0, 1); // 仅仅初始化为第1个取值
 			}
 		}
 		lbs = new HashMap<Integer, int[]>();
@@ -79,20 +79,20 @@ public class ADOPT_K extends AgentCycle {
 	
 	private void maintainTHInvariant()
 	{
-		if(this.TH1<this.LB)
+		if(this.TH_A<this.LB)
 		{
-			this.TH1=this.LB;
+			this.TH_A=this.LB;
 		}
-		if(this.TH1>this.UB)
+		if(this.TH_A>this.UB)
 		{
-			this.TH1=this.UB;
+			this.TH_A=this.UB;
 		}
 	}
 	 
 	private void maintainCurrentTHInvariant(){
 		this.UB_curr=computeCurrentUB();
 		this.LB_curr=computeCurrentLB();
-		this.TH_curr=this.TH1;
+		this.TH_curr=this.TH_A;
 		if(this.TH_curr<this.LB_curr)
 			this.TH_curr=this.LB_curr;
 		if(this.TH_curr>this.UB_curr)
@@ -190,11 +190,11 @@ public class ADOPT_K extends AgentCycle {
 		this.increaseNcccLocal();
 		int oldValueIndex = valueIndex;
 		maintainTHInvariant();
-		if(compute[1]>=Math.min(this.TH2, this.UB))
+		if(compute[1]>=Math.min(this.TH_B, this.UB))
 			this.valueIndex=compute[0];
-		else if(this.TH1==this.UB)
+		else if(this.TH_A==this.UB)
 			{this.valueIndex=compute[2];System.out.println("th1=ub");}
-		else if(compute[1]>this.TH1+(this.K-1))
+		else if(compute[1]>this.TH_A+(this.K-1))
 			{this.valueIndex=compute[0];System.out.println("lbi>th1");}
 		if(valueIndex!=oldValueIndex){
 			valueID++;
@@ -204,7 +204,7 @@ public class ADOPT_K extends AgentCycle {
 		this.maintainCurrentTHInvariant();
 		this.maintainAllocationInvariant();
 		//System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH1+"\t"+this.TH2+"\t"+this.LB+"\t"+this.UB);
-		if(this.TH1==this.UB)
+		if(this.TH_A==this.UB)
 			if(this.isRootAgent()||this.Readytermintate==true){
 				sendTerminateMessages();
 				this.stopRunning();
@@ -327,12 +327,12 @@ public class ADOPT_K extends AgentCycle {
 
 	void InitSelf() {
 
-		// int oldvalueIndex=this.valueIndex;
+		int oldvalueIndex=this.valueIndex;
 		valueIndex = this.computeMinimalLBAndUB()[0];
-		// if(oldvalueIndex!=this.valueIndex||this.valueID==0)
+		if(oldvalueIndex!=this.valueIndex||this.valueID==0)
 		valueID = valueID + 1;
-		TH1=0;
-		TH2 = Infinity.INFINITY;
+		TH_A=0;
+		TH_B = Infinity.INFINITY;
 		Debugger.valueChanges.get(this.name).add(valueIndex);
 
 	}
@@ -347,8 +347,8 @@ public class ADOPT_K extends AgentCycle {
 			int value_ = (Integer) result.get(ADOPT_K.KEY_VALUE);
 			int LB_ = (Integer) result.get(ADOPT_K.KEY_LB);
 			int UB_ = (Integer) result.get(ADOPT_K.KEY_UB);
-			int TH1_ = (Integer) result.get(ADOPT_K.KEY_TH_1);
-			int TH2_ = (Integer) result.get(ADOPT_K.KEY_TH_2);
+			int TH_A = (Integer) result.get(ADOPT_K.KEY_TH_A);
+			int TH_B = (Integer) result.get(ADOPT_K.KEY_TH_B);
 			int ncccTemp = (Integer) result.get(ADOPT_K.KEY_NCCC);
 			if (maxNccc < ncccTemp) {
 				maxNccc = ncccTemp;
@@ -360,8 +360,8 @@ public class ADOPT_K extends AgentCycle {
 			String displayStr = "Agent " + name_ + ": id=" + id_ + " value="
 					+ value_ + " LB=" + LB_ + " UB=";
 			displayStr += Infinity.infinityEasy(UB_);
-			displayStr += " TH1=" + Infinity.infinityEasy(TH1_);
-			displayStr += " TH2=" + Infinity.infinityEasy(TH2_);
+			displayStr += " TH_A=" + Infinity.infinityEasy(TH_A);
+			displayStr += " TH_B=" + Infinity.infinityEasy(TH_B);
 			System.out.println(displayStr);
 		}
 		System.out.println("totalCost: " + Infinity.infinityEasy(totalCost)
@@ -384,8 +384,8 @@ public class ADOPT_K extends AgentCycle {
 		result.put(ADOPT_K.KEY_VALUE, this.domain[valueIndex]);
 		result.put(ADOPT_K.KEY_LB, this.LB);
 		result.put(ADOPT_K.KEY_UB, this.UB);
-		result.put(ADOPT_K.KEY_TH_1, this.TH1);
-		result.put(ADOPT_K.KEY_TH_2, this.TH2);
+		result.put(ADOPT_K.KEY_TH_A, this.TH_A);
+		result.put(ADOPT_K.KEY_TH_B, this.TH_B);
 		result.put(ADOPT_K.KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
@@ -443,9 +443,9 @@ public class ADOPT_K extends AgentCycle {
 					+ ": message got in agent " + this.name + " "
 					+ this.msgMailer.easyMessageContent(msg) + " | VALUE="
 					+ this.domain[valueIndex] + " LB=" + this.LB + " UB="
-					+ Infinity.infinityEasy(this.UB) + " TH1="
-					+ Infinity.infinityEasy(this.TH1) + " TH2="
-					+ Infinity.infinityEasy(this.TH2));
+					+ Infinity.infinityEasy(this.UB) + " TH_A="
+					+ Infinity.infinityEasy(this.TH_A) + " TH_B="
+					+ Infinity.infinityEasy(this.TH_B));
 		}
 
 		// do nccc message here
@@ -545,8 +545,8 @@ public class ADOPT_K extends AgentCycle {
 			}
 			if(msg.getIdSender() == this.parent)
 			{
-				TH1=val[2];
-				TH2=val[3];
+				TH_A=val[2];
+				TH_B=val[3];
 			}
 			if(this.msgQueue.isEmpty()==true)backtrack();
 		}
@@ -703,7 +703,7 @@ public class ADOPT_K extends AgentCycle {
 		TH_di=Infinity.add(TH_di, localCost_);
 		
 		//return (TH2>UB)?(UB-TH_di):(TH2-TH_di);
-		return Infinity.minus(Math.min(TH2, UB),TH_di);
+		return Infinity.minus(Math.min(TH_B, UB),TH_di);
 	}
 
 	private int localCost(int di) {
