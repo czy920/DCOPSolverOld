@@ -1,125 +1,95 @@
 -----------A1-----------
-Parent: 19
-Children: [17]
-AllParents: [23,4,8,20,19]
-AllChildren: [14,17,7,9,18]
------------A2-----------
-Parent: 4
-Children: [10]
-AllParents: [4]
-AllChildren: [12,25,14,5,16,22,11,24,15,6,21,10]
------------A3-----------
-Parent: 9
-Children: [16,22]
-AllParents: [25,23,4,5,9,10,19]
-AllChildren: [16,22]
------------A4-----------
-Parent: -1
-Children: [2]
-AllParents: 
-AllChildren: [1,2,3,25,23,5,20,9,7,18,17,6,15,10,19]
------------A5-----------
-Parent: 17
-Children: [11]
-AllParents: [2,4,17,12,19,8]
-AllChildren: [3,16,11,7]
------------A6-----------
-Parent: 16
-Children: 
-AllParents: [2,4,16,10,20,8]
-AllChildren: 
------------A7-----------
-Parent: 11
-Children: [24,13]
-AllParents: [1,4,5,19,11,8]
-AllChildren: [24,13,21]
------------A8-----------
-Parent: 12
-Children: [15]
-AllParents: [12,20]
-AllChildren: [1,5,6,7,17,15,25,19,9]
------------A9-----------
-Parent: 24
-Children: [3]
-AllParents: [1,4,8,20,10,24,25]
-AllChildren: [3]
------------A10-----------
-Parent: 2
-Children: [20]
-AllParents: [2,4]
-AllChildren: [3,6,9,11,22,21,20,13,14,15,16]
------------A11-----------
-Parent: 5
-Children: [7]
-AllParents: [2,5,10,12,20,23,15]
-AllChildren: [7,24,16]
------------A12-----------
-Parent: 20
-Children: [8]
-AllParents: [2,20]
-AllChildren: [5,8,11,18,19,14,25,13,17,16]
------------A13-----------
-Parent: 7
-Children: [21]
-AllParents: [7,10,12,20,19,15]
-AllChildren: [21]
------------A14-----------
-Parent: 18
-Children: 
-AllParents: [1,2,10,12,19,18,15,23]
-AllChildren: 
------------A15-----------
-Parent: 8
-Children: [23]
-AllParents: [2,4,8,10,20]
-AllChildren: [11,13,14,18,24,23]
------------A17-----------
-Parent: 1
-Children: [5]
-AllParents: [1,4,8,12,25,23]
-AllChildren: [5,16,21]
------------A16-----------
 Parent: 3
 Children: [6]
-AllParents: [2,3,5,10,11,12,17]
-AllChildren: [6]
------------A19-----------
-Parent: 25
+AllParents: [3,17]
+AllChildren: [2,5,6,7,11,19]
+-----------A2-----------
+Parent: 8
+Children: [15,18]
+AllParents: [1,14,8,19]
+AllChildren: [15,18]
+-----------A3-----------
+Parent: 17
 Children: [1]
-AllParents: [4,8,12,25]
-AllChildren: [1,3,5,7,13,14,18]
------------A18-----------
-Parent: 22
-Children: [14]
-AllParents: [1,4,12,15,22,19]
-AllChildren: [14]
------------A21-----------
-Parent: 13
-Children: 
-AllParents: [2,7,10,13,17,23]
-AllChildren: 
------------A20-----------
-Parent: 10
-Children: [12]
-AllParents: [4,10]
-AllChildren: [1,6,8,9,11,12,13,15,25,24]
------------A23-----------
+AllParents: [17]
+AllChildren: [1,14,12,13,6,5,8,9,11]
+-----------A4-----------
 Parent: 15
-Children: [25]
-AllParents: [4,15]
-AllChildren: [1,3,11,14,17,21,22,25,24]
------------A22-----------
-Parent: 3
-Children: [18]
-AllParents: [2,3,10,23]
-AllChildren: [18]
------------A25-----------
-Parent: 23
-Children: [19]
-AllParents: [2,4,8,12,20,23]
-AllChildren: [3,9,17,19,24]
------------A24-----------
-Parent: 7
+Children: [16]
+AllParents: [17,15,9,8,7]
+AllChildren: [16]
+-----------A5-----------
+Parent: 19
+Children: [12]
+AllParents: [1,3,17,6,19]
+AllChildren: [12,10]
+-----------A6-----------
+Parent: 1
 Children: [9]
-AllParents: [2,7,11,15,20,23,25]
-AllChildren: [9]
+AllParents: [1,3]
+AllChildren: [5,14,11,18,10,9]
+-----------A7-----------
+Parent: 9
+Children: [19]
+AllParents: [1,9]
+AllChildren: [4,15,14,18,19,8]
+-----------A8-----------
+Parent: 14
+Children: [2,13]
+AllParents: [3,7,14]
+AllChildren: [2,4,15,13]
+-----------A9-----------
+Parent: 6
+Children: [7]
+AllParents: [3,6,17]
+AllChildren: [4,7,12,11,13]
+-----------A10-----------
+Parent: 12
+Children: [14]
+AllParents: [5,6,19,12]
+AllChildren: [13,14,16]
+-----------A11-----------
+Parent: 18
+Children: 
+AllParents: [1,3,6,9,18,17]
+AllChildren: 
+-----------A12-----------
+Parent: 5
+Children: [10]
+AllParents: [3,5,9,19]
+AllChildren: [10,13,15]
+-----------A13-----------
+Parent: 8
+Children: 
+AllParents: [3,8,9,10,12,17]
+AllChildren: 
+-----------A14-----------
+Parent: 10
+Children: [8]
+AllParents: [3,6,7,10]
+AllChildren: [2,8,16]
+-----------A15-----------
+Parent: 2
+Children: [4]
+AllParents: [2,7,8,12,17]
+AllChildren: [4]
+-----------A17-----------
+Parent: -1
+Children: [3]
+AllParents: 
+AllChildren: [1,3,4,5,9,11,13,15,16,19,18]
+-----------A16-----------
+Parent: 4
+Children: 
+AllParents: [4,10,14,17]
+AllChildren: 
+-----------A19-----------
+Parent: 7
+Children: [5]
+AllParents: [1,7,17]
+AllChildren: [2,5,10,12,18]
+-----------A18-----------
+Parent: 2
+Children: [11]
+AllParents: [2,6,7,17,19]
+AllChildren: [11]
