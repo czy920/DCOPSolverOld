@@ -26,6 +26,7 @@ import com.cqu.core.Solver;
 import com.cqu.settings.Settings;
 import com.cqu.util.DateUtil;
 import com.cqu.util.DialogUtil;
+import com.cqu.util.FormatUtil;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -342,7 +343,7 @@ public class SolverWindow {
 		panel_1.add(lblNewLabel);
 		
 		spinnerMaxDimensionsInAgileDPOP = new JSpinner();
-		spinnerMaxDimensionsInAgileDPOP.setModel(new SpinnerNumberModel(3, 2, 10, 1));
+		spinnerMaxDimensionsInAgileDPOP.setModel(new SpinnerNumberModel(8, 3, 20, 1));
 		spinnerMaxDimensionsInAgileDPOP.setBounds(161, 113, 70, 22);
 		panel_1.add(spinnerMaxDimensionsInAgileDPOP);
 		
@@ -550,9 +551,9 @@ public class SolverWindow {
 						detailedResult+="NCCC: "+((ResultAdopt)ret).nccc+"\n";
 					}else if(ret instanceof ResultDPOP)
 					{
-						detailedResult+="utilMsgSizeMin: "+((ResultDPOP)ret).utilMsgSizeMin+"\n";
-						detailedResult+="utilMsgSizeMax: "+((ResultDPOP)ret).utilMsgSizeMax+"\n";
-						detailedResult+="utilMsgSizeAvg: "+((ResultDPOP)ret).utilMsgSizeAvg+"\n";
+						detailedResult+="utilMsgSizeMin: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMin)+"\n";
+						detailedResult+="utilMsgSizeMax: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMax)+"\n";
+						detailedResult+="utilMsgSizeAvg: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeAvg)+"\n";
 					}
 					for(Integer key : ret.agentValues.keySet())
 					{

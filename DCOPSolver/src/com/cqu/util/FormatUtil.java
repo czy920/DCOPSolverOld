@@ -9,7 +9,7 @@ public class FormatUtil {
 		return new DecimalFormat(formatString).format(value);
 	}
 	
-	public static String format(int size)
+	public static String formatSize(int size)
 	{
 		if(size<1024)
 		{

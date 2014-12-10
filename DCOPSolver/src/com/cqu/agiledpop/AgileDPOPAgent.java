@@ -290,11 +290,16 @@ public class AgileDPOPAgent extends Agent{
 		}
 	}
 	
+	/**
+	 * 合并条件：A是B的子集
+	 * @param mdDataA
+	 * @param mdDataB
+	 * @return
+	 */
 	private boolean tryMerge(MultiDimensionData mdDataA, MultiDimensionData mdDataB)
 	{
 		MultiDimensionData mdDataTest=mdDataA.testMergeDimension(mdDataB);
-		if(mdDataTest.getDimensions().size()<=
-				Math.max(mdDataA.getDimensions().size(), mdDataB.getDimensions().size()))
+		if(mdDataTest.dimensionSize()==Math.max(mdDataA.dimensionSize(), mdDataB.dimensionSize()))
 		{
 			return true;
 		}else
@@ -394,8 +399,8 @@ public class AgileDPOPAgent extends Agent{
 		Integer[] sizeArr=new Integer[sizeList.size()];
 		sizeList.toArray(sizeArr);
 		int[] minMaxAvg=StatisticUtil.minMaxAvg(CollectionUtil.toInt(sizeArr));
-		System.out.println("utilMsgCount: "+sizeArr.length+" utilMsgSizeMin: "+FormatUtil.format(minMaxAvg[0])+" utilMsgSizeMax: "+
-		FormatUtil.format(minMaxAvg[2])+" utilMsgSizeAvg: "+FormatUtil.format(minMaxAvg[4]));
+		System.out.println("utilMsgCount: "+sizeArr.length+" utilMsgSizeMin: "+FormatUtil.formatSize(minMaxAvg[0])+" utilMsgSizeMax: "+
+		FormatUtil.formatSize(minMaxAvg[2])+" utilMsgSizeAvg: "+FormatUtil.formatSize(minMaxAvg[4]));
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy(totalCost));
 		
