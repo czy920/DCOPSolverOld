@@ -131,4 +131,10 @@ public class BFSTree implements TreeGenerator{
 		}
 		return new Map[]{CollectionUtil.transform(allParents), CollectionUtil.transform(allChildren)};
 	}
+
+	@Override
+	public long getPseduHeight() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

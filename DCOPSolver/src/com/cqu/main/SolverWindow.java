@@ -319,7 +319,7 @@ public class SolverWindow {
 		panel_1.add(label_7);
 		
 		spinnerBnbLayer = new JSpinner();
-		spinnerBnbLayer.setModel(new SpinnerNumberModel(2, 2, 10, 1));
+		spinnerBnbLayer.setModel(new SpinnerNumberModel(0.5, 0, 1, 0.1));
 		spinnerBnbLayer.setBounds(161, 42, 70, 22);
 		panel_1.add(spinnerBnbLayer);
 		
@@ -601,7 +601,7 @@ public class SolverWindow {
 	{
 		Settings.settings.setCommunicationTimeInDPOPs((Integer)spinnerMessageTransmissionTime.getValue());
 		Settings.settings.setCommunicationNCCCInAdopts((Integer)spinnerMessageTransmissionNCCC.getValue());
-		Settings.settings.setBNBmergeADOPTboundArg((Integer)spinnerBnbLayer.getValue());
+		Settings.settings.setBNBmergeADOPTboundArg((Double)spinnerBnbLayer.getValue());
 		Settings.settings.setDisplayGraphFrame(cbGraphFrame.isSelected());
 		Settings.settings.setMaxDimensionsInAgileDPOP((Integer)spinnerMaxDimensionsInAgileDPOP.getValue());
 		Settings.settings.setADOPT_K((Integer) spinnerADOPT_K.getValue());
