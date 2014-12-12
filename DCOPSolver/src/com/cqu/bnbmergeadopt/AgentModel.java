@@ -35,6 +35,7 @@ public class AgentModel extends AgentCycle {
 	private int LB;
 	private int UB;
 	private int TH;
+	private int TH_B;
 
 	private Map<Integer, Context[]> contexts;
 	private Context currentContext;
@@ -382,6 +383,8 @@ public class AgentModel extends AgentCycle {
 		private void InitSelf(){
 			
 			agent.TH=0;
+			if(agent.level==agent.boundary)
+				agent.TH_B=Infinity.INFINITY;
 			int oldvalueIndex=agent.valueIndex;
 			agent.valueIndex=agent.computeMinimalLBAndUB()[0];
 			if(oldvalueIndex!=agent.valueIndex||agent.valueID==0)
@@ -605,8 +608,14 @@ public class AgentModel extends AgentCycle {
 					checkCompatible();
 					InitSelf();
 				}
-				if (msg.getIdSender() == agent.parent && val[2] != (-1)) 
-					agent.TH = val[2];
+				if(msg.getIdSender() == agent.parent)
+				{
+					if((agent.level==agent.boundary)){
+						agent.TH_B=val[2];
+					}else{
+						agent.TH = val[2];
+					}	
+				}				
 				//maintainThresholdInvariant();  //放在backtrack函数里面一次性做
 				if(agent.msgQueue.isEmpty())backtrack();
 			}
@@ -700,8 +709,10 @@ public class AgentModel extends AgentCycle {
 		    
 		    BDmaintainThresholdInvariant();	    
 		    int oldValue=agent.valueIndex;
-		    
-			if (agent.TH == agent.UB) {
+		    int tempCondition=agent.TH;
+		    if((agent.level==agent.boundary)&&agent.Readytermintate)
+		    	tempCondition=agent.TH_B; 
+			if (tempCondition == agent.UB) {
 				if (agent.valueIndex != dMinimizesUB) {
 					Debugger.valueChanges.get(agent.getName()).add(dMinimizesUB);
 				}
@@ -709,7 +720,7 @@ public class AgentModel extends AgentCycle {
 				agent.valueIndex = dMinimizesUB;
 				if(agent.valueIndex!=oldValue)
 				agent.valueID = agent.valueID + 1;
-			} else if (LB_CurValue > agent.TH) {
+			} else if (LB_CurValue > tempCondition) {
 				if (agent.valueIndex != dMinimizesLB) {
 					Debugger.valueChanges.get(agent.getName()).add(dMinimizesLB);
 				}
@@ -723,7 +734,7 @@ public class AgentModel extends AgentCycle {
 			this.maintainChildThresholdInvariant();
 			this.maintainAllocationInvariant();   //必须将这个放在发送VALUE信息之前
 			sendValueMessages();
-			if (agent.TH == agent.UB) {
+			if (tempCondition == agent.UB) {
 				if (agent.Readytermintate == true
 						|| agent.isRootAgent() == true) {
 					sendTerminateMessages();
