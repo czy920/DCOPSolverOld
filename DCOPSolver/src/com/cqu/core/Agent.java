@@ -3,6 +3,7 @@ package com.cqu.core;
 import java.util.List;
 import java.util.Map;
 
+import com.cqu.main.Debugger;
 import com.cqu.util.CollectionUtil;
 
 /**
@@ -120,5 +121,13 @@ public abstract class Agent extends QueueMessager{
 	protected boolean isRootAgent()
 	{
 		return this.parent==-1;
+	}
+	
+	protected void printDebugMessage(String msg)
+	{
+		if(Debugger.debugOn==true)
+		{
+			System.out.println(Thread.currentThread().getName()+": "+msg);
+		}
 	}
 }

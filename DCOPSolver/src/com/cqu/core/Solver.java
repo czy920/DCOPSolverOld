@@ -10,7 +10,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import com.cqu.cyclequeue.AgentManagerCycle;
 import com.cqu.cyclequeue.MessageMailerCycle;
 import com.cqu.main.Debugger;
-import com.cqu.parser.DCOPParser;
+import com.cqu.parser.Problem;
+import com.cqu.parser.ProblemParser;
 import com.cqu.settings.Settings;
 import com.cqu.util.FileUtil;
 import com.cqu.visualtree.GraphFrame;
@@ -24,16 +25,19 @@ public class Solver {
 	public void solve(String problemPath, String agentType, boolean showTreeFrame, boolean debug, EventListener el)
 	{
 		//parse problem xml
-		DCOPParser parser=new DCOPParser(problemPath);
-		
-		Problem problem=null;
+		String treeGeneratorType=null;
 		if(agentType.equals("BFSDPOP"))
 		{
-			problem=parser.parse(TreeGenerator.TREE_GENERATOR_TYPE_BFS);
+			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
 		{
-			problem=parser.parse(TreeGenerator.TREE_GENERATOR_TYPE_DFS);
+			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_DFS;
 		}
+		
+		Problem problem=null;
+		ProblemParser parser=new ProblemParser(problemPath, treeGeneratorType);
+		problem=parser.parse();
+		
 		if(problem==null)
 		{
 			return;
@@ -245,16 +249,19 @@ public class Solver {
 	
 	private void batSolveEach(String problemPath, String algorithmType, final AtomicBoolean problemSolved)
 	{
-		DCOPParser parser = new DCOPParser(problemPath);
-		
-		Problem problem=null;
+		String treeGeneratorType=null;
 		if(algorithmType.equals("BFSDPOP"))
 		{
-			problem=parser.parse(TreeGenerator.TREE_GENERATOR_TYPE_BFS);
+			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
 		{
-			problem=parser.parse(TreeGenerator.TREE_GENERATOR_TYPE_DFS);
+			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_DFS;
 		}
+		
+		Problem problem=null;
+		ProblemParser parser=new ProblemParser(problemPath, treeGeneratorType);
+		problem=parser.parse();
+
 		if(problem==null)
 		{
 			synchronized (problemSolved) {

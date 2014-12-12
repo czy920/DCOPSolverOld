@@ -25,11 +25,6 @@ public class MultiDimensionData {
 		return data;
 	}
 	
-	public boolean isNull()
-	{
-		return this.data==null;
-	}
-	
 	public int indexOf(String dimensionName)
 	{
 		for(int i=0;i<dimensions.size();i++)
@@ -303,6 +298,10 @@ public class MultiDimensionData {
 		return CollectionUtil.arrayToString(data);
 	}
 	
+	/**
+	 * 
+	 * @return data size
+	 */
 	public int size()
 	{
 		if(this.data==null)
@@ -310,6 +309,15 @@ public class MultiDimensionData {
 			return 0;
 		}
 		return this.data.length*4;
+	}
+	
+	/**
+	 * 
+	 * @return dimension size
+	 */
+	public int dimensionSize()
+	{
+		return this.dimensions.size();
 	}
 	
 	/**

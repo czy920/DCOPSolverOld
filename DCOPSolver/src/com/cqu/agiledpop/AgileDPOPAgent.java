@@ -98,6 +98,7 @@ public class AgileDPOPAgent extends Agent{
 	
 	private void allMDDataReceived()
 	{
+		this.printDebugMessage("receivedMDData count before agileReduct="+receivedMDDatas.size());
 		List<Dimension> receivedMDDatasDimensions=this.fakeMergedDimensions(receivedMDDatas);
 		if(receivedMDDatasDimensions.size()>1&&
 				receivedMDDatasDimensions.get(0).getName().equals(this.id+"")==true)
@@ -121,6 +122,7 @@ public class AgileDPOPAgent extends Agent{
 			}
 			
 		}
+		this.printDebugMessage("receivedMDData count after agileReduct="+receivedMDDatas.size());
 		//先与localMDData融合，再尽量降维
 		this.mergeLocalAndReceivedMDData();
 		mergeAndReduct(this.allMDDatas);
@@ -128,6 +130,7 @@ public class AgileDPOPAgent extends Agent{
 	
 	private void agileReduct(List<Dimension> allDimensions)
 	{
+		this.printDebugMessage("agileReduct...");
 		//表示第一维以下(不包括第一维)均可降维
 		List<Dimension> dimensionsNew=new ArrayList<Dimension>();
 		dimensionsNew.add(new Dimension(allDimensions.get(0)));
@@ -233,6 +236,7 @@ public class AgileDPOPAgent extends Agent{
 	
 	private void mergeAndReduct(List<MultiDimensionData> allDatas)
 	{
+		this.printDebugMessage("mdData count before merge="+allDatas.size());
 		//先尝试merge
 		if(allDatas.size()>1)
 		{
@@ -265,6 +269,7 @@ public class AgileDPOPAgent extends Agent{
 				}
 			}
 		}
+		this.printDebugMessage("mdData count after merge and before reduct="+allDatas.size());
 		//再尝试reduct
 		boolean reductable=true;
 		while(reductable==true)
@@ -288,13 +293,19 @@ public class AgileDPOPAgent extends Agent{
 				reductable=false;
 			}
 		}
+		this.printDebugMessage("mdData count after reduct="+allDatas.size());
 	}
 	
+	/**
+	 * 合并条件：A是B的子集
+	 * @param mdDataA
+	 * @param mdDataB
+	 * @return
+	 */
 	private boolean tryMerge(MultiDimensionData mdDataA, MultiDimensionData mdDataB)
 	{
 		MultiDimensionData mdDataTest=mdDataA.testMergeDimension(mdDataB);
-		if(mdDataTest.getDimensions().size()<=
-				Math.max(mdDataA.getDimensions().size(), mdDataB.getDimensions().size()))
+		if(mdDataTest.dimensionSize()==Math.max(mdDataA.dimensionSize(), mdDataB.dimensionSize()))
 		{
 			return true;
 		}else
@@ -333,6 +344,8 @@ public class AgileDPOPAgent extends Agent{
 				allDatas.remove(involvedDatas.get(i));
 			}
 			allDatas.add(result.getMdData());
+			
+			this.printDebugMessage("dimension decreased="+dimensionName);
 			
 			return true;
 		}
@@ -394,8 +407,8 @@ public class AgileDPOPAgent extends Agent{
 		Integer[] sizeArr=new Integer[sizeList.size()];
 		sizeList.toArray(sizeArr);
 		int[] minMaxAvg=StatisticUtil.minMaxAvg(CollectionUtil.toInt(sizeArr));
-		System.out.println("utilMsgCount: "+sizeArr.length+" utilMsgSizeMin: "+FormatUtil.format(minMaxAvg[0])+" utilMsgSizeMax: "+
-		FormatUtil.format(minMaxAvg[2])+" utilMsgSizeAvg: "+FormatUtil.format(minMaxAvg[4]));
+		System.out.println("utilMsgCount: "+sizeArr.length+" utilMsgSizeMin: "+FormatUtil.formatSize(minMaxAvg[0])+" utilMsgSizeMax: "+
+		FormatUtil.formatSize(minMaxAvg[2])+" utilMsgSizeAvg: "+FormatUtil.formatSize(minMaxAvg[4]));
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy(totalCost));
 		
