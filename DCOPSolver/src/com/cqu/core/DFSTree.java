@@ -178,7 +178,7 @@ public class DFSTree implements TreeGenerator{
 					if(neighbours[i]==parent)
 					{
 						allParentList.add(neighbours[i]);
-					}else if(CollectionUtil.exists(children, neighbours[i])!=-1)
+					}else if(CollectionUtil.indexOf(children, neighbours[i])!=-1)
 					{
 						allChildrenList.add(neighbours[i]);
 					}else

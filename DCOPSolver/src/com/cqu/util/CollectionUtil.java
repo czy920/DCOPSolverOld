@@ -77,6 +77,18 @@ public class CollectionUtil {
 		return -1;
 	}
 	
+	public static int indexOf(List<Integer> list, Integer value)
+	{
+		for(int i=0;i<list.size();i++)
+		{
+			if(list.get(i)==value)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+	
 	public static int[][] toTwoDimension(int[] arr, int rows, int cols)
 	{
 		int[][] ret=new int[rows][cols];
@@ -100,30 +112,6 @@ public class CollectionUtil {
 			ret.put(id, CollectionUtil.toInt(elementList.toArray(elements)));
 		}
 		return ret;
-	}
-	
-	public static int exists(int[] arr, int value)
-	{
-		for(int i=0;i<arr.length;i++)
-		{
-			if(arr[i]==value)
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
-	
-	public static int exists(List<Integer> list, Integer value)
-	{
-		for(int i=0;i<list.size();i++)
-		{
-			if(list.get(i)==value)
-			{
-				return i;
-			}
-		}
-		return -1;
 	}
 	
 	public static String arrayToString(int[] arr)
