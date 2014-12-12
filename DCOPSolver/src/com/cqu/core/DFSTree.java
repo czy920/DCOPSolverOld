@@ -15,7 +15,9 @@ public class DFSTree implements TreeGenerator{
 	private Map<Integer, List<Integer>> childrenNodes;//生成树子节点
 	private Map<Integer, Integer> parentNode;//生成树父节点
 	private Map<Integer, Integer> nodeLevel;//节点层次，根节点为0层
+	private long pseduHeight=0;
 	
+
 	private Map<Integer, Boolean> nodeIterated;
 	private Map<Integer, int[]> neighbourCounts;
 	
@@ -118,10 +120,29 @@ public class DFSTree implements TreeGenerator{
 		}
 	}
 	
+	
 	@Override
 	public Map<Integer, Integer> getNodeLevels() {
 		// TODO Auto-generated method stub
 		return this.nodeLevel;
+	}
+	
+	@SuppressWarnings("unused")
+	public long getPseduHeight() {
+		Integer curNodeId=this.rootId;		
+		boolean link=true;
+		while(link==true&&curNodeId!=(-1))
+		{
+			if(this.childrenNodes.get(curNodeId).size()>1){
+				link=false;
+			}else {
+				this.pseduHeight++;
+				if(this.childrenNodes.get(curNodeId).size()==1){
+					curNodeId=this.childrenNodes.get(curNodeId).iterator().next();
+				}
+			}
+		}
+		return pseduHeight;
 	}
 
 	@Override

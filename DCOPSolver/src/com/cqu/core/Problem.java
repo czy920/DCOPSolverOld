@@ -17,6 +17,7 @@ public class Problem {
 		agentNames=new HashMap<Integer, String>();
 		agentLevels=new HashMap<Integer, Integer>();
 		treeDepth=0;
+		pseudoHeight=0;
 		agentDomains=new HashMap<Integer, String>();
 		neighbourAgents=new HashMap<Integer, int[]>();
 		parentAgents=new HashMap<Integer, Integer>();
@@ -34,6 +35,7 @@ public class Problem {
 	public Map<Integer, String> agentNames;
 	public Map<Integer, Integer> agentLevels;
 	public long treeDepth;
+	public long pseudoHeight;     //用来辅佐BD-ADOPT算法
 	public Map<Integer,String> agentDomains;
 	public Map<Integer, int[]> neighbourAgents;
 	

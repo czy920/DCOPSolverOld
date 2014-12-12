@@ -103,6 +103,7 @@ public class ProblemParserGeneral {
 		problem.agentLevels=treeGenerator.getNodeLevels();
 		for(Integer level:problem.agentLevels.values())
 			if(problem.treeDepth<(level+1))problem.treeDepth=level+1;
+		problem.pseudoHeight=treeGenerator.getPseduHeight();
 		problem.parentAgents=treeGenerator.getParentNode();
 		problem.childAgents=treeGenerator.getChildrenNodes();
 		Map[] allParentsAndChildren=treeGenerator.getAllChildrenAndParentNodes();

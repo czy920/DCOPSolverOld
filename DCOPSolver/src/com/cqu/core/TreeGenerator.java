@@ -10,6 +10,7 @@ public interface TreeGenerator {
 	void generate();
 	Map<Integer, int[]> getChildrenNodes();
 	Map<Integer, Integer> getParentNode();
+	public long getPseduHeight();
 	
 	/**
 	 * 层次
