@@ -192,14 +192,11 @@ public class ADOPT_K extends AgentCycle {
 		maintainTHInvariant();
 		if (this.Readytermintate) {
 			if (this.TH_A == this.UB) {
-				this.valueIndex = compute[2];
-				//System.out.println(this.name+": "+"th1=ub");
+				this.valueIndex = compute[2];			
 			} else if (compute[1] > this.TH_A + (this.K - 1)) {
-				this.valueIndex = compute[0];
-				//System.out.println(this.name+": "+"lbi>th1+k");
+				this.valueIndex = compute[0];	
 			} else if (compute[1] >= Math.min(this.TH_B, this.UB)){
 				this.valueIndex = compute[0];
-				//System.out.println(this.name+": "+"lbi>=min{th2,ub}");
 			}
 		} else {
 			if (this.TH_A == this.UB) {
