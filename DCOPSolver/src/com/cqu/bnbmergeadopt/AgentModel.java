@@ -396,9 +396,9 @@ public class AgentModel extends AgentCycle {
 		private void InitSelf(){
 			
 			agent.TH=0;
-			//int oldvalueIndex=this.valueIndex;
+			int oldvalueIndex=agent.valueIndex;
 			agent.valueIndex=agent.computeMinimalLBAndUB()[0];
-			//if(oldvalueIndex!=this.valueIndex||this.valueID==0)
+			if(oldvalueIndex!=agent.valueIndex||agent.valueID==0)
 			agent.valueID = agent.valueID + 1;
 			Debugger.valueChanges.get(agent.name).add(agent.valueIndex);			
 		}
@@ -444,11 +444,11 @@ public class AgentModel extends AgentCycle {
 			agent.currentContext = new Context();
 			
 			if(!agent.isRootAgent())
-				agent.currentContext.addOrUpdate(agent.parent, 0, 0); //仅仅初始化为第1个取值
+				agent.currentContext.addOrUpdate(agent.parent, 0, 1); //仅仅初始化为第1个取值
 			if(agent.pseudoParents!=null)
 			{
 				for(int pseudoP:agent.pseudoParents){
-				    agent.currentContext.addOrUpdate(pseudoP, 0, 0); //仅仅初始化为第1个取值
+				    agent.currentContext.addOrUpdate(pseudoP, 0, 1); //仅仅初始化为第1个取值
 				}
 			}
 
@@ -889,10 +889,10 @@ public class AgentModel extends AgentCycle {
 			agent.valueID = 0;
 			agent.currentContext = new Context();
 			if (!agent.isRootAgent())
-				agent.currentContext.addOrUpdate(agent.parent, 0, 0); // 仅仅初始化为第1个取值
+				agent.currentContext.addOrUpdate(agent.parent, 0, 1); // 仅仅初始化为第1个取值
 			if (agent.pseudoParents != null) {
 				for (int pseudoP : agent.pseudoParents) {
-					agent.currentContext.addOrUpdate(pseudoP, 0, 0); // 仅仅初始化为第1个取值
+					agent.currentContext.addOrUpdate(pseudoP, 0, 1); // 仅仅初始化为第1个取值
 				}
 			}
 			agent.lbs = new HashMap<Integer, int[]>();
@@ -934,9 +934,9 @@ public class AgentModel extends AgentCycle {
 		private void InitSelf() {
 
 			agent.TH = Infinity.INFINITY;
-			// int oldvalueIndex=this.valueIndex;
+		    int oldvalueIndex=agent.valueIndex;
 			agent.valueIndex = agent.computeMinimalLBAndUB()[0];
-			// if(oldvalueIndex!=this.valueIndex||this.valueID==0)
+			if(oldvalueIndex!=agent.valueIndex||agent.valueID==0)
 			agent.valueID = valueID + 1;
 			Debugger.valueChanges.get(agent.name).add(agent.valueIndex);
 
