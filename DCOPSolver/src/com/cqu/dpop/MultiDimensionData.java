@@ -167,6 +167,76 @@ public class MultiDimensionData {
 		return new ReductDimensionResult(mdData, resultIndexes);
 	}
 	
+	public MultiDimensionData shrinkDimension(String dimensionName, int valueIndex)
+	{
+		int dimensionToShrinkIndex=this.indexOf(dimensionName);
+		Dimension dimensionToReduct=this.dimensions.get(dimensionToShrinkIndex);
+		
+		List<Dimension> dimensionsNew=new ArrayList<Dimension>();
+		for(Dimension dimen : this.dimensions)
+		{
+			dimensionsNew.add(new Dimension(dimen));
+		}
+		dimensionsNew.remove(dimensionToShrinkIndex);
+		
+		//compute periods for each dimension in new multiple dimension data
+		int[] periodsNew=new int[dimensions.size()];
+		for(int i=0;i<dimensions.size();i++)
+		{
+			int temp=1;
+			for(int j=i+1;j<dimensions.size();j++)
+			{
+				temp*=dimensions.get(j).getSize();
+			}
+			periodsNew[i]=temp;
+		}
+		for(int i=0;i<dimensionToShrinkIndex;i++)
+		{
+			periodsNew[i]/=dimensionToReduct.getSize();
+		}
+		periodsNew[dimensionToShrinkIndex]=0;
+		
+		int[] dataNew=new int[data.length/dimensionToReduct.getSize()];
+		//降低指定维度
+		int[] agentValueIndexes=new int[dimensions.size()];
+		int dataIndex=0;
+		int dataIndexNew=0;
+		int curDimension=agentValueIndexes.length-1;
+		
+		{
+			Arrays.fill(dataNew, Integer.MAX_VALUE);
+			while(dataIndex<data.length)
+			{
+				if(agentValueIndexes[dimensionToShrinkIndex]==valueIndex)
+				{
+					dataNew[dataIndexNew]=data[dataIndex];
+				}
+				agentValueIndexes[curDimension]+=1;
+				dataIndexNew+=periodsNew[curDimension];
+				while(agentValueIndexes[curDimension]>=dimensions.get(curDimension).getSize())
+				{
+					agentValueIndexes[curDimension]=0;
+					dataIndexNew-=dimensions.get(curDimension).getSize()*periodsNew[curDimension];
+					
+					curDimension-=1;
+					if(curDimension==-1)
+					{
+						dataIndexNew=dimensions.get(0).getSize()*periodsNew[0];
+						break;
+					}
+					agentValueIndexes[curDimension]+=1;
+					if(curDimension!=dimensionToShrinkIndex)
+					{
+						dataIndexNew+=periodsNew[curDimension];
+					}
+				}
+				curDimension=agentValueIndexes.length-1;
+				dataIndex++;
+			}
+		}
+		return new MultiDimensionData(dimensionsNew, dataNew);
+	}
+	
 	public MultiDimensionData mergeDimension(MultiDimensionData mdDataB)
 	{
 		MultiDimensionData mdDataA=this;
@@ -338,6 +408,8 @@ public class MultiDimensionData {
 			dimensions.add(new Dimension("A3", 3, 2));
 			mdDataB=new MultiDimensionData(dimensions, new int[]{6, 5, 2, 7, 3, 6, 7, 9, 4});
 		}
+		
+		System.out.println(mdDataB.shrinkDimension("A1", 1));
 
 		System.out.println(mdDataA.mergeDimension(mdDataB).toString());
 		int[] reductIndex=mdDataA.mergeDimension(mdDataB).

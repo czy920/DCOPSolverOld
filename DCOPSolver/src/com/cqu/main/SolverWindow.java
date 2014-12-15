@@ -67,7 +67,7 @@ public class SolverWindow {
 	private JCheckBox cbDebug;
 	private JCheckBox cbTreeFrame;
 	private JEditorPane epResultDetails;
-	private JSpinner spinnerMaxDimensionsInAgileDPOP;
+	private JSpinner spinnerMaxDimensionsInMBDPOP;
 	private JSpinner spinnerADOPT_K;
 	
 	private JTextArea epConsoleLines;
@@ -338,14 +338,14 @@ public class SolverWindow {
 		cbTreeFrame.setBounds(241, 76, 210, 23);
 		panel_1.add(cbTreeFrame);
 		
-		JLabel lblNewLabel = new JLabel("AgileDPOP维度限制：");
+		JLabel lblNewLabel = new JLabel("MBDPOP维度限制：");
 		lblNewLabel.setBounds(10, 116, 141, 15);
 		panel_1.add(lblNewLabel);
 		
-		spinnerMaxDimensionsInAgileDPOP = new JSpinner();
-		spinnerMaxDimensionsInAgileDPOP.setModel(new SpinnerNumberModel(8, 3, 20, 1));
-		spinnerMaxDimensionsInAgileDPOP.setBounds(161, 113, 70, 22);
-		panel_1.add(spinnerMaxDimensionsInAgileDPOP);
+		spinnerMaxDimensionsInMBDPOP = new JSpinner();
+		spinnerMaxDimensionsInMBDPOP.setModel(new SpinnerNumberModel(8, 3, 20, 1));
+		spinnerMaxDimensionsInMBDPOP.setBounds(161, 113, 70, 22);
+		panel_1.add(spinnerMaxDimensionsInMBDPOP);
 		
 		JLabel lblAdoptkk = new JLabel("ADOPT_k中k值：");
 		lblAdoptkk.setBounds(241, 116, 141, 15);
@@ -489,7 +489,7 @@ public class SolverWindow {
 		cbGraphFrame.setEnabled(enable);
 		cbDebug.setEnabled(enable);
 		cbTreeFrame.setEnabled(enable);
-		spinnerMaxDimensionsInAgileDPOP.setEnabled(enable);
+		spinnerMaxDimensionsInMBDPOP.setEnabled(enable);
 		spinnerADOPT_K.setEnabled(enable);
 	}
 	
@@ -501,7 +501,7 @@ public class SolverWindow {
 		cbGraphFrame.setEnabled(componentStatus.get("cbGraphFrame"));
 		cbDebug.setEnabled(componentStatus.get("cbDebug"));
 		cbTreeFrame.setEnabled(componentStatus.get("cbTreeFrame"));
-		spinnerMaxDimensionsInAgileDPOP.setEnabled(true);
+		spinnerMaxDimensionsInMBDPOP.setEnabled(true);
 		spinnerADOPT_K.setEnabled(true);
 	}
 	
@@ -603,7 +603,7 @@ public class SolverWindow {
 		Settings.settings.setCommunicationNCCCInAdopts((Integer)spinnerMessageTransmissionNCCC.getValue());
 		Settings.settings.setBNBmergeADOPTboundArg((Double)spinnerBnbLayer.getValue());
 		Settings.settings.setDisplayGraphFrame(cbGraphFrame.isSelected());
-		Settings.settings.setMaxDimensionsInAgileDPOP((Integer)spinnerMaxDimensionsInAgileDPOP.getValue());
+		Settings.settings.setMaxDimensionsInMBDPOP((Integer)spinnerMaxDimensionsInMBDPOP.getValue());
 		Settings.settings.setADOPT_K((Integer) spinnerADOPT_K.getValue());
 	}
 }

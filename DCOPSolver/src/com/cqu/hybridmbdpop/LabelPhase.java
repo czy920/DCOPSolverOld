@@ -13,16 +13,46 @@ import com.cqu.util.CollectionUtil;
 public class LabelPhase {
 	
 	private Problem problem;
+	private Map<Integer, Boolean> isSearchingPolicyAgents;
+	private Map<Integer, boolean[]> isNeighborSearchingPolicyAgents;
 	
 	public LabelPhase(Problem problem) {
 		// TODO Auto-generated constructor stub
 		this.problem=problem;
+		this.isSearchingPolicyAgents=new HashMap<Integer, Boolean>();
+		this.isNeighborSearchingPolicyAgents=new HashMap<Integer, boolean[]>();
 	}
 	
-	public Map<Integer, Boolean> labelSearchingPolicyAgents()
+	public Map<Integer, Boolean> getIsSearchingPolicyAgents() {
+		return isSearchingPolicyAgents;
+	}
+
+	public Map<Integer, boolean[]> getIsNeighborSearchingPolicyAgents() {
+		return isNeighborSearchingPolicyAgents;
+	}
+
+	public void label()
 	{
-		Map<Integer, Boolean> isSearchingPolicyAgents=new HashMap<Integer, Boolean>();
-		
+		labelSearchingPolicyAgents();
+		calNeighborPolicy();
+	}
+	
+	private void calNeighborPolicy()
+	{
+		for(Integer agentId : problem.neighbourAgents.keySet())
+		{
+			int[] neighbors=problem.neighbourAgents.get(agentId);
+			boolean[] neighborPolicy=new boolean[neighbors.length];
+			for(int i=0;i<neighbors.length;i++)
+			{
+				neighborPolicy[i]=isSearchingPolicyAgents.get(neighbors[i]);
+			}
+			isNeighborSearchingPolicyAgents.put(agentId, neighborPolicy);
+		}
+	}
+	
+	private void labelSearchingPolicyAgents()
+	{
 		Map<Integer, List<Integer>> layerAgents=new HashMap<Integer, List<Integer>>();
 		for(Integer agentId : problem.agentLevels.keySet())
 		{
@@ -49,7 +79,7 @@ public class LabelPhase {
 					agentSeparators.remove(children[i]);
 				}
 				remove(childSeparator, agentId);
-				if(childSeparator.size()>Settings.settings.getMaxDimensionsInAgileDPOP())
+				if(childSeparator.size()>Settings.settings.getMaxDimensionsInMBDPOP())
 				{
 					isSearchingPolicyAgents.put(agentId, true);
 					agentSeparators.put(agentId, new ArrayList<Integer>());
@@ -58,7 +88,7 @@ public class LabelPhase {
 				
 				List<Integer> separator=new ArrayList<Integer>(childSeparator);
 				merge(separator, problem.allParentAgents.get(agentId));
-				if(separator.size()>Settings.settings.getMaxDimensionsInAgileDPOP())
+				if(separator.size()>Settings.settings.getMaxDimensionsInMBDPOP())
 				{
 					isSearchingPolicyAgents.put(agentId, true);
 					agentSeparators.put(agentId, childSeparator);
@@ -69,7 +99,6 @@ public class LabelPhase {
 				}
 			}
 		}
-		return isSearchingPolicyAgents;
 	}
 	
 	public void remove(List<Integer> base, int[] toRemove)
