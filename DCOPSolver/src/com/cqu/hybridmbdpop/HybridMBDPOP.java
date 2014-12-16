@@ -64,7 +64,10 @@ public class HybridMBDPOP extends Agent{
 		{
 			parentLevels[i]=neighbourLevels.get(allParents[i]);
 		}
-		
+		if(this.isRootAgent()==false)
+		{
+			computeLocalUtils();
+		}
 		if(this.isLeafAgent()==true)
 		{
 			startFromLeaf();
@@ -86,18 +89,12 @@ public class HybridMBDPOP extends Agent{
 			}
 		}else
 		{
-			/*Context c=new Context();
-			for(MultiDimensionData mdData : localMDDatas)
+			MultiDimensionData tempMDData=localMDDatas.get(0);
+			for(int i=1;i<localMDDatas.size();i++)
 			{
-				Dimension oppositeDimension=mdData.getDimensions().get(0);
-				int oppositeId=Integer.parseInt(oppositeDimension.getName());
-				if(isNeighborSearchingPolicy[CollectionUtil.indexOf(neighbours, oppositeId)]==true)
-				{
-					c.addOrUpdate(this.id, i);
-				}
-
-				sendUtilMessage(mdData.shrinkDimension(mdData.getDimensions().get(1).getName(), i), c);
-			}*/
+				tempMDData=tempMDData.mergeDimension(localMDDatas.get(i));
+			}
+			sendUtilMessage(tempMDData, new Context());
 		}
 	}
 	
@@ -236,7 +233,7 @@ public class HybridMBDPOP extends Agent{
 			disposeValueMessage(msg);
 		}else if(type==TYPE_UTIL_MESSAGE)
 		{
-			utilMsgSizes.add(((MultiDimensionData) msg.getValue()).size());
+			utilMsgSizes.add(((UtilMessage) msg).getMdData().size());
 			
 			disposeUtilMessage(msg);
 		}
@@ -260,7 +257,22 @@ public class HybridMBDPOP extends Agent{
 	
 	private void disposeUtilMessage(Message msg)
 	{
-		/*if(this.isRootAgent()==true&&rawMDData==null)
+		/*UtilMessage utilMsg=(UtilMessage) msg;
+		
+		if(CollectionUtil.indexOf(this.pseudoChildren, msg.getIdSender())!=-1)
+		{
+			
+			return;
+		}
+		if(this.isSearchingPolicy==true)
+		{
+			
+		}else
+		{
+			
+		}
+		
+		if(this.isRootAgent()==true&&rawMDData==null)
 		{
 			rawMDData=(MultiDimensionData) msg.getValue();
 		}else
