@@ -68,20 +68,20 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 			}
 			if(cycleEnd.get()==true)
 			{
-				try{
-					while(msgQueue.isEmpty()==false)
-					{
-						Message msg=msgQueue.removeFirst();
-						if(msg!=null)
-						{
-							disposeMessage(msg);
-						}
-					}
-				}catch(NoSuchElementException e)
+				while(msgQueue.isEmpty()==false)
 				{
-					
+					Message msg=null;
+					try{
+						msg=msgQueue.removeFirst();
+					}catch(NoSuchElementException e)
+					{
+						
+					}
+					if(msg!=null)
+					{
+						disposeMessage(msg);
+					}
 				}
-				
 
 				cycleCount++;
 				System.out.println("cycleCount: "+cycleCount);
