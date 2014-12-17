@@ -1,6 +1,7 @@
 package com.cqu.cyclequeue;
 
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -67,8 +68,7 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 			}
 			if(cycleEnd.get()==true)
 			{
-				try
-				{
+				try{
 					while(msgQueue.isEmpty()==false)
 					{
 						Message msg=msgQueue.removeFirst();
@@ -77,10 +77,11 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 							disposeMessage(msg);
 						}
 					}
-				}catch(Exception e)
+				}catch(NoSuchElementException e)
 				{
-					//e.printStackTrace();
+					
 				}
+				
 
 				cycleCount++;
 				System.out.println("cycleCount: "+cycleCount);

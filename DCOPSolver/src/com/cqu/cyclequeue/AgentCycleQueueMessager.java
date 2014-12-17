@@ -1,6 +1,7 @@
 package com.cqu.cyclequeue;
 
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -76,9 +77,7 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 			}
 			if(cycleBegin.get()==true)
 			{
-				this.totalAgentCount.set(this.totalAgentCountTemp.get());
-				try
-				{
+				try{
 					while(msgQueue.isEmpty()==false)
 					{
 						Message msg=msgQueue.removeFirst();
@@ -87,10 +86,11 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 							disposeMessage(msg);
 						}
 					}
-				}catch(Exception e)
+				}catch(NoSuchElementException e)
 				{
-					e.printStackTrace();
+					
 				}
+				
 				
 				boolean lastAgent=true;
 				synchronized (cycleEndCount) {
@@ -130,7 +130,13 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 				}
 			}
 		}
-		this.totalAgentCountTemp.decrementAndGet();
+		
+		synchronized (cycleEndCount) {
+			this.totalAgentCountTemp.decrementAndGet();
+			this.totalAgentCount.set(this.totalAgentCountTemp.get());
+			cycleEndCount.notifyAll();
+		}
+		
 		runFinished();
 	}
 	
