@@ -79,6 +79,11 @@ public class Context{
 		return true;
 	}
 	
+	public int size()
+	{
+		return this.context.size();
+	}
+	
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub

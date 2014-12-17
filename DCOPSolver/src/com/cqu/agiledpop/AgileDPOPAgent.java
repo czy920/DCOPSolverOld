@@ -325,7 +325,7 @@ public class AgileDPOPAgent extends Agent{
 			}
 		}
 		List<Dimension> involvedDatasDimensions=this.fakeMergedDimensions(involvedDatas);
-		if(involvedDatasDimensions.size()>(Settings.settings.getMaxDimensionsInAgileDPOP()+1))
+		if(involvedDatasDimensions.size()>(Settings.settings.getMaxDimensionsInMBDPOP()+1))
 		{
 			return false;
 		}else

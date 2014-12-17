@@ -8,20 +8,27 @@ import com.cqu.adopt.AdoptAgent;
 import com.cqu.agiledpop.AgileDPOPAgent;
 import com.cqu.bfsdpop.BFSDPOPAgent;
 import com.cqu.dpop.DPOPAgent;
+import com.cqu.hybridmbdpop.HybridMBDPOP;
+import com.cqu.hybridmbdpop.LabelPhase;
 import com.cqu.parser.Problem;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FileUtil;
 
 public class AgentManager {
 	
-	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "AgileDPOP", "ADOPT", "BNBADOPT","ADOPT_K","BDADOPT","SynAdopt","SynAdopt2"};
+	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "HybridMBDPOP", "AgileDPOP", "ADOPT", "BNBADOPT","ADOPT_K","BDADOPT","SynAdopt","SynAdopt2"};
 	
 	private Map<Integer, Agent> agents;
 	private int treeHeight=0;
 	
 	public AgentManager(Problem problem, String agentType) {
 		// TODO Auto-generated constructor stub
-		
+		LabelPhase labelPhase=null;
+		if(agentType.equals("HybridMBDPOP"))
+		{
+			labelPhase=new LabelPhase(problem);
+			labelPhase.label();
+		}
 		agents=new HashMap<Integer, Agent>();
 		for(Integer agentId : problem.agentNames.keySet())
 		{
@@ -30,6 +37,11 @@ public class AgentManager {
 			{
 				agent=new DPOPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
+			}else if(agentType.equals("HybridMBDPOP"))
+			{
+				agent=new HybridMBDPOP(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)), 
+						labelPhase.getIsSearchingPolicyAgents().get(agentId), labelPhase.getIsNeighborSearchingPolicyAgents().get(agentId));
 			}else if(agentType.equals("AgileDPOP"))
 			{
 				agent=new AgileDPOPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
