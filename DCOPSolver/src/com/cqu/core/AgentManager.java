@@ -12,7 +12,6 @@ import com.cqu.hybridmbdpop.HybridMBDPOP;
 import com.cqu.hybridmbdpop.LabelPhase;
 import com.cqu.parser.Problem;
 import com.cqu.util.CollectionUtil;
-import com.cqu.util.FileUtil;
 
 public class AgentManager {
 	
@@ -85,14 +84,14 @@ public class AgentManager {
 				treeHeight=problem.agentLevels.get(agentId);
 			}
 			
-			{
+			/*{
 				String str="-----------"+agent.name+"-----------\n";
 				str+="Parent: "+agent.parent+"\n";
 				str+="Children: "+CollectionUtil.arrayToString(agent.children)+"\n";
 				str+="AllParents: "+CollectionUtil.arrayToString(agent.allParents)+"\n";
 				str+="AllChildren: "+CollectionUtil.arrayToString(agent.allChildren)+"\n";
 				FileUtil.writeStringAppend(str, "dfsTree.txt");
-			}
+			}*/
 		}
 		treeHeight++;
 	}

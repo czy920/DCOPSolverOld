@@ -23,6 +23,7 @@ import com.cqu.core.Result;
 import com.cqu.core.ResultAdopt;
 import com.cqu.core.ResultDPOP;
 import com.cqu.core.Solver;
+import com.cqu.problemgenerator.DialogMeetingScheduling;
 import com.cqu.settings.Settings;
 import com.cqu.util.DateUtil;
 import com.cqu.util.DialogUtil;
@@ -32,7 +33,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
@@ -72,11 +72,11 @@ public class SolverWindow {
 	private JSpinner spinnerADOPT_K;
 	
 	private JTextArea epConsoleLines;
-	private ConsoleRedirectThread consoleRedirectThread;
+	/*private ConsoleRedirectThread consoleRedirectThread;
 	private String consoleOutput="";
 	private int consoleOutputLineCount=0;
 	private static final int MAX_CONSOLE_LINE_COUNT=100;
-	private PrintStream printStream;
+	private PrintStream printStream;*/
 	
 	private Map<String, Boolean> componentStatus;
 	
@@ -103,7 +103,7 @@ public class SolverWindow {
 	public SolverWindow() {
 		initialize();
 		
-		consoleRedirectThread=new ConsoleRedirectThread(new ConsoleRedirectThread.NewLineListener() {
+		/*consoleRedirectThread=new ConsoleRedirectThread(new ConsoleRedirectThread.NewLineListener() {
 			
 			@Override
 			public void newLineAvailable(final String newLine) {
@@ -125,7 +125,7 @@ public class SolverWindow {
 				});
 			}
 		});
-		/*printStream=new PrintStream(consoleRedirectThread.getOut(), true);
+		printStream=new PrintStream(consoleRedirectThread.getOut(), true);
 		System.setOut(printStream);
 		System.setErr(printStream);
 		consoleRedirectThread.start();*/
@@ -211,6 +211,19 @@ public class SolverWindow {
 			}
 		});
 		mnr.add(miRun);
+		
+		JMenu mnp = new JMenu("问题(P)");
+		mnp.setMnemonic('P');
+		menuBar.add(mnp);
+		
+		JMenuItem miMeetingScheduling = new JMenuItem("会议调度");
+		miMeetingScheduling.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DialogMeetingScheduling dlg=new DialogMeetingScheduling();
+				dlg.setVisible(true);
+			}
+		});
+		mnp.add(miMeetingScheduling);
 		
 		JMenu mnh = new JMenu("帮助(H)");
 		mnh.setMnemonic('H');
