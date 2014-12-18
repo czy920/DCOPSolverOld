@@ -47,6 +47,7 @@ import java.awt.event.WindowEvent;
 
 public class SolverWindow {
 	
+	
 	private static final String INIT_PROBLEM_PATH="problems/";
 
 	private JFrame frmDcopsolver;
