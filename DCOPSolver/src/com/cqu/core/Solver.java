@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.cqu.cyclequeue.AgentManagerCycle;
 import com.cqu.cyclequeue.MessageMailerCycle;
+import com.cqu.main.DOTrenderer;
 import com.cqu.main.Debugger;
 import com.cqu.parser.Problem;
 import com.cqu.parser.ProblemParser;
@@ -22,7 +23,7 @@ public class Solver {
 	private List<Result> results=new ArrayList<Result>();
 	private List<Result> resultsRepeated;
 
-	public void solve(String problemPath, String agentType, boolean showTreeFrame, boolean debug, EventListener el)
+	public void solve(String problemPath, String agentType, boolean showTreeFrame, boolean debug, EventListener el) throws Exception
 	{
 		//parse problem xml
 		String treeGeneratorType=null;
@@ -48,6 +49,7 @@ public class Solver {
 			//display constraint graph
 			GraphFrame graphFrame=new GraphFrame(problem.neighbourAgents);
 			graphFrame.showGraphFrame();
+			new DOTrenderer ("Constraint graph", ProblemParser.toDOT(problemPath));
 		}
 		//display DFS tree，back edges not included
 		if(showTreeFrame==true)

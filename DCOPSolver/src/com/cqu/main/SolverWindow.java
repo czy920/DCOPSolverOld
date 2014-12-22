@@ -207,7 +207,12 @@ public class SolverWindow {
 		JMenuItem miRun = new JMenuItem("运行");
 		miRun.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				solve();
+				try {
+					solve();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 		mnr.add(miRun);
@@ -533,7 +538,7 @@ public class SolverWindow {
 		}
 	}
 	
-	private void solve()
+	private void solve() throws Exception
 	{
 		this.enableUI(false);
 		this.setSettingValues();
