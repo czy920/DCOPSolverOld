@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.core.TreeGenerator;
+import com.cqu.heuristics.ScoringHeuristic;
+import com.cqu.main.DOTrenderer;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.StatisticUtil;
 
@@ -14,9 +16,9 @@ public class DFSgeneration implements TreeGenerator{
 	private DFSview dfsview ;
 	
 	/** The heuristic used to choose the root */
-	//private static ScoringHeuristic<Short> rootElectionHeuristic;
+	private static ScoringHeuristic<Short> rootElectionHeuristic;
 	/** The heuristic used to choose the next node */
-	//private static ScoringHeuristic<Short> NextNodeHeuristics ;
+	private static ScoringHeuristic<Short> NextNodeHeuristics ;
 	/*Constructor
 	 * @param neighbourNodes 	表示结点的邻接存储关系
 	 * 为根结点选择策略
@@ -57,6 +59,8 @@ public class DFSgeneration implements TreeGenerator{
 		int iteratedCount=0;
 		Integer curLevel=0;
 		
+		dfsview.rootId = DFSgeneration.rootElectionHeuristic.getScores();
+		
 		Integer curNodeId=dfsview.rootId;
 		dfsview.nodeIterated.put(curNodeId, true);
 		iteratedCount++;//根节点已遍历
@@ -66,7 +70,9 @@ public class DFSgeneration implements TreeGenerator{
 		int totalCount=dfsview.neighbourNodes.size();
 		while(iteratedCount<totalCount)
 		{
-			Integer nextNodeId=this.getMaxNeighboursNodeId(curNodeId);
+			//下一个结点选择策略
+			Integer nextNodeId=DFSgeneration.NextNodeHeuristics.getScores(curNodeId, dfsview); //下一个结点的选择是以连接边最多的为准
+			
 			if(nextNodeId==-1)
 			{
 				curLevel--;
@@ -86,8 +92,24 @@ public class DFSgeneration implements TreeGenerator{
 				curNodeId=nextNodeId;
 			}
 		}
+		//display DFS tree
+		new DOTrenderer ("DFS tree", this.dfsToString());
 	}
 
+	/*
+	 * 选择根结点策略
+	 */
+	public static void setRootHeuristics (ScoringHeuristic<Short> rootHeuristic){
+		DFSgeneration.rootElectionHeuristic = rootHeuristic;
+	}
+	/*
+	 * 选择叶子结点策略
+	 */
+	public static void setNextNodeHeuristics (ScoringHeuristic<Short> nextNodeHeuristics) 
+	{
+		DFSgeneration.NextNodeHeuristics = nextNodeHeuristics ;
+	}
+	
 	@Override
 	public Map<Integer, int[]> getChildrenNodes() {
 		// TODO Auto-generated method stub

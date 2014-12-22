@@ -51,7 +51,7 @@ public Map<Integer, int[]> neighbourNodes; //无向图（邻接表存储）
 		/*
 		 * 暂时以此种为选择策略
 		 */
-		int maxNeighbourCount=-1;
+		/*int maxNeighbourCount=-1;
 		int maxNeighbourCountNodeId=-1;
 		for(Integer nodeId : this.neighbourNodes.keySet())
 		{
@@ -62,7 +62,7 @@ public Map<Integer, int[]> neighbourNodes; //无向图（邻接表存储）
 				maxNeighbourCountNodeId=nodeId;
 			}
 		}
-		this.rootId=maxNeighbourCountNodeId;
+		this.rootId=maxNeighbourCountNodeId;*/
 	}
 	
 	public Set<String> getPseudoParents(int nodeId)
