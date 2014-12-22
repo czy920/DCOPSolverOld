@@ -98,6 +98,7 @@ public class DOTrenderer extends JFrame implements ActionListener {
 	 * @param dotCode DOT formatted code to be displayed as image
 	 */
 	public DOTrenderer(String title, String dotCode) {
+		
 		this (title, dotCode, "dot");
 	}
 
@@ -112,7 +113,7 @@ public class DOTrenderer extends JFrame implements ActionListener {
 		super(title);
 		
 		this.layout = layout;
-
+		
 		// Display each new window at a slightly different position on the screen so that the newest one cannot hide the previous ones
 		synchronized (posLock) {
 			this.setLocation(xPos, yPos);
@@ -269,6 +270,7 @@ public class DOTrenderer extends JFrame implements ActionListener {
 			}).start();
 
 			status = p.waitFor();	//0 if creation of image was successful
+			status = 0;
 		} 
 		catch (IOException e) {
 			if(e.getMessage().contains("Cannot run program")) {
