@@ -30,28 +30,6 @@ public class DFSgeneration implements TreeGenerator{
 		dfsview = new DFSview (neighbourNodes);
 	}
 	
-	//获取下一个结点
-	private Integer getMaxNeighboursNodeId(Integer nodeId)
-	{
-		int[] neighbours=dfsview.neighbourNodes.get(nodeId);
-		int[] counts=dfsview.neighbourCounts.get(nodeId);
-		for(int i=0;i<counts.length;i++)
-		{
-			if(dfsview.nodeIterated.get(neighbours[i])==true)
-			{
-				counts[i]=-1;
-			}
-		}
-		int maxIndex=StatisticUtil.max(counts);
-		if(counts[maxIndex]==-1)
-		{
-			return -1;
-		}else
-		{
-			return neighbours[maxIndex];
-		}
-	}
-	
     //DFS产生算法
 	@Override
 	public void generate() {
@@ -93,7 +71,7 @@ public class DFSgeneration implements TreeGenerator{
 			}
 		}
 		//display DFS tree
-		new DOTrenderer ("DFS tree", this.dfsToString());
+		//new DOTrenderer ("DFS tree", this.dfsToString());
 	}
 
 	/*
