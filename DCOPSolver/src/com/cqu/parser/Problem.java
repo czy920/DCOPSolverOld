@@ -2,6 +2,7 @@ package com.cqu.parser;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
 
 public class Problem {
 	
@@ -25,6 +26,8 @@ public class Problem {
 		childAgents=new HashMap<Integer, int[]>();
 		allChildrenAgents=new HashMap<Integer, int[]>();
 		agentConstraintCosts=new HashMap<Integer, String[]>();
+		relationCost = new HashMap<String, Integer>();
+		agentProperty = new HashMap<Integer, Integer>();
 	}
 	
 	//all possible domains and costs
@@ -47,4 +50,7 @@ public class Problem {
 	public Map<Integer, String[]> agentConstraintCosts;
 	
 	public Map<Integer, boolean[]> crossConstraintAllocation;
+	
+	public Map<String, Integer> relationCost; // 记录每个连接关系矩阵中的最小代价
+	public Map<Integer, Integer> agentProperty; // 将agent中的评估代价作为其属性
 }
