@@ -230,7 +230,11 @@ public class ParserGeneral extends ContentParser{
 					return false;
 				}
 			}
+			
 			problem.costs.put(elementList.get(i).getAttributeValue(NAME), cost);
+			//从小到大排序，这个需要根据问题是要求得最小值还是最大值
+			Arrays.sort(cost);
+			problem.relationCost.put(elementList.get(i).getAttributeValue(NAME), cost[0]);
 		}
 		return true;
 	}
@@ -343,6 +347,7 @@ public class ParserGeneral extends ContentParser{
 				costNames[i]=neighbourConstraintCosts.get(agentId).get(buff[i]);
 			}
 			problem.agentConstraintCosts.put(agentId, costNames);
+			
 		}
 		
 		return true;
