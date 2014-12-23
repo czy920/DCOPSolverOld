@@ -80,6 +80,7 @@ public class ProblemParser {
 		{
 			parser.parseContent(problem);
 			this.generateCommunicationStructure(problem);
+			this.generateAgentProperty(problem);
 			return problem;
 		}else
 		{
@@ -87,6 +88,25 @@ public class ProblemParser {
 		}
 	}
 	
+	private void generateAgentProperty(Problem problem)
+	{
+		for (Map.Entry<Integer, String[]> entry : problem.agentConstraintCosts.entrySet())
+		{
+			int sumCost = 0;
+			for (int i = 0; i < entry.getValue().length; i++)
+			{
+				sumCost += problem.relationCost.get(entry.getValue()[i]);
+			}
+			problem.agentProperty.put(entry.getKey(), sumCost);
+		}
+		/*
+		 * 需要对其进行排序
+		 */
+		for (Map.Entry<Integer, Integer> entry : problem.agentProperty.entrySet())
+		{
+			System.out.println("key: " + entry.getKey() + ", value: " + entry.getValue());
+		}
+	}
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void generateCommunicationStructure(Problem problem)
 	{
