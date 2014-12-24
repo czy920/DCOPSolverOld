@@ -1,0 +1,38 @@
+graph {
+	node [shape = "circle"];
+	subgraph cluster_A2 {
+		label = A2;
+		X2.1;
+	}
+	subgraph cluster_A1 {
+		label = A1;
+		X1.1;
+	}
+	subgraph cluster_A4 {
+		label = A4;
+		X4.1;
+	}
+	subgraph cluster_A3 {
+		label = A3;
+		X3.1;
+	}
+	subgraph cluster_A6 {
+		label = A6;
+		X6.1;
+	}
+	subgraph cluster_A5 {
+		label = A5;
+		X5.1;
+	}
+
+	X6.1--X1.1;
+	X6.1--X4.1;
+	X6.1--X3.1;
+	X6.1--X2.1;
+	X4.1--X1.1;
+	X3.1--X1.1;
+	X5.1--X4.1;
+	X5.1--X3.1;
+	X5.1--X2.1;
+}
+
