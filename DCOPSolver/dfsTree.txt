@@ -45,6 +45,31 @@ AllParents: [1,5,7]
 AllChildren: [2,10,12]
 -----------m9-----------
 Parent: 4
+Children: [8,9]
+AllParents: [4]
+AllChildren: [8,9]
+-----------A8-----------
+Parent: 7
+Children: 
+AllParents: [7]
+AllChildren: 
+-----------A9-----------
+Parent: 7
+Children: 
+AllParents: [7]
+AllChildren: 
+-----------A10-----------
+Parent: 3
+Children: [12]
+AllParents: [3]
+AllChildren: [12]
+-----------A11-----------
+Parent: 3
+Children: 
+AllParents: [3]
+AllChildren: 
+-----------A12-----------
+Parent: 10
 Children: 
 AllParents: [3,4]
 AllChildren: 

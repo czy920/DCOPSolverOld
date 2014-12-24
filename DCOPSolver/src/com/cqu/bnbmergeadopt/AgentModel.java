@@ -35,11 +35,11 @@ public class AgentModel extends AgentCycle {
 	private int LB;
 	private int UB;
 	private int TH;
+	private int TH_B;
 
 	private Map<Integer, Context[]> contexts;
 	private Context currentContext;
 
-	//private String strategy;
 	private String typeMethod;
 	private long boundary;    //方法的分界，可以由比例求得，这里设为3
 	private double scaleArg;    //两个方法的比例参数
@@ -52,34 +52,21 @@ public class AgentModel extends AgentCycle {
 
 	private Method method;
 	
-	public AgentModel(int id, String name, int level, int[] domain,long treeDepth) {
+	public AgentModel(int id, String name, int level, int[] domain,long treeDepth,long pseudoHeight) {
 		super(id, name, level, domain);
 		this.nccc = 0;
 		
 		//this.boundary=Settings.settings.getBNBmergeADOPTboundArg();	//初始为2 
 		this.scaleArg=Settings.settings.getBNBmergeADOPTboundArg();
-		this.boundary=(long) Math.ceil(treeDepth*this.scaleArg);
-		
-		// a sole bnbadopt
-//		method = new BnBMethod(this);
-//		typeMethod = "bnbadopt";
-//		this.strategy="bnbadopt";
+		this.boundary= pseudoHeight+(long)Math.ceil((treeDepth-pseudoHeight)*this.scaleArg);
 
-		// a sole adopt
-//		 method=new AdoptMethod(this);
-//		 typeMethod="adopt";
-//		 strategy="adopt";
-
-
-		// union adopt and bnbadopt
-		if (this.level < this.boundary) { // 前三层用bnbadopt策略
+		if (this.level < this.boundary) { 
 			method = new BnBMethod(this);
 			typeMethod = "bnbadopt";
-		} else { // 其他层用adopt策略
+		} else {
 			method=new AdoptMethod(this);
 			typeMethod = "adopt";
 		}		 
-		 //strategy="bnbandadopt";
 	}
 
 	@Override
@@ -396,6 +383,8 @@ public class AgentModel extends AgentCycle {
 		private void InitSelf(){
 			
 			agent.TH=0;
+			if(agent.level==agent.boundary)
+				agent.TH_B=Infinity.INFINITY;
 			int oldvalueIndex=agent.valueIndex;
 			agent.valueIndex=agent.computeMinimalLBAndUB()[0];
 			if(oldvalueIndex!=agent.valueIndex||agent.valueID==0)
@@ -619,8 +608,14 @@ public class AgentModel extends AgentCycle {
 					checkCompatible();
 					InitSelf();
 				}
-				if (msg.getIdSender() == agent.parent && val[2] != (-1)) 
-					agent.TH = val[2];
+				if(msg.getIdSender() == agent.parent)
+				{
+					if((agent.level==agent.boundary)){
+						agent.TH_B=val[2];
+					}else{
+						agent.TH = val[2];
+					}	
+				}				
 				//maintainThresholdInvariant();  //放在backtrack函数里面一次性做
 				if(agent.msgQueue.isEmpty())backtrack();
 			}
@@ -714,8 +709,10 @@ public class AgentModel extends AgentCycle {
 		    
 		    BDmaintainThresholdInvariant();	    
 		    int oldValue=agent.valueIndex;
-		    
-			if (agent.TH == agent.UB) {
+		    int tempCondition=agent.TH;
+		    if((agent.level==agent.boundary)&&agent.Readytermintate)
+		    	tempCondition=agent.TH_B; 
+			if (tempCondition == agent.UB) {
 				if (agent.valueIndex != dMinimizesUB) {
 					Debugger.valueChanges.get(agent.getName()).add(dMinimizesUB);
 				}
@@ -723,7 +720,7 @@ public class AgentModel extends AgentCycle {
 				agent.valueIndex = dMinimizesUB;
 				if(agent.valueIndex!=oldValue)
 				agent.valueID = agent.valueID + 1;
-			} else if (LB_CurValue > agent.TH) {
+			} else if (LB_CurValue > tempCondition) {
 				if (agent.valueIndex != dMinimizesLB) {
 					Debugger.valueChanges.get(agent.getName()).add(dMinimizesLB);
 				}
@@ -737,7 +734,7 @@ public class AgentModel extends AgentCycle {
 			this.maintainChildThresholdInvariant();
 			this.maintainAllocationInvariant();   //必须将这个放在发送VALUE信息之前
 			sendValueMessages();
-			if (agent.TH == agent.UB) {
+			if (tempCondition == agent.UB) {
 				if (agent.Readytermintate == true
 						|| agent.isRootAgent() == true) {
 					sendTerminateMessages();

@@ -192,30 +192,23 @@ public class ADOPT_K extends AgentCycle {
 		maintainTHInvariant();
 		if (this.Readytermintate) {
 			if (this.TH_A == this.UB) {
-				this.valueIndex = compute[2];
-				//System.out.println(this.name+": "+"th1=ub");
+				this.valueIndex = compute[2];			
 			} else if (compute[1] > this.TH_A + (this.K - 1)) {
-				this.valueIndex = compute[0];
-				//System.out.println(this.name+": "+"lbi>th1+k");
+				this.valueIndex = compute[0];	
 			} else if (compute[1] >= Math.min(this.TH_B, this.UB)){
 				this.valueIndex = compute[0];
-				//System.out.println(this.name+": "+"lbi>=min{th2,ub}");
 			}
 		} else {
 			if (this.TH_A == this.UB) {
 				this.valueIndex = compute[2];
-				//System.out.println(this.name+": "+"th1=ub");
+				if (compute[1] >= Math.min(this.TH_B, this.UB)){
+					this.valueIndex = compute[0];
+				}		
 			} else if (compute[1] > this.TH_A + this.K) {
 				this.valueIndex = compute[0];
-				//System.out.println(this.name+": "+"lbi>th1+k");
-			}
-			if (compute[1] >= Math.min(this.TH_B, this.UB)){
+			}else if (compute[1] >= Math.min(this.TH_B, this.UB)){
 				this.valueIndex = compute[0];
-				//System.out.println(this.name+": "+"lbi>=min{th2,ub}");
-			}
-			if((this.TH_A==this.UB)&&(compute[1]< Math.min(this.TH_B, this.UB))){
-				System.out.println("this is track result!!!");
-			}
+			}	
 		}
 		if(valueIndex!=oldValueIndex){
 			valueID++;
@@ -224,7 +217,7 @@ public class ADOPT_K extends AgentCycle {
 		this.maintainChildThresholdInvariant();
 		this.maintainCurrentTHInvariant();
 		this.maintainAllocationInvariant();
-		System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH_A+"\t"+this.TH_B+"\t"+this.LB+"\t"+this.UB);
+		//System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH_A+"\t"+this.TH_B+"\t"+this.LB+"\t"+this.UB);
 		if(this.TH_A==this.UB)
 			if(this.isRootAgent()||this.Readytermintate==true){
 				sendTerminateMessages();
