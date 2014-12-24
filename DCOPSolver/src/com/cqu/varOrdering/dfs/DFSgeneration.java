@@ -70,8 +70,6 @@ public class DFSgeneration implements TreeGenerator{
 				curNodeId=nextNodeId;
 			}
 		}
-		//display DFS tree
-		//new DOTrenderer ("DFS tree", this.dfsToString());
 	}
 
 	/*
