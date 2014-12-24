@@ -22,6 +22,7 @@ public class HybridMBDPOP extends Agent{
 	
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_UTIL_MESSAGE=1;
+	public final static int TYPE_NEXTITERATION_MESSAGE=2;
 	
 	public final static String KEY_TOTAL_COST="KEY_TOTAL_COST";
 	public final static String KEY_UTIL_MESSAGE_SIZES="KEY_UTIL_MESSAGE_SIZES";
