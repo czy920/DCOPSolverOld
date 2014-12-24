@@ -23,7 +23,6 @@ import com.cqu.core.Result;
 import com.cqu.core.ResultAdopt;
 import com.cqu.core.ResultDPOP;
 import com.cqu.core.Solver;
-import com.cqu.problemgenerator.DialogMeetingScheduling;
 import com.cqu.settings.Settings;
 import com.cqu.util.DateUtil;
 import com.cqu.util.DialogUtil;
@@ -33,6 +32,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
@@ -45,7 +45,7 @@ import javax.swing.JTextArea;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class SolverWindow {
+public class LinuxWindow {
 	
 	
 	private static final String INIT_PROBLEM_PATH="problems/";
@@ -72,11 +72,11 @@ public class SolverWindow {
 	private JSpinner spinnerADOPT_K;
 	
 	private JTextArea epConsoleLines;
-	/*private ConsoleRedirectThread consoleRedirectThread;
+	private ConsoleRedirectThread consoleRedirectThread;
 	private String consoleOutput="";
 	private int consoleOutputLineCount=0;
 	private static final int MAX_CONSOLE_LINE_COUNT=100;
-	private PrintStream printStream;*/
+	private PrintStream printStream;
 	
 	private Map<String, Boolean> componentStatus;
 	
@@ -88,7 +88,7 @@ public class SolverWindow {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					SolverWindow window = new SolverWindow();
+					LinuxWindow window = new LinuxWindow();
 					window.frmDcopsolver.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -100,10 +100,10 @@ public class SolverWindow {
 	/**
 	 * Create the application.
 	 */
-	public SolverWindow() {
+	public LinuxWindow() {
 		initialize();
 		
-		/*consoleRedirectThread=new ConsoleRedirectThread(new ConsoleRedirectThread.NewLineListener() {
+		consoleRedirectThread=new ConsoleRedirectThread(new ConsoleRedirectThread.NewLineListener() {
 			
 			@Override
 			public void newLineAvailable(final String newLine) {
@@ -125,7 +125,7 @@ public class SolverWindow {
 				});
 			}
 		});
-		printStream=new PrintStream(consoleRedirectThread.getOut(), true);
+		/*printStream=new PrintStream(consoleRedirectThread.getOut(), true);
 		System.setOut(printStream);
 		System.setErr(printStream);
 		consoleRedirectThread.start();*/
@@ -216,19 +216,6 @@ public class SolverWindow {
 			}
 		});
 		mnr.add(miRun);
-		
-		JMenu mnp = new JMenu("问题(P)");
-		mnp.setMnemonic('P');
-		menuBar.add(mnp);
-		
-		JMenuItem miMeetingScheduling = new JMenuItem("会议调度");
-		miMeetingScheduling.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				DialogMeetingScheduling dlg=new DialogMeetingScheduling();
-				dlg.setVisible(true);
-			}
-		});
-		mnp.add(miMeetingScheduling);
 		
 		JMenu mnh = new JMenu("帮助(H)");
 		mnh.setMnemonic('H');
@@ -418,7 +405,8 @@ public class SolverWindow {
 			defaultDir=INIT_PROBLEM_PATH;
 		}else if(isBatchOld==false)
 		{
-			defaultDir=defaultDir.substring(0, defaultDir.lastIndexOf('\\'));
+			//defaultDir=defaultDir.substring(0, defaultDir.lastIndexOf('\\'));
+			defaultDir=defaultDir.substring(0, defaultDir.lastIndexOf('/'));
 		}
 		
 		File f=DialogUtil.dialogOpenFile(new String[]{".xml"}, "Select A Problem", defaultDir);

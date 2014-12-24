@@ -3,6 +3,7 @@ package com.cqu.util;
 import java.io.File;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 public class DialogUtil {
@@ -79,4 +80,20 @@ public class DialogUtil {
     	}
         return null;
 	}
+	
+	public static void dialogWaring(String message)
+	{
+		JOptionPane.showMessageDialog(null, message, "Warning", JOptionPane.WARNING_MESSAGE);
+	}
+	
+	public static void dialogError(String message)
+	{
+		JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+	}
+	
+	public static void dialogInformation(String message)
+	{
+		JOptionPane.showMessageDialog(null, message, "Information", JOptionPane.INFORMATION_MESSAGE);
+	}
+	
 }

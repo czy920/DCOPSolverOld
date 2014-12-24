@@ -127,7 +127,6 @@ public class DFSTree implements TreeGenerator{
 		return this.nodeLevel;
 	}
 	
-	@SuppressWarnings("unused")
 	public long getPseduHeight() {
 		Integer curNodeId=this.rootId;		
 		boolean link=true;

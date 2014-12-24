@@ -173,7 +173,12 @@ public class MainFrame extends JFrame {
 		
 		btnSolve.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				solve();
+				try {
+					solve();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 		
@@ -269,7 +274,7 @@ public class MainFrame extends JFrame {
 		lbRunningFlag.setVisible(!enable);
 	}
 	
-	private void solve()
+	private void solve() throws Exception
 	{
 		this.enableUI(false);
 		
