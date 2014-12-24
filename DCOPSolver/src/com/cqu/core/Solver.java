@@ -49,13 +49,14 @@ public class Solver {
 			//display constraint graph
 			GraphFrame graphFrame=new GraphFrame(problem.neighbourAgents);
 			graphFrame.showGraphFrame();
-			new DOTrenderer ("Constraint graph", ProblemParser.toDOT(problemPath));
+			//new DOTrenderer ("Constraint graph", ProblemParser.toDOT(problemPath));
 		}
 		//display DFS tree，back edges not included
 		if(showTreeFrame==true)
 		{
 			TreeFrame treeFrame=new TreeFrame(DFSTree.toTreeString(problem.agentNames, problem.parentAgents, problem.childAgents));
 			treeFrame.showTreeFrame();
+			//new DOTrenderer ("DFS tree", this.dfsToString());
 		}
 		
 		//set whether to print running data records
