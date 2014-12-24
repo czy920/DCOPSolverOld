@@ -11,7 +11,6 @@ import org.jdom2.Element;
 
 import com.cqu.bfsdpop.CrossEdgeAllocator;
 import com.cqu.core.BFSTree;
-import com.cqu.core.DFSTree;
 import com.cqu.core.TreeGenerator;
 import com.cqu.heuristics.MostConnectedHeuristic;
 import com.cqu.main.DOTrenderer;

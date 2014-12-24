@@ -8,9 +8,7 @@ import java.util.Map;
 
 import com.cqu.core.TreeGenerator;
 import com.cqu.heuristics.ScoringHeuristic;
-import com.cqu.main.DOTrenderer;
 import com.cqu.util.CollectionUtil;
-import com.cqu.util.StatisticUtil;
 
 public class DFSgeneration implements TreeGenerator{
 	private DFSview dfsview ;
@@ -123,6 +121,7 @@ public class DFSgeneration implements TreeGenerator{
 		return dfsview.nodeLevel;
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Map[] getAllChildrenAndParentNodes() {
 		// TODO Auto-generated method stub

@@ -24,6 +24,7 @@ import com.cqu.core.ResultAdopt;
 import com.cqu.core.ResultDPOP;
 import com.cqu.core.Solver;
 import com.cqu.problemgenerator.DialogMeetingScheduling;
+import com.cqu.settings.DialogSetSettings;
 import com.cqu.settings.Settings;
 import com.cqu.util.DateUtil;
 import com.cqu.util.DialogUtil;
@@ -55,7 +56,7 @@ public class SolverWindow {
 	private JMenuBar menuBar;
 	
 	private JTextField tfProblemPath;
-	private JComboBox combAlgorithmType;
+	private JComboBox<String> combAlgorithmType;
 	private JSpinner spinnerRepeatTimes;
 	private JLabel labelRunProgress;
 	private JLabel labelFlagRunning;
@@ -230,6 +231,19 @@ public class SolverWindow {
 		});
 		mnp.add(miMeetingScheduling);
 		
+		JMenu mns = new JMenu("设置(S)");
+		mns.setMnemonic('S');
+		menuBar.add(mns);
+		
+		JMenuItem miSetSettings = new JMenuItem("设置");
+		miSetSettings.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DialogSetSettings dlg=new DialogSetSettings();
+				dlg.setVisible(true);
+			}
+		});
+		mns.add(miSetSettings);
+		
 		JMenu mnh = new JMenu("帮助(H)");
 		mnh.setMnemonic('H');
 		menuBar.add(mnh);
@@ -262,7 +276,7 @@ public class SolverWindow {
 		label_1.setBounds(10, 47, 45, 15);
 		panel.add(label_1);
 		
-		combAlgorithmType = new JComboBox();
+		combAlgorithmType = new JComboBox<String>();
 		combAlgorithmType.setBounds(64, 41, 385, 32);
 		panel.add(combAlgorithmType);
 		

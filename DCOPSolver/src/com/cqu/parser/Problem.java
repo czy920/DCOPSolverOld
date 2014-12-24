@@ -2,7 +2,6 @@ package com.cqu.parser;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
 
 public class Problem {
 	

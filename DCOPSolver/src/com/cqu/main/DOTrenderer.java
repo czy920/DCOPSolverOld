@@ -259,7 +259,6 @@ public class DOTrenderer extends JFrame implements ActionListener {
 			Process p = Runtime.getRuntime().exec(new String[] {this.layout, "-Tgif", input.getAbsolutePath(), "-O"});
 
 			//Reads the layout process' error stream and displays it
-			@SuppressWarnings("resource") /// @bug err will not be closed
 			final Scanner err = new Scanner(p.getErrorStream());
 			new Thread(new Runnable() {
 				public void run() {

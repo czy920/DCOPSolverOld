@@ -1,11 +1,14 @@
 package com.cqu.util;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import org.jdom2.Document;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 public class XmlUtil {
 	
@@ -23,5 +26,16 @@ public class XmlUtil {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static void saveXmlDocument(Document doc, String path)
+	{
+		try {
+			new XMLOutputter(Format.getPrettyFormat()).
+			output(doc, new FileWriter (path));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

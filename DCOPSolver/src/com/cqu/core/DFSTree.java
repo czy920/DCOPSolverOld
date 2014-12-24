@@ -10,6 +10,8 @@ import com.cqu.util.StatisticUtil;
 
 public class DFSTree implements TreeGenerator{
 	
+	public final static String[] heuristics=new String[]{"random", "max_degree", "min_degree"};
+	
 	private Map<Integer, int[]> neighbourNodes;//无向图（邻接表存储）
 	
 	private Map<Integer, List<Integer>> childrenNodes;//生成树子节点

@@ -9,7 +9,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.cqu.cyclequeue.AgentManagerCycle;
 import com.cqu.cyclequeue.MessageMailerCycle;
-import com.cqu.main.DOTrenderer;
 import com.cqu.main.Debugger;
 import com.cqu.parser.Problem;
 import com.cqu.parser.ProblemParser;
