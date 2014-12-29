@@ -16,6 +16,7 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
     protected AtomicBoolean cycleEnd;
     protected AtomicInteger cycleEndCount;
     protected AtomicInteger totalAgentCount;
+    protected AtomicInteger OperateEndCount;
     protected AtomicInteger totalAgentCountTemp;
     
     protected int cycleCount;
@@ -26,6 +27,7 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 		this.msgQueue=new LinkedList<Message>();
 		this.totalAgentCount=new AtomicInteger(totalAgentCount);
 		this.totalAgentCountTemp=new AtomicInteger(totalAgentCount);
+		this.OperateEndCount=new AtomicInteger(totalAgentCount);   //初始化是假设处理完了的
 		this.cycleBegin=new AtomicBoolean(false);
 		this.cycleEnd=new AtomicBoolean(false);
 		this.cycleEndCount=new AtomicInteger(0);
@@ -87,6 +89,17 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 				System.out.println("cycleCount: "+cycleCount);
 				cycleEnd.set(false);
 				synchronized (cycleBegin) {
+					synchronized(OperateEndCount){
+						if(OperateEndCount.intValue()<this.totalAgentCount.intValue())
+							try {
+								OperateEndCount.wait();
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+					}
+					this.OperateEndCount.set(0);
+					this.totalAgentCount.set(this.totalAgentCountTemp.get());
 					cycleBegin.set(true);//open entrance
 					cycleBegin.notifyAll();
 				}

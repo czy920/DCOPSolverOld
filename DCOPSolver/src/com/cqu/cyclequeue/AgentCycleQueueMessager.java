@@ -15,6 +15,7 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
     private AtomicBoolean cycleEnd;
     private AtomicInteger cycleEndCount;
     private AtomicInteger totalAgentCount;
+    protected AtomicInteger OperateEndCount;
     private AtomicInteger totalAgentCountTemp;
 	
 	public AgentCycleQueueMessager(String threadName) {
@@ -23,13 +24,14 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 		this.msgQueue=new LinkedList<Message>();
 	}
 	
-	public void setLocks(AtomicBoolean cycleBegin, AtomicBoolean cycleEnd, AtomicInteger cycleEndCount, AtomicInteger totalAgentCount, AtomicInteger totalAgentCountTemp)
+	public void setLocks(AtomicBoolean cycleBegin, AtomicBoolean cycleEnd, AtomicInteger cycleEndCount, AtomicInteger totalAgentCount, AtomicInteger totalAgentCountTemp, AtomicInteger OperateEndCount)
 	{
 		this.cycleBegin=cycleBegin;
 		this.cycleEnd=cycleEnd;
 		this.cycleEndCount=cycleEndCount;
 		this.totalAgentCount=totalAgentCount;
 		this.totalAgentCountTemp=totalAgentCountTemp;
+		this.OperateEndCount=OperateEndCount;
 	}
 	
 	/**
@@ -106,7 +108,7 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 							Thread.currentThread().interrupt();
 						}
 					}
-					if(cycleEndCount.get()>=this.totalAgentCount.get())
+					else if(cycleEndCount.get()>=this.totalAgentCount.get())
 					{
 						lastAgent=true;
 						cycleEndCount.set(0);
@@ -118,8 +120,30 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 					}
 				}
 
+				if(lastAgent==false){
+					if(isRunning==false){
+						
+					}else{
+						synchronized(OperateEndCount){
+							this.OperateEndCount.incrementAndGet();
+							if(OperateEndCount.intValue()==this.totalAgentCount.intValue()){
+								OperateEndCount.notifyAll();
+							}
+						}
+					}
+				}
 				if(lastAgent==true)
 				{
+					if(isRunning==false){
+						
+					}else{
+						synchronized(OperateEndCount){
+							this.OperateEndCount.incrementAndGet();
+							if(OperateEndCount.intValue()==this.totalAgentCount.intValue()){
+								OperateEndCount.notifyAll();
+							}
+						}
+					}
 					synchronized (cycleEnd) {
 						if(cycleEnd.get()==false)
 						{
@@ -131,10 +155,12 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 			}
 		}
 		
-		synchronized (cycleEndCount) {
+		synchronized(OperateEndCount){
 			this.totalAgentCountTemp.decrementAndGet();
-			this.totalAgentCount.set(this.totalAgentCountTemp.get());
-			cycleEndCount.notifyAll();
+			this.OperateEndCount.incrementAndGet();
+			if(OperateEndCount.intValue()==this.totalAgentCount.intValue()){
+				OperateEndCount.notifyAll();
+			}
 		}
 		
 		runFinished();
