@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cqu.settings.SettingsPersistent;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.StatisticUtil;
 
@@ -84,6 +85,40 @@ public class DFSTree implements TreeGenerator{
 			return neighbours[maxIndex];
 		}
 	}
+	
+	private Integer getMinNeighboursNodeId(Integer nodeId)
+	{
+		int[] neighbours=this.neighbourNodes.get(nodeId);
+		int[] counts=this.neighbourCounts.get(nodeId);
+		for(int i=0;i<counts.length;i++)
+		{
+			if(this.nodeIterated.get(neighbours[i])==true)
+			{
+				counts[i]=-1;
+			}
+		}
+		int minIndex=StatisticUtil.min(counts);
+		if(counts[minIndex]==-1)
+		{
+			return -1;
+		}else
+		{
+			return neighbours[minIndex];
+		}
+	}
+	
+	private Integer getRandomNodeId(Integer nodeId)
+	{
+		int[] neighbours=this.neighbourNodes.get(nodeId);
+		for(int i=0;i<neighbours.length;i++)
+		{
+			if(this.nodeIterated.get(neighbours[i])==false)
+			{
+				return neighbours[i];
+			}
+		}
+		return -1;
+	}
 
 	@Override
 	public void generate() {
@@ -100,7 +135,17 @@ public class DFSTree implements TreeGenerator{
 		int totalCount=neighbourNodes.size();
 		while(iteratedCount<totalCount)
 		{
-			Integer nextNodeId=this.getMaxNeighboursNodeId(curNodeId);
+			Integer nextNodeId=-1;
+			if(SettingsPersistent.settings.getDfsHeuristics().equals("random"))
+			{
+				nextNodeId=this.getRandomNodeId(curNodeId);
+			}else if(SettingsPersistent.settings.getDfsHeuristics().equals("max_degree"))
+			{
+				nextNodeId=this.getMaxNeighboursNodeId(curNodeId);
+			}else if(SettingsPersistent.settings.getDfsHeuristics().equals("min_degree"))
+			{
+				nextNodeId=this.getMinNeighboursNodeId(curNodeId);
+			}
 			if(nextNodeId==-1)
 			{
 				curLevel--;
