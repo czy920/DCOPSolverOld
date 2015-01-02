@@ -186,6 +186,9 @@ public class DFSTree implements TreeGenerator{
 				if(this.childrenNodes.get(curNodeId).size()==1){
 					curNodeId=this.childrenNodes.get(curNodeId).iterator().next();
 				}
+				if(this.childrenNodes.get(curNodeId).size()==0){
+					break;
+				}
 			}
 		}
 		return pseduHeight;

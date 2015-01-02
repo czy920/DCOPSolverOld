@@ -110,6 +110,9 @@ public class DFSgeneration implements TreeGenerator{
 				if(dfsview.childrenNodes.get(curNodeId).size()==1){
 					curNodeId=dfsview.childrenNodes.get(curNodeId).iterator().next();
 				}
+				if(dfsview.childrenNodes.get(curNodeId).size()==0){
+					break;
+				}
 			}
 		}
 		return dfsview.pseduHeight;
