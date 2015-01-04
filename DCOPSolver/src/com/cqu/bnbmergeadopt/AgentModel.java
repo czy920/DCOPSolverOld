@@ -58,7 +58,7 @@ public class AgentModel extends AgentCycle {
 		
 		//this.boundary=Settings.settings.getBNBmergeADOPTboundArg();	//初始为2 
 		this.scaleArg=Settings.settings.getBNBmergeADOPTboundArg();
-		this.boundary= pseudoHeight+(long)Math.ceil((treeDepth-pseudoHeight)*this.scaleArg);
+		this.boundary= pseudoHeight+(long)Math.floor((treeDepth-pseudoHeight)*this.scaleArg);
 
 		if (this.level < this.boundary) { 
 			method = new BnBMethod(this);
@@ -773,6 +773,8 @@ public class AgentModel extends AgentCycle {
 				return;
 			}
 			int diff = agent.TH - computeTH(agent.valueIndex);
+			if(agent.Readytermintate&&agent.level==agent.boundary)
+				diff=agent.TH_B-computeTH(agent.valueIndex);
 			int diffOriginalValue = diff;
 			int childId = 0;
 			if (diff > 0) {
