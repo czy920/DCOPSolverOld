@@ -23,6 +23,7 @@ import com.cqu.core.Result;
 import com.cqu.core.ResultAdopt;
 import com.cqu.core.ResultDPOP;
 import com.cqu.core.Solver;
+import com.cqu.heuristics.DFSHeuristicsManager;
 import com.cqu.problemgenerator.DialogMeetingScheduling;
 import com.cqu.settings.DialogSetSettings;
 import com.cqu.settings.Settings;
@@ -57,6 +58,8 @@ public class SolverWindow {
 	
 	private JTextField tfProblemPath;
 	private JComboBox<String> combAlgorithmType;
+	private JComboBox<String> combHeristicType;
+	private JComboBox<String> combHeristicNextType;
 	private JSpinner spinnerRepeatTimes;
 	private JLabel labelRunProgress;
 	private JLabel labelFlagRunning;
@@ -325,7 +328,8 @@ public class SolverWindow {
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		panel_1.setBounds(10, 202, 459, 156);
+		//panel_1.setBounds(10, 202, 459, 200);
+		panel_1.setBounds(10, 202, 459,156);
 		frmDcopsolver.getContentPane().add(panel_1);
 		panel_1.setLayout(null);
 		
@@ -371,6 +375,8 @@ public class SolverWindow {
 		cbTreeFrame.setBounds(241, 76, 210, 23);
 		panel_1.add(cbTreeFrame);
 		
+		
+		
 		JLabel lblNewLabel = new JLabel("MBDPOP维度限制：");
 		lblNewLabel.setBounds(10, 116, 141, 15);
 		panel_1.add(lblNewLabel);
@@ -387,6 +393,34 @@ public class SolverWindow {
 		spinnerADOPT_K = new JSpinner();
 		spinnerADOPT_K.setBounds(381, 113, 70, 22);
 		panel_1.add(spinnerADOPT_K);
+	/*	
+		//选择根结点
+		JLabel RootLabel = new JLabel("根结点选择：");
+		RootLabel.setBounds(10, 145, 141, 15);
+		panel_1.add(RootLabel);
+		combHeristicType = new JComboBox<String>();
+		combHeristicType.setBounds(10, 165, 165, 25);
+		panel_1.add(combHeristicType);
+		
+		String[] HeuristicTypes=DFSHeuristicsManager.HEURISTICS_TYPES;
+		for(int i=0;i<HeuristicTypes.length;i++)
+		{
+			combHeristicType.addItem(HeuristicTypes[i]);
+		}
+		
+		//选择下一个结点
+		JLabel NextLabel = new JLabel("Next结点选择：");
+		NextLabel.setBounds(240, 145, 141, 15);
+		panel_1.add(NextLabel);
+		combHeristicNextType = new JComboBox<String>();
+		combHeristicNextType.setBounds(240, 165, 165, 25);
+		panel_1.add(combHeristicNextType);
+		
+		String[] HeuristicNextTypes=DFSHeuristicsManager.HEURISTICS_TYPES;
+		for(int i=0;i<HeuristicNextTypes.length;i++)
+		{
+			combHeristicNextType.addItem(HeuristicNextTypes[i]);
+		}*/
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 393, 459, 169);
@@ -433,7 +467,7 @@ public class SolverWindow {
 		}else if(isBatchOld==false)
 		{
 			defaultDir=defaultDir.substring(0, defaultDir.lastIndexOf('\\'));
-		  //defaultDir=defaultDir.substring(0, defaultDir.lastIndexOf('/'));
+			//defaultDir=defaultDir.substring(0, defaultDir.lastIndexOf('/'));
 		}
 		
 		File f=DialogUtil.dialogOpenFile(new String[]{".xml"}, "Select A Problem", defaultDir);
@@ -453,6 +487,10 @@ public class SolverWindow {
 		
 		componentStatus.put("tfProblemPath", tfProblemPath.isEnabled());
 		componentStatus.put("combAlgorithmType", combAlgorithmType.isEnabled());
+		
+		//componentStatus.put("combHeristicType", combHeristicType.isEnabled());
+		//componentStatus.put("combHeristicNextType", combHeristicNextType.isEnabled());
+		
 		componentStatus.put("spinnerRepeatTimes", spinnerRepeatTimes.isEnabled());
 		componentStatus.put("labelRunProgress", labelRunProgress.isEnabled());
 		componentStatus.put("btnOpen", btnOpen.isEnabled());
@@ -493,6 +531,10 @@ public class SolverWindow {
 	{
 		tfProblemPath.setEnabled(enable);
 		combAlgorithmType.setEnabled(enable);
+		
+		//combHeristicType.setEnabled(enable);
+		//combHeristicNextType.setEnabled(enable);
+		
 		spinnerRepeatTimes.setEnabled(enable);
 		btnOpen.setEnabled(enable);
 		if(isBatch()==true)
@@ -509,6 +551,10 @@ public class SolverWindow {
 	{
 		tfProblemPath.setEnabled(componentStatus.get("tfProblemPath"));
 		combAlgorithmType.setEnabled(componentStatus.get("combAlgorithmType"));
+		
+		//combHeristicType.setEnabled(componentStatus.get("combHeristicType"));
+		//combHeristicNextType.setEnabled(componentStatus.get("combHeristicNextType"));
+		
 		spinnerRepeatTimes.setEnabled(componentStatus.get("spinnerRepeatTimes"));
 		labelRunProgress.setEnabled(componentStatus.get("labelRunProgress"));
 		labelFlagRunning.setVisible(false);
@@ -616,6 +662,8 @@ public class SolverWindow {
 		}
 		if(this.isBatch()==false)
 		{
+			//solver.solve(problemPath, (String) combAlgorithmType.getSelectedItem(), 
+			//		cbTreeFrame.isSelected(), cbDebug.isSelected(), el, (String) combHeristicType.getSelectedItem(), (String) combHeristicNextType.getSelectedItem());
 			solver.solve(problemPath, (String) combAlgorithmType.getSelectedItem(), 
 					cbTreeFrame.isSelected(), cbDebug.isSelected(), el);
 		}else
