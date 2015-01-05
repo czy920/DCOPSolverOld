@@ -234,7 +234,11 @@ public class ParserGeneral extends ContentParser{
 			problem.costs.put(elementList.get(i).getAttributeValue(NAME), cost);
 			//从小到大排序，这个需要根据问题是要求得最小值还是最大值
 			//Arrays.sort(cost);
-			problem.relationCost.put(elementList.get(i).getAttributeValue(NAME), cost[0]);
+			int min=cost[0];
+			for(int j=1;j<cost.length;j++){
+				if(min>cost[j])min=cost[j];
+			}
+			problem.relationCost.put(elementList.get(i).getAttributeValue(NAME), min);
 		}
 		return true;
 	}
