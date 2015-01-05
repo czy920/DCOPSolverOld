@@ -433,6 +433,7 @@ public class SolverWindow {
 		}else if(isBatchOld==false)
 		{
 			defaultDir=defaultDir.substring(0, defaultDir.lastIndexOf('\\'));
+		  //defaultDir=defaultDir.substring(0, defaultDir.lastIndexOf('/'));
 		}
 		
 		File f=DialogUtil.dialogOpenFile(new String[]{".xml"}, "Select A Problem", defaultDir);

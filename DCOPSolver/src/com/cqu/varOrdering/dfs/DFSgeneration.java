@@ -11,7 +11,7 @@ import com.cqu.heuristics.ScoringHeuristic;
 import com.cqu.util.CollectionUtil;
 
 public class DFSgeneration implements TreeGenerator{
-	private DFSview dfsview ;
+	private static DFSview dfsview ;
 	
 	/** The heuristic used to choose the root */
 	private static ScoringHeuristic<Short> rootElectionHeuristic;
@@ -227,14 +227,14 @@ public class DFSgeneration implements TreeGenerator{
 	}
 
 	/** @return a DOT-formated representation of the dfs */
-	public String dfsToString() {
-		return dfsToString(this.dfsview);
+	public static String dfsToString() {
+		return dfsToString(DFSgeneration.dfsview);
 	}
 	/** Prints the input dfs in DOT format
 	 * @param dfs for each variable, a map associating a list of neighbors to each type of relationship
 	 * @return a String representation of the DFS in DOT format
 	 */
-	public String dfsToString(DFSview dfsview) {
+	public static String dfsToString(DFSview dfsview) {
 		StringBuilder out = new StringBuilder ("digraph {\n\tnode [shape = \"circle\"];\n\n");
 		//获取每个变量结点
 		for(Map.Entry<Integer, int[]> entry : dfsview.neighbourNodes.entrySet())

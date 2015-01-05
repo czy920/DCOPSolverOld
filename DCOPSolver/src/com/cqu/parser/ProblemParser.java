@@ -13,6 +13,7 @@ import com.cqu.bfsdpop.CrossEdgeAllocator;
 import com.cqu.core.BFSTree;
 import com.cqu.core.TreeGenerator;
 import com.cqu.heuristics.MostConnectedHeuristic;
+import com.cqu.heuristics.MostConstributionHeuristics;
 import com.cqu.main.DOTrenderer;
 import com.cqu.util.XmlUtil;
 import com.cqu.varOrdering.dfs.DFSgeneration;
@@ -78,8 +79,8 @@ public class ProblemParser {
 		if(parser!=null)
 		{
 			parser.parseContent(problem);
-			this.generateCommunicationStructure(problem);
 			this.generateAgentProperty(problem);
+			this.generateCommunicationStructure(problem);
 			return problem;
 		}else
 		{
@@ -118,8 +119,8 @@ public class ProblemParser {
 		{
 			treeGenerator=new BFSTree(problem.neighbourAgents);
 		}
-		DFSgeneration.setRootHeuristics(new MostConnectedHeuristic(problem));
-		DFSgeneration.setNextNodeHeuristics(new MostConnectedHeuristic(problem));
+		DFSgeneration.setRootHeuristics(new MostConstributionHeuristics(problem));
+		DFSgeneration.setNextNodeHeuristics(new MostConstributionHeuristics(problem));
 		treeGenerator.generate();
 		
 		problem.agentLevels=treeGenerator.getNodeLevels();

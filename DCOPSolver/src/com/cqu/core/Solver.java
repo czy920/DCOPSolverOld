@@ -9,11 +9,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.cqu.cyclequeue.AgentManagerCycle;
 import com.cqu.cyclequeue.MessageMailerCycle;
+import com.cqu.main.DOTrenderer;
 import com.cqu.main.Debugger;
 import com.cqu.parser.Problem;
 import com.cqu.parser.ProblemParser;
 import com.cqu.settings.Settings;
 import com.cqu.util.FileUtil;
+import com.cqu.varOrdering.dfs.DFSgeneration;
 import com.cqu.visualtree.GraphFrame;
 import com.cqu.visualtree.TreeFrame;
 
@@ -53,9 +55,9 @@ public class Solver {
 		//display DFS tree，back edges not included
 		if(showTreeFrame==true)
 		{
-			TreeFrame treeFrame=new TreeFrame(DFSTree.toTreeString(problem.agentNames, problem.parentAgents, problem.childAgents));
-			treeFrame.showTreeFrame();
-			//new DOTrenderer ("DFS tree", this.dfsToString());
+			//TreeFrame treeFrame=new TreeFrame(DFSTree.toTreeString(problem.agentNames, problem.parentAgents, problem.childAgents));
+			//treeFrame.showTreeFrame();
+			new DOTrenderer ("DFS tree", DFSgeneration.dfsToString());
 		}
 		
 		//set whether to print running data records
