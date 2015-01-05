@@ -101,10 +101,10 @@ public class ProblemParser {
 		/*
 		 * 需要对其进行排序
 		 */
-		for (Map.Entry<Integer, Integer> entry : problem.agentProperty.entrySet())
+		/*for (Map.Entry<Integer, Integer> entry : problem.agentProperty.entrySet())
 		{
 			System.out.println("key: " + entry.getKey() + ", value: " + entry.getValue());
-		}
+		}*/
 	}
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void generateCommunicationStructure(Problem problem)
