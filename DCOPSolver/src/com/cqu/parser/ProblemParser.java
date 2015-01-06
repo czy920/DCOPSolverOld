@@ -119,8 +119,10 @@ public class ProblemParser {
 		{
 			treeGenerator=new BFSTree(problem.neighbourAgents);
 		}
-		DFSgeneration.setRootHeuristics(new MostConstributionHeuristic(problem));
-		DFSgeneration.setNextNodeHeuristics(new MostConstributionHeuristic(problem));
+//		DFSgeneration.setRootHeuristics(new MostConstributionHeuristic(problem));
+//		DFSgeneration.setNextNodeHeuristics(new MostConstributionHeuristic(problem));
+		DFSgeneration.setRootHeuristics(new MostConnectedHeuristic(problem));
+		DFSgeneration.setNextNodeHeuristics(new MostConnectedHeuristic(problem));
 		treeGenerator.generate();
 		
 		problem.agentLevels=treeGenerator.getNodeLevels();

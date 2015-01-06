@@ -117,6 +117,10 @@ public class DOTrenderer extends JFrame implements ActionListener {
 		// Display each new window at a slightly different position on the screen so that the newest one cannot hide the previous ones
 		synchronized (posLock) {
 			this.setLocation(xPos, yPos);
+			if(yPos>500){
+				xPos=30;
+				yPos=30;
+			}
 			xPos += 30;
 			yPos += 30;
 		}
