@@ -65,6 +65,13 @@ public class ParserMeetingScheduling extends ContentParser{
 				{
 					String name="R"+constraintCount;
 					int[] costs=calConstraints(sameAttendeeCount, domainSize);
+					
+					int min=costs[0];
+					for(int k=1;k<costs.length;k++){
+						if(min>costs[k])min=costs[k];
+					}
+					problem.relationCost.put(name, min);
+					
 					problem.costs.put(name, costs);
 					if(agentConstraints.containsKey(agentIds[i])==false)
 					{
