@@ -39,8 +39,8 @@ public class AgentManager {
 			}else if(agentType.equals("HybridMBDPOP"))
 			{
 				agent=new HybridMBDPOP(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)), 
-						labelPhase.getIsSearchingPolicyAgents().get(agentId), labelPhase.getIsNeighborSearchingPolicyAgents().get(agentId));
+						problem.domains.get(problem.agentDomains.get(agentId)), labelPhase.getIsSearchingPolicyAgents().get(agentId), 
+						labelPhase.getIsNeighborSearchingPolicyAgents().get(agentId), labelPhase.getContext());
 			}else if(agentType.equals("AgileDPOP"))
 			{
 				agent=new AgileDPOPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 

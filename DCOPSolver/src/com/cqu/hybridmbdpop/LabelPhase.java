@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cqu.core.Context;
+import com.cqu.dpop.Dimension;
 import com.cqu.parser.Problem;
 import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
@@ -29,6 +31,23 @@ public class LabelPhase {
 
 	public Map<Integer, boolean[]> getIsNeighborSearchingPolicyAgents() {
 		return isNeighborSearchingPolicyAgents;
+	}
+	
+	public ContextWrapped getContext()
+	{
+		Context context=new Context();
+		List<Dimension> dimensions=new ArrayList<Dimension>();
+		int domainSize=problem.domains.values().iterator().next().length;
+		for(Integer key : isSearchingPolicyAgents.keySet())
+		{
+			if(isSearchingPolicyAgents.get(key)==true)
+			{
+				context.addOrUpdate(key, 0);
+				dimensions.add(new Dimension(key+"", domainSize, problem.agentLevels.get(key)));
+			}
+		}
+		
+		return new ContextWrapped(context, dimensions);
 	}
 
 	public void label()

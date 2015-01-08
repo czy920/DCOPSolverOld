@@ -6,13 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.core.Agent;
-import com.cqu.core.Context;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.ResultDPOP;
 import com.cqu.dpop.Dimension;
 import com.cqu.dpop.MultiDimensionData;
-import com.cqu.dpop.ReductDimensionResult;
 import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FormatUtil;
@@ -33,25 +31,33 @@ public class HybridMBDPOP extends Agent{
 	private int totalCost;
 	
 	private boolean isSearchingPolicy;
-	private boolean[] isNeighborSearchingPolicy;
+	private Map<Integer, Boolean> isNeighborSearchingPolicy;
 	
-	private List<MultiDimensionData> localMDDatas;
+	private Map<Integer, MultiDimensionData> localMDDatas;
 	private List<MultiDimensionData> receivedMDDatas;
+	
+	private ContextWrapped contextWrapped;
 	
 	{
 		//表示消息不丢失
 		QUEUE_CAPACITY=-1;
 	}
 	
-	public HybridMBDPOP(int id, String name, int level, int[] domain, boolean isSearchingPolicy, boolean[] isNeighborSearchingPolicy) {
+	public HybridMBDPOP(int id, String name, int level, int[] domain, boolean isSearchingPolicy, boolean[] neighbourPolicy, ContextWrapped contextWrapped) {
 		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
 		totalCost=0;
 		this.isSearchingPolicy=isSearchingPolicy;
-		this.isNeighborSearchingPolicy=isNeighborSearchingPolicy;
+		this.isNeighborSearchingPolicy=new HashMap<Integer, Boolean>();
+		for(int i=0;i<this.neighbours.length;i++)
+		{
+			this.isNeighborSearchingPolicy.put(this.neighbours[i], neighbourPolicy[i]);
+		}
+		
+		this.contextWrapped=contextWrapped;
 		
 		utilMsgSizes=new ArrayList<Integer>();
-		localMDDatas=new ArrayList<MultiDimensionData>();
+		localMDDatas=new HashMap<Integer, MultiDimensionData>();
 		receivedMDDatas=new ArrayList<MultiDimensionData>();
 	}
 	
@@ -79,29 +85,31 @@ public class HybridMBDPOP extends Agent{
 	{
 		if(this.isSearchingPolicy==true)
 		{
-			for(int i=0;i<this.domain.length;i++)
-			{
-				for(MultiDimensionData mdData : localMDDatas)
-				{
-					Context c=new Context();
-					c.addOrUpdate(this.id, i);
-					sendUtilMessage(mdData.shrinkDimension(mdData.getDimensions().get(1).getName(), i), c);
-				}
-			}
+			sendUtilMessage(localMDDatas.get(parent).shrinkDimension(this.id+"", this.contextWrapped.getValueIndex(this.id)));
 		}else
 		{
-			MultiDimensionData tempMDData=localMDDatas.get(0);
-			for(int i=1;i<localMDDatas.size();i++)
+			MultiDimensionData tempMDData=null;
+			for(Integer key : localMDDatas.keySet())
 			{
-				tempMDData=tempMDData.mergeDimension(localMDDatas.get(i));
+				MultiDimensionData mdData=localMDDatas.get(key);
+				if(isNeighborSearchingPolicy.get(key)==true)
+				{
+					mdData=mdData.shrinkDimension(key+"", this.contextWrapped.getValueIndex(key));
+				}
+				if(tempMDData==null)
+				{
+					tempMDData=mdData;
+				}else
+				{
+					tempMDData=tempMDData.mergeDimension(mdData);
+				}
 			}
-			sendUtilMessage(tempMDData, new Context());
+			sendUtilMessage(tempMDData);
 		}
 	}
 	
-	private List<MultiDimensionData> computeLocalUtils()
+	private void computeLocalUtils()
 	{
-		List<MultiDimensionData> ret=new ArrayList<MultiDimensionData>();
 		for(int i=0;i<allParents.length;i++)
 		{
 			List<Dimension> dimensions=new ArrayList<Dimension>();
@@ -134,9 +142,9 @@ public class HybridMBDPOP extends Agent{
 					}
 				}
 			}
-			ret.add(new MultiDimensionData(dimensions, data));
+			
+			localMDDatas.put(allParents[i], new MultiDimensionData(dimensions, data));
 		}
-		return ret;
 	}
 	
 	@Override
@@ -237,6 +245,9 @@ public class HybridMBDPOP extends Agent{
 			utilMsgSizes.add(((UtilMessage) msg).getMdData().size());
 			
 			disposeUtilMessage(msg);
+		}else if(type==TYPE_NEXTITERATION_MESSAGE)
+		{
+			disposeNextIterationMessage(msg);
 		}
 	}
 
@@ -246,14 +257,19 @@ public class HybridMBDPOP extends Agent{
 		System.out.println("Error occurs because no message can be lost!");
 	}
 	
-	private void sendUtilMessage(MultiDimensionData multiDimentionalData, Context context)
+	private void sendUtilMessage(MultiDimensionData multiDimentionalData)
 	{
 		if(this.isRootAgent()==true)
 		{
 			return;
 		}
-		Message utilMsg=new UtilMessage(this.id, this.parent, TYPE_UTIL_MESSAGE, multiDimentionalData, context);
+		Message utilMsg=new UtilMessage(this.id, this.parent, TYPE_UTIL_MESSAGE, multiDimentionalData, this.contextWrapped);
 		this.sendMessage(utilMsg);
+	}
+	
+	private void disposeNextIterationMessage(Message msg)
+	{
+		
 	}
 	
 	private void disposeUtilMessage(Message msg)
