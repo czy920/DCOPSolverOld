@@ -2,6 +2,7 @@ package com.cqu.core;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Context{
 	
@@ -82,6 +83,11 @@ public class Context{
 	public int size()
 	{
 		return this.context.size();
+	}
+	
+	public Set<Integer> keySet()
+	{
+		return this.context.keySet();
 	}
 	
 	@Override

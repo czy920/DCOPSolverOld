@@ -1,7 +1,9 @@
 package com.cqu.hybridmbdpop;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import com.cqu.core.Context;
 import com.cqu.dpop.Dimension;
@@ -21,6 +23,21 @@ public class ContextWrapped {
 
 		valueIndexes=new int[dimensions.size()];
 		this.currentDimension=valueIndexes.length-1;
+	}
+	
+	public void refresh(ContextWrapped cw)
+	{
+		this.currentDimension=cw.currentDimension;
+		for(int i=0;i<valueIndexes.length;i++)
+		{
+			this.valueIndexes[i]=cw.valueIndexes[i];
+		}
+		this.context=new Context(cw.context);
+		this.dimensions=new ArrayList<Dimension>();
+		for(int i=0;i<cw.dimensions.size();i++)
+		{
+			this.dimensions.add(new Dimension(cw.dimensions.get(i)));
+		}
 	}
 	
 	/**
@@ -46,8 +63,25 @@ public class ContextWrapped {
 		return true;
 	}
 	
+	public boolean iterationOver()
+	{
+		for(int i=0;i<this.valueIndexes.length;i++)
+		{
+			if(this.valueIndexes[i]<(this.dimensions.get(i).getSize()-1))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public int getValueIndex(Integer id)
 	{
 		return this.context.get(id);
+	}
+	
+	public Set<Integer> keySet()
+	{
+		return this.context.keySet();
 	}
 }

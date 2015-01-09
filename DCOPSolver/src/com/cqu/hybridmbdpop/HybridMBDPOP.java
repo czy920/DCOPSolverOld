@@ -11,6 +11,7 @@ import com.cqu.core.Message;
 import com.cqu.core.ResultDPOP;
 import com.cqu.dpop.Dimension;
 import com.cqu.dpop.MultiDimensionData;
+import com.cqu.dpop.ReductDimensionResult;
 import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FormatUtil;
@@ -21,11 +22,10 @@ public class HybridMBDPOP extends Agent{
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_UTIL_MESSAGE=1;
 	public final static int TYPE_NEXTITERATION_MESSAGE=2;
+	public final static int TYPE_ITERATIONOVER_MESSAGE=3;
 	
 	public final static String KEY_TOTAL_COST="KEY_TOTAL_COST";
 	public final static String KEY_UTIL_MESSAGE_SIZES="KEY_UTIL_MESSAGE_SIZES";
-	
-	private Integer[] parentLevels;
 	
 	private List<Integer> utilMsgSizes;
 	private int totalCost;
@@ -34,10 +34,17 @@ public class HybridMBDPOP extends Agent{
 	private Map<Integer, Boolean> isNeighborSearchingPolicy;
 	
 	private Map<Integer, MultiDimensionData> localMDDatas;
-	private List<MultiDimensionData> receivedMDDatas;
+	private Map<Integer, MultiDimensionData> pseudoChildrenMDDatas;
 	
 	private ContextWrapped contextWrapped;
+	private int bestCost;
+	private ContextWrapped bestContext;
+	private boolean nextIteration;
+	private MultiDimensionData mdDataToSend;
+	private boolean iterationOver;
 	
+	private int[] reductDimensionResultIndexes;
+	private List<Dimension> dimensions;
 	{
 		//表示消息不丢失
 		QUEUE_CAPACITY=-1;
@@ -55,22 +62,21 @@ public class HybridMBDPOP extends Agent{
 		}
 		
 		this.contextWrapped=contextWrapped;
+		this.bestCost=Integer.MAX_VALUE;
+		this.bestContext=contextWrapped;
+		this.nextIteration=true;
+		this.mdDataToSend=null;
+		this.iterationOver=false;
 		
 		utilMsgSizes=new ArrayList<Integer>();
 		localMDDatas=new HashMap<Integer, MultiDimensionData>();
-		receivedMDDatas=new ArrayList<MultiDimensionData>();
+		pseudoChildrenMDDatas=new HashMap<Integer, MultiDimensionData>();
 	}
 	
 	@Override
 	protected void initRun() {
 		// TODO Auto-generated method stub
 		super.initRun();
-		
-		parentLevels=new Integer[allParents.length];
-		for(int i=0;i<allParents.length;i++)
-		{
-			parentLevels[i]=neighbourLevels.get(allParents[i]);
-		}
 		if(this.isRootAgent()==false)
 		{
 			computeLocalUtils();
@@ -88,24 +94,26 @@ public class HybridMBDPOP extends Agent{
 			sendUtilMessage(localMDDatas.get(parent).shrinkDimension(this.id+"", this.contextWrapped.getValueIndex(this.id)));
 		}else
 		{
-			MultiDimensionData tempMDData=null;
+			MultiDimensionData mdData=localMDDatas.remove(this.id);
 			for(Integer key : localMDDatas.keySet())
 			{
-				MultiDimensionData mdData=localMDDatas.get(key);
+				MultiDimensionData mdDataTemp=localMDDatas.get(key);
 				if(isNeighborSearchingPolicy.get(key)==true)
 				{
-					mdData=mdData.shrinkDimension(key+"", this.contextWrapped.getValueIndex(key));
-				}
-				if(tempMDData==null)
-				{
-					tempMDData=mdData;
-				}else
-				{
-					tempMDData=tempMDData.mergeDimension(mdData);
+					mdData=mdData.mergeDimension(mdDataTemp.shrinkDimension(key+"", this.contextWrapped.getValueIndex(key)));
 				}
 			}
-			sendUtilMessage(tempMDData);
+			ReductDimensionResult result=mdData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
+			if(iterationOver==true)
+			{
+				this.dimensions=result.getMdData().getDimensions();
+				this.reductDimensionResultIndexes=result.getResultIndex();
+			}
+			mdData=result.getMdData();
+			sendUtilMessage(mdData);
 		}
+		this.nextIteration=false;
+		this.mdDataToSend=null;
 	}
 	
 	private void computeLocalUtils()
@@ -117,11 +125,11 @@ public class HybridMBDPOP extends Agent{
 			int parentId=allParents[i];
 			int row=neighbourDomains.get(parentId).length;
 			int col=this.domain.length;
-			dimensions.add(new Dimension(parentId+"", row, parentLevels[i]));
+			dimensions.add(new Dimension(parentId+"", row, this.neighbourLevels.get(parentId)));
 			dimensions.add(new Dimension(this.id+"", this.domain.length, this.level));
 			
 			int[] data=new int[row*col];
-			int[][] costs=this.constraintCosts.get(allParents[i]);
+			int[][] costs=this.constraintCosts.get(parentId);
 			//原始数据中id小的为行，id大的为列
 			if(this.id<parentId)
 			{
@@ -143,7 +151,43 @@ public class HybridMBDPOP extends Agent{
 				}
 			}
 			
-			localMDDatas.put(allParents[i], new MultiDimensionData(dimensions, data));
+			localMDDatas.put(parentId, new MultiDimensionData(dimensions, data));
+		}
+		
+		for(int i=0;i<pseudoChildren.length;i++)
+		{
+			List<Dimension> dimensions=new ArrayList<Dimension>();
+			
+			int pseudoChildId=pseudoChildren[i];
+			int row=this.domain.length;
+			int col=neighbourDomains.get(pseudoChildId).length;
+			dimensions.add(new Dimension(this.id+"", this.domain.length, this.level));
+			dimensions.add(new Dimension(pseudoChildId+"", row, this.neighbourLevels.get(pseudoChildId)));
+			
+			int[] data=new int[row*col];
+			int[][] costs=this.constraintCosts.get(pseudoChildId);
+			//原始数据中id小的为行，id大的为列
+			if(this.id<pseudoChildId)
+			{
+				for(int j=0;j<row;j++)
+				{
+					for(int k=0;k<col;k++)
+					{
+						data[j*col+k]=costs[j][k];
+					}
+				}
+			}else
+			{
+				for(int j=0;j<row;j++)
+				{
+					for(int k=0;k<col;k++)
+					{
+						data[j*col+k]=costs[k][j];
+					}
+				}
+			}
+			
+			pseudoChildrenMDDatas.put(pseudoChildId, new MultiDimensionData(dimensions, data));
 		}
 	}
 	
@@ -248,6 +292,9 @@ public class HybridMBDPOP extends Agent{
 		}else if(type==TYPE_NEXTITERATION_MESSAGE)
 		{
 			disposeNextIterationMessage(msg);
+		}else if(type==TYPE_ITERATIONOVER_MESSAGE)
+		{
+			disposeIterationOverMessage(msg);
 		}
 	}
 
@@ -269,58 +316,116 @@ public class HybridMBDPOP extends Agent{
 	
 	private void disposeNextIterationMessage(Message msg)
 	{
-		
+		if(this.nextIteration==true)
+		{
+			if(this.mdDataToSend!=null)
+			{
+				sendUtilMessage(mdDataToSend);
+				this.nextIteration=false;
+				this.mdDataToSend=null;
+			}
+		}
+	}
+	
+	private void disposeIterationOverMessage(Message msg)
+	{
+		this.contextWrapped.refresh((ContextWrapped) msg.getValue());
+		this.iterationOver=true;
+		if(this.isLeafAgent()==true)
+		{
+			startFromLeaf();
+		}else
+		{
+			sendIterationOverMessage();
+		}
 	}
 	
 	private void disposeUtilMessage(Message msg)
 	{
-		/*UtilMessage utilMsg=(UtilMessage) msg;
+		UtilMessage utilMsg=(UtilMessage) msg;
+		this.contextWrapped.refresh(utilMsg.getContext());
 		
-		if(CollectionUtil.indexOf(this.pseudoChildren, msg.getIdSender())!=-1)
+		//pseudoChildren
+		MultiDimensionData mdData=utilMsg.getMdData();
+		for(int i=0;i<this.pseudoChildren.length;i++)
 		{
-			
-			return;
+			if(this.isNeighborSearchingPolicy.get(this.pseudoChildren[i])==true)
+			{
+				mdData=mdData.mergeDimension(this.pseudoChildrenMDDatas.get(this.pseudoChildren[i]).shrinkDimension(this.id+"", this.contextWrapped.getValueIndex(this.id)));
+			}
 		}
+		
+		//allParents
 		if(this.isSearchingPolicy==true)
 		{
-			
+			mdData=mdData.mergeDimension(localMDDatas.get(parent));
+			mdData=mdData.shrinkDimension(this.id+"", this.contextWrapped.getValueIndex(this.id));
 		}else
 		{
-			
-		}
-		
-		if(this.isRootAgent()==true&&rawMDData==null)
-		{
-			rawMDData=(MultiDimensionData) msg.getValue();
-		}else
-		{
-			rawMDData=rawMDData.mergeDimension((MultiDimensionData) msg.getValue());
-		}
-		
-		disposedChildrenCount++;
-		if(disposedChildrenCount>=this.children.length)
-		{
-			//所有子节点(包括伪子节点)的UtilMessage都已收集完毕，
-			//则可以进行针对本节点的降维，将最终得到的UtilMessage再往父节点发送
-			ReductDimensionResult result=rawMDData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
-			this.reductDimensionResultIndexes=result.getResultIndex();
-			dimensions=result.getMdData().getDimensions();
-			
-			if(this.isRootAgent()==true)
+			for(Integer key : localMDDatas.keySet())
+			{
+				MultiDimensionData mdDataTemp=localMDDatas.get(key);
+				if(isNeighborSearchingPolicy.get(key)==true)
+				{
+					mdDataTemp=mdDataTemp.shrinkDimension(key+"", this.contextWrapped.getValueIndex(key));
+				}
+				mdData=mdData.mergeDimension(mdDataTemp);
+			}
+			ReductDimensionResult result=mdData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
+			if(iterationOver==true)
+			{
+				this.dimensions=result.getMdData().getDimensions();
+				this.reductDimensionResultIndexes=result.getResultIndex();
+			}
+			if(this.isRootAgent()==true&&iterationOver==true)
 			{
 				this.totalCost=result.getMdData().getData()[0];
 				this.valueIndex=this.reductDimensionResultIndexes[0];
 				
 				Map<Integer, Integer> valueIndexes=new HashMap<Integer, Integer>();
+				for(Integer key : this.contextWrapped.keySet())
+				{
+					valueIndexes.put(key, this.contextWrapped.getValueIndex(key));
+				}
 				valueIndexes.put(this.id, this.valueIndex);
 				sendValueMessage(valueIndexes);
 				
 				this.stopRunning();
+				
+				return;
+			}
+			mdData=result.getMdData();
+		}
+		if(this.isRootAgent()==true)
+		{
+			if(bestCost>mdData.getData()[0])
+			{
+				bestCost=mdData.getData()[0];
+				bestContext.refresh(utilMsg.getContext());
+			}
+			if(bestContext.iterationOver()==true)
+			{
+				//iteration over
+				this.iterationOver=true;
+				sendIterationOverMessage();
+				return;
 			}else
 			{
-				this.sendUtilMessage(result.getMdData());
+				sendNextIterationMessage();
 			}
-		}*/
+		}else
+		{
+			if(this.nextIteration==true)
+			{
+				sendUtilMessage(mdData);
+				this.nextIteration=false;
+				this.mdDataToSend=null;
+				sendNextIterationMessage();
+			}else
+			{
+				this.mdDataToSend=mdData;
+			}
+		}
 	}
 	
 	private void sendValueMessage(Map<Integer, Integer> valueIndexes)
@@ -337,31 +442,61 @@ public class HybridMBDPOP extends Agent{
 		}
 	}
 	
+	private void sendNextIterationMessage()
+	{
+		if(this.isLeafAgent()==true)
+		{
+			return;
+		}
+		for(int i=0;i<this.children.length;i++)
+		{
+			Message nextIterationMsg=new Message(this.id, this.children[i], TYPE_NEXTITERATION_MESSAGE, null);
+			this.sendMessage(nextIterationMsg);
+		}
+	}
+	
+	private void sendIterationOverMessage()
+	{
+		if(this.isLeafAgent()==true)
+		{
+			return;
+		}
+		for(int i=0;i<this.children.length;i++)
+		{
+			Message nextIterationMsg=new Message(this.id, this.children[i], TYPE_ITERATIONOVER_MESSAGE, this.contextWrapped);
+			this.sendMessage(nextIterationMsg);
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	private void disposeValueMessage(Message msg)
 	{
-		/*Map<Integer, Integer> valueIndexes=(Map<Integer, Integer>) msg.getValue();
-		
-		int[] periods=new int[dimensions.size()];
-		for(int i=0;i<dimensions.size();i++)
+		Map<Integer, Integer> valueIndexes=(Map<Integer, Integer>) msg.getValue();
+		if(valueIndexes.containsKey(this.id)==false)
 		{
-			int temp=1;
-			for(int j=i+1;j<dimensions.size();j++)
+			int[] periods=new int[dimensions.size()];
+			for(int i=0;i<dimensions.size();i++)
 			{
-				temp*=dimensions.get(j).getSize();
+				int temp=1;
+				for(int j=i+1;j<dimensions.size();j++)
+				{
+					temp*=dimensions.get(j).getSize();
+				}
+				periods[i]=temp;
 			}
-			periods[i]=temp;
-		}
-		int index=0;
-		for(int i=0;i<periods.length;i++)
+			int index=0;
+			for(int i=0;i<periods.length;i++)
+			{
+				index+=valueIndexes.get(Integer.parseInt(dimensions.get(i).getName()))*periods[i];
+			}
+			this.valueIndex=this.reductDimensionResultIndexes[index];
+			
+			valueIndexes.put(this.id, this.valueIndex);
+		}else
 		{
-			index+=valueIndexes.get(Integer.parseInt(dimensions.get(i).getName()))*periods[i];
+			this.valueIndex=valueIndexes.get(this.id);
 		}
-		this.valueIndex=this.reductDimensionResultIndexes[index];
-		
-		valueIndexes.put(this.id, this.valueIndex);
 		this.sendValueMessage(valueIndexes);
-		
-		this.stopRunning();*/
+		this.stopRunning();
 	}
 }
