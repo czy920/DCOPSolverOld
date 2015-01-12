@@ -23,7 +23,7 @@ public class MostConnectedHeuristic implements ScoringHeuristic<Short>{
 		for(Integer nodeId : this.problem.neighbourAgents.keySet())
 		{
 			int temp=this.problem.neighbourAgents.get(nodeId).length;
-			if(temp > maxNeighbourCount)
+			if(temp >= maxNeighbourCount)
 			{
 				maxNeighbourCount=temp;
 				maxNeighbourCountNodeId=nodeId;

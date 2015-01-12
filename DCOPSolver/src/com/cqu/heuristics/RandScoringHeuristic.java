@@ -42,8 +42,8 @@ public class RandScoringHeuristic implements ScoringHeuristic<Short>{
 			{
 				if (!r[temp]){ //结点遍历过的
 					r[temp] = true; // 遍历过的
-				} 
-				num = num + 1;
+					num = num + 1;
+				} 			
 			}		
 			if (!r[temp]) //没有遍历过
 			{ 

@@ -22,7 +22,7 @@ public class MostConstributionHeuristic implements ScoringHeuristic<Short>{
 		for(Integer nodeId : this.problem.agentProperty.keySet())
 		{
 			int temp=this.problem.agentProperty.get(nodeId);
-			if(temp > maxConstribution)
+			if(temp >= maxConstribution)
 			{
 				maxConstribution=temp;
 				maxConstributionNodeId=nodeId;

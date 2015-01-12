@@ -22,7 +22,7 @@ public class LeastConnectedHeuristic implements ScoringHeuristic<Short>{
 		for(Integer nodeId : this.problem.neighbourAgents.keySet())
 		{
 			int temp=this.problem.neighbourAgents.get(nodeId).length;
-			if(temp < minNeighbourCount)
+			if(temp <= minNeighbourCount)
 			{
 				minNeighbourCount=temp;
 				minNeighbourCountNodeId=nodeId;
