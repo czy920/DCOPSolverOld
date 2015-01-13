@@ -222,7 +222,7 @@ public class ParserGeneral extends ContentParser{
 				cost=parseConstraintCostDisCSP(problem.domains.values().iterator().next(), elementList.get(i).getValue());
 			}else
 			{
-				cost=parseConstraintCost(elementList.get(i).getValue());
+				cost=parseConstraintCost(elementList.get(i).getValue(), problem, elementList.get(i).getAttributeValue(NAME));
 				int nbTuples=Integer.parseInt(elementList.get(i).getAttributeValue(NBTUPLES));
 				if(nbTuples!=cost.length)
 				{
@@ -230,10 +230,20 @@ public class ParserGeneral extends ContentParser{
 					return false;
 				}
 			}
-			
+			//problem.costs = key: R0, value: 17 21 30 24 36 21 29 49 19
 			problem.costs.put(elementList.get(i).getAttributeValue(NAME), cost);
+			/*for (Map.Entry<String, int[]> entry : problem.costs.entrySet())
+			{
+				System.out.print("key: " + entry.getKey() + ", value: ");
+				for (int j = 0; j < entry.getValue().length; j++)
+				{
+					System.out.print(entry.getValue()[j] + " ");
+				}
+				System.out.println();
+			}*/
 			//从小到大排序，这个需要根据问题是要求得最小值还是最大值
 			//Arrays.sort(cost);
+			//获取最小的代价值
 			int min=cost[0];
 			for(int j=1;j<cost.length;j++){
 				if(min>cost[j])min=cost[j];
@@ -243,7 +253,7 @@ public class ParserGeneral extends ContentParser{
 		return true;
 	}
 	
-	private int[] parseConstraintCost(String costStr)
+	private int[] parseConstraintCost(String costStr, Problem problem, String relation)
 	{
 		String[] items=costStr.split("\\|");
 		String[] costParts=new String[items.length];
@@ -253,16 +263,32 @@ public class ParserGeneral extends ContentParser{
 		{
 			index=items[i].indexOf(':');
 			costParts[i]=items[i].substring(0, index);
+			
+			//System.out.println("costParts[i]: " + costParts[i]);
+		//	System.out.println("items[i].substring(index+1): " + items[i].substring(index+1) + " i: " + i );
+			
 			valuePairParts.put(items[i].substring(index+1), i);
 		}
 		Object[] valuePairPartsKeyArray=valuePairParts.keySet().toArray();
+		//valuePairPartsKeyArray = 1 1 1 2 1 3 2 1 2 2 2 3 3 1 3 2 3 3 
 		Arrays.sort(valuePairPartsKeyArray);
 		
+		
 		int[] costs=new int[items.length];
+		int min = 100000 ;
+		String valuePair = "";
+		//min: 2, valuePair: 3 2
 		for(int i=0;i<items.length;i++)
 		{
 			costs[i]=Integer.parseInt(costParts[valuePairParts.get(valuePairPartsKeyArray[i])]);
+			if(min>costs[i]){
+				min=costs[i];
+			    valuePair = (String)valuePairPartsKeyArray[i] ;
+			}		
 		}
+		//System.out.println("min: " + min + ", valuePair: " + valuePair);
+		//key: R17, value:3 2
+		problem.VariableValue.put(relation, valuePair);
 		return costs;
 	}
 	
@@ -338,7 +364,12 @@ public class ParserGeneral extends ContentParser{
 			neighbourAgents.get(rightAgentId).add(leftAgentId);
 			neighbourConstraintCosts.get(leftAgentId).put(rightAgentId, elementList.get(i).getAttributeValue(REFERENCE));
 			neighbourConstraintCosts.get(rightAgentId).put(leftAgentId, elementList.get(i).getAttributeValue(REFERENCE));
+			//relationKey: R2, relationValue: 2 4
+			String variable = leftAgentId + " " + rightAgentId;
+			problem.VariableRelation.put(elementList.get(i).getAttributeValue(REFERENCE), variable);
+			
 		}
+		
 		for(Integer agentId : problem.agentNames.keySet())
 		{
 			List<Integer> temp=neighbourAgents.get(agentId);
