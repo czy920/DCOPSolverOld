@@ -23,6 +23,9 @@ import com.cqu.core.Result;
 import com.cqu.core.ResultAdopt;
 import com.cqu.core.ResultDPOP;
 import com.cqu.core.Solver;
+import com.cqu.heuristics.DFSHeuristicsManager;
+import com.cqu.problemgenerator.DialogMeetingScheduling;
+import com.cqu.settings.DialogSetSettings;
 import com.cqu.settings.Settings;
 import com.cqu.util.DateUtil;
 import com.cqu.util.DialogUtil;
@@ -31,8 +34,9 @@ import com.cqu.util.FormatUtil;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
-import java.io.PrintStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.ImageIcon;
@@ -55,7 +59,9 @@ public class LinuxWindow {
 	private JMenuBar menuBar;
 	
 	private JTextField tfProblemPath;
-	private JComboBox combAlgorithmType;
+	private JComboBox<String> combAlgorithmType;
+	private JComboBox<String> combHeristicType;
+	private JComboBox<String> combHeristicNextType;
 	private JSpinner spinnerRepeatTimes;
 	private JLabel labelRunProgress;
 	private JLabel labelFlagRunning;
@@ -72,11 +78,11 @@ public class LinuxWindow {
 	private JSpinner spinnerADOPT_K;
 	
 	private JTextArea epConsoleLines;
-	private ConsoleRedirectThread consoleRedirectThread;
+	/*private ConsoleRedirectThread consoleRedirectThread;
 	private String consoleOutput="";
 	private int consoleOutputLineCount=0;
 	private static final int MAX_CONSOLE_LINE_COUNT=100;
-	private PrintStream printStream;
+	private PrintStream printStream;*/
 	
 	private Map<String, Boolean> componentStatus;
 	
@@ -103,7 +109,7 @@ public class LinuxWindow {
 	public LinuxWindow() {
 		initialize();
 		
-		consoleRedirectThread=new ConsoleRedirectThread(new ConsoleRedirectThread.NewLineListener() {
+		/*consoleRedirectThread=new ConsoleRedirectThread(new ConsoleRedirectThread.NewLineListener() {
 			
 			@Override
 			public void newLineAvailable(final String newLine) {
@@ -125,7 +131,7 @@ public class LinuxWindow {
 				});
 			}
 		});
-		/*printStream=new PrintStream(consoleRedirectThread.getOut(), true);
+		printStream=new PrintStream(consoleRedirectThread.getOut(), true);
 		System.setOut(printStream);
 		System.setErr(printStream);
 		consoleRedirectThread.start();*/
@@ -217,6 +223,32 @@ public class LinuxWindow {
 		});
 		mnr.add(miRun);
 		
+		JMenu mnp = new JMenu("问题(P)");
+		mnp.setMnemonic('P');
+		menuBar.add(mnp);
+		
+		JMenuItem miMeetingScheduling = new JMenuItem("会议调度");
+		miMeetingScheduling.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DialogMeetingScheduling dlg=new DialogMeetingScheduling();
+				dlg.setVisible(true);
+			}
+		});
+		mnp.add(miMeetingScheduling);
+		
+		JMenu mns = new JMenu("设置(S)");
+		mns.setMnemonic('S');
+		menuBar.add(mns);
+		
+		JMenuItem miSetSettings = new JMenuItem("设置");
+		miSetSettings.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DialogSetSettings dlg=new DialogSetSettings();
+				dlg.setVisible(true);
+			}
+		});
+		mns.add(miSetSettings);
+		
 		JMenu mnh = new JMenu("帮助(H)");
 		mnh.setMnemonic('H');
 		menuBar.add(mnh);
@@ -249,7 +281,7 @@ public class LinuxWindow {
 		label_1.setBounds(10, 47, 45, 15);
 		panel.add(label_1);
 		
-		combAlgorithmType = new JComboBox();
+		combAlgorithmType = new JComboBox<String>();
 		combAlgorithmType.setBounds(64, 41, 385, 32);
 		panel.add(combAlgorithmType);
 		
@@ -298,7 +330,8 @@ public class LinuxWindow {
 		
 		JPanel panel_1 = new JPanel();
 		panel_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		panel_1.setBounds(10, 202, 459, 156);
+		//panel_1.setBounds(10, 202, 459, 200);
+		panel_1.setBounds(10, 202, 459,156);
 		frmDcopsolver.getContentPane().add(panel_1);
 		panel_1.setLayout(null);
 		
@@ -344,6 +377,8 @@ public class LinuxWindow {
 		cbTreeFrame.setBounds(241, 76, 210, 23);
 		panel_1.add(cbTreeFrame);
 		
+		
+		
 		JLabel lblNewLabel = new JLabel("MBDPOP维度限制：");
 		lblNewLabel.setBounds(10, 116, 141, 15);
 		panel_1.add(lblNewLabel);
@@ -360,6 +395,34 @@ public class LinuxWindow {
 		spinnerADOPT_K = new JSpinner();
 		spinnerADOPT_K.setBounds(381, 113, 70, 22);
 		panel_1.add(spinnerADOPT_K);
+	/*	
+		//选择根结点
+		JLabel RootLabel = new JLabel("根结点选择：");
+		RootLabel.setBounds(10, 145, 141, 15);
+		panel_1.add(RootLabel);
+		combHeristicType = new JComboBox<String>();
+		combHeristicType.setBounds(10, 165, 165, 25);
+		panel_1.add(combHeristicType);
+		
+		String[] HeuristicTypes=DFSHeuristicsManager.HEURISTICS_TYPES;
+		for(int i=0;i<HeuristicTypes.length;i++)
+		{
+			combHeristicType.addItem(HeuristicTypes[i]);
+		}
+		
+		//选择下一个结点
+		JLabel NextLabel = new JLabel("Next结点选择：");
+		NextLabel.setBounds(240, 145, 141, 15);
+		panel_1.add(NextLabel);
+		combHeristicNextType = new JComboBox<String>();
+		combHeristicNextType.setBounds(240, 165, 165, 25);
+		panel_1.add(combHeristicNextType);
+		
+		String[] HeuristicNextTypes=DFSHeuristicsManager.HEURISTICS_TYPES;
+		for(int i=0;i<HeuristicNextTypes.length;i++)
+		{
+			combHeristicNextType.addItem(HeuristicNextTypes[i]);
+		}*/
 		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(10, 393, 459, 169);
@@ -426,6 +489,10 @@ public class LinuxWindow {
 		
 		componentStatus.put("tfProblemPath", tfProblemPath.isEnabled());
 		componentStatus.put("combAlgorithmType", combAlgorithmType.isEnabled());
+		
+		//componentStatus.put("combHeristicType", combHeristicType.isEnabled());
+		//componentStatus.put("combHeristicNextType", combHeristicNextType.isEnabled());
+		
 		componentStatus.put("spinnerRepeatTimes", spinnerRepeatTimes.isEnabled());
 		componentStatus.put("labelRunProgress", labelRunProgress.isEnabled());
 		componentStatus.put("btnOpen", btnOpen.isEnabled());
@@ -437,7 +504,8 @@ public class LinuxWindow {
 		componentStatus.put("cbDebug", cbDebug.isEnabled());
 		componentStatus.put("cbTreeFrame", cbTreeFrame.isEnabled());
 		
-		tfProblemPath.setText(new File(INIT_PROBLEM_PATH).listFiles()[0].getPath());
+		//tfProblemPath.setText(new File(INIT_PROBLEM_PATH).listFiles()[0].getPath());
+		tfProblemPath.setText("/home/wang/workspace/FrodoPlatform/problems/number12/30/RandomDCOP_12_3_1.xml");
 		setBatch(isBatch());
 		labelFlagRunning.setVisible(false);
 	}
@@ -466,6 +534,10 @@ public class LinuxWindow {
 	{
 		tfProblemPath.setEnabled(enable);
 		combAlgorithmType.setEnabled(enable);
+		
+		//combHeristicType.setEnabled(enable);
+		//combHeristicNextType.setEnabled(enable);
+		
 		spinnerRepeatTimes.setEnabled(enable);
 		btnOpen.setEnabled(enable);
 		if(isBatch()==true)
@@ -482,6 +554,10 @@ public class LinuxWindow {
 	{
 		tfProblemPath.setEnabled(componentStatus.get("tfProblemPath"));
 		combAlgorithmType.setEnabled(componentStatus.get("combAlgorithmType"));
+		
+		//combHeristicType.setEnabled(componentStatus.get("combHeristicType"));
+		//combHeristicNextType.setEnabled(componentStatus.get("combHeristicNextType"));
+		
 		spinnerRepeatTimes.setEnabled(componentStatus.get("spinnerRepeatTimes"));
 		labelRunProgress.setEnabled(componentStatus.get("labelRunProgress"));
 		labelFlagRunning.setVisible(false);
@@ -549,18 +625,26 @@ public class LinuxWindow {
 				if(ret!=null)
 				{
 					String detailedResult=DateUtil.currentTime()+"\n";
+					String Result = "\n";
+					
 					detailedResult+="totalCost: "+ret.totalCost+"\n";
 					detailedResult+="totalTime: "+ret.totalTime+"ms\n";
 					detailedResult+="messageQuantity: "+ret.messageQuantity+"\n";
 					detailedResult+="lostRatio: "+ret.lostRatio+"%"+"\n";
+					
+					Result += ret.messageQuantity+"\t" ;
+					
 					if(ret instanceof ResultAdopt)
 					{
 						detailedResult+="NCCC: "+((ResultAdopt)ret).nccc+"\n";
+						Result += ((ResultAdopt)ret).nccc ;
 					}else if(ret instanceof ResultDPOP)
 					{
 						detailedResult+="utilMsgSizeMin: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMin)+"\n";
 						detailedResult+="utilMsgSizeMax: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMax)+"\n";
 						detailedResult+="utilMsgSizeAvg: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeAvg)+"\n";
+						
+						Result += "\t" + ((ResultDPOP)ret).utilMsgSizeAvg ;
 					}
 					for(Integer key : ret.agentValues.keySet())
 					{
@@ -569,12 +653,25 @@ public class LinuxWindow {
 					detailedResult=detailedResult.substring(0, detailedResult.length()-1);
 					
 					final String resultToShow=detailedResult;
+					final String fileResult = Result;
 					EventQueue.invokeLater(new Runnable() {
 						
 						@Override
 						public void run() {
 							// TODO Auto-generated method stub
 							epResultDetails.setText(resultToShow);
+							
+							try{
+								//FileWriter writer = new FileWriter("adopt.txt", true);
+								FileWriter writer = new FileWriter("result.txt", true);
+								
+								writer.write(fileResult);
+								writer.write("\n");
+								writer.close();
+							}catch(IOException e)
+							{
+								e.printStackTrace();
+							}
 						}
 					});
 				}
@@ -589,6 +686,8 @@ public class LinuxWindow {
 		}
 		if(this.isBatch()==false)
 		{
+			//solver.solve(problemPath, (String) combAlgorithmType.getSelectedItem(), 
+			//		cbTreeFrame.isSelected(), cbDebug.isSelected(), el, (String) combHeristicType.getSelectedItem(), (String) combHeristicNextType.getSelectedItem());
 			solver.solve(problemPath, (String) combAlgorithmType.getSelectedItem(), 
 					cbTreeFrame.isSelected(), cbDebug.isSelected(), el);
 		}else
