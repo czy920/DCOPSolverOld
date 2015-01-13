@@ -622,11 +622,10 @@ public class LinuxWindow {
 			public void onFinished(Object result) {
 				// TODO Auto-generated method stub
 				Result ret=(Result) result;
+				String Result = "\n";
 				if(ret!=null)
 				{
 					String detailedResult=DateUtil.currentTime()+"\n";
-					String Result = "\n";
-					
 					detailedResult+="totalCost: "+ret.totalCost+"\n";
 					detailedResult+="totalTime: "+ret.totalTime+"ms\n";
 					detailedResult+="messageQuantity: "+ret.messageQuantity+"\n";
@@ -662,11 +661,8 @@ public class LinuxWindow {
 							epResultDetails.setText(resultToShow);
 							
 							try{
-								//FileWriter writer = new FileWriter("adopt.txt", true);
-								FileWriter writer = new FileWriter("result.txt", true);
-								
+								FileWriter writer = new FileWriter("result.txt", true);							
 								writer.write(fileResult);
-								writer.write("\n");
 								writer.close();
 							}catch(IOException e)
 							{
