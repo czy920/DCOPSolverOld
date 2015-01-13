@@ -1,8 +1,11 @@
 package com.cqu.parser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -80,6 +83,7 @@ public class ProblemParser {
 		{
 			parser.parseContent(problem);
 			this.generateAgentProperty(problem);
+			
 			this.generateCommunicationStructure(problem);
 			return problem;
 		}else
@@ -87,15 +91,95 @@ public class ProblemParser {
 			return null;
 		}
 	}
-	
+	//获取agentID,将不必要的domain排除
+	private void resetVariableDomain(String relationName, int variableID, Problem problem)
+	{
+		String variablePair = problem.VariableRelation.get(relationName);
+		String valuePair = problem.VariableValue.get(relationName);
+		
+		String[] splitVariable = variablePair.split("\\s+");
+		//1 2 1 8 2 4
+		/*for(String each : splitVariable) {
+		    System.out.print("'" + each + "'");
+		}
+		System.out.println();*/
+		String[] splitValue = valuePair.split("\\s+");
+		/*for(String each : splitValue) {
+		    System.out.print("'" + each + "'");
+		}
+		System.out.println();*/
+		int leftVariable = Integer.parseInt(splitVariable[0]);
+		int rightVariable = Integer.parseInt(splitVariable[1]);
+		
+		//System.out.println("leftVariable： " + leftVariable);
+		//System.out.println("rightVariable： " + rightVariable);
+		
+		if (!problem.variableDomains.containsKey(variableID))
+		{
+			problem.variableDomains.put(variableID, new HashSet<Integer>() );
+		}
+
+		if (leftVariable >= variableID) 
+		{
+			problem.variableDomains.get(variableID).add(Integer.parseInt(splitValue[0]));
+		}else
+		{
+			problem.variableDomains.get(variableID).add(Integer.parseInt(splitValue[1]));
+		}
+	}
 	private void generateAgentProperty(Problem problem)
 	{
 		for (Map.Entry<Integer, String[]> entry : problem.agentConstraintCosts.entrySet())
 		{
+			//System.out.println("id: " + entry.getKey());
 			int sumCost = 0;
 			for (int i = 0; i < entry.getValue().length; i++)
 			{
-				sumCost += problem.relationCost.get(entry.getValue()[i]);
+				sumCost += problem.relationCost.get(entry.getValue()[i]); //每个relation的最小代价值
+				//约束关系少于domain-1的结点，减少其domain
+				if(entry.getValue().length <= 2)
+				{
+					String relationName = entry.getValue()[i] ;
+					resetVariableDomain(relationName, entry.getKey(), problem);
+					//System.out.println("variable: " + entry.getKey());
+					//System.out.println("relationName:  " + relationName);
+					
+				/*	String variablePair = problem.VariableRelation.get(relationName);
+					String valuePair = problem.VariableValue.get(relationName);
+					
+					String[] splitVariable = variablePair.split("\\s+");
+					//1 2 1 8 2 4
+					for(String each : splitVariable) {
+					    System.out.print("'" + each + "'");
+					}
+					System.out.println();
+					String[] splitValue = valuePair.split("\\s+");
+					for(String each : splitValue) {
+					    System.out.print("'" + each + "'");
+					}
+					System.out.println();
+					int leftVariable = Integer.parseInt(splitVariable[0]);
+					int rightVariable = Integer.parseInt(splitVariable[1]);
+					
+					System.out.println("leftVariable： " + leftVariable);
+					System.out.println("rightVariable： " + rightVariable);
+					
+					if (!problem.variableDomains.containsKey(entry.getKey()))
+					{
+						problem.variableDomains.put(entry.getKey(), new HashSet<Integer>() );
+					}
+		
+					if (leftVariable >= entry.getKey()) 
+					{
+						problem.variableDomains.get(entry.getKey()).add(Integer.parseInt(splitValue[0]));
+					}else
+					{
+						problem.variableDomains.get(entry.getKey()).add(Integer.parseInt(splitValue[1]));
+					}
+					*/
+					//problem.variableDomains.get(rightVariable).add(Integer.parseInt(splitValue[1]));
+								
+				}
 			}
 			problem.agentProperty.put(entry.getKey(), sumCost);
 		}
@@ -106,6 +190,17 @@ public class ProblemParser {
 		{
 			System.out.println("key: " + entry.getKey() + ", value: " + entry.getValue());
 		}*/
+		
+		for (Map.Entry<Integer, Set<Integer> > entry : problem.variableDomains.entrySet())
+		{
+			System.out.print("variable: " + entry.getKey() + ", domain: ");
+			Iterator<Integer> iter = entry.getValue().iterator();
+			for (; iter.hasNext();)
+			{
+				System.out.print(iter.next() + " ");
+			}
+			System.out.println();
+		}
 	}
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void generateCommunicationStructure(Problem problem)
@@ -119,10 +214,10 @@ public class ProblemParser {
 		{
 			treeGenerator=new BFSTree(problem.neighbourAgents);
 		}
-//		DFSgeneration.setRootHeuristics(new MostConstributionHeuristic(problem));
-//		DFSgeneration.setNextNodeHeuristics(new MostConstributionHeuristic(problem));
-		DFSgeneration.setRootHeuristics(new MostConnectedHeuristic(problem));
-		DFSgeneration.setNextNodeHeuristics(new MostConnectedHeuristic(problem));
+		DFSgeneration.setRootHeuristics(new MostConstributionHeuristic(problem));
+		DFSgeneration.setNextNodeHeuristics(new MostConstributionHeuristic(problem));
+		//DFSgeneration.setRootHeuristics(new MostConnectedHeuristic(problem));
+		//DFSgeneration.setNextNodeHeuristics(new MostConnectedHeuristic(problem));
 		treeGenerator.generate();
 		
 		problem.agentLevels=treeGenerator.getNodeLevels();
