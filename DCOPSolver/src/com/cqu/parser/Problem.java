@@ -1,7 +1,9 @@
 package com.cqu.parser;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Problem {
 	
@@ -19,14 +21,19 @@ public class Problem {
 		treeDepth=0;
 		pseudoHeight=0;
 		agentDomains=new HashMap<Integer, String>();
+		variableDomains = new HashMap<Integer, Set<Integer> >();
+		 
 		neighbourAgents=new HashMap<Integer, int[]>();
 		parentAgents=new HashMap<Integer, Integer>();
 		allParentAgents=new HashMap<Integer, int[]>();
 		childAgents=new HashMap<Integer, int[]>();
 		allChildrenAgents=new HashMap<Integer, int[]>();
-		agentConstraintCosts=new HashMap<Integer, String[]>();
-		relationCost = new HashMap<String, Integer>();
-		agentProperty = new HashMap<Integer, Integer>();
+		agentConstraintCosts=new HashMap<Integer, String[]>(); //每个agent的约束关系集合
+		
+		relationCost = new HashMap<String, Integer>(); //约束关系的最值
+		agentProperty = new HashMap<Integer, Integer>(); 
+		VariableRelation = new HashMap<String, String>(); //对应的relation variable pair
+		VariableValue = new HashMap<String, String>(); //对应的relation value pair
 	}
 	
 	//all possible domains and costs
@@ -39,6 +46,8 @@ public class Problem {
 	public long treeDepth;
 	public long pseudoHeight;     //用来辅佐BD-ADOPT算法
 	public Map<Integer,String> agentDomains;
+	
+	public Map<Integer, Set<Integer> > variableDomains;
 	public Map<Integer, int[]> neighbourAgents;
 	
 	public Map<Integer, Integer> parentAgents;
@@ -52,4 +61,7 @@ public class Problem {
 	
 	public Map<String, Integer> relationCost; // 记录每个连接关系矩阵中的最小代价
 	public Map<Integer, Integer> agentProperty; // 将agent中的评估代价作为其属性
+	
+	public Map<String, String> VariableRelation;
+	public Map<String, String> VariableValue;
 }
