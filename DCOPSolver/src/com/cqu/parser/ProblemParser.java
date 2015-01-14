@@ -137,48 +137,21 @@ public class ProblemParser {
 			{
 				sumCost += problem.relationCost.get(entry.getValue()[i]); //每个relation的最小代价值
 				//约束关系少于domain-1的结点，减少其domain
-				if(entry.getValue().length <= 2)
+				if(entry.getValue().length <= problem.domains.get(problem.agentDomains.get(entry.getKey())).length - 1)
 				{
 					String relationName = entry.getValue()[i] ;
-					resetVariableDomain(relationName, entry.getKey(), problem);
-					//System.out.println("variable: " + entry.getKey());
-					//System.out.println("relationName:  " + relationName);
-					
-				/*	String variablePair = problem.VariableRelation.get(relationName);
-					String valuePair = problem.VariableValue.get(relationName);
-					
-					String[] splitVariable = variablePair.split("\\s+");
-					//1 2 1 8 2 4
-					for(String each : splitVariable) {
-					    System.out.print("'" + each + "'");
-					}
-					System.out.println();
-					String[] splitValue = valuePair.split("\\s+");
-					for(String each : splitValue) {
-					    System.out.print("'" + each + "'");
-					}
-					System.out.println();
-					int leftVariable = Integer.parseInt(splitVariable[0]);
-					int rightVariable = Integer.parseInt(splitVariable[1]);
-					
-					System.out.println("leftVariable： " + leftVariable);
-					System.out.println("rightVariable： " + rightVariable);
-					
+					resetVariableDomain(relationName, entry.getKey(), problem);								
+				}
+				else {
+					int[] domain = problem.domains.get(problem.agentDomains.get(entry.getKey()));
 					if (!problem.variableDomains.containsKey(entry.getKey()))
 					{
-						problem.variableDomains.put(entry.getKey(), new HashSet<Integer>() );
+						problem.variableDomains.put(entry.getKey(), new HashSet<Integer>());
 					}
-		
-					if (leftVariable >= entry.getKey()) 
+					for (int each : domain)
 					{
-						problem.variableDomains.get(entry.getKey()).add(Integer.parseInt(splitValue[0]));
-					}else
-					{
-						problem.variableDomains.get(entry.getKey()).add(Integer.parseInt(splitValue[1]));
+						problem.variableDomains.get(entry.getKey()).add(each);
 					}
-					*/
-					//problem.variableDomains.get(rightVariable).add(Integer.parseInt(splitValue[1]));
-								
 				}
 			}
 			problem.agentProperty.put(entry.getKey(), sumCost);

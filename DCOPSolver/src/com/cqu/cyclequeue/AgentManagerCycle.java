@@ -1,6 +1,7 @@
 package com.cqu.cyclequeue;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +31,22 @@ public class AgentManagerCycle {
 			{
 			}else if(agentType.equals("BNBADOPT"))
 			{
+				//agent=new BnBAdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+				//		problem.domains.get(problem.agentDomains.get(agentId)));
+				
+				int []domain = new int[problem.variableDomains.get(agentId).size()];
+				Iterator<Integer> iter = problem.variableDomains.get(agentId).iterator();
+				System.out.println("agent:" + agentId);
+				for (int i = 0; iter.hasNext();i++)
+				{
+					domain[i] = iter.next();
+					System.out.print("domain: " + domain[i] + " ");
+				}
+				System.out.println();
+	
 				agent=new BnBAdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
+						domain);
+				
 			}else if(agentType.equals("BDADOPT"))
 			{
 				agent=new AgentModel(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
