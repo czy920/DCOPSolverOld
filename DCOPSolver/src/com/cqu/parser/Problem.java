@@ -22,7 +22,8 @@ public class Problem {
 		pseudoHeight=0;
 		agentDomains=new HashMap<Integer, String>();
 		variableDomains = new HashMap<Integer, Set<Integer> >();
-		 
+		VariableDomains = new HashMap<Integer, int[]>();
+		
 		neighbourAgents=new HashMap<Integer, int[]>();
 		parentAgents=new HashMap<Integer, Integer>();
 		allParentAgents=new HashMap<Integer, int[]>();
@@ -48,6 +49,7 @@ public class Problem {
 	public Map<Integer,String> agentDomains;
 	
 	public Map<Integer, Set<Integer> > variableDomains;
+	public Map<Integer, int[]> VariableDomains;
 	public Map<Integer, int[]> neighbourAgents;
 	
 	public Map<Integer, Integer> parentAgents;

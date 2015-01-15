@@ -82,7 +82,7 @@ public class ProblemParser {
 		if(parser!=null)
 		{
 			parser.parseContent(problem);
-			this.generateAgentProperty(problem);
+			//this.generateAgentProperty(problem);
 			
 			this.generateCommunicationStructure(problem);
 			return problem;
@@ -131,30 +131,29 @@ public class ProblemParser {
 	{
 		for (Map.Entry<Integer, String[]> entry : problem.agentConstraintCosts.entrySet())
 		{
-			//System.out.println("id: " + entry.getKey());
-			int sumCost = 0;
-			for (int i = 0; i < entry.getValue().length; i++)
+			if(entry.getValue().length <= problem.domains.get(problem.agentDomains.get(entry.getKey())).length - 1)
 			{
-				sumCost += problem.relationCost.get(entry.getValue()[i]); //每个relation的最小代价值
-				//约束关系少于domain-1的结点，减少其domain
-				if(entry.getValue().length <= problem.domains.get(problem.agentDomains.get(entry.getKey())).length - 1)
+				for (int i = 0; i < entry.getValue().length; i++)
 				{
 					String relationName = entry.getValue()[i] ;
-					resetVariableDomain(relationName, entry.getKey(), problem);								
+					resetVariableDomain(relationName, entry.getKey(), problem);	
 				}
-				else {
+			}else
+			{
+				for (int i = 0; i < entry.getValue().length; i++)
+				{
 					int[] domain = problem.domains.get(problem.agentDomains.get(entry.getKey()));
-					if (!problem.variableDomains.containsKey(entry.getKey()))
+					/*if (!problem.variableDomains.containsKey(entry.getKey()))
 					{
 						problem.variableDomains.put(entry.getKey(), new HashSet<Integer>());
 					}
 					for (int each : domain)
 					{
 						problem.variableDomains.get(entry.getKey()).add(each);
-					}
+					}*/
+					problem.VariableDomains.put(entry.getKey(), domain);
 				}
 			}
-			problem.agentProperty.put(entry.getKey(), sumCost);
 		}
 		/*
 		 * 需要对其进行排序
@@ -166,13 +165,16 @@ public class ProblemParser {
 		
 		for (Map.Entry<Integer, Set<Integer> > entry : problem.variableDomains.entrySet())
 		{
+			int[] domains = new int[entry.getValue().size()];
 			System.out.print("variable: " + entry.getKey() + ", domain: ");
 			Iterator<Integer> iter = entry.getValue().iterator();
-			for (; iter.hasNext();)
+			for (int i = 0; iter.hasNext(); i++)
 			{
-				System.out.print(iter.next() + " ");
+			    domains[i] = iter.next();
+				System.out.print(domains[i] + " ");
 			}
 			System.out.println();
+			problem.VariableDomains.put(entry.getKey(), domains);
 		}
 	}
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -187,10 +189,10 @@ public class ProblemParser {
 		{
 			treeGenerator=new BFSTree(problem.neighbourAgents);
 		}
-		DFSgeneration.setRootHeuristics(new MostConstributionHeuristic(problem));
-		DFSgeneration.setNextNodeHeuristics(new MostConstributionHeuristic(problem));
-		//DFSgeneration.setRootHeuristics(new MostConnectedHeuristic(problem));
-		//DFSgeneration.setNextNodeHeuristics(new MostConnectedHeuristic(problem));
+		//DFSgeneration.setRootHeuristics(new MostConstributionHeuristic(problem));
+		//DFSgeneration.setNextNodeHeuristics(new MostConstributionHeuristic(problem));
+		DFSgeneration.setRootHeuristics(new MostConnectedHeuristic(problem));
+		DFSgeneration.setNextNodeHeuristics(new MostConnectedHeuristic(problem));
 		treeGenerator.generate();
 		
 		problem.agentLevels=treeGenerator.getNodeLevels();
