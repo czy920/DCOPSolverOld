@@ -31,21 +31,23 @@ public class AgentManagerCycle {
 			{
 			}else if(agentType.equals("BNBADOPT"))
 			{
-				//agent=new BnBAdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-				//		problem.domains.get(problem.agentDomains.get(agentId)));
+				agent=new BnBAdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
 				
-				int []domain = new int[problem.variableDomains.get(agentId).size()];
+				/*int []domain = new int[problem.variableDomains.get(agentId).size()];
 				Iterator<Integer> iter = problem.variableDomains.get(agentId).iterator();
-				System.out.println("agent:" + agentId);
+				//System.out.println("agent:" + agentId);
 				for (int i = 0; iter.hasNext();i++)
 				{
 					domain[i] = iter.next();
-					System.out.print("domain: " + domain[i] + " ");
-				}
-				System.out.println();
+					
+				}*/
+				
 	
-				agent=new BnBAdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						domain);
+				/*agent=new BnBAdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.VariableDomains.get(agentId));
+				
+				BnBAdoptAgent.agentDomains.put(agentId, problem.VariableDomains.get(agentId));*/
 				
 			}else if(agentType.equals("BDADOPT"))
 			{
