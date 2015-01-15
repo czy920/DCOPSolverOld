@@ -26,6 +26,8 @@ public class BnBAdoptAgent extends AgentCycle {
 	
 	public final static String KEY_VALUE_MESSAGE="KEY_VALUE_MESSAGE";
 	
+	public static Map<Integer, int[]> agentDomains=new HashMap<Integer, int[]>();
+	
 	private Map<Integer, int[]> lbs;
     private Map<Integer, int[]> ubs;
 	private int LB;
@@ -521,9 +523,11 @@ public class BnBAdoptAgent extends AgentCycle {
 					//保证id小的为行，id大的为列
 					if(this.id<parentId)
 					{
+						//ret[j]+=this.constraintCosts.get(parentId)[this.domain[j]-1][agentDomains.get(parentId)[oppositeAgentValueIndex]-1];
 						ret[j]+=this.constraintCosts.get(parentId)[j][oppositeAgentValueIndex];
 					}else
 					{
+						//ret[j]+=this.constraintCosts.get(parentId)[agentDomains.get(parentId)[oppositeAgentValueIndex]-1][this.domain[j]-1];
 						ret[j]+=this.constraintCosts.get(parentId)[oppositeAgentValueIndex][j];
 					}
 				}
@@ -556,9 +560,11 @@ public class BnBAdoptAgent extends AgentCycle {
 				//保证id小的为行，id大的为列
 				if(this.id<parentId)
 				{
+					//ret+=this.constraintCosts.get(parentId)[this.domain[di]-1][agentDomains.get(parentId)[oppositeAgentValueIndex]-1];
 					ret+=this.constraintCosts.get(parentId)[di][oppositeAgentValueIndex];
 				}else
 				{
+					//ret+=this.constraintCosts.get(parentId)[agentDomains.get(parentId)[oppositeAgentValueIndex]-1][this.domain[di]-1];
 					ret+=this.constraintCosts.get(parentId)[oppositeAgentValueIndex][di];
 				}
 			}
