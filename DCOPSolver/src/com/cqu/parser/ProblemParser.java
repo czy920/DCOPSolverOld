@@ -82,7 +82,7 @@ public class ProblemParser {
 		if(parser!=null)
 		{
 			parser.parseContent(problem);
-			//this.generateAgentProperty(problem);
+			this.generateAgentProperty(problem);
 			
 			this.generateCommunicationStructure(problem);
 			return problem;
@@ -131,7 +131,7 @@ public class ProblemParser {
 	{
 		for (Map.Entry<Integer, String[]> entry : problem.agentConstraintCosts.entrySet())
 		{
-			if(entry.getValue().length <= problem.domains.get(problem.agentDomains.get(entry.getKey())).length - 1)
+			if(entry.getValue().length == problem.domains.get(problem.agentDomains.get(entry.getKey())).length - 1)
 			{
 				for (int i = 0; i < entry.getValue().length; i++)
 				{
