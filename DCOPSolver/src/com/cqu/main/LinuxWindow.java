@@ -505,7 +505,7 @@ public class LinuxWindow {
 		componentStatus.put("cbTreeFrame", cbTreeFrame.isEnabled());
 		
 		//tfProblemPath.setText(new File(INIT_PROBLEM_PATH).listFiles()[0].getPath());
-		tfProblemPath.setText("/home/wang/workspace/FrodoPlatform/problems/number12/30/RandomDCOP_12_3_1.xml");
+		tfProblemPath.setText("/home/wang/workspace/FrodoPlatform/problems/40/14/30/RandomDCOP_14_4_5.xml");
 		setBatch(isBatch());
 		labelFlagRunning.setVisible(false);
 	}
