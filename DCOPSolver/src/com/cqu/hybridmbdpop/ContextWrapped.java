@@ -21,12 +21,15 @@ public class ContextWrapped {
 		this.dimensions=dimensions;
 		Collections.sort(this.dimensions);
 
-		valueIndexes=new int[dimensions.size()];
+		this.valueIndexes=new int[dimensions.size()];
 		this.currentDimension=valueIndexes.length-1;
 	}
 	
-	public void refresh(ContextWrapped cw)
+	public ContextWrapped(ContextWrapped cw)
 	{
+		this.valueIndexes=new int[cw.dimensions.size()];
+		this.currentDimension=this.valueIndexes.length-1;
+		
 		this.currentDimension=cw.currentDimension;
 		for(int i=0;i<valueIndexes.length;i++)
 		{
@@ -46,6 +49,10 @@ public class ContextWrapped {
 	 */
 	public boolean next()
 	{
+		if(context.size()<=0)
+		{
+			return false;
+		}
 		valueIndexes[currentDimension]++;
 		context.addOrUpdate(Integer.parseInt(dimensions.get(currentDimension).getName()), valueIndexes[currentDimension]);
 		while(valueIndexes[currentDimension]>=dimensions.get(currentDimension).getSize())
@@ -60,6 +67,7 @@ public class ContextWrapped {
 			valueIndexes[currentDimension]++;
 			context.addOrUpdate(Integer.parseInt(dimensions.get(currentDimension).getName()), valueIndexes[currentDimension]);
 		}
+		currentDimension=valueIndexes.length-1;
 		return true;
 	}
 	
@@ -83,5 +91,10 @@ public class ContextWrapped {
 	public Set<Integer> keySet()
 	{
 		return this.context.keySet();
+	}
+	
+	public int size()
+	{
+		return this.context.size();
 	}
 }

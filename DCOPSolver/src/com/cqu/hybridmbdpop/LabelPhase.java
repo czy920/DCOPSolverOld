@@ -94,8 +94,8 @@ public class LabelPhase {
 				int[] children=problem.childAgents.get(agentId);
 				for(int j=0;j<children.length;j++)
 				{
-					merge(childSeparator, agentSeparators.get(children[i]));
-					agentSeparators.remove(children[i]);
+					merge(childSeparator, agentSeparators.get(children[j]));
+					agentSeparators.remove(children[j]);
 				}
 				remove(childSeparator, agentId);
 				if(childSeparator.size()>Settings.settings.getMaxDimensionsInMBDPOP())

@@ -637,6 +637,10 @@ public class SolverWindow {
 						detailedResult+="utilMsgSizeMax: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMax)+"\n";
 						detailedResult+="utilMsgSizeAvg: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeAvg)+"\n";
 					}
+					for(String key : ret.otherResults.keySet())
+					{
+						detailedResult+=key+": "+ret.otherResults.get(key)+"\n";
+					}
 					for(Integer key : ret.agentValues.keySet())
 					{
 						detailedResult+="agent "+key+": "+ret.agentValues.get(key)+"\n";

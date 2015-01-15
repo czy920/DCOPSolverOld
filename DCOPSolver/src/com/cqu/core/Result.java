@@ -1,5 +1,6 @@
 package com.cqu.core;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Result {
@@ -10,6 +11,7 @@ public class Result {
 	public int lostRatio;
 	public long totalTime;
 	public Map<Integer, Integer> agentValues;
+	public Map<String, Object> otherResults;
 	
 	public Result() {
 		// TODO Auto-generated constructor stub
@@ -17,6 +19,7 @@ public class Result {
 		this.messageQuantity=0;
 		this.lostRatio=0;
 		this.totalTime=0;
+		this.otherResults=new HashMap<String, Object>();
 	}
 	
 	public Result(Result rs)
