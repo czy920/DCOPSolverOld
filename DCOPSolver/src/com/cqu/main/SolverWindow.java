@@ -391,6 +391,7 @@ public class SolverWindow {
 		panel_1.add(lblAdoptkk);
 		
 		spinnerADOPT_K = new JSpinner();
+		spinnerADOPT_K.setModel(new SpinnerNumberModel(0, 0, 10000, 100));
 		spinnerADOPT_K.setBounds(381, 113, 70, 22);
 		panel_1.add(spinnerADOPT_K);
 	/*	
@@ -499,6 +500,7 @@ public class SolverWindow {
 		componentStatus.put("spinnerMessageTransmissionNCCC", spinnerMessageTransmissionNCCC.isEnabled());
 		componentStatus.put("spinnerBnbLayer", spinnerBnbLayer.isEnabled());
 		componentStatus.put("cbGraphFrame", cbGraphFrame.isEnabled());
+		componentStatus.put("spinnerADOPT_K", spinnerADOPT_K.isEnabled());
 		componentStatus.put("cbDebug", cbDebug.isEnabled());
 		componentStatus.put("cbTreeFrame", cbTreeFrame.isEnabled());
 		
@@ -582,7 +584,7 @@ public class SolverWindow {
 		cbDebug.setEnabled(componentStatus.get("cbDebug"));
 		cbTreeFrame.setEnabled(componentStatus.get("cbTreeFrame"));
 		spinnerMaxDimensionsInMBDPOP.setEnabled(true);
-		spinnerADOPT_K.setEnabled(true);
+		spinnerADOPT_K.setEnabled(componentStatus.get("spinnerADOPT_K"));
 	}
 	
 	private void enableUI(boolean enable)
