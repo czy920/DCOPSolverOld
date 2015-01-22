@@ -170,6 +170,10 @@ public class MultiDimensionData {
 	public MultiDimensionData shrinkDimension(String dimensionName, int valueIndex)
 	{
 		int dimensionToShrinkIndex=this.indexOf(dimensionName);
+		if(dimensionToShrinkIndex==-1)
+		{
+			return this;
+		}
 		Dimension dimensionToReduct=this.dimensions.get(dimensionToShrinkIndex);
 		
 		List<Dimension> dimensionsNew=new ArrayList<Dimension>();
@@ -258,6 +262,24 @@ public class MultiDimensionData {
 			}
 		}
 		Collections.sort(dimensionsNew);
+		
+		if(mdDataB.dimensions.size()==0&&mdDataB.data!=null&&mdDataB.data.length==1)
+		{
+			int[] dataNewTemp=new int[mdDataA.data.length];
+			for(int i=0;i<dataNewTemp.length;i++)
+			{
+				dataNewTemp[i]=mdDataA.data[i]+mdDataB.data[0];
+			}
+			return new MultiDimensionData(dimensionsNew, dataNewTemp);
+		}else if(mdDataA.dimensions.size()==0&&mdDataA.data!=null&&mdDataA.data.length==1)
+		{
+			int[] dataNewTemp=new int[mdDataB.data.length];
+			for(int i=0;i<dataNewTemp.length;i++)
+			{
+				dataNewTemp[i]=mdDataB.data[i]+mdDataA.data[0];
+			}
+			return new MultiDimensionData(dimensionsNew, dataNewTemp);
+		}
 		
 		//compute periods for each dimension in multiple dimension data
 		int[] periodsA=new int[dimensionsNew.size()];

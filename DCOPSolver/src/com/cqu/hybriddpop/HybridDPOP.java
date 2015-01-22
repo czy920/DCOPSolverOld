@@ -1,4 +1,4 @@
-package com.cqu.hybridmbdpop;
+package com.cqu.hybriddpop;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,12 +12,14 @@ import com.cqu.core.ResultDPOP;
 import com.cqu.dpop.Dimension;
 import com.cqu.dpop.MultiDimensionData;
 import com.cqu.dpop.ReductDimensionResult;
+import com.cqu.hybridmbdpop.ContextWrapped;
+import com.cqu.hybridmbdpop.UtilMessage;
 import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FormatUtil;
 import com.cqu.util.StatisticUtil;
 
-public class HybridMBDPOP extends Agent{
+public class HybridDPOP extends Agent{
 	
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_UTIL_MESSAGE=1;
@@ -52,7 +54,7 @@ public class HybridMBDPOP extends Agent{
 		QUEUE_CAPACITY=-1;
 	}
 	
-	public HybridMBDPOP(int id, String name, int level, int[] domain, boolean isSearchingPolicy, boolean[] neighbourPolicy, ContextWrapped contextWrapped) {
+	public HybridDPOP(int id, String name, int level, int[] domain, boolean isSearchingPolicy, boolean[] neighbourPolicy, ContextWrapped contextWrapped) {
 		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
 		totalCost=0;
@@ -99,42 +101,32 @@ public class HybridMBDPOP extends Agent{
 	{
 		this.nextIteration=false;
 		this.mdDataToSend=null;
-		if(this.isSearchingPolicy==true)
+		
+		MultiDimensionData mdData=localMDDatas.get(this.parent);
+		for(Integer key : localMDDatas.keySet())
 		{
-			MultiDimensionData mdData=localMDDatas.get(parent).shrinkDimension(this.id+"", this.contextWrapped.getValueIndex(this.id));
-			if(isNeighborSearchingPolicy.get(this.parent)==true)
+			if(key.equals(this.parent)==false)
 			{
-				mdData=mdData.shrinkDimension(this.parent+"", this.contextWrapped.getValueIndex(this.parent));
-			}
-			sendUtilMessage(mdData);
-		}else
-		{
-			MultiDimensionData mdData=localMDDatas.get(this.parent);
-			for(Integer key : localMDDatas.keySet())
-			{
-				if(key.equals(this.parent)==false)
+				MultiDimensionData mdDataTemp=localMDDatas.get(key);
+				if(isNeighborSearchingPolicy.get(key)==true)
 				{
-					MultiDimensionData mdDataTemp=localMDDatas.get(key);
-					if(isNeighborSearchingPolicy.get(key)==true)
-					{
-						mdDataTemp=mdDataTemp.shrinkDimension(key+"", this.contextWrapped.getValueIndex(key));
-					}
-					mdData=mdData.mergeDimension(mdDataTemp);
+					mdDataTemp=mdDataTemp.shrinkDimension(key+"", this.contextWrapped.getValueIndex(key));
 				}
+				mdData=mdData.mergeDimension(mdDataTemp);
 			}
-			if(isNeighborSearchingPolicy.get(this.parent)==true)
-			{
-				mdData=mdData.shrinkDimension(this.parent+"", this.contextWrapped.getValueIndex(this.parent));
-			}
-			ReductDimensionResult result=mdData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
-			if(iterationOver==true)
-			{
-				this.dimensions=result.getMdData().getDimensions();
-				this.reductDimensionResultIndexes=result.getResultIndex();
-			}
-			mdData=result.getMdData();
-			sendUtilMessage(mdData);
 		}
+		if(isNeighborSearchingPolicy.get(this.parent)==true)
+		{
+			mdData=mdData.shrinkDimension(this.parent+"", this.contextWrapped.getValueIndex(this.parent));
+		}
+		ReductDimensionResult result=mdData.reductDimension(this.id+"", ReductDimensionResult.REDUCT_DIMENSION_WITH_MIN);
+		if(iterationOver==true)
+		{
+			this.dimensions=result.getMdData().getDimensions();
+			this.reductDimensionResultIndexes=result.getResultIndex();
+		}
+		mdData=result.getMdData();
+		sendUtilMessage(mdData);
 	}
 	
 	private void computeLocalUtils()
@@ -223,7 +215,7 @@ public class HybridMBDPOP extends Agent{
 		result.put(KEY_VALUE, this.domain[valueIndex]);
 		if(this.isRootAgent()==true)
 		{
-			result.put(HybridMBDPOP.KEY_TOTAL_COST, this.totalCost);
+			result.put(KEY_TOTAL_COST, this.totalCost);
 		}
 		result.put(KEY_UTIL_MESSAGE_SIZES, this.utilMsgSizes);
 		
@@ -245,7 +237,7 @@ public class HybridMBDPOP extends Agent{
 			int id_=(Integer) result.get(KEY_ID);
 			String name_=(String) result.get(KEY_NAME);
 			int value_=(Integer) result.get(KEY_VALUE);
-			if(result.containsKey(HybridMBDPOP.KEY_TOTAL_COST))
+			if(result.containsKey(KEY_TOTAL_COST))
 			{
 				totalCost=(Integer) result.get(KEY_TOTAL_COST);
 			}
@@ -410,26 +402,50 @@ public class HybridMBDPOP extends Agent{
 					mdData=mdData.mergeDimension(receivedMDDatas.get(id));
 				}
 			}
-			//pseudoChildren
-			for(int i=0;i<this.pseudoChildren.length;i++)
-			{
-				if(this.isNeighborSearchingPolicy.get(this.pseudoChildren[i])==true)
-				{
-					mdData=mdData.mergeDimension(this.pseudoChildrenMDDatas.get(this.pseudoChildren[i]).shrinkDimension(this.pseudoChildren[i]+"", this.contextWrapped.getValueIndex(this.pseudoChildren[i])));
-				}
-			}
+			
 			//allParents
 			if(this.isSearchingPolicy==true)
 			{
-				//root节点不会执行此段代码
-				mdData=mdData.mergeDimension(localMDDatas.get(parent));
-				mdData=mdData.shrinkDimension(this.id+"", this.contextWrapped.getValueIndex(this.id));
-				if(isNeighborSearchingPolicy.get(this.parent)==true)
+				//root节点不执行此段代码
+				if(this.isRootAgent()==true)
 				{
-					mdData=mdData.shrinkDimension(this.parent+"", this.contextWrapped.getValueIndex(this.parent));
+					if(iterationOver==true)
+					{
+						this.totalCost=mdData.getData()[0];
+						this.valueIndex=this.bestContext.getValueIndex(this.id);
+						
+						Map<Integer, Integer> valueIndexes=new HashMap<Integer, Integer>();
+						for(Integer key : this.bestContext.keySet())
+						{
+							valueIndexes.put(key, this.bestContext.getValueIndex(key));
+						}
+						//valueIndexes.put(this.id, this.valueIndex);
+						sendValueMessage(valueIndexes);
+						
+						this.stopRunning();
+						receivedMDDatas=new HashMap<Integer, MultiDimensionData>();
+						return;
+					}
+				}else
+				{
+					mdData=mdData.mergeDimension(localMDDatas.get(parent));
+					mdData=mdData.shrinkDimension(this.id+"", this.contextWrapped.getValueIndex(this.id));
+					if(isNeighborSearchingPolicy.get(this.parent)==true)
+					{
+						mdData=mdData.shrinkDimension(this.parent+"", this.contextWrapped.getValueIndex(this.parent));
+					}
 				}
 			}else
 			{
+				//pseudoChildren
+				for(int i=0;i<this.pseudoChildren.length;i++)
+				{
+					if(this.isNeighborSearchingPolicy.get(this.pseudoChildren[i])==true)
+					{
+						mdData=mdData.mergeDimension(this.pseudoChildrenMDDatas.get(this.pseudoChildren[i]).shrinkDimension(this.pseudoChildren[i]+"", this.contextWrapped.getValueIndex(this.pseudoChildren[i])));
+					}
+				}
+				
 				for(Integer key : localMDDatas.keySet())
 				{
 					MultiDimensionData mdDataTemp=localMDDatas.get(key);
@@ -447,22 +463,26 @@ public class HybridMBDPOP extends Agent{
 					this.reductDimensionResultIndexes=result.getResultIndex();
 				}
 				mdData=result.getMdData();
-				if(this.isRootAgent()==true&&iterationOver==true)
+				if(this.isRootAgent()==true)
 				{
-					this.totalCost=result.getMdData().getData()[0];
-					this.valueIndex=this.reductDimensionResultIndexes[0];
-					
-					Map<Integer, Integer> valueIndexes=new HashMap<Integer, Integer>();
-					for(Integer key : this.bestContext.keySet())
+					if(iterationOver==true)
 					{
-						valueIndexes.put(key, this.bestContext.getValueIndex(key));
+						this.totalCost=result.getMdData().getData()[0];
+						this.valueIndex=this.reductDimensionResultIndexes[0];
+						
+						Map<Integer, Integer> valueIndexes=new HashMap<Integer, Integer>();
+						for(Integer key : this.bestContext.keySet())
+						{
+							valueIndexes.put(key, this.bestContext.getValueIndex(key));
+						}
+						valueIndexes.put(this.id, this.valueIndex);
+						sendValueMessage(valueIndexes);
+						
+						this.stopRunning();
+						receivedMDDatas=new HashMap<Integer, MultiDimensionData>();
+						return;
 					}
-					valueIndexes.put(this.id, this.valueIndex);
-					sendValueMessage(valueIndexes);
 					
-					this.stopRunning();
-					receivedMDDatas=new HashMap<Integer, MultiDimensionData>();
-					return;
 				}
 			}
 			if(this.isRootAgent()==true)

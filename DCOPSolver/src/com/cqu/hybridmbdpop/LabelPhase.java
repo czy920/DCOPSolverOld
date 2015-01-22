@@ -1,7 +1,6 @@
 package com.cqu.hybridmbdpop;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,13 +8,12 @@ import java.util.Map;
 import com.cqu.core.Context;
 import com.cqu.dpop.Dimension;
 import com.cqu.parser.Problem;
-import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
 
-public class LabelPhase {
+public abstract class LabelPhase {
 	
-	private Problem problem;
-	private Map<Integer, Boolean> isSearchingPolicyAgents;
+	protected Problem problem;
+	protected Map<Integer, Boolean> isSearchingPolicyAgents;
 	private Map<Integer, boolean[]> isNeighborSearchingPolicyAgents;
 	
 	public LabelPhase(Problem problem) {
@@ -56,6 +54,8 @@ public class LabelPhase {
 		calNeighborPolicy();
 	}
 	
+	protected abstract void labelSearchingPolicyAgents();
+	
 	private void calNeighborPolicy()
 	{
 		for(Integer agentId : problem.neighbourAgents.keySet())
@@ -70,72 +70,24 @@ public class LabelPhase {
 		}
 	}
 	
-	private void labelSearchingPolicyAgents()
-	{
-		Map<Integer, List<Integer>> layerAgents=new HashMap<Integer, List<Integer>>();
-		for(Integer agentId : problem.agentLevels.keySet())
-		{
-			if(layerAgents.containsKey(problem.agentLevels.get(agentId))==false)
-			{
-				layerAgents.put(problem.agentLevels.get(agentId), new ArrayList<Integer>());
-			}
-			layerAgents.get(problem.agentLevels.get(agentId)).add(agentId);
-		}
-		List<Integer> layers=new ArrayList<Integer>(layerAgents.keySet());
-		Collections.sort(layers);
-		Map<Integer, List<Integer>> agentSeparators=new HashMap<Integer, List<Integer>>();
-		for(int i=layers.size()-1;i>-1;i--)
-		{
-			List<Integer> nodesOfLayer=layerAgents.get(layers.get(i));
-			for(Integer agentId : nodesOfLayer)
-			{
-				//sep(children)-self+allParents
-				List<Integer> childSeparator=new ArrayList<Integer>();
-				int[] children=problem.childAgents.get(agentId);
-				for(int j=0;j<children.length;j++)
-				{
-					merge(childSeparator, agentSeparators.get(children[j]));
-					agentSeparators.remove(children[j]);
-				}
-				remove(childSeparator, agentId);
-				if(childSeparator.size()>Settings.settings.getMaxDimensionsInMBDPOP())
-				{
-					isSearchingPolicyAgents.put(agentId, true);
-					agentSeparators.put(agentId, new ArrayList<Integer>());
-					continue;
-				}
-				
-				List<Integer> separator=new ArrayList<Integer>(childSeparator);
-				merge(separator, problem.allParentAgents.get(agentId));
-				if(separator.size()>Settings.settings.getMaxDimensionsInMBDPOP())
-				{
-					isSearchingPolicyAgents.put(agentId, true);
-					agentSeparators.put(agentId, childSeparator);
-				}else
-				{
-					isSearchingPolicyAgents.put(agentId, false);
-					agentSeparators.put(agentId, separator);
-				}
-			}
-		}
-	}
-	
-	public void remove(List<Integer> base, int[] toRemove)
+	protected void remove(List<Integer> base, List<Integer> toRemove)
 	{
 		if(toRemove==null)
 		{
 			return;
 		}
-		for(int i=0; i<toRemove.length;i++)
+		int index=-1;
+		for(int i=0; i<toRemove.size();i++)
 		{
-			if(CollectionUtil.indexOf(base, toRemove[i])!=-1)
+			index=CollectionUtil.indexOf(base, toRemove.get(i));
+			if(index!=-1)
 			{
-				base.add(toRemove[i]);
+				base.remove(index);
 			}
 		}
 	}
 	
-	public void remove(List<Integer> base, Integer value)
+	protected void remove(List<Integer> base, Integer value)
 	{
 		int index=CollectionUtil.indexOf(base, value);
 		if(index!=-1)
@@ -144,7 +96,7 @@ public class LabelPhase {
 		}
 	}
 	
-	public void merge(List<Integer> base, List<Integer> toMerge)
+	protected void merge(List<Integer> base, List<Integer> toMerge)
 	{
 		if(toMerge==null)
 		{
@@ -159,7 +111,7 @@ public class LabelPhase {
 		}
 	}
 	
-	public void merge(List<Integer> base, int[] toMerge)
+	protected void merge(List<Integer> base, int[] toMerge)
 	{
 		if(toMerge==null)
 		{

@@ -1,7 +1,6 @@
 package com.cqu.core;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -9,14 +8,17 @@ import com.cqu.adopt.AdoptAgent;
 import com.cqu.agiledpop.AgileDPOPAgent;
 import com.cqu.bfsdpop.BFSDPOPAgent;
 import com.cqu.dpop.DPOPAgent;
+import com.cqu.hybriddpop.HybridDPOP;
+import com.cqu.hybriddpop.LabelPhaseHybridDPOP;
 import com.cqu.hybridmbdpop.HybridMBDPOP;
 import com.cqu.hybridmbdpop.LabelPhase;
+import com.cqu.hybridmbdpop.LabelPhaseHybridMBDPOP;
 import com.cqu.parser.Problem;
 import com.cqu.util.CollectionUtil;
 
 public class AgentManager {
 	
-	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "HybridMBDPOP", "AgileDPOP", "ADOPT", "BNBADOPT","ADOPT_K","BDADOPT","SynAdopt","SynAdopt2"};
+	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "HybridDPOP", "HybridMBDPOP", "AgileDPOP", "ADOPT", "BNBADOPT","ADOPT_K","BDADOPT","SynAdopt","SynAdopt2"};
 	
 	private Map<Integer, Agent> agents;
 	private int treeHeight=0;
@@ -26,7 +28,11 @@ public class AgentManager {
 		LabelPhase labelPhase=null;
 		if(agentType.equals("HybridMBDPOP"))
 		{
-			labelPhase=new LabelPhase(problem);
+			labelPhase=new LabelPhaseHybridMBDPOP(problem);
+			labelPhase.label();
+		}else if(agentType.equals("HybridDPOP"))
+		{
+			labelPhase=new LabelPhaseHybridDPOP(problem);
 			labelPhase.label();
 		}
 		agents=new HashMap<Integer, Agent>();
@@ -34,13 +40,17 @@ public class AgentManager {
 		{
 			Agent agent=null;
 			if(agentType.equals("DPOP"))
-			{		
+			{
 				agent=new DPOPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-				
 			}else if(agentType.equals("HybridMBDPOP"))
 			{
 				agent=new HybridMBDPOP(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)), labelPhase.getIsSearchingPolicyAgents().get(agentId), 
+						labelPhase.getIsNeighborSearchingPolicyAgents().get(agentId), labelPhase.getContext());
+			}else if(agentType.equals("HybridDPOP"))
+			{
+				agent=new HybridDPOP(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)), labelPhase.getIsSearchingPolicyAgents().get(agentId), 
 						labelPhase.getIsNeighborSearchingPolicyAgents().get(agentId), labelPhase.getContext());
 			}else if(agentType.equals("AgileDPOP"))
