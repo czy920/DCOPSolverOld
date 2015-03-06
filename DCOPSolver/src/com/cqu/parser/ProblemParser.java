@@ -82,7 +82,7 @@ public class ProblemParser {
 		if(parser!=null)
 		{
 			parser.parseContent(problem);
-			this.generateAgentProperty(problem);
+			//this.generateAgentProperty(problem);
 			
 			this.generateCommunicationStructure(problem);
 			return problem;

@@ -24,7 +24,7 @@ public class Solver {
 	private List<Result> results=new ArrayList<Result>();
 	private List<Result> resultsRepeated;
 
-	public void solve(String problemPath, String agentType, boolean showTreeFrame, boolean debug, EventListener el) throws Exception
+	public void solve(String problemPath, String agentType, boolean showTreeFrame, boolean debug, EventListener el)
 	{
 		//parse problem xml
 		String treeGeneratorType=null;

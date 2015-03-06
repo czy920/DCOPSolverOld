@@ -17,6 +17,7 @@ import javax.swing.JEditorPane;
 import javax.swing.border.EtchedBorder;
 import javax.swing.SpinnerNumberModel;
 
+import com.cqu.algorithmconfiguration.LabelSpinnerParameter;
 import com.cqu.core.AgentManager;
 import com.cqu.core.EventListener;
 import com.cqu.core.Result;
@@ -33,9 +34,14 @@ import com.cqu.util.FormatUtil;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.swing.ImageIcon;
 import javax.swing.event.ChangeListener;
@@ -46,6 +52,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.JTextArea;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.FlowLayout;
 
 public class SolverWindow {
 	
@@ -65,24 +72,26 @@ public class SolverWindow {
 	private JLabel labelFlagRunning;
 	private JButton btnOpen;
 	
-	private JSpinner spinnerMessageTransmissionTime;
-	private JSpinner spinnerMessageTransmissionNCCC;
-	private JSpinner spinnerBnbLayer;
+	private LabelSpinnerParameter lspSpinnerMessageTransmissionTime;
+	private LabelSpinnerParameter lspSpinnerMessageTransmissionNCCC;
+	private LabelSpinnerParameter lspSpinnerBnbLayer;
 	private JCheckBox cbGraphFrame;
 	private JCheckBox cbDebug;
 	private JCheckBox cbTreeFrame;
 	private JEditorPane epResultDetails;
-	private JSpinner spinnerMaxDimensionsInMBDPOP;
-	private JSpinner spinnerADOPT_K;
+	private LabelSpinnerParameter lspSpinnerMaxDimensionsInMBDPOP;
+	private LabelSpinnerParameter lspSpinnerADOPT_K;
+	private JPanel panelAlgorithmParamSetting;
+	private JPanel panelGraphDisplaySetting;
+	private List<LabelSpinnerParameter> paramList;
 	
 	private JTextArea epConsoleLines;
-	/*private ConsoleRedirectThread consoleRedirectThread;
+	
+	private ConsoleRedirectThread consoleRedirectThread;
 	private String consoleOutput="";
 	private int consoleOutputLineCount=0;
 	private static final int MAX_CONSOLE_LINE_COUNT=100;
-	private PrintStream printStream;*/
-	
-	private Map<String, Boolean> componentStatus;
+	private PrintStream printStream;
 	
 
 	/**
@@ -107,7 +116,7 @@ public class SolverWindow {
 	public SolverWindow() {
 		initialize();
 		
-		/*consoleRedirectThread=new ConsoleRedirectThread(new ConsoleRedirectThread.NewLineListener() {
+		consoleRedirectThread=new ConsoleRedirectThread(new ConsoleRedirectThread.NewLineListener() {
 			
 			@Override
 			public void newLineAvailable(final String newLine) {
@@ -132,7 +141,7 @@ public class SolverWindow {
 		printStream=new PrintStream(consoleRedirectThread.getOut(), true);
 		System.setOut(printStream);
 		System.setErr(printStream);
-		consoleRedirectThread.start();*/
+		consoleRedirectThread.start();
 		System.out.println("DCOPSolver starts working...");
 	}
 
@@ -260,34 +269,45 @@ public class SolverWindow {
 		mnh.add(miAbout);
 		frmDcopsolver.getContentPane().setLayout(null);
 		
-		JPanel panel = new JPanel();
-		panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		panel.setLayout(null);
-		panel.setBounds(10, 35, 459, 132);
-		frmDcopsolver.getContentPane().add(panel);
+		JPanel panelRunningSetting = new JPanel();
+		panelRunningSetting.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		panelRunningSetting.setLayout(null);
+		panelRunningSetting.setBounds(10, 35, 459, 132);
+		frmDcopsolver.getContentPane().add(panelRunningSetting);
 		
 		JLabel label = new JLabel("路径：");
 		label.setBounds(10, 13, 45, 15);
-		panel.add(label);
+		panelRunningSetting.add(label);
 		
 		tfProblemPath = new JTextField();
 		tfProblemPath.setColumns(10);
 		tfProblemPath.setBounds(64, 10, 314, 21);
-		panel.add(tfProblemPath);
+		panelRunningSetting.add(tfProblemPath);
 		
 		JLabel label_1 = new JLabel("算法：");
 		label_1.setBounds(10, 47, 45, 15);
-		panel.add(label_1);
+		panelRunningSetting.add(label_1);
 		
 		combAlgorithmType = new JComboBox<String>();
 		combAlgorithmType.setBounds(64, 41, 385, 32);
-		panel.add(combAlgorithmType);
+		panelRunningSetting.add(combAlgorithmType);
 		
 		String[] agentTypes=AgentManager.AGENT_TYPES;
 		for(int i=0;i<agentTypes.length;i++)
 		{
 			combAlgorithmType.addItem(agentTypes[i]);
 		}
+		combAlgorithmType.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				// TODO Auto-generated method stub
+				if(e.getStateChange()==ItemEvent.SELECTED)
+				{
+					algorithmTypeChanged((String) e.getItem());
+				}
+			}
+		});
 		
 		spinnerRepeatTimes = new JSpinner();
 		spinnerRepeatTimes.addChangeListener(new ChangeListener() {
@@ -298,21 +318,21 @@ public class SolverWindow {
 		});
 		spinnerRepeatTimes.setModel(new SpinnerNumberModel(5, 3, 10, 1));
 		spinnerRepeatTimes.setBounds(64, 83, 65, 22);
-		panel.add(spinnerRepeatTimes);
+		panelRunningSetting.add(spinnerRepeatTimes);
 		
 		labelRunProgress = new JLabel(spinnerRepeatTimes.getValue()+"/0/0");
 		labelRunProgress.setBounds(207, 86, 118, 15);
-		panel.add(labelRunProgress);
+		panelRunningSetting.add(labelRunProgress);
 		
 		JLabel label_3 = new JLabel("遍数：");
 		label_3.setBounds(10, 86, 45, 15);
-		panel.add(label_3);
+		panelRunningSetting.add(label_3);
 		
 		labelFlagRunning = new JLabel("");
 		labelFlagRunning.setIcon(new ImageIcon("resources/loading.gif"));
 		labelFlagRunning.setHorizontalAlignment(SwingConstants.CENTER);
 		labelFlagRunning.setBounds(409, 83, 40, 39);
-		panel.add(labelFlagRunning);
+		panelRunningSetting.add(labelFlagRunning);
 		
 		btnOpen = new JButton("打开");
 		btnOpen.setBounds(388, 9, 61, 23);
@@ -324,76 +344,20 @@ public class SolverWindow {
 				openProblemFile();
 			}
 		});
-		panel.add(btnOpen);
+		panelRunningSetting.add(btnOpen);
 		
-		JPanel panel_1 = new JPanel();
-		panel_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		panelAlgorithmParamSetting = new JPanel();
+		panelAlgorithmParamSetting.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		//panel_1.setBounds(10, 202, 459, 200);
-		panel_1.setBounds(10, 202, 459,156);
-		frmDcopsolver.getContentPane().add(panel_1);
-		panel_1.setLayout(null);
+		panelAlgorithmParamSetting.setBounds(10, 270, 459,88);
+		frmDcopsolver.getContentPane().add(panelAlgorithmParamSetting);
+		panelAlgorithmParamSetting.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 		
-		JLabel label_5 = new JLabel("DPOP类算法通信时间：");
-		label_5.setBounds(10, 13, 141, 15);
-		panel_1.add(label_5);
-		
-		spinnerMessageTransmissionTime = new JSpinner();
-		spinnerMessageTransmissionTime.setModel(new SpinnerNumberModel(0, 0, 1000, 10));
-		spinnerMessageTransmissionTime.setBounds(161, 10, 70, 22);
-		panel_1.add(spinnerMessageTransmissionTime);
-		
-		JLabel label_6 = new JLabel("每次消息通信NCCC：");
-		label_6.setBounds(241, 13, 130, 15);
-		panel_1.add(label_6);
-		
-		spinnerMessageTransmissionNCCC = new JSpinner();
-		spinnerMessageTransmissionNCCC.setModel(new SpinnerNumberModel(0, 0, 1000, 10));
-		spinnerMessageTransmissionNCCC.setBounds(381, 10, 70, 22);
-		panel_1.add(spinnerMessageTransmissionNCCC);
-		
-		JLabel label_7 = new JLabel("BNB合并算法分层：");
-		label_7.setBounds(10, 45, 141, 15);
-		panel_1.add(label_7);
-		
-		spinnerBnbLayer = new JSpinner();
-		spinnerBnbLayer.setModel(new SpinnerNumberModel(0.5, 0, 1, 0.1));
-		spinnerBnbLayer.setBounds(161, 42, 70, 22);
-		panel_1.add(spinnerBnbLayer);
-		
-		cbGraphFrame = new JCheckBox("每次显示GraphFrame");
-		cbGraphFrame.setSelected(true);
-		cbGraphFrame.setBounds(241, 41, 210, 23);
-		panel_1.add(cbGraphFrame);
-		
-		cbDebug = new JCheckBox("输出Debug信息");
-		cbDebug.setEnabled(true);
-		cbDebug.setBounds(6, 76, 225, 23);
-		panel_1.add(cbDebug);
-		
-		cbTreeFrame = new JCheckBox("每次显示Tree Frame");
-		cbTreeFrame.setEnabled(true);
-		cbTreeFrame.setBounds(241, 76, 210, 23);
-		panel_1.add(cbTreeFrame);
-		
-		
-		
-		JLabel lblNewLabel = new JLabel("MBDPOP维度限制：");
-		lblNewLabel.setBounds(10, 116, 141, 15);
-		panel_1.add(lblNewLabel);
-		
-		spinnerMaxDimensionsInMBDPOP = new JSpinner();
-		spinnerMaxDimensionsInMBDPOP.setModel(new SpinnerNumberModel(8, 3, 20, 1));
-		spinnerMaxDimensionsInMBDPOP.setBounds(161, 113, 70, 22);
-		panel_1.add(spinnerMaxDimensionsInMBDPOP);
-		
-		JLabel lblAdoptkk = new JLabel("ADOPT_k中k值：");
-		lblAdoptkk.setBounds(241, 116, 141, 15);
-		panel_1.add(lblAdoptkk);
-		
-		spinnerADOPT_K = new JSpinner();
-		spinnerADOPT_K.setModel(new SpinnerNumberModel(0, 0, 10000, 100));
-		spinnerADOPT_K.setBounds(381, 113, 70, 22);
-		panel_1.add(spinnerADOPT_K);
+		lspSpinnerMessageTransmissionTime=new LabelSpinnerParameter("通信时间：", new SpinnerNumberModel(0, 0, 1000, 10));
+		lspSpinnerMessageTransmissionNCCC=new LabelSpinnerParameter("通信NCCC：", new SpinnerNumberModel(0, 0, 1000, 10));
+		lspSpinnerBnbLayer=new LabelSpinnerParameter("BNB合并算法分层：", new SpinnerNumberModel(0.5, 0, 1, 0.1));
+		lspSpinnerMaxDimensionsInMBDPOP=new LabelSpinnerParameter("维度限制：", new SpinnerNumberModel(8, 3, 20, 1));
+		lspSpinnerADOPT_K=new LabelSpinnerParameter("K值：", new SpinnerNumberModel(0, 0, 10000, 100));
 	/*	
 		//选择根结点
 		JLabel RootLabel = new JLabel("根结点选择：");
@@ -442,7 +406,7 @@ public class SolverWindow {
 		label_2.setBounds(10, 368, 760, 15);
 		frmDcopsolver.getContentPane().add(label_2);
 		
-		JLabel label_4 = new JLabel("算法参数设置");
+		JLabel label_4 = new JLabel("图形显示设置");
 		label_4.setBounds(10, 177, 459, 15);
 		frmDcopsolver.getContentPane().add(label_4);
 		
@@ -454,8 +418,97 @@ public class SolverWindow {
 		label_9.setBounds(10, 10, 459, 15);
 		frmDcopsolver.getContentPane().add(label_9);
 		
+		cbDebug = new JCheckBox("输出Debug信息");
+		cbDebug.setBounds(107, 364, 141, 23);
+		frmDcopsolver.getContentPane().add(cbDebug);
+		cbDebug.setEnabled(true);
+		
+		JLabel label_10 = new JLabel("算法参数设置");
+		label_10.setBounds(10, 245, 459, 15);
+		frmDcopsolver.getContentPane().add(label_10);
+		
+		panelGraphDisplaySetting = new JPanel();
+		FlowLayout fl_panelGraphDisplaySetting = (FlowLayout) panelGraphDisplaySetting.getLayout();
+		fl_panelGraphDisplaySetting.setAlignment(FlowLayout.LEFT);
+		panelGraphDisplaySetting.setBounds(10, 202, 459, 33);
+		frmDcopsolver.getContentPane().add(panelGraphDisplaySetting);
+		
+		cbGraphFrame = new JCheckBox("每次显示GraphFrame");
+		panelGraphDisplaySetting.add(cbGraphFrame);
+		cbGraphFrame.setSelected(true);
+		
+		cbTreeFrame = new JCheckBox("每次显示Tree Frame");
+		panelGraphDisplaySetting.add(cbTreeFrame);
+		cbTreeFrame.setEnabled(true);
+		
 		initStatus();
 		setSettingValues();
+	}
+	
+	private void initStatus()
+	{
+		tfProblemPath.setText(new File(INIT_PROBLEM_PATH).listFiles()[0].getPath());
+		setBatch(isBatch());
+		labelFlagRunning.setVisible(false);
+		
+		this.algorithmTypeChanged((String) this.combAlgorithmType.getSelectedItem());
+	}
+	
+	private void algorithmTypeChanged(String newType)
+	{
+		this.panelAlgorithmParamSetting.removeAll();
+		this.panelAlgorithmParamSetting.repaint();
+		this.paramList=getCurrentAlgorithmParams(newType);
+		for(LabelSpinnerParameter param : this.paramList)
+		{
+			this.panelAlgorithmParamSetting.add(param);
+		}
+		this.panelAlgorithmParamSetting.paintAll(this.panelAlgorithmParamSetting.getGraphics());
+		this.panelAlgorithmParamSetting.invalidate();
+	}
+	
+	private List<LabelSpinnerParameter> getCurrentAlgorithmParams(String algorithmType)
+	{
+		List<LabelSpinnerParameter> paramList=new ArrayList<LabelSpinnerParameter>();
+		if(algorithmType.equals("DPOP"))
+		{
+			paramList.add(lspSpinnerMessageTransmissionTime);
+		}else if(algorithmType.equals("BFSDPOP"))
+		{
+			paramList.add(lspSpinnerMessageTransmissionTime);
+		}else if(algorithmType.equals("HybridDPOP"))
+		{
+			paramList.add(lspSpinnerMessageTransmissionTime);
+		}else if(algorithmType.equals("HybridMBDPOP"))
+		{
+			paramList.add(lspSpinnerMessageTransmissionTime);
+			paramList.add(lspSpinnerMaxDimensionsInMBDPOP);
+		}else if(algorithmType.equals("AgileDPOP"))
+		{
+			paramList.add(lspSpinnerMessageTransmissionTime);
+			paramList.add(lspSpinnerMaxDimensionsInMBDPOP);
+		}else if(algorithmType.equals("ADOPT"))
+		{
+			paramList.add(lspSpinnerMessageTransmissionNCCC);
+		}else if(algorithmType.equals("BNBADOPT"))
+		{
+			paramList.add(lspSpinnerMessageTransmissionNCCC);
+		}else if(algorithmType.equals("ADOPT_K"))
+		{
+			paramList.add(lspSpinnerMessageTransmissionNCCC);
+			paramList.add(lspSpinnerADOPT_K);
+		}else if(algorithmType.equals("BDADOPT"))
+		{
+			paramList.add(lspSpinnerMessageTransmissionNCCC);
+			paramList.add(lspSpinnerBnbLayer);
+		}else if(algorithmType.equals("SynAdopt"))
+		{
+			paramList.add(lspSpinnerMessageTransmissionNCCC);
+		}else if(algorithmType.equals("SynAdopt2"))
+		{
+			paramList.add(lspSpinnerMessageTransmissionNCCC);
+		}
+		return paramList;
 	}
 	
 	private void openProblemFile()
@@ -482,33 +535,6 @@ public class SolverWindow {
 		}
 	}
 	
-	private void initStatus()
-	{
-		componentStatus=new HashMap<String, Boolean>();
-		
-		componentStatus.put("tfProblemPath", tfProblemPath.isEnabled());
-		componentStatus.put("combAlgorithmType", combAlgorithmType.isEnabled());
-		
-		//componentStatus.put("combHeristicType", combHeristicType.isEnabled());
-		//componentStatus.put("combHeristicNextType", combHeristicNextType.isEnabled());
-		
-		componentStatus.put("spinnerRepeatTimes", spinnerRepeatTimes.isEnabled());
-		componentStatus.put("labelRunProgress", labelRunProgress.isEnabled());
-		componentStatus.put("btnOpen", btnOpen.isEnabled());
-		
-		componentStatus.put("spinnerMessageTransmissionTime", spinnerMessageTransmissionTime.isEnabled());
-		componentStatus.put("spinnerMessageTransmissionNCCC", spinnerMessageTransmissionNCCC.isEnabled());
-		componentStatus.put("spinnerBnbLayer", spinnerBnbLayer.isEnabled());
-		componentStatus.put("cbGraphFrame", cbGraphFrame.isEnabled());
-		componentStatus.put("spinnerADOPT_K", spinnerADOPT_K.isEnabled());
-		componentStatus.put("cbDebug", cbDebug.isEnabled());
-		componentStatus.put("cbTreeFrame", cbTreeFrame.isEnabled());
-		
-		tfProblemPath.setText(new File(INIT_PROBLEM_PATH).listFiles()[0].getPath());
-		setBatch(isBatch());
-		labelFlagRunning.setVisible(false);
-	}
-	
 	private boolean isBatch()
 	{
 		return new File(tfProblemPath.getText().trim()).isDirectory();
@@ -517,93 +543,65 @@ public class SolverWindow {
 	private void setBatch(boolean batch)
 	{
 		cbDebug.setEnabled(!batch);
-		cbTreeFrame.setEnabled(!batch);
-		cbGraphFrame.setEnabled(!batch);
+		setStateGraphDisplaySettingPanel(batch);
 		spinnerRepeatTimes.setEnabled(batch);
 		labelRunProgress.setEnabled(batch);
-		
-		componentStatus.put("cbDebug", cbDebug.isEnabled());
-		componentStatus.put("cbTreeFrame", cbTreeFrame.isEnabled());
-		componentStatus.put("cbGraphFrame", cbGraphFrame.isEnabled());
-		componentStatus.put("spinnerRepeatTimes", spinnerRepeatTimes.isEnabled());
-		componentStatus.put("labelRunProgress", labelRunProgress.isEnabled());
 	}
 	
-	private void enableMainPanel(boolean enable)
+	private void setStateRunningPanel(boolean running)
 	{
-		tfProblemPath.setEnabled(enable);
-		combAlgorithmType.setEnabled(enable);
+		tfProblemPath.setEnabled(!running);
+		combAlgorithmType.setEnabled(!running);
+		spinnerRepeatTimes.setEnabled(!running);
+		labelRunProgress.setEnabled(!running);
+		labelFlagRunning.setVisible(running);
+		btnOpen.setEnabled(!running);
 		
-		//combHeristicType.setEnabled(enable);
-		//combHeristicNextType.setEnabled(enable);
-		
-		spinnerRepeatTimes.setEnabled(enable);
-		btnOpen.setEnabled(enable);
-		if(isBatch()==true)
+		cbDebug.setEnabled(!running);
+	}
+	
+	private void setStateAlgorithmParamSettingPanel(boolean running)
+	{
+		for(LabelSpinnerParameter param : this.paramList)
 		{
-			labelRunProgress.setEnabled(!enable);
-		}else
-		{
-			labelRunProgress.setEnabled(enable);
-		}
-		labelFlagRunning.setVisible(!enable);
-	}
-	
-	private void resumeMainPanel()
-	{
-		tfProblemPath.setEnabled(componentStatus.get("tfProblemPath"));
-		combAlgorithmType.setEnabled(componentStatus.get("combAlgorithmType"));
-		
-		//combHeristicType.setEnabled(componentStatus.get("combHeristicType"));
-		//combHeristicNextType.setEnabled(componentStatus.get("combHeristicNextType"));
-		
-		spinnerRepeatTimes.setEnabled(componentStatus.get("spinnerRepeatTimes"));
-		labelRunProgress.setEnabled(componentStatus.get("labelRunProgress"));
-		labelFlagRunning.setVisible(false);
-		btnOpen.setEnabled(componentStatus.get("btnOpen"));
-	}
-	
-	private void enableSettingPanel(boolean enable)
-	{
-		spinnerMessageTransmissionTime.setEnabled(enable);
-		spinnerMessageTransmissionNCCC.setEnabled(enable);
-		spinnerBnbLayer.setEnabled(enable);
-		cbGraphFrame.setEnabled(enable);
-		cbDebug.setEnabled(enable);
-		cbTreeFrame.setEnabled(enable);
-		spinnerMaxDimensionsInMBDPOP.setEnabled(enable);
-		spinnerADOPT_K.setEnabled(enable);
-	}
-	
-	private void resumeSettingPanel()
-	{
-		spinnerMessageTransmissionTime.setEnabled(componentStatus.get("spinnerMessageTransmissionTime"));
-		spinnerMessageTransmissionNCCC.setEnabled(componentStatus.get("spinnerMessageTransmissionNCCC"));
-		spinnerBnbLayer.setEnabled(componentStatus.get("spinnerBnbLayer"));
-		cbGraphFrame.setEnabled(componentStatus.get("cbGraphFrame"));
-		cbDebug.setEnabled(componentStatus.get("cbDebug"));
-		cbTreeFrame.setEnabled(componentStatus.get("cbTreeFrame"));
-		spinnerMaxDimensionsInMBDPOP.setEnabled(true);
-		spinnerADOPT_K.setEnabled(componentStatus.get("spinnerADOPT_K"));
-	}
-	
-	private void enableUI(boolean enable)
-	{
-		menuBar.setEnabled(enable);
-		if(enable==false)
-		{
-			enableMainPanel(false);
-			enableSettingPanel(false);
-		}else
-		{
-			resumeMainPanel();
-			resumeSettingPanel();
+			param.getSpinner().setEnabled(!running);
 		}
 	}
 	
-	private void solve() throws Exception
+	private void setStateGraphDisplaySettingPanel(boolean running)
 	{
-		this.enableUI(false);
+		cbGraphFrame.setEnabled(!running);
+		cbTreeFrame.setEnabled(!running);
+	}
+	
+	private void setUIState(boolean running)
+	{
+		boolean batch=isBatch();
+		if(running==true)
+		{
+			setStateRunningPanel(running);
+			setStateGraphDisplaySettingPanel(running);
+			setStateAlgorithmParamSettingPanel(running);
+			
+			if(batch==true)
+			{
+				spinnerRepeatTimes.setEnabled(!running);
+				labelRunProgress.setEnabled(running);
+			}
+		}else
+		{
+			setStateRunningPanel(running);
+			setStateGraphDisplaySettingPanel(running);
+			setStateAlgorithmParamSettingPanel(running);
+			
+			setBatch(batch);
+		}
+		
+	}
+	
+	private void solve()
+	{
+		this.setUIState(true);
 		this.setSettingValues();
 		this.epResultDetails.setText("");
 		this.labelFlagRunning.setVisible(true);
@@ -657,7 +655,7 @@ public class SolverWindow {
 						}
 					});
 				}
-				enableUI(true);
+				setUIState(false);
 			}
 		};
 
@@ -687,11 +685,11 @@ public class SolverWindow {
 	
 	private void setSettingValues()
 	{
-		Settings.settings.setCommunicationTimeInDPOPs((Integer)spinnerMessageTransmissionTime.getValue());
-		Settings.settings.setCommunicationNCCCInAdopts((Integer)spinnerMessageTransmissionNCCC.getValue());
-		Settings.settings.setBNBmergeADOPTboundArg((Double)spinnerBnbLayer.getValue());
+		Settings.settings.setCommunicationTimeInDPOPs((Integer)lspSpinnerMessageTransmissionTime.getSpinner().getValue());
+		Settings.settings.setCommunicationNCCCInAdopts((Integer)lspSpinnerMessageTransmissionNCCC.getSpinner().getValue());
+		Settings.settings.setBNBmergeADOPTboundArg((Double)lspSpinnerBnbLayer.getSpinner().getValue());
 		Settings.settings.setDisplayGraphFrame(cbGraphFrame.isSelected());
-		Settings.settings.setMaxDimensionsInMBDPOP((Integer)spinnerMaxDimensionsInMBDPOP.getValue());
-		Settings.settings.setADOPT_K((Integer) spinnerADOPT_K.getValue());
+		Settings.settings.setMaxDimensionsInMBDPOP((Integer)lspSpinnerMaxDimensionsInMBDPOP.getSpinner().getValue());
+		Settings.settings.setADOPT_K((Integer) lspSpinnerADOPT_K.getSpinner().getValue());
 	}
 }
