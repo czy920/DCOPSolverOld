@@ -85,8 +85,16 @@ public class SolverWindow {
 	private JPanel panelGraphDisplaySetting;
 	private List<LabelSpinnerParameter> paramList;
 	
-	private JTextArea epConsoleLines;
+	private JCheckBox cbTotalCost;
+	private JCheckBox cbValues;
+	private JCheckBox cbRunningTime;
+	private JCheckBox cbMessageQuantity;
+	private JCheckBox cbLostRatio;
+	private JCheckBox cbNCCC;
+	private JCheckBox cbMessageSize;
+	private JCheckBox cbCycle;
 	
+	private JTextArea epConsoleLines;
 	private ConsoleRedirectThread consoleRedirectThread;
 	private String consoleOutput="";
 	private int consoleOutputLineCount=0;
@@ -395,7 +403,7 @@ public class SolverWindow {
 		scrollPane.setViewportView(epConsoleLines);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(479, 35, 238, 527);
+		scrollPane_1.setBounds(479, 202, 238, 360);
 		frmDcopsolver.getContentPane().add(scrollPane_1);
 		scrollPane_1.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		
@@ -411,7 +419,7 @@ public class SolverWindow {
 		frmDcopsolver.getContentPane().add(label_4);
 		
 		JLabel label_8 = new JLabel("运行结果");
-		label_8.setBounds(479, 10, 192, 15);
+		label_8.setBounds(479, 177, 192, 15);
 		frmDcopsolver.getContentPane().add(label_8);
 		
 		JLabel label_9 = new JLabel("运行设置");
@@ -428,6 +436,7 @@ public class SolverWindow {
 		frmDcopsolver.getContentPane().add(label_10);
 		
 		panelGraphDisplaySetting = new JPanel();
+		panelGraphDisplaySetting.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		FlowLayout fl_panelGraphDisplaySetting = (FlowLayout) panelGraphDisplaySetting.getLayout();
 		fl_panelGraphDisplaySetting.setAlignment(FlowLayout.LEFT);
 		panelGraphDisplaySetting.setBounds(10, 202, 459, 33);
@@ -440,6 +449,49 @@ public class SolverWindow {
 		cbTreeFrame = new JCheckBox("每次显示Tree Frame");
 		panelGraphDisplaySetting.add(cbTreeFrame);
 		cbTreeFrame.setEnabled(true);
+		
+		JLabel label_5 = new JLabel("输出项");
+		label_5.setBounds(479, 10, 192, 15);
+		frmDcopsolver.getContentPane().add(label_5);
+		
+		JPanel panel = new JPanel();
+		panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		FlowLayout flowLayout = (FlowLayout) panel.getLayout();
+		flowLayout.setAlignment(FlowLayout.LEFT);
+		panel.setBounds(479, 35, 238, 132);
+		frmDcopsolver.getContentPane().add(panel);
+		
+		cbTotalCost = new JCheckBox("TotalCost");
+		cbTotalCost.setSelected(true);
+		panel.add(cbTotalCost);
+		
+		cbValues = new JCheckBox("Values");
+		cbValues.setSelected(true);
+		panel.add(cbValues);
+		
+		cbRunningTime = new JCheckBox("RunningTime");
+		cbRunningTime.setSelected(true);
+		panel.add(cbRunningTime);
+		
+		cbMessageQuantity = new JCheckBox("MessageQuantity");
+		cbMessageQuantity.setSelected(true);
+		panel.add(cbMessageQuantity);
+		
+		cbMessageSize = new JCheckBox("MessageSize");
+		cbMessageSize.setSelected(true);
+		panel.add(cbMessageSize);
+		
+		cbLostRatio = new JCheckBox("LostRatio");
+		cbLostRatio.setSelected(true);
+		panel.add(cbLostRatio);
+		
+		cbNCCC = new JCheckBox("NCCC");
+		cbNCCC.setSelected(true);
+		panel.add(cbNCCC);
+		
+		cbCycle = new JCheckBox("Cycle");
+		cbCycle.setSelected(true);
+		panel.add(cbCycle);
 		
 		initStatus();
 		setSettingValues();
@@ -622,26 +674,52 @@ public class SolverWindow {
 				if(ret!=null)
 				{
 					String detailedResult=DateUtil.currentTime()+"\n";
-					detailedResult+="totalCost: "+ret.totalCost+"\n";
-					detailedResult+="totalTime: "+ret.totalTime+"ms\n";
-					detailedResult+="messageQuantity: "+ret.messageQuantity+"\n";
-					detailedResult+="lostRatio: "+ret.lostRatio+"%"+"\n";
+					if(cbTotalCost.isSelected()==true)
+					{
+						detailedResult+="totalCost: "+ret.totalCost+"\n";
+					}
+					if(cbRunningTime.isSelected()==true)
+					{
+						detailedResult+="totalTime: "+ret.totalTime+"ms\n";
+					}
+					if(cbMessageQuantity.isSelected()==true)
+					{
+						detailedResult+="messageQuantity: "+ret.messageQuantity+"\n";
+					}
+					if(cbLostRatio.isSelected()==true)
+					{
+						detailedResult+="lostRatio: "+ret.lostRatio+"%"+"\n";
+					}
+					
+					
 					if(ret instanceof ResultAdopt)
 					{
-						detailedResult+="NCCC: "+((ResultAdopt)ret).nccc+"\n";
+						if(cbNCCC.isSelected()==true)
+						{
+							detailedResult+="NCCC: "+((ResultAdopt)ret).nccc+"\n";
+						}
 					}else if(ret instanceof ResultDPOP)
 					{
-						detailedResult+="utilMsgSizeMin: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMin)+"\n";
-						detailedResult+="utilMsgSizeMax: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMax)+"\n";
-						detailedResult+="utilMsgSizeAvg: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeAvg)+"\n";
+						if(cbMessageSize.isSelected()==true)
+						{
+							detailedResult+="utilMsgSizeMin: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMin)+"\n";
+							detailedResult+="utilMsgSizeMax: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMax)+"\n";
+							detailedResult+="utilMsgSizeAvg: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeAvg)+"\n";
+						}
 					}
-					for(String key : ret.otherResults.keySet())
+					if(cbCycle.isSelected()==true)
 					{
-						detailedResult+=key+": "+ret.otherResults.get(key)+"\n";
+						for(String key : ret.otherResults.keySet())
+						{
+							detailedResult+=key+": "+ret.otherResults.get(key)+"\n";
+						}
 					}
-					for(Integer key : ret.agentValues.keySet())
+					if(cbValues.isSelected()==true)
 					{
-						detailedResult+="agent "+key+": "+ret.agentValues.get(key)+"\n";
+						for(Integer key : ret.agentValues.keySet())
+						{
+							detailedResult+="agent "+key+": "+ret.agentValues.get(key)+"\n";
+						}
 					}
 					detailedResult=detailedResult.substring(0, detailedResult.length()-1);
 					
