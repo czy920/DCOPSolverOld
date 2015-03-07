@@ -283,7 +283,7 @@ public class SolverWindow {
 		panelRunningSetting.setBounds(10, 35, 459, 132);
 		frmDcopsolver.getContentPane().add(panelRunningSetting);
 		
-		JLabel label = new JLabel("路径：");
+		JLabel label = new JLabel("问题：");
 		label.setBounds(10, 13, 45, 15);
 		panelRunningSetting.add(label);
 		
@@ -332,7 +332,7 @@ public class SolverWindow {
 		labelRunProgress.setBounds(207, 86, 118, 15);
 		panelRunningSetting.add(labelRunProgress);
 		
-		JLabel label_3 = new JLabel("遍数：");
+		JLabel label_3 = new JLabel("重复：");
 		label_3.setBounds(10, 86, 45, 15);
 		panelRunningSetting.add(label_3);
 		
@@ -442,11 +442,11 @@ public class SolverWindow {
 		panelGraphDisplaySetting.setBounds(10, 202, 459, 33);
 		frmDcopsolver.getContentPane().add(panelGraphDisplaySetting);
 		
-		cbGraphFrame = new JCheckBox("每次显示GraphFrame");
+		cbGraphFrame = new JCheckBox("GraphFrame");
 		panelGraphDisplaySetting.add(cbGraphFrame);
 		cbGraphFrame.setSelected(true);
 		
-		cbTreeFrame = new JCheckBox("每次显示Tree Frame");
+		cbTreeFrame = new JCheckBox("Tree Frame");
 		panelGraphDisplaySetting.add(cbTreeFrame);
 		cbTreeFrame.setEnabled(true);
 		
@@ -478,7 +478,6 @@ public class SolverWindow {
 		panel.add(cbMessageQuantity);
 		
 		cbMessageSize = new JCheckBox("MessageSize");
-		cbMessageSize.setSelected(true);
 		panel.add(cbMessageSize);
 		
 		cbLostRatio = new JCheckBox("LostRatio");
@@ -490,7 +489,6 @@ public class SolverWindow {
 		panel.add(cbNCCC);
 		
 		cbCycle = new JCheckBox("Cycle");
-		cbCycle.setSelected(true);
 		panel.add(cbCycle);
 		
 		initStatus();
@@ -676,19 +674,19 @@ public class SolverWindow {
 					String detailedResult=DateUtil.currentTime()+"\n";
 					if(cbTotalCost.isSelected()==true)
 					{
-						detailedResult+="totalCost: "+ret.totalCost+"\n";
+						detailedResult+="TotalCost: "+ret.totalCost+"\n";
 					}
 					if(cbRunningTime.isSelected()==true)
 					{
-						detailedResult+="totalTime: "+ret.totalTime+"ms\n";
+						detailedResult+="RunningTime: "+ret.totalTime+"ms\n";
 					}
 					if(cbMessageQuantity.isSelected()==true)
 					{
-						detailedResult+="messageQuantity: "+ret.messageQuantity+"\n";
+						detailedResult+="MessageQuantity: "+ret.messageQuantity+"\n";
 					}
 					if(cbLostRatio.isSelected()==true)
 					{
-						detailedResult+="lostRatio: "+ret.lostRatio+"%"+"\n";
+						detailedResult+="LostRatio: "+ret.lostRatio+"%"+"\n";
 					}
 					
 					
@@ -702,9 +700,9 @@ public class SolverWindow {
 					{
 						if(cbMessageSize.isSelected()==true)
 						{
-							detailedResult+="utilMsgSizeMin: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMin)+"\n";
-							detailedResult+="utilMsgSizeMax: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMax)+"\n";
-							detailedResult+="utilMsgSizeAvg: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeAvg)+"\n";
+							detailedResult+="UtilMsgSizeMin: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMin)+"\n";
+							detailedResult+="UtilMsgSizeMax: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMax)+"\n";
+							detailedResult+="UtilMsgSizeAvg: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeAvg)+"\n";
 						}
 					}
 					if(cbCycle.isSelected()==true)
@@ -718,7 +716,7 @@ public class SolverWindow {
 					{
 						for(Integer key : ret.agentValues.keySet())
 						{
-							detailedResult+="agent "+key+": "+ret.agentValues.get(key)+"\n";
+							detailedResult+="Agent "+key+": "+ret.agentValues.get(key)+"\n";
 						}
 					}
 					detailedResult=detailedResult.substring(0, detailedResult.length()-1);
