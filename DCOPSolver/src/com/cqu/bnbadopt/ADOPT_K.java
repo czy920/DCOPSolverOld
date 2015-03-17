@@ -23,8 +23,6 @@ public class ADOPT_K extends AgentCycle {
 	public final static String KEY_TH_A = "KEY_TH_A";
 	public final static String KEY_TH_B = "KEY_TH_B";
 	public final static String KEY_NCCC = "KEY_NCCC";
-	public final static String KCOUNT ="KCOUNT";
-	public final static String KKCOUNT = "KKCOUNT";
 
 	//public final static String KEY_VALUE_MESSAGE = "KEY_VALUE_MESSAGE";
 
@@ -46,9 +44,6 @@ public class ADOPT_K extends AgentCycle {
 	private int valueID;
 	private boolean Readytermintate = false;
 	private int K;
-	
-	private int kCount=0;    //测试用
-	private int kkCount=0;
 
 	private int nccc;
 
@@ -200,7 +195,6 @@ public class ADOPT_K extends AgentCycle {
 				this.valueIndex = compute[2];			
 			} else if (compute[1] > this.TH_A + (this.K - 1)) {
 				this.valueIndex = compute[0];	
-				kCount++;
 			} else if (compute[1] >= Math.min(this.TH_B, this.UB)){
 				this.valueIndex = compute[0];
 			}
@@ -212,7 +206,6 @@ public class ADOPT_K extends AgentCycle {
 				}		
 			} else if (compute[1] > this.TH_A + this.K) {
 				this.valueIndex = compute[0];
-				kkCount++;
 			}else if (compute[1] >= Math.min(this.TH_B, this.UB)){
 				this.valueIndex = compute[0];
 			}	
@@ -372,8 +365,6 @@ public class ADOPT_K extends AgentCycle {
 			int TH_A = (Integer) result.get(ADOPT_K.KEY_TH_A);
 			int TH_B = (Integer) result.get(ADOPT_K.KEY_TH_B);
 			int ncccTemp = (Integer) result.get(ADOPT_K.KEY_NCCC);
-			int kCount=(Integer) result.get(ADOPT_K.KCOUNT);
-			int kkCount=(Integer) result.get(ADOPT_K.KKCOUNT);
 				
 			if (maxNccc < ncccTemp) {
 				maxNccc = ncccTemp;
@@ -387,8 +378,6 @@ public class ADOPT_K extends AgentCycle {
 			displayStr += Infinity.infinityEasy(UB_);
 			displayStr += " TH_A=" + Infinity.infinityEasy(TH_A);
 			displayStr += " TH_B=" + Infinity.infinityEasy(TH_B);
-			displayStr += " kCount=" + Infinity.infinityEasy(kCount);
-			displayStr += " kkCount=" + Infinity.infinityEasy(kkCount);
 			System.out.println(displayStr);
 		}
 		System.out.println("totalCost: " + Infinity.infinityEasy(totalCost)
@@ -414,8 +403,6 @@ public class ADOPT_K extends AgentCycle {
 		result.put(ADOPT_K.KEY_TH_A, this.TH_A);
 		result.put(ADOPT_K.KEY_TH_B, this.TH_B);
 		result.put(ADOPT_K.KEY_NCCC, this.nccc);
-		result.put(ADOPT_K.KCOUNT, this.kCount);
-		result.put(ADOPT_K.KKCOUNT, this.kkCount);
 		
 		this.msgMailer.setResult(result);
 		
