@@ -1086,7 +1086,7 @@ public class AgentModel extends AgentCycle {
 			}
 			TH_di=Infinity.add(TH_di, localCost_);
 			
-			return (agent.TH>agent.UB)?(agent.UB-TH_di):(agent.TH-TH_di);
+			return (agent.TH>agent.UB)?Infinity.minus(agent.UB, TH_di):Infinity.minus(agent.TH, TH_di);
 		}
 		
 		private int computeTH2(int di,int child)
@@ -1107,7 +1107,7 @@ public class AgentModel extends AgentCycle {
 			}
 			TH_di=Infinity.add(TH_di, localCost_);
 			
-			return (agent.TH-TH_di);
+			return Infinity.minus(agent.TH, TH_di);
 		}
 
 		protected void disposeValueMessage(Message msg) {

@@ -468,7 +468,7 @@ public class BnBAdoptAgent extends AgentCycle {
 		}
 		TH_di=Infinity.add(TH_di, localCost_);
 		
-		return (TH>UB)?(UB-TH_di):(TH-TH_di);
+		return (TH>UB)?Infinity.minus(UB,TH_di):Infinity.minus(TH,TH_di);
 	}
 	
 	private int computeTH2(int di,int child)
@@ -489,7 +489,7 @@ public class BnBAdoptAgent extends AgentCycle {
 		}
 		TH_di=Infinity.add(TH_di, localCost_);
 		
-		return (TH-TH_di);
+		return Infinity.minus(TH, TH_di);
 	}
 	
 	

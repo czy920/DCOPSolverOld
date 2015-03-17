@@ -191,7 +191,7 @@ public class ADOPT_K extends AgentCycle {
 		int oldValueIndex = valueIndex;
 		maintainTHInvariant();
 		if (this.Readytermintate) {
-			if (this.TH_A == this.UB) {
+			if (this.TH_A == this.UB||this.TH_B==this.UB) {
 				this.valueIndex = compute[2];			
 			} else if (compute[1] > this.TH_A + (this.K - 1)) {
 				this.valueIndex = compute[0];	
@@ -217,8 +217,8 @@ public class ADOPT_K extends AgentCycle {
 		this.maintainChildThresholdInvariant();
 		this.maintainCurrentTHInvariant();
 		this.maintainAllocationInvariant();
-//		System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH_A+"\t"+this.TH_B+"\t"+this.LB+"\t"+this.UB);
-		if(this.TH_A==this.UB)
+		System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH_A+"\t"+this.TH_B+"\t"+this.LB+"\t"+this.UB);
+		if(this.TH_A==this.UB||this.TH_B==this.UB)
 			if(this.isRootAgent()||this.Readytermintate==true){
 				System.out.println("agent"+this.id+": "+this.valueIndex+"\t"+this.valueID+"\t"+this.TH_A+"\t"+this.TH_B+"\t"+this.LB+"\t"+this.UB);
 				sendTerminateMessages();
