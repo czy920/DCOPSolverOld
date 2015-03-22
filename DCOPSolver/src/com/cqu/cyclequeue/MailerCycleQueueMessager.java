@@ -6,9 +6,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.cqu.core.Message;
-import com.cqu.core.ThreadEx;
+import com.cqu.core.ProcessThread;
 
-public abstract class MailerCycleQueueMessager extends ThreadEx{
+public abstract class MailerCycleQueueMessager extends ProcessThread{
 	
     private LinkedList<Message> msgQueue;
     
@@ -52,7 +52,7 @@ public abstract class MailerCycleQueueMessager extends ThreadEx{
 	protected void runProcess() {
 		// TODO Auto-generated method stub
 		initRun();
-		while(isRunning==true)
+		while(isRunning()==true)
 		{
 			//wait for all agents notify arrivals and then put all messages to agents
 			synchronized (cycleEnd) {

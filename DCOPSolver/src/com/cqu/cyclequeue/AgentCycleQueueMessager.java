@@ -6,9 +6,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.cqu.core.Message;
-import com.cqu.core.ThreadEx;
+import com.cqu.core.ProcessThread;
 
-public abstract class AgentCycleQueueMessager extends ThreadEx{
+public abstract class AgentCycleQueueMessager extends ProcessThread{
 	
     protected LinkedList<Message> msgQueue;
     private AtomicBoolean cycleBegin;
@@ -61,7 +61,7 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 				}
 			}
 		}
-		while(isRunning==true)
+		while(isRunning()==true)
 		{
 			//wait for mailer to put messages out to all agents
 			synchronized (cycleBegin) {
@@ -121,7 +121,7 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 				}
 
 				if(lastAgent==false){
-					if(isRunning==false){
+					if(isRunning()==false){
 						
 					}else{
 						synchronized(OperateEndCount){
@@ -134,7 +134,7 @@ public abstract class AgentCycleQueueMessager extends ThreadEx{
 				}
 				if(lastAgent==true)
 				{
-					if(isRunning==false){
+					if(isRunning()==false){
 						
 					}else{
 						synchronized(OperateEndCount){

@@ -149,7 +149,7 @@ public class SolverWindow {
 		printStream=new PrintStream(consoleRedirectThread.getOut(), true);
 		System.setOut(printStream);
 		System.setErr(printStream);
-		consoleRedirectThread.start();
+		consoleRedirectThread.startProcess();
 		System.out.println("DCOPSolver starts working...");
 	}
 

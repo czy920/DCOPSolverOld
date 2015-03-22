@@ -137,7 +137,7 @@ public class AgentManagerCycle {
 		for(AgentCycle agent : agents.values())
 		{
 			agent.setMessageMailer(msgMailer);
-			agent.start();
+			agent.startProcess();
 		}
 	}
 	
