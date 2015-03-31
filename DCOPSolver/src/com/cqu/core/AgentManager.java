@@ -144,7 +144,7 @@ public class AgentManager {
 		for(Agent agent : agents.values())
 		{
 			agent.setMessageMailer(msgMailer);
-			agent.start();
+			agent.startProcess();
 		}
 	}
 	

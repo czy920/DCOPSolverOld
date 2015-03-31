@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class QueueMessager extends ThreadEx{
+public abstract class QueueMessager extends ProcessThread{
 
 	private LinkedList<Message> msgQueue;
 	
@@ -75,7 +75,7 @@ public abstract class QueueMessager extends ThreadEx{
 	protected void runProcess() {
 		// TODO Auto-generated method stub
 		initRun();
-		while(isRunning==true)
+		while(isRunning()==true)
 		{
 			Message msg=null;
 			synchronized (msgQueue) {

@@ -72,7 +72,7 @@ public class Solver {
 			AgentManagerCycle agentManagerCycle=new AgentManagerCycle(problem, agentType);
 			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManagerCycle);
 			msgMailer.addEventListener(el);
-			msgMailer.start();
+			msgMailer.startProcess();
 			agentManagerCycle.startAgents(msgMailer);
 		}
 		//采用异步消息机制的算法
@@ -82,7 +82,7 @@ public class Solver {
 			AgentManager agentManager=new AgentManager(problem, agentType);
 			MessageMailer msgMailer=new MessageMailer(agentManager);
 			msgMailer.addEventListener(el);
-			msgMailer.start();
+			msgMailer.startProcess();
 			agentManager.startAgents(msgMailer);
 		}
 	}
@@ -306,7 +306,7 @@ public class Solver {
 			AgentManagerCycle agentManagerCycle=new AgentManagerCycle(problem, algorithmType);
 			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManagerCycle);
 			msgMailer.addEventListener(el);
-			msgMailer.start();
+			msgMailer.startProcess();
 			agentManagerCycle.startAgents(msgMailer);
 		}
 		//采用异步消息机制的算法
@@ -316,7 +316,7 @@ public class Solver {
 			AgentManager agentManager=new AgentManager(problem, algorithmType);
 			MessageMailer msgMailer=new MessageMailer(agentManager);
 			msgMailer.addEventListener(el);
-			msgMailer.start();
+			msgMailer.startProcess();
 			agentManager.startAgents(msgMailer);
 		}
 	}

@@ -6,9 +6,9 @@ import java.io.InputStreamReader;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
-import com.cqu.core.ThreadEx;
+import com.cqu.core.ProcessThread;
 
-public class ConsoleRedirectThread extends ThreadEx{
+public class ConsoleRedirectThread extends ProcessThread{
 	
 	private PipedInputStream pis = new PipedInputStream();
 	private BufferedReader reader = new BufferedReader(new InputStreamReader(pis));
@@ -37,7 +37,7 @@ public class ConsoleRedirectThread extends ThreadEx{
 		String newLine="";
 		char[] buf=new char[1];
 		int readoutCount=0;
-		while (isRunning==true) {
+		while (isRunning()==true) {
 			try {
 				readoutCount=reader.read(buf);
 				if(readoutCount!=-1)
