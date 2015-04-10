@@ -11,6 +11,7 @@ import com.cqu.bnbadopt.ADOPT_K;
 import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.bnbmergeadopt.AgentModel;
 import com.cqu.core.Message;
+import com.cqu.dsa.DsaAgent;
 import com.cqu.parser.Problem;
 import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
@@ -60,6 +61,9 @@ public class AgentManagerCycle {
 			}else if(agentType.equals("SynAdopt2"))
 			{
 				agent=new AdoptAgentCycle_2(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}else if(agentType.equals("DSA")){
+				agent=new DsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}else
 			{

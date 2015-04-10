@@ -520,7 +520,9 @@ public class SolverWindow {
 	private List<LabelSpinnerParameter> getCurrentAlgorithmParams(String algorithmType)
 	{
 		List<LabelSpinnerParameter> paramList=new ArrayList<LabelSpinnerParameter>();
-		if(algorithmType.equals("DPOP"))
+		if(algorithmType.equals("DSA")){
+			paramList.add(lspSpinnerMessageTransmissionTime);
+		}else if(algorithmType.equals("DPOP"))
 		{
 			paramList.add(lspSpinnerMessageTransmissionTime);
 		}else if(algorithmType.equals("BFSDPOP"))
