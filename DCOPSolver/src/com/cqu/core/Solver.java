@@ -65,7 +65,7 @@ public class Solver {
 		Debugger.debugOn=debug;
 		
 		//采用同步消息机制的算法
-		if(agentType.equals("BNBADOPT")||agentType.equals("BDADOPT")||agentType.equals("ADOPT_K")||agentType.equals("SynAdopt1")||agentType.equals("SynAdopt2")||agentType.equals("DSA"))
+		if(agentType.equals("BNBADOPT")||agentType.equals("BDADOPT")||agentType.equals("ADOPT_K")||agentType.equals("SynAdopt1")||agentType.equals("SynAdopt2")||agentType.equals("DSA_A")||agentType.equals("DSA_B")||agentType.equals("DSA_C")||agentType.equals("DSA_D")||agentType.equals("DSA_E"))
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
 			//construct agents

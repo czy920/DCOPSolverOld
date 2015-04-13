@@ -11,7 +11,7 @@ import com.cqu.bnbadopt.ADOPT_K;
 import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.bnbmergeadopt.AgentModel;
 import com.cqu.core.Message;
-import com.cqu.dsa.DsaAgent;
+import com.cqu.dsa.*;
 import com.cqu.parser.Problem;
 import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
@@ -62,10 +62,23 @@ public class AgentManagerCycle {
 			{
 				agent=new AdoptAgentCycle_2(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("DSA")){
-				agent=new DsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+			}else if(agentType.equals("DSA_A")){
+				agent=new DsaA_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else
+			}else if(agentType.equals("DSA_B")){
+				agent=new DsaB_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}else if(agentType.equals("DSA_C")){
+				agent=new DsaC_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}else if(agentType.equals("DSA_D")){
+				agent=new DsaD_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}else if(agentType.equals("DSA_E")){
+				agent=new DsaE_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else
 			{
 				agent=new AdoptAgentCycle(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
