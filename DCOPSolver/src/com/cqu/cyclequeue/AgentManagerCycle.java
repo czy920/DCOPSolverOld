@@ -12,6 +12,7 @@ import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.bnbmergeadopt.AgentModel;
 import com.cqu.core.Message;
 import com.cqu.dsa.*;
+import com.cqu.mgm.*;
 import com.cqu.parser.Problem;
 import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
@@ -76,6 +77,9 @@ public class AgentManagerCycle {
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}else if(agentType.equals("DSA_E")){
 				agent=new DsaE_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}else if(agentType.equals("MGM")){
+				agent=new MgmAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else
