@@ -18,7 +18,7 @@ public class DsaB_Agent extends AgentCycle {
 	private final static double p=0.3;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
-	
+	//
 	private int localCost;
 	private int localMinCost=0;
 	private int receivedQuantity=0;

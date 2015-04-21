@@ -18,7 +18,7 @@ public class DsaC_Agent extends AgentCycle {
 	private final static double p=0.3;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
-
+//
 	private int localCost;
 	private int receivedQuantity=0;
 	private int cycleCount=0;

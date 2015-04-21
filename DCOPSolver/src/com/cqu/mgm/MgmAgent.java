@@ -3,14 +3,11 @@ package com.cqu.mgm;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.lang.Math;
 
-import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.Result;
 import com.cqu.cyclequeue.AgentCycle;
-import com.cqu.dsa.DsaA_Agent;
 import com.cqu.main.Debugger;
 
 public class MgmAgent extends AgentCycle {
@@ -154,7 +151,6 @@ public class MgmAgent extends AgentCycle {
 				}
 			}
 			valueIndex=selectValueIndex;
-			localCost=localCost-gainValue;
 			sendValueMessages();
 		}
 	}

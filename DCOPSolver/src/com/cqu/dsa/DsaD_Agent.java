@@ -25,7 +25,7 @@ public class DsaD_Agent extends AgentCycle {
 	private int cycleCount=0;
 	private int neighboursQuantity=0;	
 	private HashMap<Integer, Integer> neighboursValueIndex;			//<neighbour 的 Index, neighbourValue 的  Index>
-	
+	//
 	
 	public DsaD_Agent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
