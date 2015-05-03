@@ -23,15 +23,19 @@ public class Mgm2Agent extends AgentCycle {
 	public final static int TYPE_GAIN_MESSAGE=6;
 	public final static int TYPE_DECIDEGO_MESSAGE=7;
 	public final static int TYPE_WAITAGAIN_MESSAGE=8;
+	public final static int TYPE_COGAIN_MESSAGE=9;
 	
 	public final static String TYPE_OFFER="type_offer";
 	public final static String TYPE_RECEIVER="type_receiver";
 	public final static String TYPE_UNKNOW="type_UNKNOW";
 	
-	private final static double p=0.3;
+	private final static double p=0.5;
 	public final static int cycleCountEnd=20;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
+	
+	private int wrong;
+	private int wrongNumber;
 	
 	private int gainValue;
 	private int localCost;
@@ -117,6 +121,10 @@ public class Mgm2Agent extends AgentCycle {
 		}
 	}
 	
+	private void sendCoGainMessages(){
+		Message msg=new Message(this.id, neighbours[coordinate], Mgm2Agent.TYPE_COGAIN_MESSAGE, valueIndex);
+		this.sendMessage(msg);
+	}
 	private void sendDecideGoMessages(){
 		Message msg=new Message(this.id, neighbours[coordinate], Mgm2Agent.TYPE_DECIDEGO_MESSAGE, isAbleToGo);
 		this.sendMessage(msg);
@@ -138,12 +146,29 @@ public class Mgm2Agent extends AgentCycle {
 		}
 		return localCostTemp;
 	}
+	
 
+	protected void work(int i){
+		wrong = 0;
+		if(i != neighboursQuantity){
+			wrong = 1;
+			wrongNumber = i;
+		}
+	}
+	
+	
 	@Override
 	protected void disposeMessage(Message msg) {
 		// TODO 自动生成的方法存根
 		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
-		System.out.println(cycleCount+"____"+this.id);
+		//System.out.println(cycleCount+"____"+this.id);
+		
+		//纠错部分，找到message未收全的Agent
+		if(wrong == 1){
+			System.out.println("Agent "+this.id+"____"+"cycleCount "+cycleCount+"____"+"neighbour数 "+neighboursQuantity+"____"+"收到 "+wrongNumber+"____"+
+					"第 "+receivedQuantity+"____"+"类型 "+msg.getType());
+		}
+		
 		if(Debugger.debugOn==true)
 		{
 			System.out.println(Thread.currentThread().getName()+": message got in agent "+
@@ -170,6 +195,9 @@ public class Mgm2Agent extends AgentCycle {
 		}else if(msg.getType()==Mgm2Agent.TYPE_GAIN_MESSAGE)
 		{
 			disposeGainMessage(msg);
+		}else if(msg.getType()==Mgm2Agent.TYPE_COGAIN_MESSAGE)
+		{
+			disposeCoGainMessage(msg);
 		}else if(msg.getType()==Mgm2Agent.TYPE_DECIDEGO_MESSAGE)
 		{
 			disposeDecideGoMessage(msg);
@@ -180,7 +208,7 @@ public class Mgm2Agent extends AgentCycle {
 	}
 	
 	private void disposeValueMessage(Message msg) {
-		System.out.println("value");
+		//System.out.println("value");
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighboursQuantity; i++){
@@ -265,11 +293,11 @@ public class Mgm2Agent extends AgentCycle {
 				cycleCount++;
 			}
 		}
-		System.out.println("value_end");
+		//System.out.println("value_end");
 	}
 	
 	private void disposeOfferMessage(Message msg) {
-		System.out.println("offer");
+		//System.out.println("offer");
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighboursQuantity; i++){
@@ -280,7 +308,6 @@ public class Mgm2Agent extends AgentCycle {
 		}
 		
 		if(ownType!=TYPE_OFFER){
-			ownType=TYPE_RECEIVER;
 			
 			LinkedList<int[]> tempMap = ((LinkedList<int[]>)(msg.getValue()));
 			int tempList[][] = new int[tempMap.size()][4];
@@ -294,11 +321,13 @@ public class Mgm2Agent extends AgentCycle {
 			for(int i=0; i<tempList.length; i++){
 				tempList[i][2]+=localCost;
 				tempList[i][2]-=constraintCosts.get(neighbours[senderIndex])[valueIndex][neighboursValueIndex.get(senderIndex)];
-				for(int j=0; j<neighbours.length && j!=senderIndex; j++)
+				for(int j=0; j<neighbours.length; j++){
+					if(j!=senderIndex)
 					tempList[i][2]-=constraintCosts.get(neighbours[j])[tempList[i][0]][neighboursValueIndex.get(j)];
+				}
 			}
 			int selectTemp=0;
-			for(int i=0; i<tempList.length; i++){
+			for(int i=1; i<tempList.length; i++){
 				if(tempList[selectTemp][2] < tempList[i][2])
 					selectTemp=i;
 			}
@@ -314,11 +343,11 @@ public class Mgm2Agent extends AgentCycle {
 			
 		}else
 			sendRejectMessages(senderIndex);
-		System.out.println("offer_end");
+		//System.out.println("offer_end");
 	}
 	
 	private void disposeWaitMessage(Message msg) {
-		System.out.println("wait");
+		//System.out.println("wait");
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighboursQuantity; i++){
@@ -332,13 +361,13 @@ public class Mgm2Agent extends AgentCycle {
 		if(receivedQuantity==0 && selectOfferGroup.isEmpty() != true){
 			gather();
 		}
-		System.out.println("wait_end");
+		//System.out.println("wait_end");
 	}
 	
 	private void gather() {
-		System.out.println("gather");
-		int temp[]=selectOfferGroup.remove();
-		for(int i=0; i<selectOfferGroup.size(); i++){
+		//System.out.println("gather");
+		int temp[]=selectOfferGroup.get(0);
+		for(int i=1; i<selectOfferGroup.size(); i++){
 			if(temp[2]<selectOfferGroup.get(i)[2]){
 				sendRejectMessages(temp[3]);
 				temp=selectOfferGroup.get(i);
@@ -347,44 +376,51 @@ public class Mgm2Agent extends AgentCycle {
 				sendRejectMessages(selectOfferGroup.get(i)[3]);
 			}
 		}
+		ownType=TYPE_RECEIVER;
 		selectValueIndex=temp[0];
-		coordinate=temp[3];
 		gainValue=temp[2];
+		coordinate=temp[3];
 		sendAcceptMessages(temp);
-		System.out.println("gather_end");
+		//System.out.println("gather_end");
 	}
 	
 	private void disposeAcceptMessage(Message msg) {
-		System.out.println("accept");
+		//System.out.println("accept");
 		selectValueIndex=((int[])(msg.getValue()))[1];
 		gainValue=((int[])(msg.getValue()))[2];
 		
 		if(receivedQuantity==0){
 			sendGainMessages();
+			if(coordinate!=-1){
+				sendCoGainMessages();
+			}
 		}
-		System.out.println("accept_end");
+		//System.out.println("accept_end");
 	}
 	
 	private void disposeRejectMessage(Message msg) {
-		System.out.println("reject");
+		//System.out.println("reject");
 		ownType=TYPE_UNKNOW;
 		coordinate=-1;
 		if(receivedQuantity==0){
 			sendGainMessages();
 		}
-		System.out.println("reject_end");
+		//System.out.println("reject_end");
 	}
 	
 	private void disposeWaitGainMessage(Message msg) {
-		System.out.println("waitgain");
+		//System.out.println("waitgain");
 		if(receivedQuantity==0){
+			if(coordinate!=-1){	
+				sendCoGainMessages();
+			}
 			sendGainMessages();
 		}		
-		System.out.println("waitgain_end");
+		//System.out.println("waitgain_end");
 	}
 	
 	private void disposeGainMessage(Message msg) {
-		System.out.println("gain");
+		//System.out.println("gain");
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighboursQuantity; i++){
@@ -397,13 +433,15 @@ public class Mgm2Agent extends AgentCycle {
 		
 		if(receivedQuantity==0){
 			for(int i=0; i<neighboursQuantity; i++){
-				if(neighboursGain[i]>=gainValue){
-					isAbleToGo="not";
-					if(coordinate!=-1){	
-						sendDecideGoMessages();
+				if(i!=coordinate){
+					if(neighboursGain[i]>=gainValue){
+						isAbleToGo="not";
+						if(coordinate!=-1){	
+							sendDecideGoMessages();
+						}
+						sendWaitAgainMessages();
+						return;
 					}
-					sendWaitAgainMessages();
-					return;
 				}
 			}
 			isAbleToGo="go";
@@ -413,31 +451,49 @@ public class Mgm2Agent extends AgentCycle {
 			sendWaitAgainMessages();
 		}
 
-		System.out.println("gain_end");
+		//System.out.println("gain_end");
 	}
-	
-	private void disposeDecideGoMessage(Message msg) {
-		System.out.println("decide");
-		if((String)(msg.getValue()) == "go" && isAbleToGo == "go")
-			isAbleToGo = "letUsGo";
+	private void disposeCoGainMessage(Message msg){
+		//System.out.println("cogain");
 		if(receivedQuantity==0){
-			if(isAbleToGo=="letUsGo")
-				valueIndex=selectValueIndex;
+			for(int i=0; i<neighboursQuantity; i++){
+				if(i!=coordinate){
+					if(neighboursGain[i]>=gainValue){
+						isAbleToGo="not";
+						if(coordinate!=-1){	
+							sendDecideGoMessages();
+						}
+						sendWaitAgainMessages();
+						return;
+					}
+				}
+			}
+			isAbleToGo="go";
+			if(coordinate!=-1){	
+				sendDecideGoMessages();
+			}
+			sendWaitAgainMessages();
+		}
+		//System.out.println("cogain_end");
+	}
+	private void disposeDecideGoMessage(Message msg) {
+		//System.out.println("decide");
+		if((String)(msg.getValue()) == "go" && isAbleToGo == "go")
+			valueIndex=selectValueIndex;
+		if(receivedQuantity==0){
 			sendValueMessages();
 		}
-		System.out.println("decide_end");
+		//System.out.println("decide_end");
 	}
 	
 	private void disposeWaitAgainMessage(Message msg) {
-		System.out.println("waitagain");
+		//System.out.println("waitagain");
+		if(isAbleToGo=="go" && coordinate == -1)
+			valueIndex=selectValueIndex;
 		if(receivedQuantity==0){
-			if(isAbleToGo=="letUsGo")
-				valueIndex=selectValueIndex;
-			else if(isAbleToGo=="go" && coordinate == -1)
-				valueIndex=selectValueIndex;
 			sendValueMessages();
 		}
-		System.out.println("waitagain_end");
+		//System.out.println("waitagain_end");
 	}
 	
 	protected void runFinished(){
@@ -506,6 +562,9 @@ public class Mgm2Agent extends AgentCycle {
 		case Mgm2Agent.TYPE_GAIN_MESSAGE :
 			int gainValue=(Integer) msg.getValue();
 			return "gain["+gainValue+"]";
+			
+		case Mgm2Agent.TYPE_COGAIN_MESSAGE :
+			return "co_gain[ ]";
 			
 		case Mgm2Agent.TYPE_DECIDEGO_MESSAGE :
 			return "decide_go["+(String)(msg.getValue())+"]";
