@@ -11,6 +11,7 @@ import com.cqu.core.Message;
 import com.cqu.core.Result;
 import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.main.Debugger;
+import com.cqu.settings.Settings;
 
 public class Mgm2Agent extends AgentCycle {
 
@@ -29,8 +30,8 @@ public class Mgm2Agent extends AgentCycle {
 	public final static String TYPE_RECEIVER="type_receiver";
 	public final static String TYPE_UNKNOW="type_UNKNOW";
 	
-	private final static double p=0.5;
-	public final static int cycleCountEnd=20;
+	private static double p;
+	private static int cycleCountEnd;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
 	
@@ -59,6 +60,9 @@ public class Mgm2Agent extends AgentCycle {
 	
 	protected void initRun() {
 		super.initRun();
+
+		cycleCountEnd = Settings.settings.getCycleCountEnd();
+		p = Settings.settings.getSelectProbability();
 		
 		valueIndex=0;
 		selectValueIndex=0;
@@ -279,15 +283,11 @@ public class Mgm2Agent extends AgentCycle {
 						coordinate=-1;
 						ownType=TYPE_UNKNOW;						
 					}
-					for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++){
-						if(neighbourIndex!=coordinate){
-							sendWaitMessages(neighbourIndex);
-						}
-					}
 				}
-				else{
-					for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++)
+				for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++){
+					if(neighbourIndex!=coordinate){
 						sendWaitMessages(neighbourIndex);
+					}
 				}
 				
 				cycleCount++;

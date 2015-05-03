@@ -75,15 +75,18 @@ public class SolverWindow {
 	private LabelSpinnerParameter lspSpinnerMessageTransmissionTime;
 	private LabelSpinnerParameter lspSpinnerMessageTransmissionNCCC;
 	private LabelSpinnerParameter lspSpinnerBnbLayer;
+	private LabelSpinnerParameter lspSpinnerMaxDimensionsInMBDPOP;
+	private LabelSpinnerParameter lspSpinnerADOPT_K;
+	private LabelSpinnerParameter lspSpinnerCycleCountEnd;
+	private LabelSpinnerParameter lspSpinnerSelectProbability;
+	private List<LabelSpinnerParameter> paramList;
+	
 	private JCheckBox cbGraphFrame;
 	private JCheckBox cbDebug;
 	private JCheckBox cbTreeFrame;
 	private JEditorPane epResultDetails;
-	private LabelSpinnerParameter lspSpinnerMaxDimensionsInMBDPOP;
-	private LabelSpinnerParameter lspSpinnerADOPT_K;
 	private JPanel panelAlgorithmParamSetting;
 	private JPanel panelGraphDisplaySetting;
-	private List<LabelSpinnerParameter> paramList;
 	
 	private JCheckBox cbTotalCost;
 	private JCheckBox cbValues;
@@ -366,6 +369,8 @@ public class SolverWindow {
 		lspSpinnerBnbLayer=new LabelSpinnerParameter("BNB合并算法分层：", new SpinnerNumberModel(0.5, 0, 1, 0.1));
 		lspSpinnerMaxDimensionsInMBDPOP=new LabelSpinnerParameter("维度限制：", new SpinnerNumberModel(8, 3, 20, 1));
 		lspSpinnerADOPT_K=new LabelSpinnerParameter("K值：", new SpinnerNumberModel(0, 0, 10000, 100));
+		lspSpinnerCycleCountEnd=new LabelSpinnerParameter("回合限制：", new SpinnerNumberModel(20, 0, 1000, 1));
+		lspSpinnerSelectProbability=new LabelSpinnerParameter("选择概率：", new SpinnerNumberModel(0.3, 0, 1, 0.1));
 	/*	
 		//选择根结点
 		JLabel RootLabel = new JLabel("根结点选择：");
@@ -520,8 +525,26 @@ public class SolverWindow {
 	private List<LabelSpinnerParameter> getCurrentAlgorithmParams(String algorithmType)
 	{
 		List<LabelSpinnerParameter> paramList=new ArrayList<LabelSpinnerParameter>();
-		if(algorithmType.equals("DSA")){
-			paramList.add(lspSpinnerMessageTransmissionTime);
+		if(algorithmType.equals("DSA_A")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
+		}else if(algorithmType.equals("DSA_B")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
+		}else if(algorithmType.equals("DSA_C")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
+		}else if(algorithmType.equals("DSA_D")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
+		}else if(algorithmType.equals("DSA_E")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
+		}else if(algorithmType.equals("MGM")){
+			paramList.add(lspSpinnerCycleCountEnd);
+		}else if(algorithmType.equals("MGM_2")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
 		}else if(algorithmType.equals("DPOP"))
 		{
 			paramList.add(lspSpinnerMessageTransmissionTime);
@@ -768,6 +791,8 @@ public class SolverWindow {
 		Settings.settings.setBNBmergeADOPTboundArg((Double)lspSpinnerBnbLayer.getSpinner().getValue());
 		Settings.settings.setDisplayGraphFrame(cbGraphFrame.isSelected());
 		Settings.settings.setMaxDimensionsInMBDPOP((Integer)lspSpinnerMaxDimensionsInMBDPOP.getSpinner().getValue());
-		Settings.settings.setADOPT_K((Integer) lspSpinnerADOPT_K.getSpinner().getValue());
+		Settings.settings.setADOPT_K((Integer)lspSpinnerADOPT_K.getSpinner().getValue());
+		Settings.settings.setCycleCount((Integer)lspSpinnerCycleCountEnd.getSpinner().getValue());
+		Settings.settings.setSelectProbability((Double)lspSpinnerSelectProbability.getSpinner().getValue());
 	}
 }

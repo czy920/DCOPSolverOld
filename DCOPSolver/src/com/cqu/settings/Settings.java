@@ -11,7 +11,9 @@ public class Settings {
 	private double BNBmergeADOPTboundArg;
 	private int ADOPT_K;
 	private int maxDimensionInMBDPOP;
-
+	private int cycleCountEnd;
+	private double  selectProbability;
+	
 	private boolean displayGraphFrame;
 	
 	public Settings() {
@@ -22,6 +24,22 @@ public class Settings {
 		this.ADOPT_K=2;
 		this.displayGraphFrame=true;
 		this.maxDimensionInMBDPOP=3;
+	}
+	
+	public int getCycleCountEnd() {
+		return cycleCountEnd;
+	}
+
+	public void setCycleCount(int myCycleCountEnd) {
+		cycleCountEnd = myCycleCountEnd;
+	}
+	
+	public double getSelectProbability() {
+		return selectProbability;
+	}
+
+	public void setSelectProbability(double mySelectProbability) {
+		selectProbability = mySelectProbability;
 	}
 	
 	public double getBNBmergeADOPTboundArg() {

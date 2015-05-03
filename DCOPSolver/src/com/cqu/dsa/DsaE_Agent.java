@@ -10,12 +10,13 @@ import com.cqu.core.Message;
 import com.cqu.core.Result;
 import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.main.Debugger;
+import com.cqu.settings.Settings;
 
 public class DsaE_Agent extends AgentCycle {
 	
 	public final static int TYPE_VALUE_MESSAGE=0;
-	public final static int cycleCountEnd=20;
-	private final static double p=0.3;
+	public static int cycleCountEnd;
+	private static double p;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
 	
@@ -35,6 +36,9 @@ public class DsaE_Agent extends AgentCycle {
 	
 	protected void initRun() {
 		super.initRun();
+
+		cycleCountEnd = Settings.settings.getCycleCountEnd();
+		p = Settings.settings.getSelectProbability();
 		
 		receivedQuantity=0;
 		valueIndex=0;
