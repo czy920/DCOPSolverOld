@@ -8,7 +8,7 @@ import java.lang.Math;
 
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
-import com.cqu.core.Result;
+import com.cqu.core.ResultCycle;
 import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
@@ -39,7 +39,6 @@ public class Mgm2Agent extends AgentCycle {
 	private int wrongNumber;
 	
 	private int gainValue;
-	private int localCost;
 	private int selectValueIndex;
 	private int receivedQuantity;
 	private int cycleCount;
@@ -146,12 +145,14 @@ public class Mgm2Agent extends AgentCycle {
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighboursQuantity; i++){
-			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
+			if(this.id < neighbours[i])
+				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
+			else
+				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex.get(i)][valueIndex];	
 		}
 		return localCostTemp;
 	}
 	
-
 	protected void work(int i){
 		wrong = 0;
 		if(i != neighboursQuantity){
@@ -160,10 +161,10 @@ public class Mgm2Agent extends AgentCycle {
 		}
 	}
 	
-	
 	@Override
 	protected void disposeMessage(Message msg) {
 		// TODO 自动生成的方法存根
+		
 		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
 		//System.out.println(cycleCount+"____"+this.id);
 		
@@ -213,6 +214,9 @@ public class Mgm2Agent extends AgentCycle {
 	
 	private void disposeValueMessage(Message msg) {
 		//System.out.println("value");
+		if(receivedQuantity==0)
+			cycleCount++;
+		
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighboursQuantity; i++){
@@ -229,14 +233,16 @@ public class Mgm2Agent extends AgentCycle {
 			if(cycleCount>=cycleCountEnd){
 				stopRunning();
 			}else{
-				
 				int[] selectMinCost=new int[domain.length];
 				for(int i=0; i<domain.length; i++){
 					selectMinCost[i]=0;
 				}
 				for(int i=0; i<domain.length; i++){
 					for(int j=0; j<neighboursQuantity; j++){
-						selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
+						if(this.id < neighbours[j])
+							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
+						else
+							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];			
 					}					
 				}
 				int newLocalCost=localCost;
@@ -261,8 +267,12 @@ public class Mgm2Agent extends AgentCycle {
 					int selectGroupCost[] = new int[domain.length];
 					for(int i=0; i<neighbourDomains.get(neighbours[coordinate]).length; i++){
 						for(int j=0; j<domain.length; j++){
-							selectGroupCost[j]=selectMinCost[j]-constraintCosts.get(neighbours[coordinate])[j][neighboursValueIndex.get(coordinate)]+
-									constraintCosts.get(neighbours[coordinate])[j][i];
+							if(this.id < neighbours[coordinate])
+								selectGroupCost[j]=selectMinCost[j]-constraintCosts.get(neighbours[coordinate])[j][neighboursValueIndex.get(coordinate)]
+										+constraintCosts.get(neighbours[coordinate])[j][i];
+							else
+								selectGroupCost[j]=selectMinCost[j]-constraintCosts.get(neighbours[coordinate])[neighboursValueIndex.get(coordinate)][j]
+										+constraintCosts.get(neighbours[coordinate])[i][j];
 						}
 						int findTheMin=0;
 						for(int j=0; j<domain.length; j++){
@@ -289,8 +299,6 @@ public class Mgm2Agent extends AgentCycle {
 						sendWaitMessages(neighbourIndex);
 					}
 				}
-				
-				cycleCount++;
 			}
 		}
 		//System.out.println("value_end");
@@ -320,10 +328,17 @@ public class Mgm2Agent extends AgentCycle {
 			
 			for(int i=0; i<tempList.length; i++){
 				tempList[i][2]+=localCost;
-				tempList[i][2]-=constraintCosts.get(neighbours[senderIndex])[valueIndex][neighboursValueIndex.get(senderIndex)];
+				if(this.id < neighbours[senderIndex])
+					tempList[i][2]-=constraintCosts.get(neighbours[senderIndex])[valueIndex][neighboursValueIndex.get(senderIndex)];
+				else
+					tempList[i][2]-=constraintCosts.get(neighbours[senderIndex])[neighboursValueIndex.get(senderIndex)][valueIndex];
+				
 				for(int j=0; j<neighbours.length; j++){
 					if(j!=senderIndex)
-					tempList[i][2]-=constraintCosts.get(neighbours[j])[tempList[i][0]][neighboursValueIndex.get(j)];
+						if(this.id < neighbours[j])
+							tempList[i][2]-=constraintCosts.get(neighbours[j])[tempList[i][0]][neighboursValueIndex.get(j)];
+						else
+							tempList[i][2]-=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][tempList[i][0]];
 				}
 			}
 			int selectTemp=0;
@@ -526,7 +541,7 @@ public class Mgm2Agent extends AgentCycle {
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost));
 		
-		Result ret=new Result();
+		ResultCycle ret=new ResultCycle();
 		ret.totalCost=(int)totalCost;
 		return ret;
 	}

@@ -1,20 +1,10 @@
 package com.cqu.core;
 
 import java.util.HashMap;
-import java.util.Map;
 
-public class Result {
-	
-	public int totalCost;
-	public double[] totalCostInCycle;			//新增参数，用于记录每一个回合的totalCost，来描述动态变化
-	
-	public int messageQuantity;
-	public int lostRatio;
-	public long totalTime;
-	public Map<Integer, Integer> agentValues;
-	public Map<String, Object> otherResults;
-	
-	public Result() {
+public class ResultCycle extends Result{
+
+	public ResultCycle() {
 		// TODO Auto-generated constructor stub
 		this.totalCost=0;
 		this.messageQuantity=0;
@@ -24,16 +14,7 @@ public class Result {
 		this.totalCostInCycle = null;
 	}
 	
-	public Result(Result rs)
-	{
-		this.messageQuantity=rs.messageQuantity;
-		this.lostRatio=rs.lostRatio;
-		this.totalTime=rs.totalTime;
-		this.agentValues=rs.agentValues;
-		this.totalCost = rs.totalCost;
-	}
-	
-	public Result(ResultCycle rs)
+	public ResultCycle(Result rs)
 	{
 		this.messageQuantity=rs.messageQuantity;
 		this.lostRatio=rs.lostRatio;
@@ -48,7 +29,10 @@ public class Result {
 		this.messageQuantity=Math.min(this.messageQuantity, rs.messageQuantity);
 		this.lostRatio=Math.min(this.lostRatio, rs.lostRatio);
 		this.totalTime=Math.min(this.totalTime, rs.totalTime);
-		this.totalCost=Math.min(this.totalCost, rs.totalCost);
+		if(this.totalCost > rs.totalCost){
+			this.totalCost = rs.totalCost;
+			this.totalCostInCycle = rs.totalCostInCycle;
+		}
 	}
 	
 	public void max(Result rs)
@@ -56,7 +40,10 @@ public class Result {
 		this.messageQuantity=Math.max(this.messageQuantity, rs.messageQuantity);
 		this.lostRatio=Math.max(this.lostRatio, rs.lostRatio);
 		this.totalTime=Math.max(this.totalTime, rs.totalTime);
-		this.totalCost=Math.max(this.totalCost, rs.totalCost);
+		if(this.totalCost < rs.totalCost){
+			this.totalCost = rs.totalCost;
+			this.totalCostInCycle = rs.totalCostInCycle;
+		}
 	}
 	
 	public void add(Result rs, int validCount)
@@ -65,6 +52,13 @@ public class Result {
 		this.lostRatio+=(int)(1.0*rs.lostRatio/validCount);
 		this.totalTime+=(int)(1.0*rs.totalTime/validCount);
 		this.totalCost+=(int)(1.0*rs.totalCost/validCount);
+		if(totalCostInCycle == null){
+			totalCostInCycle = new double[rs.totalCostInCycle.length];
+			for(int i = 0; i < totalCostInCycle.length; i++)
+				this.totalCostInCycle[i] = 0;
+		}
+		for(int i = 0; i < totalCostInCycle.length; i++)
+			this.totalCostInCycle[i] += (rs.totalCostInCycle[i]/validCount);
 	}
 	
 	public void minus(Result rs, int validCount)
@@ -73,5 +67,12 @@ public class Result {
 		this.lostRatio-=(int)(1.0*rs.lostRatio/validCount);
 		this.totalTime-=(int)(1.0*rs.totalTime/validCount);
 		this.totalCost-=(int)(1.0*rs.totalCost/validCount);
+		if(totalCostInCycle == null){
+			totalCostInCycle = new double[rs.totalCostInCycle.length];
+			for(int i = 0; i < totalCostInCycle.length; i++)
+				this.totalCostInCycle[i] = 0;
+		}
+		for(int i = 0; i < totalCostInCycle.length; i++)
+			this.totalCostInCycle[i] -= (rs.totalCostInCycle[i]/validCount);
 	}
 }

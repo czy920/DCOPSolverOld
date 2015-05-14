@@ -31,6 +31,7 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 	protected MessageMailerCycle msgMailer;
 	
 	protected int valueIndex;
+	protected int localCost=0;
 	
 	public AgentCycle(int id, String name, int level, int[] domain) {
 		super("Agent "+name);
@@ -51,6 +52,10 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 	public int getValue()
 	{
 		return this.domain[this.valueIndex];
+	}
+	
+	public int getLocalCost(){
+		return localCost;
 	}
 	
 	public void setNeibours(int[] neighbours, int parent, int[] children, int[] allParents, 
@@ -112,5 +117,4 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 	{
 		return this.parent==-1;
 	}
-
 }

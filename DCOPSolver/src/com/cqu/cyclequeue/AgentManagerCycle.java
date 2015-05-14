@@ -10,6 +10,7 @@ import com.cqu.adopt.AdoptAgentCycle_2;
 import com.cqu.bnbadopt.ADOPT_K;
 import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.bnbmergeadopt.AgentModel;
+import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.dsa.*;
 import com.cqu.mgm.*;
@@ -194,4 +195,15 @@ public class AgentManagerCycle {
 		AgentCycle receiverAgent=this.getAgent(msg.getIdReceiver());
 		return senderAgent.easyMessageContent(msg, senderAgent, receiverAgent);
 	}
+	
+	public int getTotalCost(){
+		int totalCost = 0;
+		for(AgentCycle agent : agents.values()){
+			if(agent != null)
+				totalCost += agent.getLocalCost();
+		}
+		totalCost = totalCost/2;
+		return totalCost;
+	}
+	
 }

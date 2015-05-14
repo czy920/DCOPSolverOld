@@ -1,16 +1,22 @@
 package com.cqu.cyclequeue;
 
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.ProcessThread;
 
 public abstract class MailerCycleQueueMessager extends ProcessThread{
 	
     private LinkedList<Message> msgQueue;
+
+    protected AgentManagerCycle agentManager;
+    protected double[] totalCostInCycle;
     
     protected AtomicBoolean cycleBegin;
     protected AtomicBoolean cycleEnd;
@@ -20,7 +26,7 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
     protected AtomicInteger totalAgentCountTemp;
     
     protected int cycleCount;
-	
+    
 	public MailerCycleQueueMessager(String threadName, int totalAgentCount) {
 		super(threadName);
 		// TODO Auto-generated constructor stub
@@ -32,6 +38,7 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 		this.cycleEnd=new AtomicBoolean(false);
 		this.cycleEndCount=new AtomicInteger(0);
 		
+		totalCostInCycle = new double[999];
 		this.cycleCount=0;
 	}
 	
@@ -84,8 +91,18 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 						disposeMessage(msg);
 					}
 				}
-
+				
+				//保存每个回合的totalCost
+				if(cycleCount >= totalCostInCycle.length){
+					double[] templist = new double[2*totalCostInCycle.length];
+					for(int i = 0; i < totalCostInCycle.length; i++)
+						templist[i] = totalCostInCycle[i];
+					totalCostInCycle = templist;
+					//System.out.println(totalCostInCycle.length);
+				}
+				totalCostInCycle[cycleCount] = agentManager.getTotalCost();		
 				cycleCount++;
+				
 				//System.out.println("cycleCount: "+cycleCount);
 				cycleEnd.set(false);
 				synchronized (cycleBegin) {
@@ -105,9 +122,14 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 				}
 			}
 		}
+		double[] correct = new double[cycleCount];
+		for(int i = 0; i < cycleCount; i++)
+			correct[i] = totalCostInCycle[i];
+		totalCostInCycle = correct;
+		
 		runFinished();
 	}
-	
+
 	protected void initRun(){}
 	
 	protected void runFinished(){}

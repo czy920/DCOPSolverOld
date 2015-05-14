@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
-import com.cqu.core.Result;
+import com.cqu.core.ResultCycle;
 import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
@@ -20,7 +20,6 @@ public class MgmAgent extends AgentCycle {
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
 	
 	private int gainValue;
-	private int localCost;
 	private int selectValueIndex;
 	private int receivedQuantity;
 	private int cycleCount;
@@ -68,7 +67,10 @@ public class MgmAgent extends AgentCycle {
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighboursQuantity; i++){
-			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
+			if(this.id < neighbours[i])
+				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
+			else
+				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex.get(i)][valueIndex];	
 		}
 		return localCostTemp;
 	}
@@ -92,7 +94,10 @@ public class MgmAgent extends AgentCycle {
 	
 	private void disposeValueMessage(Message msg) {
 		// TODO 自动生成的方法存根
+		if(receivedQuantity==0)
+			cycleCount++;
 		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
+		
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighboursQuantity; i++){
@@ -101,22 +106,46 @@ public class MgmAgent extends AgentCycle {
 				break;
 			}
 		}
+		
+		/*
+		if(cycleCount == 8){
+			if(neighboursValueIndex.get(senderIndex) != msg.getValue()){
+				System.out.println("agent"+this.id+"_______"+"neighbour_changed"+"________"+neighbours[senderIndex]);
+			}
+		}
+		*/
+		
 		neighboursValueIndex.put((Integer)senderIndex, (Integer)msg.getValue());
 		
 		if(receivedQuantity==0){
+			/*
+			if(cycleCount == 10){
+				if(localCost < localCost()){
+					System.out.println("agent"+this.id+"_______"+"Lost"+"________"+(localCost()-localCost));
+				}
+				else{
+					System.out.println("agent"+this.id+"_______"+"Gain"+"________"+(localCost-localCost()));
+				}
+			}
+			*/
+			//System.out.println("agent"+this.id+"_______"+this.valueIndex);
+			
 			localCost=localCost();
 			
 			if(cycleCount>=cycleCountEnd){
 				stopRunning();
-			}else{
+			}else{				
 				int[] selectMinCost=new int[domain.length];
 				for(int i=0; i<domain.length; i++){
 					selectMinCost[i]=0;
 				}
 				for(int i=0; i<domain.length; i++){
 					for(int j=0; j<neighboursQuantity; j++){
-						selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-					}					
+						if(this.id < neighbours[j])
+							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
+						else
+							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
+					}
 				}
 				int newLocalCost=localCost;
 				for(int i=0; i<domain.length; i++){
@@ -126,8 +155,7 @@ public class MgmAgent extends AgentCycle {
 					}
 				}
 				gainValue=localCost-newLocalCost;
-				
-				cycleCount++;
+				//System.out.println("agent"+this.id+"_______"+cycleCount+"_______"+gainValue+"________");
 				sendGainMessages();
 			}
 		}
@@ -154,6 +182,9 @@ public class MgmAgent extends AgentCycle {
 				}
 			}
 			valueIndex=selectValueIndex;
+			//if(cycleCount == 9){
+			//	System.out.println("agent"+this.id+"_______"+"Gain_ready"+"________"+gainValue);
+			//}
 			sendValueMessages();
 		}
 	}
@@ -187,8 +218,7 @@ public class MgmAgent extends AgentCycle {
 		}
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost));
-		
-		Result ret=new Result();
+		ResultCycle ret=new ResultCycle();
 		ret.totalCost=(int)totalCost;
 		return ret;
 	}

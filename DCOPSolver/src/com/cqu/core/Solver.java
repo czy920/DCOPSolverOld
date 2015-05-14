@@ -189,21 +189,25 @@ public class Solver {
 		if(rs instanceof ResultAdopt)
 		{
 			String totalTime="";
+			String totalCost="";
 			String messageQuantity="";
 			String nccc="";
 			for(int i=0;i<results.size();i++)
 			{
 				ResultAdopt result=(ResultAdopt) results.get(i);
 				totalTime+=result.totalTime+"\n";
+				totalCost+=result.totalCost+"\n";
 				messageQuantity+=result.messageQuantity+"\n";
 				nccc+=result.nccc+"\n";
 			}
 			FileUtil.writeString(totalTime, path+"\\totalTime.txt");
+			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
 			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
 			FileUtil.writeString(nccc, path+"\\nccc.txt");
-		}else
+		}else if(rs instanceof ResultDPOP)
 		{
 			String totalTime="";
+			String totalCost="";
 			String messageQuantity="";
 			String messageSizeMax="";
 			String messageSizeAvg="";
@@ -211,14 +215,52 @@ public class Solver {
 			{
 				ResultDPOP result=(ResultDPOP) results.get(i);
 				totalTime+=result.totalTime+"\n";
+				totalCost+=result.totalCost+"\n";
 				messageQuantity+=result.messageQuantity+"\n";
 				messageSizeMax+=result.utilMsgSizeMax+"\n";
 				messageSizeAvg+=result.utilMsgSizeAvg+"\n";
 			}
 			FileUtil.writeString(totalTime, path+"\\totalTime.txt");
+			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
 			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
 			FileUtil.writeString(messageSizeMax, path+"\\messageSizeMax.txt");
 			FileUtil.writeString(messageSizeAvg, path+"\\messageSizeAvg.txt");
+		}else if(rs instanceof ResultCycle)
+		{
+			String totalTime="";
+			String messageQuantity="";
+			String totalCost="";
+			String myTotalCostInCycle = "";
+			for(int i=0;i<results.size();i++)
+			{
+				Result result=(Result) results.get(i);
+				totalTime+=result.totalTime+"\n";
+				messageQuantity+=result.messageQuantity+"\n";
+				totalCost+=result.totalCost+"\n";
+				myTotalCostInCycle = "";
+				for(int j=0; j < rs.totalCostInCycle.length; j++){
+					myTotalCostInCycle += results.get(i).totalCostInCycle[j] + "\n";
+				}
+				FileUtil.writeString(myTotalCostInCycle, path+"\\totalCostInCycle_"+i+".txt");
+			}
+			FileUtil.writeString(totalTime, path+"\\totalTime.txt");
+			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
+			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
+		}else
+		{
+			String totalTime="";
+			String totalCost="";
+			String messageQuantity="";
+			for(int i=0;i<results.size();i++)
+			{
+				ResultDPOP result=(ResultDPOP) results.get(i);
+				totalTime+=result.totalTime+"\n";
+				totalCost+=result.totalCost+"\n";
+				messageQuantity+=result.messageQuantity+"\n";
+			}
+			FileUtil.writeString(totalTime, path+"\\totalTime.txt");
+			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
+			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
 		}
 	}
 	
@@ -233,11 +275,21 @@ public class Solver {
 			min=new ResultAdopt(rs);
 			max=new ResultAdopt(rs);
 			avg=new ResultAdopt();
-		}else
+		}else if(rs instanceof ResultDPOP)
 		{
 			min=new ResultDPOP(rs);
 			max=new ResultDPOP(rs);
 			avg=new ResultDPOP();
+		}else if(rs instanceof ResultCycle)
+		{
+			min=new ResultCycle(rs);
+			max=new ResultCycle(rs);
+			avg=new ResultCycle();
+		}else
+		{
+			min=new Result(rs);
+			max=new Result(rs);
+			avg=new Result();
 		}
 		avg.add(rs, repeatTimes-2);
 		

@@ -327,7 +327,7 @@ public class SolverWindow {
 				labelRunProgress.setText(spinnerRepeatTimes.getValue()+oldText.substring(oldText.indexOf('/')));
 			}
 		});
-		spinnerRepeatTimes.setModel(new SpinnerNumberModel(5, 3, 10, 1));
+		spinnerRepeatTimes.setModel(new SpinnerNumberModel(10, 3, 50, 1));
 		spinnerRepeatTimes.setBounds(64, 83, 65, 22);
 		panelRunningSetting.add(spinnerRepeatTimes);
 		

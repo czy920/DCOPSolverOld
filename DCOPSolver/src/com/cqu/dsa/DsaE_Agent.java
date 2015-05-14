@@ -7,7 +7,7 @@ import java.lang.Math;
 
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
-import com.cqu.core.Result;
+import com.cqu.core.ResultCycle;
 import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
@@ -19,8 +19,7 @@ public class DsaE_Agent extends AgentCycle {
 	private static double p;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
-	
-	private int localCost;
+
 	private int localMinCost;
 	private int receivedQuantity;
 	private int cycleCount=0;
@@ -63,6 +62,8 @@ public class DsaE_Agent extends AgentCycle {
 	@Override
 	protected void disposeMessage(Message msg) {
 		// TODO Auto-generated method stub
+		if(receivedQuantity==0)
+			cycleCount++;
 		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
@@ -86,7 +87,10 @@ public class DsaE_Agent extends AgentCycle {
 				}
 				for(int i=0; i<domain.length; i++){
 					for(int j=0; j<neighbours.length; j++){
-						selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
+						if(this.id < neighbours[j])
+							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
+						else
+							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
 					}
 				}
 				
@@ -100,16 +104,13 @@ public class DsaE_Agent extends AgentCycle {
 				}
 					
 				if(selectOneMinCost<localCost){
-					localCost=selectOneMinCost;
 					valueIndex=selectValueIndex;
 				}else if(selectOneMinCost==localCost){
 					if(Math.random()<p){
-						localCost=selectOneMinCost;
 						valueIndex=selectValueIndex;
 					}
 				}
 				sendValueMessages();
-				cycleCount++;
 			}
 		}
 	}
@@ -118,7 +119,10 @@ public class DsaE_Agent extends AgentCycle {
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighbours.length; i++){
-			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
+			if(this.id < neighbours[i])
+				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
+			else
+				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex.get(i)][valueIndex];	
 		}
 		return localCostTemp;
 	}
@@ -129,10 +133,22 @@ public class DsaE_Agent extends AgentCycle {
 		for(int i=0; i<domain.length; i++){
 			int tempLocalCost=0;
 			for(int j=0; j<neighboursQuantity; j++){
-				int oneMinCost=constraintCosts.get(neighbours[j])[i][0];
-				for(int k=1; k<constraintCosts.get(neighbours[j])[i].length; k++){	
-					if(oneMinCost>constraintCosts.get(neighbours[j])[i][k])
-						oneMinCost=constraintCosts.get(neighbours[j])[i][k];		
+				
+				int oneMinCost;
+				if(this.id < neighbours[j])
+					oneMinCost=constraintCosts.get(neighbours[j])[i][0];
+				else
+					oneMinCost=constraintCosts.get(neighbours[j])[0][i];
+				
+				for(int k=1; k<neighbourDomains.get(neighbours[j]).length; k++){	
+					if(this.id < neighbours[j]){
+						if(oneMinCost>constraintCosts.get(neighbours[j])[i][k])
+							oneMinCost=constraintCosts.get(neighbours[j])[i][k];
+					}
+					else{
+						if(oneMinCost>constraintCosts.get(neighbours[j])[k][i])
+							oneMinCost=constraintCosts.get(neighbours[j])[k][i];						
+					}
 				}
 				tempLocalCost+=oneMinCost;
 			}
@@ -171,7 +187,7 @@ public class DsaE_Agent extends AgentCycle {
 		}
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost));
-		Result ret=new Result();
+		ResultCycle ret=new ResultCycle();
 		ret.totalCost=(int)totalCost;
 		return ret;
 	}

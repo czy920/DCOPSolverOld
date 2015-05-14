@@ -7,14 +7,14 @@ import java.util.Map;
 import com.cqu.core.EventListener;
 import com.cqu.core.Message;
 import com.cqu.core.Result;
+import com.cqu.core.ResultCycle;
 import com.cqu.main.Debugger;
 import com.cqu.util.FormatUtil;
 
 public class MessageMailerCycle extends MailerCycleQueueMessager{
 
-	private AgentManagerCycle agentManager;
-	private List<Map<String, Object>> results;
-	
+    private List<Map<String, Object>> results;
+    
 	private long timeStart=0;
 	private long timeEnd=0;
 	
@@ -108,6 +108,7 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		resultReturned.lostRatio=(int)(messageLostQuantity*100.0/(messageQuantity+messageLostQuantity));
 		resultReturned.totalTime=timeEnd-timeStart;
 		resultReturned.agentValues=agentManager.getAgentValues();
+		resultReturned.totalCostInCycle = this.totalCostInCycle;
 		
 		System.out.println("Mailer stopped, totalTime: "+resultReturned.totalTime+"ms");
 		System.out.println("Cycle Count: "+this.cycleCount);
