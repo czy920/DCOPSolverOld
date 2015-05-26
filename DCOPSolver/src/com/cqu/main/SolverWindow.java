@@ -542,7 +542,10 @@ public class SolverWindow {
 			paramList.add(lspSpinnerSelectProbability);
 		}else if(algorithmType.equals("MGM")){
 			paramList.add(lspSpinnerCycleCountEnd);
-		}else if(algorithmType.equals("MGM_2")){
+		}else if(algorithmType.equals("MGM2")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
+		}else if(algorithmType.equals("ALS_DSA")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
 		}else if(algorithmType.equals("DPOP"))

@@ -28,7 +28,7 @@ public class Solver {
 	{
 		//parse problem xml
 		String treeGeneratorType=null;
-		if(agentType.equals("BFSDPOP"))
+		if(agentType.equals("BFSDPOP")||agentType.equals("ALS_DSA"))
 		{
 			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
@@ -67,7 +67,7 @@ public class Solver {
 		//采用同步消息机制的算法
 		if(agentType.equals("BNBADOPT")||agentType.equals("BDADOPT")||agentType.equals("ADOPT_K")||agentType.equals("SynAdopt1")||agentType.equals("SynAdopt2")||									
 				agentType.equals("DSA_A")||agentType.equals("DSA_B")||agentType.equals("DSA_C")||agentType.equals("DSA_D")||agentType.equals("DSA_E")||
-				agentType.equals("MGM")||agentType.equals("MGM_2"))
+				agentType.equals("MGM")||agentType.equals("MGM2")||agentType.equals("ALS_DSA"))
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
 			//construct agents
@@ -308,7 +308,7 @@ public class Solver {
 	private void batSolveEach(String problemPath, String algorithmType, final AtomicBoolean problemSolved)
 	{
 		String treeGeneratorType=null;
-		if(algorithmType.equals("BFSDPOP"))
+		if(algorithmType.equals("BFSDPOP") || algorithmType.equals("ALS_DSA"))
 		{
 			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
@@ -355,7 +355,7 @@ public class Solver {
 		//采用同步消息机制的算法
 		if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT_K")||algorithmType.equals("BDADOPT")||algorithmType.equals("SynAdopt1")||algorithmType.equals("SynAdopt2")||
 				algorithmType.equals("DSA_A")||algorithmType.equals("DSA_B")||algorithmType.equals("DSA_C")||algorithmType.equals("DSA_D")||algorithmType.equals("DSA_E")||
-				algorithmType.equals("MGM")||algorithmType.equals("MGM_2"))
+				algorithmType.equals("MGM")||algorithmType.equals("MGM2")||algorithmType.equals("ALS_DSA"))
 		//if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT"))
 		{
 			//construct agents

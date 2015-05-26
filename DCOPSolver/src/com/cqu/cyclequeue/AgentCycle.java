@@ -16,6 +16,7 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 	protected int level;
 	protected int[] domain;
 	
+	protected static int totalHeight;
 	protected int[] neighbours;
 	protected int parent;
 	protected int[] allParents;

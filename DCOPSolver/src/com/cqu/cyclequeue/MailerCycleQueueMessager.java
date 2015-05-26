@@ -92,15 +92,8 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 					}
 				}
 				
-				//保存每个回合的totalCost
-				if(cycleCount >= totalCostInCycle.length){
-					double[] templist = new double[2*totalCostInCycle.length];
-					for(int i = 0; i < totalCostInCycle.length; i++)
-						templist[i] = totalCostInCycle[i];
-					totalCostInCycle = templist;
-					//System.out.println(totalCostInCycle.length);
-				}
-				totalCostInCycle[cycleCount] = agentManager.getTotalCost();		
+				totalCostInCycleIncrease();
+				//System.out.println(totalCostInCycle[cycleCount]);
 				cycleCount++;
 				
 				//System.out.println("cycleCount: "+cycleCount);
@@ -122,14 +115,31 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 				}
 			}
 		}
+		//数组长度修正
+		correction();
+		runFinished();
+	}
+
+	//保存每个回合的totalCost
+	private void totalCostInCycleIncrease(){
+		if(cycleCount >= totalCostInCycle.length){
+			double[] templist = new double[2*totalCostInCycle.length];
+			for(int i = 0; i < totalCostInCycle.length; i++)
+				templist[i] = totalCostInCycle[i];
+			totalCostInCycle = templist;
+			//System.out.println(totalCostInCycle.length);
+		}
+		totalCostInCycle[cycleCount] = agentManager.getTotalCost();		
+	}
+	
+	//数组长度修正
+	private void correction(){
 		double[] correct = new double[cycleCount];
 		for(int i = 0; i < cycleCount; i++)
 			correct[i] = totalCostInCycle[i];
 		totalCostInCycle = correct;
-		
-		runFinished();
 	}
-
+	
 	protected void initRun(){}
 	
 	protected void runFinished(){}

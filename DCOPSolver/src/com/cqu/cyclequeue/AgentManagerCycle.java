@@ -82,15 +82,18 @@ public class AgentManagerCycle {
 			}else if(agentType.equals("MGM")){
 				agent=new MgmAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("MGM_2")){
+			}else if(agentType.equals("MGM2")){
 				agent=new Mgm2Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
+			}else if(agentType.equals("ALS_DSA")){
+				agent=new AlsDsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else
-			{
+			else{
 				agent=new AdoptAgentCycle(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
+			
 			Map<Integer, int[]> neighbourDomains=new HashMap<Integer, int[]>();
 			Map<Integer, int[][]> constraintCosts=new HashMap<Integer, int[][]>();
 			int[] neighbourAgentIds=problem.neighbourAgents.get(agentId);
@@ -114,6 +117,12 @@ public class AgentManagerCycle {
 					problem.allChildrenAgents.get(agentId), neighbourDomains, constraintCosts, neighbourLevels);
 			
 			agents.put(agent.getId(), agent);
+			
+			AgentCycle.totalHeight=0;
+			for(AgentCycle tempAgent : agents.values()){
+				if(AgentCycle.totalHeight < tempAgent.level)
+					AgentCycle.totalHeight = tempAgent.level;
+			}
 			
 			{
 				String str="-----------"+agent.name+"-----------\n";
