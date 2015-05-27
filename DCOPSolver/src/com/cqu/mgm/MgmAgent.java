@@ -18,7 +18,9 @@ public class MgmAgent extends AgentCycle {
 	private static int cycleCountEnd;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
+	public final static String KEY_NCCC="KEY_NCCC";
 	
+	private int nccc = 0;
 	private int gainValue;
 	private int selectValueIndex;
 	private int receivedQuantity;
@@ -155,6 +157,7 @@ public class MgmAgent extends AgentCycle {
 					}
 				}
 				gainValue=localCost-newLocalCost;
+				increaseNccc();
 				//System.out.println("agent"+this.id+"_______"+cycleCount+"_______"+gainValue+"________");
 				sendGainMessages();
 			}
@@ -197,6 +200,7 @@ public class MgmAgent extends AgentCycle {
 		result.put(KEY_NAME, this.name);
 		result.put(KEY_VALUE, this.domain[valueIndex]);
 		result.put(KEY_LOCALCOST, this.localCost);
+		result.put(KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
 		System.out.println("Agent "+this.name+" stopped!");
@@ -204,25 +208,36 @@ public class MgmAgent extends AgentCycle {
 	
 	@Override
 	public Object printResults(List<Map<String, Object>> results) {
-		// TODO 自动生成的方法存根
+		// TODO Auto-generated method stub
 		double totalCost=0;
+		int ncccTemp = 0;
 		for(Map<String, Object> result : results){
 			
 			int id_=(Integer)result.get(KEY_ID);
 			String name_=(String)result.get(KEY_NAME);
 			int value_=(Integer)result.get(KEY_VALUE);
+			
+			if(ncccTemp < (Integer)result.get(KEY_NCCC))
+				ncccTemp = (Integer)result.get(KEY_NCCC);
 			totalCost+=((double)((Integer)result.get(KEY_LOCALCOST)))/2;
 			
 			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
 			System.out.println(displayStr);
 		}
 		
-		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost));
+		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost)+
+				" nccc: "+Infinity.infinityEasy((int)ncccTemp));
+		
 		ResultCycle ret=new ResultCycle();
+		ret.nccc=(int)ncccTemp;
 		ret.totalCost=(int)totalCost;
 		return ret;
 	}
 
+	private void increaseNccc(){
+		nccc++;
+	}
+	
 	@Override
 	public String easyMessageContent(Message msg, AgentCycle sender, AgentCycle receiver) {
 		// TODO 自动生成的方法存根

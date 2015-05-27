@@ -230,6 +230,7 @@ public class Solver {
 			String totalTime="";
 			String messageQuantity="";
 			String totalCost="";
+			String nccc="";
 			String myTotalCostInCycle = "";
 			for(int i=0;i<results.size();i++)
 			{
@@ -237,6 +238,7 @@ public class Solver {
 				totalTime+=result.totalTime+"\n";
 				messageQuantity+=result.messageQuantity+"\n";
 				totalCost+=result.totalCost+"\n";
+				nccc+=result.nccc+"\n";
 				myTotalCostInCycle = "";
 				for(int j=0; j < rs.totalCostInCycle.length; j++){
 					myTotalCostInCycle += results.get(i).totalCostInCycle[j] + "\n";
@@ -246,6 +248,7 @@ public class Solver {
 			FileUtil.writeString(totalTime, path+"\\totalTime.txt");
 			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
 			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
+			FileUtil.writeString(nccc, path+"\\nccc.txt");
 		}else
 		{
 			String totalTime="";

@@ -19,13 +19,14 @@ public class DsaA_Agent extends AgentCycle {
 	private static double p;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
+	public final static String KEY_NCCC="KEY_NCCC";
 
+	private int nccc = 0;
 	private int receivedQuantity=0;
 	private int cycleCount=0;
 	private int neighboursQuantity;	
 	private HashMap<Integer, Integer> neighboursValueIndex;			//<neighbour 的 Index, neighbourValue 的  Index>
-	
-	
+		
 	public DsaA_Agent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
@@ -94,7 +95,8 @@ public class DsaA_Agent extends AgentCycle {
 						if(selectMinCost[i]<localCost){
 							valueIndex=i;
 						}
-					}				
+					}
+					nccc++;
 				}
 				sendValueMessages();
 			}
@@ -122,6 +124,7 @@ public class DsaA_Agent extends AgentCycle {
 		result.put(KEY_NAME, this.name);
 		result.put(KEY_VALUE, this.domain[valueIndex]);
 		result.put(KEY_LOCALCOST, this.localCost);
+		result.put(KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
 		System.out.println("Agent "+this.name+" stopped!");
@@ -133,20 +136,26 @@ public class DsaA_Agent extends AgentCycle {
 		// TODO Auto-generated method stub
 		
 		double totalCost=0;
+		int ncccTemp = 0;
 		for(Map<String, Object> result : results){
 			
 			int id_=(Integer)result.get(KEY_ID);
 			String name_=(String)result.get(KEY_NAME);
 			int value_=(Integer)result.get(KEY_VALUE);
+			
+			if(ncccTemp < (Integer)result.get(KEY_NCCC))
+				ncccTemp = (Integer)result.get(KEY_NCCC);
 			totalCost+=((double)((Integer)result.get(KEY_LOCALCOST)))/2;
 			
 			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
 			System.out.println(displayStr);
 		}
 		
-		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost));
+		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost)+
+				" nccc: "+Infinity.infinityEasy((int)ncccTemp));
 		
 		ResultCycle ret=new ResultCycle();
+		ret.nccc=(int)ncccTemp;
 		ret.totalCost=(int)totalCost;
 		return ret;
 	}
