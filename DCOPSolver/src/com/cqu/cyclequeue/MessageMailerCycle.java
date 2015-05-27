@@ -95,7 +95,10 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		super.runFinished();
 	
 		//Debugger.printValueChanges();
-		Result resultReturned=(Result) this.agentManager.printResults(results);
+		ResultCycle temp = (ResultCycle) this.agentManager.printResults(results);
+		temp.totalCostInCycle = this.totalCostInCycle;					//通过temp输出totalCostInCycle[]
+		Result resultReturned = temp;
+		
 		System.out.println(
 				"messageQuantity: "+messageQuantity+
 				" messageLostQuantity: "+messageLostQuantity+
@@ -108,7 +111,6 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		resultReturned.lostRatio=(int)(messageLostQuantity*100.0/(messageQuantity+messageLostQuantity));
 		resultReturned.totalTime=timeEnd-timeStart;
 		resultReturned.agentValues=agentManager.getAgentValues();
-		resultReturned.totalCostInCycle = this.totalCostInCycle;
 		
 		System.out.println("Mailer stopped, totalTime: "+resultReturned.totalTime+"ms");
 		System.out.println("Cycle Count: "+this.cycleCount);

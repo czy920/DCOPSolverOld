@@ -234,14 +234,14 @@ public class Solver {
 			String myTotalCostInCycle = "";
 			for(int i=0;i<results.size();i++)
 			{
-				Result result=(Result) results.get(i);
+				ResultCycle result=(ResultCycle) results.get(i);
 				totalTime+=result.totalTime+"\n";
 				messageQuantity+=result.messageQuantity+"\n";
 				totalCost+=result.totalCost+"\n";
 				nccc+=result.nccc+"\n";
 				myTotalCostInCycle = "";
-				for(int j=0; j < rs.totalCostInCycle.length; j++){
-					myTotalCostInCycle += results.get(i).totalCostInCycle[j] + "\n";
+				for(int j=0; j < result.totalCostInCycle.length; j++){
+					myTotalCostInCycle += result.totalCostInCycle[j] + "\n";
 				}
 				FileUtil.writeString(myTotalCostInCycle, path+"\\totalCostInCycle_"+i+".txt");
 			}

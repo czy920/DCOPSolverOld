@@ -6,8 +6,6 @@ import java.util.Map;
 public class Result {
 	
 	public int totalCost;
-	public double[] totalCostInCycle;			//新增参数，用于记录每一个回合的totalCost，来描述动态变化
-	public int nccc;
 	
 	public int messageQuantity;
 	public int lostRatio;
@@ -22,8 +20,6 @@ public class Result {
 		this.lostRatio=0;
 		this.totalTime=0;
 		this.otherResults=new HashMap<String, Object>();
-		this.totalCostInCycle = null;
-		this.nccc = 0;
 	}
 	
 	public Result(Result rs)
@@ -42,8 +38,6 @@ public class Result {
 		this.totalTime=rs.totalTime;
 		this.agentValues=rs.agentValues;
 		this.totalCost = rs.totalCost;
-		this.totalCostInCycle = rs.totalCostInCycle;
-		this.nccc = rs.nccc; 
 	}
 	
 	public void min(Result rs)

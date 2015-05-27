@@ -4,6 +4,9 @@ import java.util.HashMap;
 
 public class ResultCycle extends Result{
 	
+	public double[] totalCostInCycle;			//新增参数，用于记录每一个回合的totalCost，来描述动态变化
+	public int nccc;
+		
 	public ResultCycle() {
 		// TODO Auto-generated constructor stub
 		super();
@@ -13,7 +16,7 @@ public class ResultCycle extends Result{
 	public ResultCycle(Result rs)
 	{
 		super(rs);
-		this.totalCostInCycle = rs.totalCostInCycle;
+		this.totalCostInCycle = ((ResultCycle)rs).totalCostInCycle;
 		this.nccc=((ResultCycle)rs).nccc;
 	}
 	
@@ -22,7 +25,7 @@ public class ResultCycle extends Result{
 		super.min(rs);
 		if(this.totalCost > rs.totalCost){
 			this.totalCost = rs.totalCost;
-			this.totalCostInCycle = rs.totalCostInCycle;
+			this.totalCostInCycle = ((ResultCycle)rs).totalCostInCycle;
 		}
 		this.nccc=Math.min(this.nccc, ((ResultCycle)rs).nccc);
 	}
@@ -32,7 +35,7 @@ public class ResultCycle extends Result{
 		super.max(rs);
 		if(this.totalCost < rs.totalCost){
 			this.totalCost = rs.totalCost;
-			this.totalCostInCycle = rs.totalCostInCycle;
+			this.totalCostInCycle = ((ResultCycle)rs).totalCostInCycle;
 		}
 		this.nccc=Math.max(this.nccc, ((ResultCycle)rs).nccc);
 	}
@@ -41,12 +44,12 @@ public class ResultCycle extends Result{
 	{
 		super.add(rs, validCount);
 		if(totalCostInCycle == null){
-			totalCostInCycle = new double[rs.totalCostInCycle.length];
+			totalCostInCycle = new double[((ResultCycle)rs).totalCostInCycle.length];
 			for(int i = 0; i < totalCostInCycle.length; i++)
 				this.totalCostInCycle[i] = 0;
 		}
 		for(int i = 0; i < totalCostInCycle.length; i++)
-			this.totalCostInCycle[i] += (rs.totalCostInCycle[i]/validCount);
+			this.totalCostInCycle[i] += (((ResultCycle)rs).totalCostInCycle[i]/validCount);
 		this.nccc+=(int)(1.0*((ResultCycle)rs).nccc/validCount);
 	}
 	
@@ -54,12 +57,12 @@ public class ResultCycle extends Result{
 	{
 		super.minus(rs, validCount);
 		if(totalCostInCycle == null){
-			totalCostInCycle = new double[rs.totalCostInCycle.length];
+			totalCostInCycle = new double[((ResultCycle)rs).totalCostInCycle.length];
 			for(int i = 0; i < totalCostInCycle.length; i++)
 				this.totalCostInCycle[i] = 0;
 		}
 		for(int i = 0; i < totalCostInCycle.length; i++)
-			this.totalCostInCycle[i] -= (rs.totalCostInCycle[i]/validCount);
+			this.totalCostInCycle[i] -= (((ResultCycle)rs).totalCostInCycle[i]/validCount);
 		this.nccc-=(int)(1.0*((ResultCycle)rs).nccc/validCount);
 	}
 }
