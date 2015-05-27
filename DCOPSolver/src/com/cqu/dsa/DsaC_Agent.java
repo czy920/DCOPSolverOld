@@ -40,12 +40,12 @@ public class DsaC_Agent extends AgentCycle {
 		cycleCountEnd = Settings.settings.getCycleCountEnd();
 		p = Settings.settings.getSelectProbability();
 		
-		valueIndex=0;
+		localCost=2147483647;
+		valueIndex=(int)(Math.random()*(domain.length));
 		neighboursValueIndex=new HashMap<Integer, Integer>();
 		neighboursQuantity=neighbours.length;
 		for(int i=0; i<neighbours.length; i++)
-			neighboursValueIndex.put((Integer)i, (Integer)0);	
-		localCost=localCost();
+			neighboursValueIndex.put((Integer)i, (Integer)0);
 		sendValueMessages();
 	}
 	

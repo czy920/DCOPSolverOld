@@ -39,7 +39,8 @@ public class MgmAgent extends AgentCycle {
 		
 		cycleCountEnd = Settings.settings.getCycleCountEnd();
 		
-		valueIndex=0;
+		localCost=2147483647;
+		valueIndex=(int)(Math.random()*(domain.length));
 		selectValueIndex=0;
 		receivedQuantity=0;
 		cycleCount=0;
@@ -47,8 +48,7 @@ public class MgmAgent extends AgentCycle {
 		neighboursQuantity=neighbours.length;
 		neighboursGain=new int[neighboursQuantity];
 		for(int i=0; i<neighbours.length; i++)
-			neighboursValueIndex.put((Integer)i, (Integer)0);	
-		localCost=localCost();
+			neighboursValueIndex.put((Integer)i, (Integer)0);
 		sendValueMessages();
 	}
 	

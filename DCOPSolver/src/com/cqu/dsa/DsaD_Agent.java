@@ -42,12 +42,12 @@ public class DsaD_Agent extends AgentCycle {
 		p = Settings.settings.getSelectProbability();
 		
 		receivedQuantity=0;
-		valueIndex=0;
+		localCost=2147483647;
+		valueIndex=(int)(Math.random()*(domain.length));
 		neighboursValueIndex=new HashMap<Integer, Integer>();
 		neighboursQuantity=neighbours.length;
 		for(int i=0; i<neighbours.length; i++)
-			neighboursValueIndex.put((Integer)i, (Integer)0);	
-		localCost=localCost();
+			neighboursValueIndex.put((Integer)i, (Integer)0);
 		localMinCost();
 		sendValueMessages();
 	}

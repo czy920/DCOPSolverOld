@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class ResultCycle extends Result{
 	
 	public double[] totalCostInCycle;			//新增参数，用于记录每一个回合的totalCost，来描述动态变化
-	public int nccc;
+	public double nccc;
 		
 	public ResultCycle() {
 		// TODO Auto-generated constructor stub
@@ -50,7 +50,7 @@ public class ResultCycle extends Result{
 		}
 		for(int i = 0; i < totalCostInCycle.length; i++)
 			this.totalCostInCycle[i] += (((ResultCycle)rs).totalCostInCycle[i]/validCount);
-		this.nccc+=(int)(1.0*((ResultCycle)rs).nccc/validCount);
+		this.nccc+=(1.0*((ResultCycle)rs).nccc/validCount);
 	}
 	
 	public void minus(Result rs, int validCount)
@@ -63,6 +63,6 @@ public class ResultCycle extends Result{
 		}
 		for(int i = 0; i < totalCostInCycle.length; i++)
 			this.totalCostInCycle[i] -= (((ResultCycle)rs).totalCostInCycle[i]/validCount);
-		this.nccc-=(int)(1.0*((ResultCycle)rs).nccc/validCount);
+		this.nccc-=(1.0*((ResultCycle)rs).nccc/validCount);
 	}
 }
