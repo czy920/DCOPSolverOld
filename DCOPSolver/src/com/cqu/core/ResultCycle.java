@@ -22,7 +22,9 @@ public class ResultCycle extends Result{
 	
 	public void min(Result rs)
 	{
-		super.min(rs);
+		this.messageQuantity=Math.min(this.messageQuantity, rs.messageQuantity);
+		this.lostRatio=Math.min(this.lostRatio, rs.lostRatio);
+		this.totalTime=Math.min(this.totalTime, rs.totalTime);
 		if(this.totalCost > rs.totalCost){
 			this.totalCost = rs.totalCost;
 			this.totalCostInCycle = ((ResultCycle)rs).totalCostInCycle;
@@ -32,8 +34,10 @@ public class ResultCycle extends Result{
 	
 	public void max(Result rs)
 	{
-		super.max(rs);
-		if(this.totalCost < rs.totalCost){
+		this.messageQuantity=Math.max(this.messageQuantity, rs.messageQuantity);
+		this.lostRatio=Math.max(this.lostRatio, rs.lostRatio);
+		this.totalTime=Math.max(this.totalTime, rs.totalTime);
+		if(this.totalCost <= rs.totalCost){
 			this.totalCost = rs.totalCost;
 			this.totalCostInCycle = ((ResultCycle)rs).totalCostInCycle;
 		}
@@ -50,7 +54,7 @@ public class ResultCycle extends Result{
 		}
 		for(int i = 0; i < totalCostInCycle.length; i++)
 			this.totalCostInCycle[i] += (((ResultCycle)rs).totalCostInCycle[i]/validCount);
-		this.nccc+=(1.0*((ResultCycle)rs).nccc/validCount);
+		this.nccc+=((ResultCycle)rs).nccc/validCount;
 	}
 	
 	public void minus(Result rs, int validCount)
@@ -63,6 +67,6 @@ public class ResultCycle extends Result{
 		}
 		for(int i = 0; i < totalCostInCycle.length; i++)
 			this.totalCostInCycle[i] -= (((ResultCycle)rs).totalCostInCycle[i]/validCount);
-		this.nccc-=(1.0*((ResultCycle)rs).nccc/validCount);
+		this.nccc-=((ResultCycle)rs).nccc/validCount;
 	}
 }

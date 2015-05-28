@@ -88,6 +88,9 @@ public class AgentManagerCycle {
 			}else if(agentType.equals("ALS_DSA")){
 				agent=new AlsDsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
+			}else if(agentType.equals("ALS_MGM")){
+				agent=new AlsMgmAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else{
 				agent=new AdoptAgentCycle(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 

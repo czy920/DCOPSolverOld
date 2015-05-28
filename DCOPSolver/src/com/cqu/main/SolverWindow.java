@@ -548,6 +548,8 @@ public class SolverWindow {
 		}else if(algorithmType.equals("ALS_DSA")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
+		}else if(algorithmType.equals("ALS_MGM")){
+			paramList.add(lspSpinnerCycleCountEnd);
 		}else if(algorithmType.equals("DPOP"))
 		{
 			paramList.add(lspSpinnerMessageTransmissionTime);
