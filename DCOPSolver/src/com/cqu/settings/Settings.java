@@ -12,7 +12,16 @@ public class Settings {
 	private int ADOPT_K;
 	private int maxDimensionInMBDPOP;
 	private int cycleCountEnd;
-	private double  selectProbability;
+	private double selectProbability;
+	private double selectNewProbability;
+	private double selectProbabilityA;
+	private double selectProbabilityB;
+	private double selectProbabilityC;
+	private double selectProbabilityD;
+	private int selectStepK1;
+	private int selectStepK2;
+	private int selectRound;
+	
 	
 	private boolean displayGraphFrame;
 	
@@ -24,22 +33,12 @@ public class Settings {
 		this.ADOPT_K=2;
 		this.displayGraphFrame=true;
 		this.maxDimensionInMBDPOP=3;
-	}
-	
-	public int getCycleCountEnd() {
-		return cycleCountEnd;
-	}
-
-	public void setCycleCount(int myCycleCountEnd) {
-		cycleCountEnd = myCycleCountEnd;
-	}
-	
-	public double getSelectProbability() {
-		return selectProbability;
-	}
-
-	public void setSelectProbability(double mySelectProbability) {
-		selectProbability = mySelectProbability;
+		this.cycleCountEnd = 20;
+		this.selectProbability = 0.3;
+		this.selectNewProbability = 0.5;
+		this.selectStepK1 = 20;
+		this.selectStepK2 = 20;
+		this.selectRound = 60;
 	}
 	
 	public double getBNBmergeADOPTboundArg() {
@@ -89,7 +88,87 @@ public class Settings {
 	public void setMaxDimensionsInMBDPOP(int maxDimensionsInAgileDPOP) {
 		this.maxDimensionInMBDPOP = maxDimensionsInAgileDPOP;
 	}
+	
+	public int getCycleCountEnd() {
+		return cycleCountEnd;
+	}
 
+	public void setCycleCount(int myCycleCountEnd) {
+		cycleCountEnd = myCycleCountEnd;
+	}
+	
+	public double getSelectProbability() {
+		return selectProbability;
+	}
+
+	public void setSelectProbability(double mySelectProbability) {
+		selectProbability = mySelectProbability;
+	}
+	
+	public double getSelectNewProbability() {
+		return selectNewProbability;
+	}
+
+	public void setSelectNewProbability(double mySelectNewProbability) {
+		selectNewProbability = mySelectNewProbability;
+	}
+
+	public double getSelectProbabilityA() {
+		return selectProbabilityA;
+	}
+
+	public void setSelectProbabilityA(double mySelectProbabilityA) {
+		selectProbabilityA = mySelectProbabilityA;
+	}
+
+	public double getSelectProbabilityB() {
+		return selectProbabilityB;
+	}
+
+	public void setSelectProbabilityB(double mySelectProbabilityB) {
+		selectProbabilityB = mySelectProbabilityB;
+	}
+
+	public double getSelectProbabilityC() {
+		return selectProbabilityC;
+	}
+
+	public void setSelectProbabilityC(double mySelectProbabilityC) {
+		selectProbabilityC = mySelectProbabilityC;
+	}
+
+	public double getSelectProbabilityD() {
+		return selectProbabilityD;
+	}
+
+	public void setSelectProbabilityD(double mySelectProbabilityD) {
+		selectProbabilityD = mySelectProbabilityD;
+	}
+	
+	public int getSelectStepK1() {
+		return selectStepK1;
+	}
+
+	public void setSelectStepK1(int mySelectStepK1) {
+		selectStepK1 = mySelectStepK1;
+	}
+
+	public int getSelectStepK2() {
+		return selectStepK2;
+	}
+
+	public void setSelectStepK2(int mySelectStepK2) {
+		selectStepK2 = mySelectStepK2;
+	}
+
+	public int getSelectRound() {
+		return selectRound;
+	}
+
+	public void setSelectRound(int mySelectRound) {
+		selectRound = mySelectRound;
+	}
+	
 	public static Settings showSettingsDialog()
 	{
 		DialogSettings dialog = new DialogSettings(settings);

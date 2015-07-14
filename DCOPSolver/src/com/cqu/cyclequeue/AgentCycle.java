@@ -13,10 +13,10 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 	
 	protected int id;
 	protected String name;
-	protected int level;
+	protected int level;					//Agent的等级，也就是距离root的距离，根节点的值为0
 	protected int[] domain;
 	
-	protected static int totalHeight;
+	protected static int totalHeight;		//每个Agent维持一个树高的值，为根到叶子的距离，也就是叶子的level值
 	protected int[] neighbours;
 	protected int parent;
 	protected int[] allParents;

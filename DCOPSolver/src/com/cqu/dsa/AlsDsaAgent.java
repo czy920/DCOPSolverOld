@@ -13,6 +13,7 @@ import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
 
+//Anytime固定框架的DSA算法
 public class AlsDsaAgent extends AgentCycle {
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_ALSCOST_MESSAGE=1;
@@ -83,14 +84,13 @@ public class AlsDsaAgent extends AgentCycle {
 	@Override
 	protected void disposeMessage(Message msg) {
 		// TODO Auto-generated method stub
-		if(msg.getType() == AlsDsaAgent.TYPE_VALUE_MESSAGE)
-		{
+		if(msg.getType() == AlsDsaAgent.TYPE_VALUE_MESSAGE){
 			disposeValueMessage(msg);
-		}else if(msg.getType() == AlsDsaAgent.TYPE_ALSCOST_MESSAGE)
-		{
+		}
+		else if(msg.getType() == AlsDsaAgent.TYPE_ALSCOST_MESSAGE){
 			disposeAlsCostMessage(msg);
-		}else if(msg.getType() == AlsDsaAgent.TYPE_ALSBEST_MESSAGE)
-		{
+		}
+		else if(msg.getType() == AlsDsaAgent.TYPE_ALSBEST_MESSAGE){
 			disposeAlsBestMessage(msg);
 		}else
 			System.out.println("wrong!!!!!!!!");
@@ -115,6 +115,7 @@ public class AlsDsaAgent extends AgentCycle {
 			
 			if(cycleCount>=cycleCountEnd){
 				//stopRunning();
+				//!!!!!!!!!!!!!!!!!!!!在Als框架下，线程终止操作不在这里进行!!!!!!!!!!!!!!!!!!!!
 			}else{
 				//进行ALS框架操作
 				AlsWork();
@@ -132,10 +133,16 @@ public class AlsDsaAgent extends AgentCycle {
 								selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];	
 						}					
 					}				
-					for(int i=0; i<domain.length; i++){
-						if(selectMinCost[i]<localCost){
-							valueIndex=i;
+					int selectValueIndex=0;
+					int selectOneMinCost=selectMinCost[0];
+					for(int i = 1; i < domain.length; i++){
+						if(selectOneMinCost > selectMinCost[i]){
+							selectOneMinCost = selectMinCost[i];
+							selectValueIndex = i;
 						}
+					}
+					if(selectOneMinCost < localCost){
+						valueIndex = selectValueIndex;
 					}
 					nccc++;
 				}
@@ -186,25 +193,25 @@ public class AlsDsaAgent extends AgentCycle {
 			if(this.isRootAgent() == false)
 				sendAlsCostMessage();
 			else{
+				accumulativeCost = accumulativeCost/2;
 				if(accumulativeCost < bestCost){
 					bestCost = accumulativeCost;
 					bestValue = valueIndexList.removeFirst();
 					isChanged = YES;
-					sendAlsBestMessage();
 				}
 				else{
 					valueIndexList.removeFirst();
 					isChanged = NO;
-					sendAlsBestMessage();
 				}
-				//System.out.println("cycleCount~~~"+cycleCount+"~~~bestCost~~~"+bestCost/2);
+				sendAlsBestMessage();
+				System.out.println("cycleCount~~~"+cycleCount+"~~~bestCost~~~"+bestCost);
 			}
 		}
 		if(valueIndexList.isEmpty() == true){
 			bestCost = bestCost/2;
 			stopRunning();
 		}
-		//System.out.println("Agent "+this.name+"~~~cost~~~"+cycleCount);
+		//System.out.println("Agent "+this.name+"~~~~~~"+cycleCount);
 	}
 	
 	private void disposeAlsBestMessage(Message msg){
@@ -259,7 +266,6 @@ public class AlsDsaAgent extends AgentCycle {
 		this.msgMailer.setResult(result);
 		System.out.println("Agent "+this.name+" stopped!");
 	}
-	
 	
 	@Override
 	public Object printResults(List<Map<String, Object>> results) {
