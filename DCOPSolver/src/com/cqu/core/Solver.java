@@ -28,7 +28,8 @@ public class Solver {
 	{
 		//parse problem xml
 		String treeGeneratorType=null;
-		if(agentType.equals("BFSDPOP")||agentType.equals("ALS_DSA")||agentType.equals("ALS_MGM"))
+		if(agentType.equals("BFSDPOP")||agentType.equals("ALSDSA")||agentType.equals("ALSMGM")||agentType.equals("ALS_DSA")||agentType.equals("ALS_H1_DSA")||
+				agentType.equals("ALS_H2_DSA"))
 		{
 			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
@@ -67,7 +68,8 @@ public class Solver {
 		//采用同步消息机制的算法
 		if(agentType.equals("BNBADOPT")||agentType.equals("BDADOPT")||agentType.equals("ADOPT_K")||agentType.equals("SynAdopt1")||agentType.equals("SynAdopt2")||									
 				agentType.equals("DSA_A")||agentType.equals("DSA_B")||agentType.equals("DSA_C")||agentType.equals("DSA_D")||agentType.equals("DSA_E")||
-				agentType.equals("MGM")||agentType.equals("MGM2")||agentType.equals("ALS_DSA")||agentType.equals("ALS_MGM"))
+				agentType.equals("MGM")||agentType.equals("MGM2")||agentType.equals("ALSDSA")||agentType.equals("ALSMGM")||agentType.equals("ALS_DSA")||
+				agentType.equals("ALS_H1_DSA")||agentType.equals("ALS_H2_DSA"))
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
 			//construct agents
@@ -358,7 +360,8 @@ public class Solver {
 		//采用同步消息机制的算法
 		if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT_K")||algorithmType.equals("BDADOPT")||algorithmType.equals("SynAdopt1")||algorithmType.equals("SynAdopt2")||
 				algorithmType.equals("DSA_A")||algorithmType.equals("DSA_B")||algorithmType.equals("DSA_C")||algorithmType.equals("DSA_D")||algorithmType.equals("DSA_E")||
-				algorithmType.equals("MGM")||algorithmType.equals("MGM2")||algorithmType.equals("ALS_DSA")||algorithmType.equals("ALS_MGM"))
+				algorithmType.equals("MGM")||algorithmType.equals("MGM2")||algorithmType.equals("ALSDSA")||algorithmType.equals("ALSMGM")||algorithmType.equals("ALS_DSA")||
+				algorithmType.equals("ALS_H1_DSA")||algorithmType.equals("ALS_H2_DSA"))
 		//if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT"))
 		{
 			//construct agents

@@ -15,7 +15,7 @@ import com.cqu.settings.Settings;
 public class DsaE_Agent extends AgentCycle {
 	
 	public final static int TYPE_VALUE_MESSAGE=0;
-	public static int cycleCountEnd;
+	private static int cycleCountEnd;
 	private static double p;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
@@ -96,20 +96,20 @@ public class DsaE_Agent extends AgentCycle {
 					}
 				}
 				
-				int selectOneMinCost=selectMinCost[0];
-				int selectValueIndex=0;
-				for(int i=1; i<domain.length; i++){
-					if(selectMinCost[i]<selectOneMinCost){
-						selectOneMinCost=selectMinCost[i];
-						selectValueIndex=i;
+				int selectOneMinCost = selectMinCost[0];
+				int selectValueIndex = 0;
+				for(int i = 1; i < domain.length; i++){
+					if(selectOneMinCost >= selectMinCost[i] || selectValueIndex != valueIndex){
+						selectOneMinCost = selectMinCost[i];
+						selectValueIndex = i;
 					}
 				}
 					
-				if(selectOneMinCost<localCost){
-					valueIndex=selectValueIndex;
-				}else if(selectOneMinCost==localCost){
-					if(Math.random()<p){
-						valueIndex=selectValueIndex;
+				if(selectOneMinCost < localCost){
+					valueIndex = selectValueIndex;
+				}else if(selectOneMinCost == localCost){
+					if(Math.random() < p){
+						valueIndex = selectValueIndex;
 					}
 				}
 				nccc++;

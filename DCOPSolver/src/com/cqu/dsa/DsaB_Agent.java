@@ -15,7 +15,7 @@ import com.cqu.settings.Settings;
 public class DsaB_Agent extends AgentCycle {
 	
 	public final static int TYPE_VALUE_MESSAGE=0;
-	public static int cycleCountEnd;
+	private static int cycleCountEnd;
 	private static double p;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
@@ -94,11 +94,17 @@ public class DsaB_Agent extends AgentCycle {
 							else
 								selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
 						}					
-					}				
-					for(int i=0; i<domain.length; i++){
-						if(selectMinCost[i]<localCost || selectMinCost[i]==localCost && localCost>localMinCost){
-							valueIndex=i;
+					}
+					int selectValueIndex = 0;
+					int selectOneMinCost = selectMinCost[0];
+					for(int i = 1; i < domain.length; i++){
+						if(selectOneMinCost >= selectMinCost[i] && selectMinCost[i] != valueIndex){
+							selectOneMinCost = selectMinCost[i];
+							selectValueIndex = i;
 						}
+					}
+					if(selectOneMinCost < localCost || selectOneMinCost == localCost && localCost > localMinCost){
+						valueIndex = selectValueIndex;
 					}
 					nccc++;
 				}
