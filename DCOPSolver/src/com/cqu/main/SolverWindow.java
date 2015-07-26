@@ -25,7 +25,9 @@ import com.cqu.core.ResultAdopt;
 import com.cqu.core.ResultDPOP;
 import com.cqu.core.Solver;
 import com.cqu.heuristics.DFSHeuristicsManager;
+import com.cqu.problemgenerator.DialogGraphColoring;
 import com.cqu.problemgenerator.DialogMeetingScheduling;
+import com.cqu.problemgenerator.DialogRandomDCOP;
 import com.cqu.settings.DialogSetSettings;
 import com.cqu.settings.Settings;
 import com.cqu.util.DateUtil;
@@ -261,6 +263,30 @@ public class SolverWindow {
 			}
 		});
 		mnp.add(miMeetingScheduling);
+		
+		JMenuItem miGraphColoring = new JMenuItem("图着色");
+		miGraphColoring.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				DialogGraphColoring dlg=new DialogGraphColoring();
+				dlg.setVisible(true);
+			}
+		});
+		mnp.add(miGraphColoring);
+		
+		JMenuItem miRandomDCOP = new JMenuItem("RandomDCOP");
+		miRandomDCOP.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				DialogRandomDCOP dlg=new DialogRandomDCOP();
+				dlg.setVisible(true);
+			}
+		});
+		mnp.add(miRandomDCOP);
 		
 		JMenu mns = new JMenu("设置(S)");
 		mns.setMnemonic('S');

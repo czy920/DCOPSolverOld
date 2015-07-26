@@ -35,6 +35,7 @@ public class DialogMeetingScheduling extends JDialog {
 	private JSpinner spinnerAgentNumPerMeeting;
 	private JSpinner spinnerInstanceNum;
 	private JSpinner spinnerSlots;
+	private JLabel lblNewLabel;
 
 	/**
 	 * Launch the application.
@@ -56,7 +57,7 @@ public class DialogMeetingScheduling extends JDialog {
 		setModal(true);
 		
 		setTitle("MeetingScheduling Problem Generator");
-		setBounds(100, 100, 555, 355);
+		setBounds(100, 100, 555, 394);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -91,15 +92,15 @@ public class DialogMeetingScheduling extends JDialog {
 		contentPanel.add(lblInstances);
 		
 		JLabel lblAgents = new JLabel("Agents:");
-		lblAgents.setBounds(10, 75, 111, 15);
+		lblAgents.setBounds(10, 113, 111, 15);
 		contentPanel.add(lblAgents);
 		
 		JLabel lblMeetings = new JLabel("Meetings：");
-		lblMeetings.setBounds(10, 114, 111, 15);
+		lblMeetings.setBounds(10, 152, 111, 15);
 		contentPanel.add(lblMeetings);
 		
 		JLabel lblAgentspermeeting = new JLabel("AgentsPerMeeting：");
-		lblAgentspermeeting.setBounds(10, 153, 111, 15);
+		lblAgentspermeeting.setBounds(10, 191, 111, 15);
 		contentPanel.add(lblAgentspermeeting);
 		
 		JButton btnGenerate = new JButton("Generate");
@@ -108,42 +109,42 @@ public class DialogMeetingScheduling extends JDialog {
 				generateProblems();
 			}
 		});
-		btnGenerate.setBounds(10, 225, 519, 82);
+		btnGenerate.setBounds(10, 263, 519, 82);
 		contentPanel.add(btnGenerate);
 		
 		spinnerAgentNumFrom = new JSpinner();
 		spinnerAgentNumFrom.setModel(new SpinnerNumberModel(10, 5, 100, 1));
-		spinnerAgentNumFrom.setBounds(133, 72, 75, 22);
+		spinnerAgentNumFrom.setBounds(133, 110, 75, 22);
 		contentPanel.add(spinnerAgentNumFrom);
 		
 		spinnerAgentNumStep = new JSpinner();
 		spinnerAgentNumStep.setModel(new SpinnerNumberModel(1, 1, 10, 1));
-		spinnerAgentNumStep.setBounds(297, 72, 80, 22);
+		spinnerAgentNumStep.setBounds(297, 110, 80, 22);
 		contentPanel.add(spinnerAgentNumStep);
 		
 		spinnerAgentNumTo = new JSpinner();
 		spinnerAgentNumTo.setModel(new SpinnerNumberModel(12, 5, 100, 1));
-		spinnerAgentNumTo.setBounds(454, 72, 75, 22);
+		spinnerAgentNumTo.setBounds(454, 110, 75, 22);
 		contentPanel.add(spinnerAgentNumTo);
 		
 		spinnerMeetingNumFrom = new JSpinner();
 		spinnerMeetingNumFrom.setModel(new SpinnerNumberModel(10, 2, 100, 1));
-		spinnerMeetingNumFrom.setBounds(133, 111, 75, 22);
+		spinnerMeetingNumFrom.setBounds(133, 149, 75, 22);
 		contentPanel.add(spinnerMeetingNumFrom);
 		
 		spinnerMeetingNumStep = new JSpinner();
 		spinnerMeetingNumStep.setModel(new SpinnerNumberModel(1, 1, 10, 1));
-		spinnerMeetingNumStep.setBounds(297, 111, 81, 22);
+		spinnerMeetingNumStep.setBounds(297, 149, 81, 22);
 		contentPanel.add(spinnerMeetingNumStep);
 		
 		spinnerMeetingNumTo = new JSpinner();
 		spinnerMeetingNumTo.setModel(new SpinnerNumberModel(10, 2, 100, 1));
-		spinnerMeetingNumTo.setBounds(454, 111, 75, 22);
+		spinnerMeetingNumTo.setBounds(454, 149, 75, 22);
 		contentPanel.add(spinnerMeetingNumTo);
 		
 		spinnerAgentNumPerMeeting = new JSpinner();
 		spinnerAgentNumPerMeeting.setModel(new SpinnerNumberModel(2, 2, 100, 1));
-		spinnerAgentNumPerMeeting.setBounds(133, 150, 396, 22);
+		spinnerAgentNumPerMeeting.setBounds(133, 188, 396, 22);
 		contentPanel.add(spinnerAgentNumPerMeeting);
 		
 		spinnerInstanceNum = new JSpinner();
@@ -152,13 +153,17 @@ public class DialogMeetingScheduling extends JDialog {
 		contentPanel.add(spinnerInstanceNum);
 		
 		JLabel lblSlots = new JLabel("Slots：");
-		lblSlots.setBounds(10, 196, 54, 15);
+		lblSlots.setBounds(10, 234, 54, 15);
 		contentPanel.add(lblSlots);
 		
 		spinnerSlots = new JSpinner();
 		spinnerSlots.setModel(new SpinnerNumberModel(3, 2, 20, 1));
-		spinnerSlots.setBounds(133, 193, 396, 22);
+		spinnerSlots.setBounds(133, 231, 396, 22);
 		contentPanel.add(spinnerSlots);
+		
+		lblNewLabel = new JLabel("From                        Step                     To");
+		lblNewLabel.setBounds(133, 80, 396, 15);
+		contentPanel.add(lblNewLabel);
 	}
 	
 	private void generateProblems()
