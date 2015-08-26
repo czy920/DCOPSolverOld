@@ -22,13 +22,13 @@ public class Mgm2Agent extends AgentCycle {
 	public final static int TYPE_REJECT_MESSAGE=4;
 	public final static int TYPE_WAITGAIN_MESSAGE=5;
 	public final static int TYPE_GAIN_MESSAGE=6;
-	public final static int TYPE_DECIDEGO_MESSAGE=7;
-	public final static int TYPE_WAITAGAIN_MESSAGE=8;
-	public final static int TYPE_COGAIN_MESSAGE=9;
+	public final static int TYPE_COGAIN_MESSAGE=7;
+	public final static int TYPE_DECIDEGO_MESSAGE=8;
+	public final static int TYPE_WAITAGAIN_MESSAGE=9;
 	
 	public final static String TYPE_OFFER="type_offer";
 	public final static String TYPE_RECEIVER="type_receiver";
-	public final static String TYPE_UNKNOW="type_UNKNOW";
+	public final static String TYPE_UNKNOW="type_unknow";
 	
 	private static double p;
 	private static int cycleCountEnd;
@@ -38,6 +38,7 @@ public class Mgm2Agent extends AgentCycle {
 	
 	private int wrong;
 	private int wrongNumber;
+	private int receivedWrongNumber = 0;
 	
 	private int nccc = 0;
 	private int gainValue;
@@ -172,8 +173,13 @@ public class Mgm2Agent extends AgentCycle {
 		
 		//纠错部分，找到message未收全的Agent
 		if(wrong == 1){
-			System.out.println("Agent "+this.id+"____"+"cycleCount "+cycleCount+"____"+"neighbour数 "+neighboursQuantity+"____"+"收到 "+wrongNumber+"____"+
+			receivedWrongNumber++;
+			System.out.println("Agent "+this.id+"____"+"cycleCount "+cycleCount+"____"+"neighbour数 "+neighboursQuantity+"____"+"邻居"+msg.getIdSender()+"____"+"收到 "+wrongNumber+"____"+
 					"第 "+receivedQuantity+"____"+"类型 "+msg.getType());
+			if(receivedWrongNumber == wrongNumber){
+				int ii = 1;
+				ii = ii/0;
+			}
 		}
 		
 		if(Debugger.debugOn==true)
@@ -506,9 +512,9 @@ public class Mgm2Agent extends AgentCycle {
 	
 	private void disposeWaitAgainMessage(Message msg) {
 		//System.out.println("waitagain");
-		if(isAbleToGo=="go" && coordinate == -1)
-			valueIndex=selectValueIndex;
 		if(receivedQuantity==0){
+			if(isAbleToGo=="go" && coordinate == -1)
+				valueIndex=selectValueIndex;
 			sendValueMessages();
 		}
 		//System.out.println("waitagain_end");

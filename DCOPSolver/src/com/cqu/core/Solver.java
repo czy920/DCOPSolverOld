@@ -28,8 +28,8 @@ public class Solver {
 	{
 		//parse problem xml
 		String treeGeneratorType=null;
-		if(agentType.equals("BFSDPOP")||agentType.equals("ALSDSA")||agentType.equals("ALSMGM")||agentType.equals("ALS_DSA")||agentType.equals("ALS_H1_DSA")||
-				agentType.equals("ALS_H2_DSA"))
+		if(agentType.equals("BFSDPOP")||agentType.equals("ALSDSA")||agentType.equals("ALS_DSA")||agentType.equals("ALSMGM")||agentType.equals("ALS_H1_DSA")
+				||agentType.equals("ALS_H2_DSA"))
 		{
 			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
@@ -77,6 +77,7 @@ public class Solver {
 			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManagerCycle);
 			msgMailer.addEventListener(el);
 			msgMailer.startProcess();
+			msgMailer.initWait();						//为避免出现Agent线程开始而Mailer未初始化完成而出现错误
 			agentManagerCycle.startAgents(msgMailer);
 		}
 		//采用异步消息机制的算法
@@ -234,6 +235,8 @@ public class Solver {
 			String totalCost="";
 			String nccc="";
 			String myTotalCostInCycle = "";
+			String myTimeCostInCycle = "";
+			String myMessageQuantityInCycle = "";
 			for(int i=0;i<results.size();i++)
 			{
 				ResultCycle result=(ResultCycle) results.get(i);
@@ -242,10 +245,16 @@ public class Solver {
 				totalCost+=result.totalCost+"\n";
 				nccc+=result.nccc+"\n";
 				myTotalCostInCycle = "";
+				myTimeCostInCycle = "";
+				myMessageQuantityInCycle = "";
 				for(int j=0; j < result.totalCostInCycle.length; j++){
 					myTotalCostInCycle += result.totalCostInCycle[j] + "\n";
+					myTimeCostInCycle +=result.timeCostInCycle[j] + "\n";
+					myMessageQuantityInCycle +=result.messageQuantityInCycle[j] + "\n";
 				}
 				FileUtil.writeString(myTotalCostInCycle, path+"\\totalCostInCycle_"+i+".txt");
+				FileUtil.writeString(myTimeCostInCycle, path+"\\timeCostInCycle_"+i+".txt");
+				FileUtil.writeString(myMessageQuantityInCycle, path+"\\messageQuantityInCycle_"+i+".txt");
 			}
 			FileUtil.writeString(totalTime, path+"\\totalTime.txt");
 			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
@@ -313,7 +322,8 @@ public class Solver {
 	private void batSolveEach(String problemPath, String algorithmType, final AtomicBoolean problemSolved)
 	{
 		String treeGeneratorType=null;
-		if(algorithmType.equals("BFSDPOP") || algorithmType.equals("ALS_DSA") || algorithmType.equals("ALS_MGM"))
+		if(algorithmType.equals("BFSDPOP") || algorithmType.equals("ALSDSA") || algorithmType.equals("ALS_DSA") || algorithmType.equals("ALS_MGM") 
+				|| algorithmType.equals("ALS_H1_DSA") || algorithmType.equals("ALS_H2_DSA"))
 		{
 			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
@@ -369,6 +379,7 @@ public class Solver {
 			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManagerCycle);
 			msgMailer.addEventListener(el);
 			msgMailer.startProcess();
+			msgMailer.initWait();						//为避免出现Agent线程开始而Mailer未初始化完成而出现错误
 			agentManagerCycle.startAgents(msgMailer);
 		}
 		//采用异步消息机制的算法

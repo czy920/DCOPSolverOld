@@ -15,13 +15,21 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 
     private List<Map<String, Object>> results;
     
-	private long timeStart=0;
-	private long timeEnd=0;
+    private AgentManagerCycle agentManager;
+    
+    private long timeStart=0;
+    private long timeEnd=0;
 	
-	private int messageQuantity;
-	private int messageLostQuantity;
+    private int messageQuantity=0;
+    private int messageLostQuantity=0;
+    
+    private double[] totalCostInCycle;
+    private long[] timeCostInCycle;
+    private int[] messageQuantityInCycle;
 	
 	private List<EventListener> eventListeners;
+	
+	private boolean initFinished = false;
 	
 	public MessageMailerCycle(AgentManagerCycle agentManager) {
 		// TODO Auto-generated constructor stub
@@ -29,10 +37,11 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		this.agentManager=agentManager;
 		results=new ArrayList<Map<String, Object>>();
 		
-		messageQuantity=0;
-		messageLostQuantity=0;
-		
 		eventListeners=new ArrayList<EventListener>();
+		
+		this.totalCostInCycle = new double[999];
+		this.timeCostInCycle = new long[999];
+		this.messageQuantityInCycle = new int[999];
 	}
 	
 	public void setResult(Map<String, Object> result)
@@ -87,6 +96,8 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		}
 		
 		timeStart=System.currentTimeMillis();
+		
+		initFinished = true;
 	}
 	
 	@Override
@@ -95,9 +106,19 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		super.runFinished();
 	
 		//Debugger.printValueChanges();
-		ResultCycle temp = (ResultCycle) this.agentManager.printResults(results);
-		temp.totalCostInCycle = this.totalCostInCycle;					//通过temp输出totalCostInCycle[]
-		Result resultReturned = temp;
+		Result temp = (Result) this.agentManager.printResults(results);
+		Result resultReturned;
+		if(temp instanceof ResultCycle){
+			//通过temp输出totalCostInCycle[]
+			ResultCycle tempCycle = (ResultCycle) temp;
+			tempCycle.totalCostInCycle = this.totalCostInCycle;
+			tempCycle.timeCostInCycle = this.timeCostInCycle;
+			tempCycle.messageQuantityInCycle = this.messageQuantityInCycle;
+			resultReturned = tempCycle;
+		}
+		else
+			resultReturned = temp;
+		
 		
 		System.out.println(
 				"messageQuantity: "+messageQuantity+
@@ -118,6 +139,56 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		for(EventListener el : this.eventListeners)
 		{
 			el.onFinished(resultReturned);
+		}
+	}
+
+	//保存每个回合的totalCost
+	protected void dataInCycleIncrease(){
+		if(cycleCount == 0)
+			return;
+		if(cycleCount > totalCostInCycle.length){
+			double[] templist1 = new double[2*totalCostInCycle.length];
+			long[] templist2 = new long[2*totalCostInCycle.length];
+			int[] templist3 = new int[2*totalCostInCycle.length];
+			for(int i = 0; i < totalCostInCycle.length; i++){
+				templist1[i] = totalCostInCycle[i];
+				templist2[i] = timeCostInCycle[i];
+				templist3[i] = messageQuantityInCycle[i];
+			}
+			totalCostInCycle = templist1;
+			timeCostInCycle = templist2;
+			messageQuantityInCycle = templist3;
+			//System.out.println(totalCostInCycle.length);
+		}
+		//System.out.println(cycleCount);
+		totalCostInCycle[cycleCount-1] = agentManager.getTotalCost();
+		timeCostInCycle[cycleCount-1] = System.currentTimeMillis()-timeStart;
+		messageQuantityInCycle[cycleCount-1] = this.messageQuantity;
+		//System.out.println(totalCostInCycle[cycleCount]+"~~~"+timeCostInCycle[cycleCount]+"~~~"+messageQuantityInCycle[cycleCount]);
+	}
+	
+	//数组长度修正
+	protected void dataInCycleCorrection(){
+		double[] correctCost = new double[cycleCount-1];
+		long[] correctTime = new long[cycleCount-1];
+		int[] correctMessages = new int[cycleCount-1];
+		for(int i = 0; i < cycleCount-1; i++){
+			correctCost[i] = totalCostInCycle[i];
+			correctTime[i] = timeCostInCycle[i];
+			correctMessages[i] = messageQuantityInCycle[i];
+		}
+		totalCostInCycle = correctCost;
+		timeCostInCycle = correctTime;
+		messageQuantityInCycle = correctMessages;
+		//System.out.println(totalCostInCycle.length+"~~~~~end");
+	}
+	
+	/**
+	 * 让Agent线程等待Mailer初始化完毕
+	 */
+	public void initWait(){
+		while(!initFinished){
+			
 		}
 	}
 	

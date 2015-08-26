@@ -26,6 +26,10 @@ public class DsaA_Agent extends AgentCycle {
 	private int cycleCount=0;
 	private int neighboursQuantity;	
 	private HashMap<Integer, Integer> neighboursValueIndex;			//<neighbour 的 Index, neighbourValue 的  Index>
+	
+	private int wrong;
+	private int wrongNumber;
+	private int receivedWrongNumber = 0;
 		
 	public DsaA_Agent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
@@ -55,6 +59,14 @@ public class DsaA_Agent extends AgentCycle {
 		}
 	}
 
+
+	protected void work(int i){
+		wrong = 0;
+		if(i != neighboursQuantity){
+			wrong = 1;
+			wrongNumber = i;
+		}
+	}
 	
 	@Override
 	protected void disposeMessage(Message msg) {
@@ -62,6 +74,18 @@ public class DsaA_Agent extends AgentCycle {
 		if(receivedQuantity==0)
 			cycleCount++;
 		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
+		
+		//纠错部分，找到message未收全的Agent
+		if(wrong == 1){
+			receivedWrongNumber++;
+			System.out.println("Agent "+this.id+"____"+"cycleCount "+cycleCount+"____"+"neighbour数 "+neighboursQuantity+"____"+"邻居"+msg.getIdSender()+"____"+"收到 "+wrongNumber+"____"+
+					"第 "+receivedQuantity+"____");
+			if(receivedWrongNumber == wrongNumber){
+				int ii = 1;
+				ii = ii/0;
+			}
+		}
+		
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighbours.length; i++){

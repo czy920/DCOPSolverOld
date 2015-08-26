@@ -14,9 +14,6 @@ import com.cqu.core.ProcessThread;
 public abstract class MailerCycleQueueMessager extends ProcessThread{
 	
     private LinkedList<Message> msgQueue;
-
-    protected AgentManagerCycle agentManager;
-    protected double[] totalCostInCycle;
     
     protected AtomicBoolean cycleBegin;
     protected AtomicBoolean cycleEnd;
@@ -37,8 +34,7 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 		this.cycleBegin=new AtomicBoolean(false);
 		this.cycleEnd=new AtomicBoolean(false);
 		this.cycleEndCount=new AtomicInteger(0);
-		
-		totalCostInCycle = new double[999];
+
 		this.cycleCount=0;
 	}
 	
@@ -92,8 +88,7 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 					}
 				}
 				
-				totalCostInCycleIncrease();
-				//System.out.println(totalCostInCycle[cycleCount]);
+				dataInCycleIncrease();
 				cycleCount++;
 				
 				//System.out.println("cycleCount: "+cycleCount);
@@ -116,29 +111,16 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 			}
 		}
 		//数组长度修正
-		correction();
+		dataInCycleCorrection();
+		
 		runFinished();
 	}
 
-	//保存每个回合的totalCost
-	private void totalCostInCycleIncrease(){
-		if(cycleCount >= totalCostInCycle.length){
-			double[] templist = new double[2*totalCostInCycle.length];
-			for(int i = 0; i < totalCostInCycle.length; i++)
-				templist[i] = totalCostInCycle[i];
-			totalCostInCycle = templist;
-			//System.out.println(totalCostInCycle.length);
-		}
-		totalCostInCycle[cycleCount] = agentManager.getTotalCost();		
-	}
+	//保存每个回合的dataInCycle
+	protected void dataInCycleIncrease(){}
 	
-	//数组长度修正
-	private void correction(){
-		double[] correct = new double[cycleCount];
-		for(int i = 0; i < cycleCount; i++)
-			correct[i] = totalCostInCycle[i];
-		totalCostInCycle = correct;
-	}
+	//dataInCycle数组长度修正
+	protected void dataInCycleCorrection(){}
 	
 	protected void initRun(){}
 	
