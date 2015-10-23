@@ -11,6 +11,7 @@ public class Settings {
 	private double BNBmergeADOPTboundArg;
 	private int ADOPT_K;
 	private int maxDimensionInMBDPOP;
+	
 	private int cycleCountEnd;
 	private double selectProbability;
 	private double selectNewProbability;
@@ -18,6 +19,7 @@ public class Settings {
 	private double selectProbabilityB;
 	private double selectProbabilityC;
 	private double selectProbabilityD;
+	private int selectInterval;
 	private int selectStepK1;
 	private int selectStepK2;
 	private int selectRound;
@@ -36,6 +38,7 @@ public class Settings {
 		this.cycleCountEnd = 20;
 		this.selectProbability = 0.3;
 		this.selectNewProbability = 0.5;
+		this.selectInterval = 20;
 		this.selectStepK1 = 20;
 		this.selectStepK2 = 20;
 		this.selectRound = 60;
@@ -143,6 +146,14 @@ public class Settings {
 
 	public void setSelectProbabilityD(double mySelectProbabilityD) {
 		selectProbabilityD = mySelectProbabilityD;
+	}
+	
+	public int getSelectInterval() {
+		return selectInterval;
+	}
+
+	public void setSelectInterval(int mySelectInterval) {
+		selectInterval = mySelectInterval;
 	}
 	
 	public int getSelectStepK1() {

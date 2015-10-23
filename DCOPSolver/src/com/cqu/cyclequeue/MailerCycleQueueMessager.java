@@ -30,7 +30,7 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 		this.msgQueue=new LinkedList<Message>();
 		this.totalAgentCount=new AtomicInteger(totalAgentCount);
 		this.totalAgentCountTemp=new AtomicInteger(totalAgentCount);
-		this.OperateEndCount=new AtomicInteger(totalAgentCount);   //初始化是假设处理完了的
+		this.OperateEndCount=new AtomicInteger(totalAgentCount);   //初始化是假设处理完了时的
 		this.cycleBegin=new AtomicBoolean(false);
 		this.cycleEnd=new AtomicBoolean(false);
 		this.cycleEndCount=new AtomicInteger(0);
@@ -89,6 +89,7 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 				}
 				
 				dataInCycleIncrease();
+				//System.out.println("cycleCount: "+cycleCount);
 				cycleCount++;
 				
 				//System.out.println("cycleCount: "+cycleCount);
@@ -112,6 +113,12 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 		}
 		//数组长度修正
 		dataInCycleCorrection();
+		
+		//if(cycleCount != 39){
+		//	System.out.println("~~~"+cycleCount+"~~~wrong!!!!!!!!");
+		//	int a = 1;
+		//	a = a/0;
+		//}
 		
 		runFinished();
 	}

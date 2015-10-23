@@ -114,7 +114,7 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 			tempCycle.totalCostInCycle = this.totalCostInCycle;
 			tempCycle.timeCostInCycle = this.timeCostInCycle;
 			tempCycle.messageQuantityInCycle = this.messageQuantityInCycle;
-			resultReturned = tempCycle;
+			resultReturned = (Result)tempCycle;
 		}
 		else
 			resultReturned = temp;
@@ -144,7 +144,7 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 
 	//保存每个回合的totalCost
 	protected void dataInCycleIncrease(){
-		if(cycleCount == 0)
+		if(cycleCount == 0)													//除去初始化时Cost混乱时的统计
 			return;
 		if(cycleCount > totalCostInCycle.length){
 			double[] templist1 = new double[2*totalCostInCycle.length];

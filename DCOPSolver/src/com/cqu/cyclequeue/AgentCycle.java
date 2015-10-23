@@ -2,6 +2,7 @@ package com.cqu.cyclequeue;
 
 import java.util.List;
 import java.util.Map;
+
 import com.cqu.core.Message;
 import com.cqu.util.CollectionUtil;
 
@@ -33,6 +34,7 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 	
 	protected int valueIndex;
 	protected int localCost=0;
+	//protected int cycleCount=0;
 	
 	public AgentCycle(int id, String name, int level, int[] domain) {
 		super("Agent "+name);
@@ -58,7 +60,7 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 	public int getLocalCost(){
 		return localCost;
 	}
-	
+
 	public void setNeibours(int[] neighbours, int parent, int[] children, int[] allParents, 
 			int[] allChildren, Map<Integer, int[]> neighbourDomains, Map<Integer, 
 			int[][]> constraintCosts, Map<Integer, Integer> neighbourLevels)

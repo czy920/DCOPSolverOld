@@ -6,8 +6,9 @@ import java.util.LinkedList;
 import com.cqu.core.Message;
 
 public abstract class AgentCycleAls extends AgentCycle{
-
+	
 	public final static String KEY_BESTCOST="KEY_BESTCOST";
+	public final static String KEY_BESTCOSTINCYCLE="KEY_BESTCOSTINCYCLE";
 	public final static int TYPE_ALSCOST_MESSAGE=345;
 	public final static int TYPE_ALSBEST_MESSAGE=346;
 	
@@ -16,6 +17,7 @@ public abstract class AgentCycleAls extends AgentCycle{
 	
 	protected int AlsCycleCount = 0;
 	protected int bestCost = 2147483647;
+	protected double[] bestCostInCycle; 
 	protected int bestValue = 0;
 	protected int accumulativeCost = 0;
 	protected String isChanged = NO; 
@@ -24,6 +26,8 @@ public abstract class AgentCycleAls extends AgentCycle{
 	protected LinkedList<Integer> valueIndexList = new LinkedList<Integer>();
 	protected HashMap<Integer, LinkedList<Integer>> childrenMessageList = new HashMap<Integer, LinkedList<Integer>>();
 	
+	private int warning = 0;
+	
 	
 	public AgentCycleAls(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
@@ -31,6 +35,7 @@ public abstract class AgentCycleAls extends AgentCycle{
 		this.level=level;
 		this.name = name;
 		this.domain=domain;
+		bestCostInCycle = new double[9999];
 	}
 
 	//!!!!!!!!!!!!!!!!!!!!该类的核心方法，子类必须调用才能使ALS框架起作用!!!!!!!!!!!!!!!!!!!!
@@ -50,14 +55,21 @@ public abstract class AgentCycleAls extends AgentCycle{
 	//!!!!!!!!!!!!!!!!!!!!该类的核心方法，子类必须调用才能使ALS框架起作用!!!!!!!!!!!!!!!!!!!!
 	//!!!!!!!!!!!!!!!!!调用位置应该位于算法获取局部COST之后，改变value之前 !!!!!!!!!!!!!!!!!!
 	protected void AlsWork(){
-		localCostList.add(localCost);
-		valueIndexList.add(valueIndex);
 		
-		if(this.isLeafAgent() == true){
+		warning = 0;
+		
+		valueIndexList.add(valueIndex);
+		if(this.isLeafAgent() == false)
+			localCostList.add(localCost);
+		else{
 			accumulativeCost  = localCost;
 			sendAlsCostMessage();
 		}
 		//System.out.println("Agent "+this.name+"~~~~~"+cycleCount);
+		
+		//if(id == 40){
+		//	System.out.println("Agent "+this.id+"~~~costMessage~~~"+cycleCount);
+		//}
 	};
 	
 	
@@ -91,6 +103,8 @@ public abstract class AgentCycleAls extends AgentCycle{
 		
 		if(enoughReceived == true){
 			
+			warning++;
+			
 			accumulativeCost = localCostList.removeFirst();
 			
 			for(int i = 0; i < children.length; i++){
@@ -100,25 +114,49 @@ public abstract class AgentCycleAls extends AgentCycle{
 					childrenMessageList.put(i, temp);
 			}
 			
-			if(this.isRootAgent() == false)
+			if(this.isRootAgent() == false){
 				sendAlsCostMessage();
+			}
 			else{
-				AlsCycleCount++;
 				accumulativeCost = accumulativeCost/2;
 				if(accumulativeCost < bestCost){
-					bestCost = accumulativeCost;
 					bestValue = valueIndexList.removeFirst();
+					bestCost = accumulativeCost;
 					isChanged = YES;
 				}
 				else{
 					valueIndexList.removeFirst();
 					isChanged = NO;
 				}
+				
+				if(bestCostInCycle.length > AlsCycleCount){
+					bestCostInCycle[AlsCycleCount] = bestCost;
+				}
+				else{
+					double temp[] = new double[2*bestCostInCycle.length];
+					for(int i = 0; i < bestCostInCycle.length; i++){
+						temp[i] = bestCostInCycle[i];
+					}
+					bestCostInCycle = temp;
+					bestCostInCycle[AlsCycleCount] = bestCost;
+				}
+				AlsCycleCount++;
 				sendAlsBestMessage();
-				System.out.println("cycleCount~~~"+AlsCycleCount+"~~~bestCost~~~"+bestCost);
+				//System.out.println("cycleCount~~~"+AlsCycleCount+"~~~bestCost~~~"+bestCost);
+				
+				//if(valueIndexList.size() == 0){
+				//	System.out.println("cycleCount~~~"+cycleCount);
+				//}
 			}
 		}
 		if(valueIndexList.isEmpty() == true){
+			if(level == 0){
+				double temp[] = new double[AlsCycleCount];
+				for(int i = 0; i < AlsCycleCount; i++){
+					temp[i] = bestCostInCycle[i];
+				}
+				bestCostInCycle = temp;						//更正数组长度
+			}
 			valueIndex = bestValue;
 			stopRunning();
 		}
@@ -138,11 +176,23 @@ public abstract class AgentCycleAls extends AgentCycle{
 		if(this.isLeafAgent() == false)
 			sendAlsBestMessage();
 		
+		//System.out.println("Agent "+this.name+"~~~best~~~"+AlsCycleCount);
+		
+		//if(id == 40){
+		//	System.out.println("Agent "+this.id+"~~~~bestMessage~~~"+cycleCount);
+		//	if(cycleCount > 10){
+		//		cycleCount++;
+		//	}
+		//}
+		
 		if(valueIndexList.isEmpty() == true){
 			valueIndex = bestValue;
 			stopRunning();
+			
+			//if(id == 40 && cycleCount != 19){
+			//	System.out.println("~~~"+cycleCount+"~~~wrong!!!!!!!!");
+			//}
 		}
-		//System.out.println("Agent "+this.name+"~~~best~~~"+AlsCycleCount);
 	}
 	
 }

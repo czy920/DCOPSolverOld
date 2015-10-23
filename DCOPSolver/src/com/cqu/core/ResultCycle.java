@@ -28,29 +28,37 @@ public class ResultCycle extends Result{
 	
 	public void min(Result rs)
 	{
-		this.messageQuantity=Math.min(this.messageQuantity, rs.messageQuantity);
-		this.lostRatio=Math.min(this.lostRatio, rs.lostRatio);
-		this.totalTime=Math.min(this.totalTime, rs.totalTime);
 		if(this.totalCost > rs.totalCost){
 			this.totalCost = rs.totalCost;
 			this.totalCostInCycle = ((ResultCycle)rs).totalCostInCycle;
-			this.timeCostInCycle = ((ResultCycle)rs).timeCostInCycle;
+		}
+		if(this.messageQuantity > rs.messageQuantity){
+			this.messageQuantity = rs.messageQuantity;
 			this.messageQuantityInCycle = ((ResultCycle)rs).messageQuantityInCycle;
 		}
+		if(this.totalTime > rs.totalTime){
+			this.totalTime = rs.totalTime;
+			this.timeCostInCycle = ((ResultCycle)rs).timeCostInCycle;
+		}
+		this.lostRatio=Math.min(this.lostRatio, rs.lostRatio);
 		this.nccc=Math.min(this.nccc, ((ResultCycle)rs).nccc);
 	}
 	
 	public void max(Result rs)
 	{
-		this.messageQuantity=Math.max(this.messageQuantity, rs.messageQuantity);
-		this.lostRatio=Math.max(this.lostRatio, rs.lostRatio);
-		this.totalTime=Math.max(this.totalTime, rs.totalTime);
-		if(this.totalCost <= rs.totalCost){
+		if(this.totalCost < rs.totalCost){
 			this.totalCost = rs.totalCost;
 			this.totalCostInCycle = ((ResultCycle)rs).totalCostInCycle;
-			this.timeCostInCycle = ((ResultCycle)rs).timeCostInCycle;
+		}
+		if(this.messageQuantity < rs.messageQuantity){
+			this.messageQuantity = rs.messageQuantity;
 			this.messageQuantityInCycle = ((ResultCycle)rs).messageQuantityInCycle;
 		}
+		if(this.totalTime < rs.totalTime){
+			this.totalTime = rs.totalTime;
+			this.timeCostInCycle = ((ResultCycle)rs).timeCostInCycle;
+		}
+		this.lostRatio=Math.max(this.lostRatio, rs.lostRatio);
 		this.nccc=Math.max(this.nccc, ((ResultCycle)rs).nccc);
 	}
 	
@@ -67,7 +75,7 @@ public class ResultCycle extends Result{
 				this.messageQuantityInCycle[i] = 0;
 			}
 		}
-		for(int i = 0; i < totalCostInCycle.length; i++){
+		for(int i = 0; i < Math.min(totalCostInCycle.length, ((ResultCycle)rs).totalCostInCycle.length); i++){
 			this.totalCostInCycle[i] += (((ResultCycle)rs).totalCostInCycle[i]/validCount);
 			this.timeCostInCycle[i] += (((ResultCycle)rs).timeCostInCycle[i]/validCount);
 			this.messageQuantityInCycle[i] += (((ResultCycle)rs).messageQuantityInCycle[i]/validCount);
@@ -88,7 +96,7 @@ public class ResultCycle extends Result{
 				this.messageQuantityInCycle[i] = 0;
 			}
 		}
-		for(int i = 0; i < totalCostInCycle.length; i++){
+		for(int i = 0; i < Math.min(totalCostInCycle.length, ((ResultCycle)rs).totalCostInCycle.length); i++){
 			this.totalCostInCycle[i] -= (((ResultCycle)rs).totalCostInCycle[i]/validCount);
 			this.timeCostInCycle[i] -= (((ResultCycle)rs).timeCostInCycle[i]/validCount);
 			this.messageQuantityInCycle[i] -= (((ResultCycle)rs).messageQuantityInCycle[i]/validCount);

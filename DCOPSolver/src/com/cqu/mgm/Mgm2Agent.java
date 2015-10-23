@@ -531,7 +531,7 @@ public class Mgm2Agent extends AgentCycle {
 		result.put(KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
-		System.out.println("Agent "+this.name+" stopped!");
+		//System.out.println("Agent "+this.name+" stopped!");
 	}
 	
 	@Override
@@ -549,8 +549,8 @@ public class Mgm2Agent extends AgentCycle {
 				ncccTemp = (Integer)result.get(KEY_NCCC);
 			totalCost+=((double)((Integer)result.get(KEY_LOCALCOST)))/2;
 			
-			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
-			System.out.println(displayStr);
+			//String displayStr="Agent "+name_+": id="+id_+" value="+value_;
+			//System.out.println(displayStr);
 		}
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost)+

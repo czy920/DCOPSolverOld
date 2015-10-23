@@ -14,6 +14,7 @@ import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.dsa.*;
 import com.cqu.mgm.*;
+import com.cqu.mus.*;
 import com.cqu.parser.Problem;
 import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
@@ -52,53 +53,73 @@ public class AgentManagerCycle {
 				
 				BnBAdoptAgent.agentDomains.put(agentId, problem.VariableDomains.get(agentId));*/
 				
-			}else if(agentType.equals("BDADOPT"))
-			{
+			}
+			else if(agentType.equals("BDADOPT")){
 				agent=new AgentModel(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)),problem.treeDepth,problem.pseudoHeight);
-			}else if(agentType.equals("ADOPT_K"))
-			{
+			}
+			else if(agentType.equals("ADOPT_K")){
 				agent=new ADOPT_K(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)),Settings.settings.getADOPT_K());
-			}else if(agentType.equals("SynAdopt2"))
-			{
+			}
+			else if(agentType.equals("SynAdopt2")){
 				agent=new AdoptAgentCycle_2(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("DSA_A")){
+			}
+			else if(agentType.equals("DSA_A")){
 				agent=new DsaA_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("DSA_B")){
+			}
+			else if(agentType.equals("DSA_B")){
 				agent=new DsaB_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("DSA_C")){
+			}
+			else if(agentType.equals("DSA_C")){
 				agent=new DsaC_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("DSA_D")){
+			}
+			else if(agentType.equals("DSA_D")){
 				agent=new DsaD_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("DSA_E")){
+			}
+			else if(agentType.equals("DSA_E")){
 				agent=new DsaE_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("MGM")){
+			}
+			else if(agentType.equals("MGM")){
 				agent=new MgmAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("MGM2")){
+			}
+			else if(agentType.equals("MGM2")){
 				agent=new Mgm2Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("ALSDSA")){
+			}
+			else if(agentType.equals("ALSDSA")){
 				agent=new AlsDsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("ALSMGM")){
+			}
+			else if(agentType.equals("ALSMGM")){
 				agent=new AlsMgmAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("ALS_DSA")){
+			}
+			else if(agentType.equals("ALS_DSA")){
 				agent=new AlsDsa_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("ALS_H1_DSA")){
+			}
+			else if(agentType.equals("ALS_H1_DSA")){
 				agent=new AlsDsa_H1_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if(agentType.equals("ALS_H2_DSA")){
+			}
+			else if(agentType.equals("ALS_H2_DSA")){
 				agent=new AlsDsa_H2_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if(agentType.equals("ALSMUS")){
+				agent=new AlsMusAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if(agentType.equals("ALSMUSDSA")){
+				agent=new AlsMusDsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else{

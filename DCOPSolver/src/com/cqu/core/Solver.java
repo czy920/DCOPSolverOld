@@ -29,7 +29,7 @@ public class Solver {
 		//parse problem xml
 		String treeGeneratorType=null;
 		if(agentType.equals("BFSDPOP")||agentType.equals("ALSDSA")||agentType.equals("ALS_DSA")||agentType.equals("ALSMGM")||agentType.equals("ALS_H1_DSA")
-				||agentType.equals("ALS_H2_DSA"))
+				||agentType.equals("ALS_H2_DSA")||agentType.equals("ALSMUS")||agentType.equals("ALSMUSDSA"))
 		{
 			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
@@ -69,7 +69,7 @@ public class Solver {
 		if(agentType.equals("BNBADOPT")||agentType.equals("BDADOPT")||agentType.equals("ADOPT_K")||agentType.equals("SynAdopt1")||agentType.equals("SynAdopt2")||									
 				agentType.equals("DSA_A")||agentType.equals("DSA_B")||agentType.equals("DSA_C")||agentType.equals("DSA_D")||agentType.equals("DSA_E")||
 				agentType.equals("MGM")||agentType.equals("MGM2")||agentType.equals("ALSDSA")||agentType.equals("ALSMGM")||agentType.equals("ALS_DSA")||
-				agentType.equals("ALS_H1_DSA")||agentType.equals("ALS_H2_DSA"))
+				agentType.equals("ALS_H1_DSA")||agentType.equals("ALS_H2_DSA")||agentType.equals("ALSMUS")||agentType.equals("ALSMUSDSA"))
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
 			//construct agents
@@ -228,8 +228,45 @@ public class Solver {
 			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
 			FileUtil.writeString(messageSizeMax, path+"\\messageSizeMax.txt");
 			FileUtil.writeString(messageSizeAvg, path+"\\messageSizeAvg.txt");
-		}else if(rs instanceof ResultCycle)
-		{
+		}
+		else if(rs instanceof ResultCycleAls){
+			String totalTime="";
+			String messageQuantity="";
+			String totalCost="";
+			String nccc="";
+			String myTotalCostInCycle = "";
+			String myBestCostInCycle = "";
+			String myTimeCostInCycle = "";
+			String myMessageQuantityInCycle = "";
+			for(int i=0;i<results.size();i++)
+			{
+				ResultCycleAls result=(ResultCycleAls) results.get(i);
+				totalTime+=result.totalTime+"\n";
+				messageQuantity+=result.messageQuantity+"\n";
+				totalCost+=result.totalCost+"\n";
+				nccc+=result.nccc+"\n";
+				myTotalCostInCycle = "";
+				myBestCostInCycle = "";
+				myTimeCostInCycle = "";
+				myMessageQuantityInCycle = "";
+				for(int j=0; j < result.totalCostInCycle.length; j++){
+					myTotalCostInCycle += result.totalCostInCycle[j] + "\n";
+					myTimeCostInCycle +=result.timeCostInCycle[j] + "\n";
+					myMessageQuantityInCycle +=result.messageQuantityInCycle[j] + "\n";
+				}
+				for(int j = 0; j < result.bestCostInCycle.length; j++)
+					myBestCostInCycle += result.bestCostInCycle[j] + "\n";
+				FileUtil.writeString(myTotalCostInCycle, path+"\\totalCostInCycle_"+i+".txt");
+				FileUtil.writeString(myBestCostInCycle, path+"\\bestCostInCycle_"+i+".txt");
+				FileUtil.writeString(myTimeCostInCycle, path+"\\timeCostInCycle_"+i+".txt");
+				FileUtil.writeString(myMessageQuantityInCycle, path+"\\messageQuantityInCycle_"+i+".txt");
+			}
+			FileUtil.writeString(totalTime, path+"\\totalTime.txt");
+			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
+			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
+			FileUtil.writeString(nccc, path+"\\nccc.txt");
+		}
+		else if(rs instanceof ResultCycle){
 			String totalTime="";
 			String messageQuantity="";
 			String totalCost="";
@@ -260,8 +297,8 @@ public class Solver {
 			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
 			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
 			FileUtil.writeString(nccc, path+"\\nccc.txt");
-		}else
-		{
+		}
+		else{
 			String totalTime="";
 			String totalCost="";
 			String messageQuantity="";
@@ -294,6 +331,11 @@ public class Solver {
 			min=new ResultDPOP(rs);
 			max=new ResultDPOP(rs);
 			avg=new ResultDPOP();
+		}else if(rs instanceof ResultCycleAls)
+		{
+			min=new ResultCycleAls(rs);
+			max=new ResultCycleAls(rs);
+			avg=new ResultCycleAls();
 		}else if(rs instanceof ResultCycle)
 		{
 			min=new ResultCycle(rs);
@@ -323,7 +365,7 @@ public class Solver {
 	{
 		String treeGeneratorType=null;
 		if(algorithmType.equals("BFSDPOP") || algorithmType.equals("ALSDSA") || algorithmType.equals("ALS_DSA") || algorithmType.equals("ALS_MGM") 
-				|| algorithmType.equals("ALS_H1_DSA") || algorithmType.equals("ALS_H2_DSA"))
+				|| algorithmType.equals("ALS_H1_DSA") || algorithmType.equals("ALS_H2_DSA") || algorithmType.equals("ALSMUS") || algorithmType.equals("ALSMUSDSA"))
 		{
 			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
@@ -371,7 +413,7 @@ public class Solver {
 		if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT_K")||algorithmType.equals("BDADOPT")||algorithmType.equals("SynAdopt1")||algorithmType.equals("SynAdopt2")||
 				algorithmType.equals("DSA_A")||algorithmType.equals("DSA_B")||algorithmType.equals("DSA_C")||algorithmType.equals("DSA_D")||algorithmType.equals("DSA_E")||
 				algorithmType.equals("MGM")||algorithmType.equals("MGM2")||algorithmType.equals("ALSDSA")||algorithmType.equals("ALSMGM")||algorithmType.equals("ALS_DSA")||
-				algorithmType.equals("ALS_H1_DSA")||algorithmType.equals("ALS_H2_DSA"))
+				algorithmType.equals("ALS_H1_DSA")||algorithmType.equals("ALS_H2_DSA")||algorithmType.equals("ALSMUS")||algorithmType.equals("ALSMUSDSA"))
 		//if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT"))
 		{
 			//construct agents

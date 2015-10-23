@@ -86,6 +86,7 @@ public class SolverWindow {
 	private LabelSpinnerParameter lspSpinnerSelectProbabilityB;
 	private LabelSpinnerParameter lspSpinnerSelectProbabilityC;
 	private LabelSpinnerParameter lspSpinnerSelectProbabilityD;
+	private LabelSpinnerParameter lspSpinnerSelectInterval;
 	private LabelSpinnerParameter lspSpinnerSelectStepK1;
 	private LabelSpinnerParameter lspSpinnerSelectStepK2;
 	private LabelSpinnerParameter lspSpinnerSelectRound;
@@ -405,12 +406,13 @@ public class SolverWindow {
 		lspSpinnerADOPT_K=new LabelSpinnerParameter("K值：", new SpinnerNumberModel(0, 0, 10000, 100));
 		
 		lspSpinnerCycleCountEnd=new LabelSpinnerParameter("回合限制：", new SpinnerNumberModel(20, 0, 1000, 1));
-		lspSpinnerSelectProbability=new LabelSpinnerParameter("选择概率：", new SpinnerNumberModel(0.3, 0, 1, 0.1));
+		lspSpinnerSelectProbability=new LabelSpinnerParameter("选择概率p：", new SpinnerNumberModel(0.3, 0, 1, 0.1));
 		lspSpinnerSelectNewProbability=new LabelSpinnerParameter("选择概率p*：", new SpinnerNumberModel(0.5, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityA=new LabelSpinnerParameter("选择概率A：", new SpinnerNumberModel(0.1, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityB=new LabelSpinnerParameter("选择概率B：", new SpinnerNumberModel(0.2, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityC=new LabelSpinnerParameter("选择概率C：", new SpinnerNumberModel(0.05, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityD=new LabelSpinnerParameter("选择概率D：", new SpinnerNumberModel(0.2, 0, 1, 0.1));
+		lspSpinnerSelectInterval=new LabelSpinnerParameter("控制间隔：", new SpinnerNumberModel(20, 0, 500, 1));
 		lspSpinnerSelectStepK1=new LabelSpinnerParameter("步长k：", new SpinnerNumberModel(5, 0, 50, 1));
 		lspSpinnerSelectStepK2=new LabelSpinnerParameter("步长K*：", new SpinnerNumberModel(5, 0, 50, 1));
 		lspSpinnerSelectRound=new LabelSpinnerParameter("重启轮数：", new SpinnerNumberModel(20, 0, 600, 1));
@@ -572,46 +574,71 @@ public class SolverWindow {
 		if(algorithmType.equals("DSA_A")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
-		}else if(algorithmType.equals("DSA_B")){
+		}
+		else if(algorithmType.equals("DSA_B")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
-		}else if(algorithmType.equals("DSA_C")){
+		}
+		else if(algorithmType.equals("DSA_C")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
-		}else if(algorithmType.equals("DSA_D")){
+		}
+		else if(algorithmType.equals("DSA_D")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
-		}else if(algorithmType.equals("DSA_E")){
+		}
+		else if(algorithmType.equals("DSA_E")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
-		}else if(algorithmType.equals("MGM")){
+		}
+		else if(algorithmType.equals("MGM")){
 			paramList.add(lspSpinnerCycleCountEnd);
-		}else if(algorithmType.equals("MGM2")){
-			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectProbability);
-		}else if(algorithmType.equals("ALSDSA")){
-			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectProbability);
-		}else if(algorithmType.equals("ALSMGM")){
-			paramList.add(lspSpinnerCycleCountEnd);
-		}else if(algorithmType.equals("ALS_DSA")){
+		}
+		else if(algorithmType.equals("MGM2")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
-		}else if(algorithmType.equals("ALS_H1_DSA")){
+		}
+		else if(algorithmType.equals("ALSDSA")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
+		}
+		else if(algorithmType.equals("ALSMGM")){
+			paramList.add(lspSpinnerCycleCountEnd);
+		}
+		else if(algorithmType.equals("ALS_DSA")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
+		}
+		else if(algorithmType.equals("ALS_H1_DSA")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
 			paramList.add(lspSpinnerSelectNewProbability);
 			paramList.add(lspSpinnerSelectStepK1);
 			paramList.add(lspSpinnerSelectStepK2);
 			paramList.add(lspSpinnerSelectRound);
-		}else if(algorithmType.equals("ALS_H2_DSA")){
+		}
+		else if(algorithmType.equals("ALS_H2_DSA")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbabilityA);
 			paramList.add(lspSpinnerSelectProbabilityB);
 			paramList.add(lspSpinnerSelectProbabilityC);
 			paramList.add(lspSpinnerSelectProbabilityD);
 			paramList.add(lspSpinnerSelectRound);
-		}else if(algorithmType.equals("DPOP"))
+		}
+		else if(algorithmType.equals("ALSMUS")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
+			paramList.add(lspSpinnerSelectProbabilityA);
+			paramList.add(lspSpinnerSelectProbabilityB);
+		}
+		else if(algorithmType.equals("ALSMUSDSA")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectInterval);
+			paramList.add(lspSpinnerSelectProbability);
+			paramList.add(lspSpinnerSelectProbabilityA);
+			paramList.add(lspSpinnerSelectProbabilityB);
+		}
+		else if(algorithmType.equals("DPOP"))
 		{
 			paramList.add(lspSpinnerMessageTransmissionTime);
 		}else if(algorithmType.equals("BFSDPOP"))
@@ -865,6 +892,7 @@ public class SolverWindow {
 		Settings.settings.setSelectProbabilityC((Double)lspSpinnerSelectProbabilityC.getSpinner().getValue());
 		Settings.settings.setSelectProbabilityD((Double)lspSpinnerSelectProbabilityD.getSpinner().getValue());
 		Settings.settings.setSelectNewProbability((Double)lspSpinnerSelectNewProbability.getSpinner().getValue());
+		Settings.settings.setSelectInterval((Integer)lspSpinnerSelectInterval.getSpinner().getValue());
 		Settings.settings.setSelectStepK1((Integer)lspSpinnerSelectStepK1.getSpinner().getValue());
 		Settings.settings.setSelectStepK2((Integer)lspSpinnerSelectStepK2.getSpinner().getValue());
 		Settings.settings.setSelectRound((Integer)lspSpinnerSelectRound.getSpinner().getValue());
