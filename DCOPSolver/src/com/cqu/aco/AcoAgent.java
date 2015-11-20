@@ -12,6 +12,8 @@ public class AcoAgent extends Agent{
 		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
 	}
+	
+	
 
 	@Override
 	public Object printResults(List<Map<String, Object>> results) {
