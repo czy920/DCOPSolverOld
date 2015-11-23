@@ -95,8 +95,11 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 				//System.out.println("cycleCount: "+cycleCount);
 				cycleEnd.set(false);
 				synchronized (cycleBegin) {
+					// modify by hechen, 2015.11.23
+					//避免agent结束时，totalAgentCountTemp还没变化的错误
+					//OperateEndCount表示操作结束，即totalAgentCountTemp一定发生了变化
 					synchronized(OperateEndCount){
-						if(OperateEndCount.intValue()<this.totalAgentCount.intValue())
+						while(OperateEndCount.intValue()<this.totalAgentCount.intValue())
 							try {
 								OperateEndCount.wait();
 							} catch (InterruptedException e) {
