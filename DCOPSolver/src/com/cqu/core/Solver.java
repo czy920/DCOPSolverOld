@@ -430,7 +430,17 @@ public class Solver {
 			MessageMailerCycle msgMailer=new MessageMailerCycle(agentManagerCycle);
 			msgMailer.addEventListener(el);
 			msgMailer.startProcess();
-			msgMailer.initWait();						//为避免出现Agent线程开始而Mailer未初始化完成而出现错误
+			
+			//先让MsgMailer启动并初始化完成，用while循环判断变量不行，会导致死循环，加一个sleep就行。
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			//msgMailer.initWait();						//为避免出现Agent线程开始而Mailer未初始化完成而出现错误
+			
 			agentManagerCycle.startAgents(msgMailer);
 		}
 		//采用异步消息机制的算法
