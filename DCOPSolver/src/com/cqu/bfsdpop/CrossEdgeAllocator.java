@@ -8,14 +8,14 @@ import java.util.Map;
 import com.cqu.parser.Problem;
 import com.cqu.util.CollectionUtil;
 
-public class CrossEdgeAllocator {
+public abstract class CrossEdgeAllocator {
 	
-	private Map<Integer, int[]> neighbourAgents;
+	protected Map<Integer, int[]> neighbourAgents;
 	
-	private Map<Integer, boolean[]> isCrossNeighbours;
-	private Map<Integer, boolean[]> considerCrossConstraint;
+	protected Map<Integer, boolean[]> isCrossNeighbours;
+	protected Map<Integer, boolean[]> considerCrossConstraint;
 
-	private Map<Integer, List<Edge>> crossEdges;
+	protected Map<Integer, List<Edge>> crossEdges;
 	
 	public CrossEdgeAllocator(Problem problem) {
 		// TODO Auto-generated constructor stub
@@ -55,33 +55,15 @@ public class CrossEdgeAllocator {
 		}
 	}
 	
-	public void allocate()
-	{
-		if(crossEdges.size()<=0)
-		{
-			return;
-		}
-		Integer[] keys=new ListSizeComparator<Edge>(crossEdges).sort();
-		List<Edge> edgeList=crossEdges.get(keys[keys.length-1]);
-		while(edgeList.size()>0)
-		{
-			for(int i=0;i<edgeList.size();i++)
-			{
-				Edge edge=edgeList.get(i);
-				
-				int index=CollectionUtil.indexOf(neighbourAgents.get(edge.getNodeB()), edge.getNodeA());
-				considerCrossConstraint.get(edge.getNodeB())[index]=true;
-				
-				this.removeEdge(crossEdges.get(edge.getNodeB()), edge);
-			}
-			edgeList.clear();
-			
-			keys=new ListSizeComparator<Edge>(crossEdges).sort();
-			edgeList=crossEdges.get(keys[keys.length-1]);
-		}
-	}
+	public abstract void allocate();
 	
-	private boolean removeEdge(List<Edge> edgeList, Edge target)
+	/**
+	 * 从 edgeList中移除target
+	 * @param edgeList
+	 * @param target
+	 * @return
+	 */
+	protected boolean removeEdge(List<Edge> edgeList, Edge target)
 	{
 		for(Edge edge : edgeList)
 		{
@@ -94,6 +76,10 @@ public class CrossEdgeAllocator {
 		return false;
 	}
 	
+	/**
+	 * 获得交叉边分配结果
+	 * @return 每个Agent需要考虑的约束边数组，true为需要考虑，false反之
+	 */
 	public Map<Integer, boolean[]> getConsideredConstraint()
 	{
 		return this.considerCrossConstraint;

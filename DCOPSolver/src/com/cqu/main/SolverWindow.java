@@ -59,7 +59,8 @@ import java.awt.FlowLayout;
 public class SolverWindow {
 	
 	
-	private static final String INIT_PROBLEM_PATH="problems/";
+	//private static final String INIT_PROBLEM_PATH="problems/";
+	private static final String INIT_PROBLEM_PATH="F:/hc/meeting-15-3-3/";
 
 	private JFrame frmDcopsolver;
 	

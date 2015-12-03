@@ -1,22 +1,20 @@
 package com.cqu.parser;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
 
+import com.cqu.bfsdpop.CEAllocatorFactory;
 import com.cqu.bfsdpop.CrossEdgeAllocator;
 import com.cqu.core.BFSTree;
 import com.cqu.core.TreeGenerator;
 import com.cqu.heuristics.MostConnectedHeuristic;
-import com.cqu.heuristics.MostConstributionHeuristic;
 import com.cqu.main.DOTrenderer;
 import com.cqu.util.XmlUtil;
 import com.cqu.varOrdering.dfs.DFSgeneration;
@@ -207,7 +205,7 @@ public class ProblemParser {
 		
 		if(treeGeneratorType.equals(TreeGenerator.TREE_GENERATOR_TYPE_BFS))
 		{
-			CrossEdgeAllocator allocator=new CrossEdgeAllocator(problem);
+			CrossEdgeAllocator allocator=CEAllocatorFactory.getCrossEdgeAllocator("CEAllocatorA", problem);
 			allocator.allocate();
 			problem.crossConstraintAllocation=allocator.getConsideredConstraint();
 		}
