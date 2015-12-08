@@ -55,7 +55,28 @@ public abstract class CrossEdgeAllocator {
 		}
 	}
 	
+	/**
+	 * 分配交叉边
+	 */
 	public abstract void allocate();
+	
+	/**
+	 * 移簇
+	 */
+	protected void removeCluster(Integer agentId)
+	{
+		List<Edge> edgeList=crossEdges.get(agentId);
+		for(int i=0;i<edgeList.size();i++)
+		{
+			Edge edge=edgeList.get(i);
+			
+			int index=CollectionUtil.indexOf(neighbourAgents.get(edge.getNodeB()), edge.getNodeA());
+			considerCrossConstraint.get(edge.getNodeB())[index]=true;
+			
+			this.removeEdge(crossEdges.get(edge.getNodeB()), edge);
+		}
+		edgeList.clear();
+	}
 	
 	/**
 	 * 从 edgeList中移除target

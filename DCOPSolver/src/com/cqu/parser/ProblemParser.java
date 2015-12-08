@@ -16,6 +16,7 @@ import com.cqu.core.BFSTree;
 import com.cqu.core.TreeGenerator;
 import com.cqu.heuristics.MostConnectedHeuristic;
 import com.cqu.main.DOTrenderer;
+import com.cqu.settings.Settings;
 import com.cqu.util.XmlUtil;
 import com.cqu.varOrdering.dfs.DFSgeneration;
 
@@ -205,7 +206,14 @@ public class ProblemParser {
 		
 		if(treeGeneratorType.equals(TreeGenerator.TREE_GENERATOR_TYPE_BFS))
 		{
-			CrossEdgeAllocator allocator=CEAllocatorFactory.getCrossEdgeAllocator("CEAllocatorA", problem);
+			CrossEdgeAllocator allocator;
+			if(Settings.settings.getClusterRemovingChoice()==1)
+			{
+				allocator=CEAllocatorFactory.getCrossEdgeAllocator("CEAllocatorB", problem);
+			}else
+			{
+				allocator=CEAllocatorFactory.getCrossEdgeAllocator("CEAllocatorA", problem);
+			}
 			allocator.allocate();
 			problem.crossConstraintAllocation=allocator.getConsideredConstraint();
 		}

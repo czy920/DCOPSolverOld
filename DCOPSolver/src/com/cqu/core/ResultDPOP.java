@@ -2,10 +2,10 @@ package com.cqu.core;
 
 public class ResultDPOP extends Result{
 	
-	public int utilMsgCount;
-	public int utilMsgSizeMin;
-	public int utilMsgSizeMax;
-	public int utilMsgSizeAvg;
+	public double utilMsgCount;
+	public double utilMsgSizeMin;
+	public double utilMsgSizeMax;
+	public double utilMsgSizeAvg;
 	
 	public ResultDPOP() {
 		// TODO Auto-generated constructor stub
@@ -46,19 +46,19 @@ public class ResultDPOP extends Result{
 	public void add(Result rs, int validCount) {
 		// TODO Auto-generated method stub
 		super.add(rs, validCount);
-		this.utilMsgCount+=(int)(1.0*((ResultDPOP)rs).utilMsgCount/validCount);
-		this.utilMsgSizeMin+=(int)(1.0*((ResultDPOP)rs).utilMsgSizeMin/validCount);
-		this.utilMsgSizeMax+=(int)(1.0*((ResultDPOP)rs).utilMsgSizeMax/validCount);
-		this.utilMsgSizeAvg+=(int)(1.0*((ResultDPOP)rs).utilMsgSizeAvg/validCount);
+		this.utilMsgCount+=((ResultDPOP)rs).utilMsgCount/validCount;
+		this.utilMsgSizeMin+=((ResultDPOP)rs).utilMsgSizeMin/validCount;
+		this.utilMsgSizeMax+=((ResultDPOP)rs).utilMsgSizeMax/validCount;
+		this.utilMsgSizeAvg+=((ResultDPOP)rs).utilMsgSizeAvg/validCount;
 	}
 	
 	@Override
 	public void minus(Result rs, int validCount) {
 		// TODO Auto-generated method stub
 		super.minus(rs, validCount);
-		this.utilMsgCount-=(int)(1.0*((ResultDPOP)rs).utilMsgCount/validCount);
-		this.utilMsgSizeMin-=(int)(1.0*((ResultDPOP)rs).utilMsgSizeMin/validCount);
-		this.utilMsgSizeMax-=(int)(1.0*((ResultDPOP)rs).utilMsgSizeMax/validCount);
-		this.utilMsgSizeAvg-=(int)(1.0*((ResultDPOP)rs).utilMsgSizeAvg/validCount);
+		this.utilMsgCount-=((ResultDPOP)rs).utilMsgCount/validCount;
+		this.utilMsgSizeMin-=((ResultDPOP)rs).utilMsgSizeMin/validCount;
+		this.utilMsgSizeMax-=((ResultDPOP)rs).utilMsgSizeMax/validCount;
+		this.utilMsgSizeAvg-=((ResultDPOP)rs).utilMsgSizeAvg/validCount;
 	}
 }

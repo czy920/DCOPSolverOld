@@ -12,6 +12,9 @@ public class Settings {
 	private int ADOPT_K;
 	private int maxDimensionInMBDPOP;
 	
+	//BFSDPOP
+	private int clusterRemovingChoice;
+	
 	private int cycleCountEnd;
 	private double selectProbability;
 	private double selectNewProbability;
@@ -35,6 +38,10 @@ public class Settings {
 		this.ADOPT_K=2;
 		this.displayGraphFrame=true;
 		this.maxDimensionInMBDPOP=3;
+		
+		//BFSDPOP
+		this.clusterRemovingChoice=0;
+		
 		this.cycleCountEnd = 20;
 		this.selectProbability = 0.3;
 		this.selectNewProbability = 0.5;
@@ -92,6 +99,14 @@ public class Settings {
 		this.maxDimensionInMBDPOP = maxDimensionsInAgileDPOP;
 	}
 	
+	public int getClusterRemovingChoice() {
+		return clusterRemovingChoice;
+	}
+
+	public void setClusterRemovingChoice(int clusterRemovingChoice) {
+		this.clusterRemovingChoice = clusterRemovingChoice;
+	}
+
 	public int getCycleCountEnd() {
 		return cycleCountEnd;
 	}

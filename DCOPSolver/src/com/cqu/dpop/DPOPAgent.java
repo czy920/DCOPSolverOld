@@ -167,7 +167,8 @@ public class DPOPAgent extends Agent{
 			disposeValueMessage(msg);
 		}else if(type==TYPE_UTIL_MESSAGE)
 		{
-			utilMsgSizes.add(((MultiDimensionData) msg.getValue()).size());
+			//utilMsgSizes.add(((MultiDimensionData) msg.getValue()).size());
+			utilMsgSizes.add(((MultiDimensionData) msg.getValue()).dimensionSize());
 			
 			disposeUtilMessage(msg);
 		}

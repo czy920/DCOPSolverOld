@@ -639,9 +639,9 @@ public class LinuxWindow {
 						Result += ((ResultAdopt)ret).nccc ;
 					}else if(ret instanceof ResultDPOP)
 					{
-						detailedResult+="utilMsgSizeMin: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMin)+"\n";
-						detailedResult+="utilMsgSizeMax: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMax)+"\n";
-						detailedResult+="utilMsgSizeAvg: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeAvg)+"\n";
+						detailedResult+="utilMsgSizeMin: "+FormatUtil.formatSize((int)Math.round(((ResultDPOP)ret).utilMsgSizeMin))+"\n";
+						detailedResult+="utilMsgSizeMax: "+FormatUtil.formatSize((int)Math.round(((ResultDPOP)ret).utilMsgSizeMax))+"\n";
+						detailedResult+="utilMsgSizeAvg: "+FormatUtil.formatSize((int)Math.round(((ResultDPOP)ret).utilMsgSizeAvg))+"\n";
 						
 						Result += "\t" + ((ResultDPOP)ret).utilMsgSizeAvg ;
 					}

@@ -58,9 +58,8 @@ import java.awt.FlowLayout;
 
 public class SolverWindow {
 	
-	
-	//private static final String INIT_PROBLEM_PATH="problems/";
-	private static final String INIT_PROBLEM_PATH="F:/hc/meeting-15-3-3/";
+	private static final String INIT_PROBLEM_PATH="problems/";
+	//private static final String INIT_PROBLEM_PATH="F:/hc/meeting-15-3-3/";
 
 	private JFrame frmDcopsolver;
 	
@@ -91,6 +90,10 @@ public class SolverWindow {
 	private LabelSpinnerParameter lspSpinnerSelectStepK1;
 	private LabelSpinnerParameter lspSpinnerSelectStepK2;
 	private LabelSpinnerParameter lspSpinnerSelectRound;
+	
+	//BFSDPOP移簇方式选择
+	private LabelSpinnerParameter lspSpinnerClusterRemovingChoice;
+	
 	private List<LabelSpinnerParameter> paramList;
 	
 	private JCheckBox cbGraphFrame;
@@ -406,6 +409,9 @@ public class SolverWindow {
 		lspSpinnerMaxDimensionsInMBDPOP=new LabelSpinnerParameter("维度限制：", new SpinnerNumberModel(8, 3, 20, 1));
 		lspSpinnerADOPT_K=new LabelSpinnerParameter("K值：", new SpinnerNumberModel(0, 0, 10000, 100));
 		
+		//BFSDPOP
+		lspSpinnerClusterRemovingChoice=new LabelSpinnerParameter("移簇方式：", new SpinnerNumberModel(0, 0, 1, 1));
+		
 		lspSpinnerCycleCountEnd=new LabelSpinnerParameter("回合限制：", new SpinnerNumberModel(20, 0, 1000, 1));
 		lspSpinnerSelectProbability=new LabelSpinnerParameter("选择概率p：", new SpinnerNumberModel(0.3, 0, 1, 0.1));
 		lspSpinnerSelectNewProbability=new LabelSpinnerParameter("选择概率p*：", new SpinnerNumberModel(0.5, 0, 1, 0.1));
@@ -645,6 +651,7 @@ public class SolverWindow {
 		}else if(algorithmType.equals("BFSDPOP"))
 		{
 			paramList.add(lspSpinnerMessageTransmissionTime);
+			paramList.add(lspSpinnerClusterRemovingChoice);
 		}else if(algorithmType.equals("HybridDPOP"))
 		{
 			paramList.add(lspSpinnerMessageTransmissionTime);
@@ -819,9 +826,9 @@ public class SolverWindow {
 					{
 						if(cbMessageSize.isSelected()==true)
 						{
-							detailedResult+="UtilMsgSizeMin: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMin)+"\n";
-							detailedResult+="UtilMsgSizeMax: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeMax)+"\n";
-							detailedResult+="UtilMsgSizeAvg: "+FormatUtil.formatSize(((ResultDPOP)ret).utilMsgSizeAvg)+"\n";
+							detailedResult+="UtilMsgSizeMin: "+FormatUtil.formatSize((int)Math.round(((ResultDPOP)ret).utilMsgSizeMin))+"\n";
+							detailedResult+="UtilMsgSizeMax: "+FormatUtil.formatSize((int)Math.round(((ResultDPOP)ret).utilMsgSizeMax))+"\n";
+							detailedResult+="UtilMsgSizeAvg: "+FormatUtil.formatSize((int)Math.round(((ResultDPOP)ret).utilMsgSizeAvg))+"\n";
 						}
 					}
 					if(cbCycle.isSelected()==true)
@@ -886,6 +893,10 @@ public class SolverWindow {
 		Settings.settings.setDisplayGraphFrame(cbGraphFrame.isSelected());
 		Settings.settings.setMaxDimensionsInMBDPOP((Integer)lspSpinnerMaxDimensionsInMBDPOP.getSpinner().getValue());
 		Settings.settings.setADOPT_K((Integer)lspSpinnerADOPT_K.getSpinner().getValue());
+		
+		//BFSDPOP
+		Settings.settings.setClusterRemovingChoice((Integer)lspSpinnerClusterRemovingChoice.getSpinner().getValue());
+		
 		Settings.settings.setCycleCount((Integer)lspSpinnerCycleCountEnd.getSpinner().getValue());
 		Settings.settings.setSelectProbability((Double)lspSpinnerSelectProbability.getSpinner().getValue());
 		Settings.settings.setSelectProbabilityA((Double)lspSpinnerSelectProbabilityA.getSpinner().getValue());

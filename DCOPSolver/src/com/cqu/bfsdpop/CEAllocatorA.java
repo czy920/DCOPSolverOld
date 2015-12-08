@@ -25,22 +25,13 @@ public class CEAllocatorA extends CrossEdgeAllocator{
 			return;
 		}
 		Integer[] keys=new ListSizeComparator<Edge>(crossEdges).sort();
-		List<Edge> edgeList=crossEdges.get(keys[keys.length-1]);
-		while(edgeList.size()>0)
+		Integer maxAgent=keys[keys.length-1];
+		while(crossEdges.get(maxAgent).size()>0)
 		{
-			for(int i=0;i<edgeList.size();i++)
-			{
-				Edge edge=edgeList.get(i);
-				
-				int index=CollectionUtil.indexOf(neighbourAgents.get(edge.getNodeB()), edge.getNodeA());
-				considerCrossConstraint.get(edge.getNodeB())[index]=true;
-				
-				this.removeEdge(crossEdges.get(edge.getNodeB()), edge);
-			}
-			edgeList.clear();
+			removeCluster(maxAgent);
 			
 			keys=new ListSizeComparator<Edge>(crossEdges).sort();
-			edgeList=crossEdges.get(keys[keys.length-1]);
+			maxAgent=keys[keys.length-1];
 		}
 	}
 

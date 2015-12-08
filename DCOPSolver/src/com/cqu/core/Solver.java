@@ -228,9 +228,9 @@ public class Solver {
 				ResultDPOP result=(ResultDPOP) results.get(i);
 				totalTime+=result.totalTime+"\n";
 				totalCost+=result.totalCost+"\n";
-				messageQuantity+=result.messageQuantity+"\n";
-				messageSizeMax+=result.utilMsgSizeMax+"\n";
-				messageSizeAvg+=result.utilMsgSizeAvg+"\n";
+				messageQuantity+=Math.round(result.messageQuantity)+"\n";
+				messageSizeMax+=Math.round(result.utilMsgSizeMax)+"\n";
+				messageSizeAvg+=Math.round(result.utilMsgSizeAvg)+"\n";
 			}
 			FileUtil.writeString(totalTime, path+"\\totalTime.txt");
 			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
