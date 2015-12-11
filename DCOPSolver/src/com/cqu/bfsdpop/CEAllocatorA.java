@@ -1,9 +1,6 @@
 package com.cqu.bfsdpop;
 
-import java.util.List;
-
 import com.cqu.parser.Problem;
-import com.cqu.util.CollectionUtil;
 
 /**
  * cluster removing by cross edge count

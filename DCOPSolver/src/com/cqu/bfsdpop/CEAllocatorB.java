@@ -1,6 +1,5 @@
 package com.cqu.bfsdpop;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,18 +64,37 @@ public class CEAllocatorB extends CrossEdgeAllocator{
 			int score=0;
 			
 			List<Edge> edges=crossEdges.get(agentId);
-			score+=edges.size();//边数
+			score+=edges.size()*100;//边数
 			
 			for(Edge edge : edges)
 			{
-				if(crossEdges.get(edge.getNodeB()).size()==1)
+				if(getIncompleteness(edge.getNodeB())==1)
 				{
-					score+=100;
+					score+=1;
 				}
 			}
 			
 			clusterScores.put(agentId, score);
 		}
+	}
+	
+	/**
+	 * 获得非完整度
+	 * @param agentId
+	 * @return
+	 */
+	private int getIncompleteness(Integer agentId)
+	{
+		boolean[] considered=considerCrossConstraint.get(agentId);
+		int incompletenessValue=0;
+		for(int i=0;i<considered.length;i++)
+		{
+			if(considered[i]==false)
+			{
+				incompletenessValue++;
+			}
+		}
+		return incompletenessValue;
 	}
 
 }
