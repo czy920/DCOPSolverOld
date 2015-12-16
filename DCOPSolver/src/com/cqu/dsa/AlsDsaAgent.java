@@ -10,17 +10,22 @@ import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.ResultCycle;
 import com.cqu.cyclequeue.AgentCycle;
+import com.cqu.cyclequeue.AgentCycleAls;
 import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
 
 //Anytime固定框架的DSA算法
-public class AlsDsaAgent extends AgentCycle {
+//改良具备反馈机制的ALS框架固定算法
+
+public class AlsDsaAgent extends AgentCycleAls {
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_ALSCOST_MESSAGE=1;
 	public final static int TYPE_ALSBEST_MESSAGE=2;
 	
 	private static int cycleCountEnd;
 	private static double p;
+	private static int bestValueBox;
+	private static double degradation;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
 	public final static String KEY_NCCC="KEY_NCCC";
@@ -34,9 +39,13 @@ public class AlsDsaAgent extends AgentCycle {
 	private HashMap<Integer, Integer> neighboursValueIndex;			//<neighbour 的 Index, neighbourValue 的  Index>
 	
 	private int bestCost = 2147483647;
-	private int bestValue = 0;
+	private int newBestCost = 2147483647;
+	private int[] valueWeight;
+	private int bestValue;
+	private int[][] topBestValue;
+	private int bestValueNumber = 0;
+	//private int decisionMax;
 	private int accumulativeCost = 0;
-	private String isChanged = NO; 
 	private boolean enoughReceived = false;
 	private LinkedList<Integer> localCostList = new LinkedList<Integer>();
 	private LinkedList<Integer> valueIndexList = new LinkedList<Integer>();
@@ -52,11 +61,21 @@ public class AlsDsaAgent extends AgentCycle {
 		
 		cycleCountEnd = Settings.settings.getCycleCountEnd();
 		p = Settings.settings.getSelectProbability();
+		bestValueBox = 5;
+		degradation = 0.01;
 			
 		localCost=2147483647;
+		//decisionMax = (int)(bestValueBox*(1-degradation)/degradation)+1;
+		valueWeight = new int[domain.length];
+		topBestValue = new int[2][bestValueBox];
 		valueIndex=(int)(Math.random()*(domain.length));
 		neighboursValueIndex=new HashMap<Integer, Integer>();
 		neighboursQuantity=neighbours.length;
+		
+		for(int i = 0; i < bestValueBox; i++)
+			topBestValue[0][i] = 2147483647;
+		for(int i = 0;i < domain.length; i++)
+			valueWeight[i] = 5000;
 		for(int i=0; i<neighbours.length; i++)
 			neighboursValueIndex.put((Integer)i, (Integer)0);
 		sendValueMessages();
@@ -69,14 +88,14 @@ public class AlsDsaAgent extends AgentCycle {
 		}
 	}
 	
-	private void sendAlsCostMessage(){
+	protected void sendAlsCostMessage(){
 		Message msg=new Message(this.id, this.parent, AlsDsaAgent.TYPE_ALSCOST_MESSAGE, this.accumulativeCost);
 		this.sendMessage(msg);
 	}
 	
-	private void sendAlsBestMessage(){
+	protected void sendAlsBestMessage(){
 		for(int i = 0; i < children.length; i++){
-			Message msg=new Message(this.id, children[i], AlsDsaAgent.TYPE_ALSBEST_MESSAGE, isChanged);
+			Message msg=new Message(this.id, children[i], AlsDsaAgent.TYPE_ALSBEST_MESSAGE, newBestCost);
 			this.sendMessage(msg);
 		}
 	}
@@ -140,9 +159,37 @@ public class AlsDsaAgent extends AgentCycle {
 							selectOneMinCost = selectMinCost[i];
 							selectValueIndex = i;
 						}
+					}	
+					
+					int max=0,min=0;
+					for(int i = 1; i < domain.length; i++){
+						if(valueWeight[i] > valueWeight[max])
+							max = i;
+						else if(valueWeight[i] < valueWeight[min])
+							min = i;
 					}
-					if(selectOneMinCost < localCost){
-						valueIndex = selectValueIndex;
+					int defference = valueWeight[max] - valueWeight[min];
+					double preDecision = defference/valueWeight[max];
+					
+					if(Math.random() > preDecision){
+						if(selectOneMinCost < localCost)
+							valueIndex = selectValueIndex;
+					}
+					else{
+						int decision = 0;
+						for(int i = 0; i < domain.length; i++){
+							decision += valueWeight[i];
+						}
+						decision = (int)(decision * Math.random());
+						for(int i = 0; i < domain.length; i++){
+							if(decision < valueWeight[i]){
+								valueIndex = i;
+								break;
+							}
+							else{
+								decision -= valueWeight[i];
+							}
+						}
 					}
 					nccc++;
 				}
@@ -151,7 +198,7 @@ public class AlsDsaAgent extends AgentCycle {
 		}
 	}
 	
-	private void disposeAlsCostMessage(Message msg){
+	protected void disposeAlsCostMessage(Message msg){
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<children.length; i++){
@@ -182,7 +229,6 @@ public class AlsDsaAgent extends AgentCycle {
 		if(enoughReceived == true){
 			
 			accumulativeCost = localCostList.removeFirst();
-			
 			for(int i = 0; i < children.length; i++){
 				LinkedList<Integer> temp = childrenMessageList.remove(i);
 				accumulativeCost = accumulativeCost + temp.remove();
@@ -197,32 +243,75 @@ public class AlsDsaAgent extends AgentCycle {
 				if(accumulativeCost < bestCost){
 					bestCost = accumulativeCost;
 					bestValue = valueIndexList.removeFirst();
-					isChanged = YES;
+					newBestCost = bestCost;
 				}
 				else{
 					valueIndexList.removeFirst();
-					isChanged = NO;
+					newBestCost = 2147483647;
 				}
 				sendAlsBestMessage();
-				System.out.println("cycleCount~~~"+cycleCount+"~~~bestCost~~~"+bestCost);
+				//System.out.println("cycleCount~~~"+cycleCount+"~~~bestCost~~~"+bestCost);
 			}
 		}
 		if(valueIndexList.isEmpty() == true){
-			bestCost = bestCost/2;
+			//bestCost = bestCost/2;
 			stopRunning();
 		}
 		//System.out.println("Agent "+this.name+"~~~~~~"+cycleCount);
 	}
 	
-	private void disposeAlsBestMessage(Message msg){
-		if((String)msg.getValue() == YES){
+	protected void disposeAlsBestMessage(Message msg){
+		if((Integer)msg.getValue() != 2147483647){
 			bestValue = valueIndexList.remove();
-			isChanged = YES;
+			newBestCost = (Integer)msg.getValue();
+			if(bestValueNumber == 0){
+				topBestValue[0][0] = bestValue;
+				topBestValue[1][0] = newBestCost;
+			}
+			else{
+				if(bestValueNumber == bestValueBox){
+					for(int i = bestValueNumber - 1; i > 0; i--){
+						topBestValue[0][i] = topBestValue[0][i-1];
+						topBestValue[1][i] = topBestValue[1][i-1];
+					}
+				}
+				else{
+					for(int i = bestValueNumber; i > 0; i--){
+						topBestValue[0][i] = topBestValue[0][i-1];
+						topBestValue[1][i] = topBestValue[1][i-1];
+					}
+				}
+				topBestValue[0][0] = bestValue;
+				topBestValue[1][0] = newBestCost;
+			}
 		}
 		else{
+			if(bestValueNumber == bestValueBox){
+				for(int i = bestValueNumber - 1; i > 0; i--){
+					topBestValue[0][i] = topBestValue[0][i-1];
+					topBestValue[1][i] = topBestValue[1][i-1];
+				}
+			}
+			else{
+				for(int i = bestValueNumber; i > 0; i--){
+					topBestValue[0][i] = topBestValue[0][i-1];
+					topBestValue[1][i] = topBestValue[1][i-1];
+				}
+			}
+			topBestValue[0][0] = topBestValue[0][1];
+			topBestValue[1][0] = topBestValue[1][1];
 			valueIndexList.remove();
-			isChanged = NO;
+			newBestCost = 2147483647;
 		}
+		if(bestValueNumber < bestValueBox)
+			bestValueNumber++;
+		
+		for(int i = 0; i < domain.length; i++)
+			if(valueWeight[i] > 1)
+				valueWeight[i] = (int)(valueWeight[i]*(1-degradation));
+		for(int i = 0; i < bestValueNumber; i++)
+			valueWeight[topBestValue[0][i]]++;
+		
 		if(this.isLeafAgent() == false)
 			sendAlsBestMessage();
 		
@@ -231,7 +320,7 @@ public class AlsDsaAgent extends AgentCycle {
 		//System.out.println("Agent "+this.name+"~~~best~~~"+cycleCount);
 	}
 		
-	private void AlsWork(){
+	protected void AlsWork(){
 		localCostList.add(localCost);
 		valueIndexList.add(valueIndex);
 		
@@ -259,12 +348,12 @@ public class AlsDsaAgent extends AgentCycle {
 		HashMap<String, Object> result=new HashMap<String, Object>();
 		result.put(KEY_ID, this.id);
 		result.put(KEY_NAME, this.name);
-		result.put(KEY_VALUE, this.domain[valueIndex]);
-		result.put(KEY_LOCALCOST, this.localCost);
+		result.put(KEY_VALUE, this.bestValue);
+		result.put(KEY_LOCALCOST, this.bestCost);
 		result.put(KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
-		System.out.println("Agent "+this.name+" stopped!");
+		//System.out.println("Agent "+this.name+" stopped!");
 	}
 	
 	@Override
@@ -273,6 +362,7 @@ public class AlsDsaAgent extends AgentCycle {
 		
 		double totalCost=0;
 		int ncccTemp = 0;
+		int tag = 0;
 		for(Map<String, Object> result : results){
 			
 			int id_=(Integer)result.get(KEY_ID);
@@ -281,10 +371,13 @@ public class AlsDsaAgent extends AgentCycle {
 			
 			if(ncccTemp < (Integer)result.get(KEY_NCCC))
 				ncccTemp = (Integer)result.get(KEY_NCCC);
-			totalCost+=((double)((Integer)result.get(KEY_LOCALCOST)))/2;
+			if(tag == 0){
+				totalCost = ((double)((Integer)result.get(KEY_LOCALCOST)));
+				tag ++;
+			}
 			
-			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
-			System.out.println(displayStr);
+			//String displayStr="Agent "+name_+": id="+id_+" value="+value_;
+			//System.out.println(displayStr);
 		}
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost)+

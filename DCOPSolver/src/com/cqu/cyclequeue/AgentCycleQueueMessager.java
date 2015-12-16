@@ -99,10 +99,14 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 				
 				if(msgQueue.isEmpty()==false){
 					System.out.println("Wrong!!!!!!!!!!!!!!!!!!!!!!!!!!");
+					int i = 1;
+					i = 1/0;
 				}
 
 				if(msgQueue.size() != 0){
 					System.out.println("Wrong!!!!!!!!!!!!!!!!!!!!!!!!!!");
+					int i = 1;
+					i = 1/0;
 				}
 				
 				boolean lastAgent=true;

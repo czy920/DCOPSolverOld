@@ -12,7 +12,7 @@ import com.cqu.cyclequeue.AgentCycleAls;
 import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
 
-public class AlsMusDsaAgent extends AgentCycleAls{
+public class AlsMusDsa2Agent extends AgentCycleAls{
 	
 	public final static int TYPE_STEP1_MESSAGE = 1;
 	public final static int TYPE_STEP2_MESSAGE = 2;
@@ -39,8 +39,9 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 	private int[][] neighboursDegreeAndTag;							//[neighbour 的度数, neighbour的tag]
 	private int myTag;												//Suggester竞争标记
 	private String myIdentity;										//身份标记
-	private int mySuggestValue;										//给自己的建议值
-	private int[] myNeighboursSuggestTable;							//给邻居的建议值
+	private double mySuggestValueTag;									//给自己的建议值标记
+	private int[] mySuggestValue;									//给自己的建议值
+	private int[][] myNeighboursSuggestTable;						//给邻居的建议值
 	private int[] myNeighboursSuggestAgainTable;					//第二次接受者发送的建议值
 	private int mySuggestersNumber;									//周围建议者的数量
 	private int mySuggesters[];										//各建议者的标号
@@ -48,9 +49,9 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 	
 	private int stayDsaCount = 0;
 	
-	//Suggester每次选择最优value作为候选
+	//Suggester遍历选择value~~~~~~~~~~~~
 	
-	public AlsMusDsaAgent(int id, String name, int level, int[] domain) {
+	public AlsMusDsa2Agent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 		// TODO 自动生成的构造函数存根
 	}
@@ -86,6 +87,9 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 		}
 		mySuggestersNumber = 0;
 		mySuggesters = new int[neighboursQuantity];
+		mySuggestValueTag = 0;
+		mySuggestValue = new int[domain.length];
+		myNeighboursSuggestTable = new int[domain.length][neighboursQuantity];
 		mySuggestedValue = new int[neighboursQuantity];
 		myNeighboursSuggestAgainTable = new int[neighboursQuantity];
 		buildMyTable();
@@ -94,9 +98,12 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 	
 	
 	private void buildMyTable(){
-		int localMinCost = 2147483647;
-		int localMinValueIndex = 0;
-		int[] localMinTable = new int[neighboursQuantity];
+		int[] localMinCost = new int[domain.length];
+		int[] localMinValueIndex = new int[domain.length];
+		int[][] localMinTable = new int[domain.length][neighboursQuantity];
+		for(int i = 0; i < domain.length; i++)
+			localMinCost[i] = 2147483647;
+		
 		for(int i = 0; i < domain.length; i++){
 			int tempLocalCost = 0;
 			int[] tempLocalMinTable = new int[neighboursQuantity];
@@ -125,17 +132,27 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 				}
 				tempLocalCost += oneMinCost;
 			}
-			if(tempLocalCost < localMinCost){
-				localMinCost = tempLocalCost;
-				localMinValueIndex = i;
-				for(int j = 0; j < neighboursQuantity; j++){
-					localMinTable[j] = tempLocalMinTable[j];
-				}
+			
+			localMinCost[i] = tempLocalCost;
+			for(int j = 0; j < neighboursQuantity; j++){
+				localMinTable[i][j] = tempLocalMinTable[j];
 			}
+			
 		}
 		
-		mySuggestValue = localMinValueIndex;
-		myNeighboursSuggestTable = localMinTable;
+		for(int i = 0; i < domain.length; i++){
+			int minId = 0, minCost = 2147483647;
+			for(int j = 0; j < domain.length; j++){
+				if(localMinCost[j] <= minCost && localMinCost[j] != 2147483647){
+					minId = j;
+					minCost = localMinCost[j];
+				}
+			}
+			mySuggestValue[i] = minId;
+			for(int j = 0; j < neighboursQuantity; j++)
+				myNeighboursSuggestTable[i][j] = localMinTable[minId][j];
+			localMinCost[minId] = 2147483647;
+		}
 	}
 	
 	
@@ -144,7 +161,7 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 			int[] box = new int[1];
 			box[0] = valueIndex;
 			for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++){
-				Message msg = new Message(this.id, neighbours[neighbourIndex], AlsMusDsaAgent.TYPE_STEP1_MESSAGE, box);
+				Message msg = new Message(this.id, neighbours[neighbourIndex], AlsMusDsa2Agent.TYPE_STEP1_MESSAGE, box);
 				this.sendMessage(msg);
 			}
 		}
@@ -154,7 +171,7 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 			box[1] = neighboursQuantity;
 			box[2] = myTag;
 			for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++){
-				Message msg = new Message(this.id, neighbours[neighbourIndex], AlsMusDsaAgent.TYPE_STEP1_MESSAGE, box);
+				Message msg = new Message(this.id, neighbours[neighbourIndex], AlsMusDsa2Agent.TYPE_STEP1_MESSAGE, box);
 				this.sendMessage(msg);
 			}
 		}
@@ -171,7 +188,7 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 			int[] box = new int[1];
 			box[0] = valueIndex;
 			for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++){
-				Message msg = new Message(this.id, neighbours[neighbourIndex], AlsMusDsaAgent.TYPE_STEP2_MESSAGE, box);
+				Message msg = new Message(this.id, neighbours[neighbourIndex], AlsMusDsa2Agent.TYPE_STEP2_MESSAGE, box);
 				this.sendMessage(msg);
 			}
 		}
@@ -179,8 +196,8 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 			int[] box = new int[2];
 			box[0] = valueIndex;
 			for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++){
-				box[1] = myNeighboursSuggestTable[neighbourIndex];
-				Message msg=new Message(this.id, neighbours[neighbourIndex], AlsMusDsaAgent.TYPE_STEP2_MESSAGE, box);
+				box[1] = myNeighboursSuggestTable[((int)mySuggestValueTag)%domain.length][neighbourIndex];
+				Message msg=new Message(this.id, neighbours[neighbourIndex], AlsMusDsa2Agent.TYPE_STEP2_MESSAGE, box);
 				this.sendMessage(msg);
 			}
 		}
@@ -197,7 +214,7 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 			int[] box = new int[1];
 			box[0] = valueIndex;
 			for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
-				Message msg=new Message(this.id, neighbours[neighbourIndex], AlsMusDsaAgent.TYPE_STEP3_MESSAGE, box);
+				Message msg=new Message(this.id, neighbours[neighbourIndex], AlsMusDsa2Agent.TYPE_STEP3_MESSAGE, box);
 				this.sendMessage(msg);
 			}
 		}
@@ -207,13 +224,13 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 					int[] box = new int[2];
 					box[0] = valueIndex;
 					box[1] = myNeighboursSuggestAgainTable[neighbourIndex];
-					Message msg = new Message(this.id, neighbours[neighbourIndex], AlsMusDsaAgent.TYPE_STEP3_MESSAGE, box);
+					Message msg = new Message(this.id, neighbours[neighbourIndex], AlsMusDsa2Agent.TYPE_STEP3_MESSAGE, box);
 					this.sendMessage(msg);
 				}
 				else{
 					int[] box = new int[1];
 					box[0] = valueIndex;
-					Message msg=new Message(this.id, neighbours[neighbourIndex], AlsMusDsaAgent.TYPE_STEP3_MESSAGE, box);
+					Message msg=new Message(this.id, neighbours[neighbourIndex], AlsMusDsa2Agent.TYPE_STEP3_MESSAGE, box);
 					this.sendMessage(msg);
 				}
 			}
@@ -228,7 +245,7 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 	
 	private void sendStepDsaMessages(){
 		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
-			Message msg=new Message(this.id, neighbours[neighbourIndex], AlsMusDsaAgent.TYPE_STEPDSA_MESSAGE, valueIndex);
+			Message msg=new Message(this.id, neighbours[neighbourIndex], AlsMusDsa2Agent.TYPE_STEPDSA_MESSAGE, valueIndex);
 			this.sendMessage(msg);
 		}
 	}
@@ -238,24 +255,24 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 	protected void disposeMessage(Message msg) {
 		// TODO 自动生成的方法存根
 		//System.out.println("!!!!!!!!"+cycleCount+"~~~~~"+stayDsaCount);
-		if(msg.getType() == AlsMusDsaAgent.TYPE_STEP1_MESSAGE){
+		if(msg.getType() == AlsMusDsa2Agent.TYPE_STEP1_MESSAGE){
 			disposeStep1Message(msg);
 		}
-		else if(msg.getType() == AlsMusDsaAgent.TYPE_STEP2_MESSAGE){
+		else if(msg.getType() == AlsMusDsa2Agent.TYPE_STEP2_MESSAGE){
 			disposeStep2Message(msg);
 		}
-		else if(msg.getType() == AlsMusDsaAgent.TYPE_STEP3_MESSAGE){
+		else if(msg.getType() == AlsMusDsa2Agent.TYPE_STEP3_MESSAGE){
 			disposeStep3Message(msg);
 		}
-		else if(msg.getType() == AlsMusDsaAgent.TYPE_STEPDSA_MESSAGE){
+		else if(msg.getType() == AlsMusDsa2Agent.TYPE_STEPDSA_MESSAGE){
 			disposeStepDsaMessage(msg);
 		}
 		//!!!!!!!!!!!!!!!!!!!!要添加disposeAlsCostMessage(msg)的处理模块!!!!!!!!!!!!!!!!!!!!
-		else if(msg.getType() == AlsMusDsaAgent.TYPE_ALSCOST_MESSAGE){
+		else if(msg.getType() == AlsMusDsa2Agent.TYPE_ALSCOST_MESSAGE){
 			disposeAlsCostMessage(msg);
 		}
 		//!!!!!!!!!!!!!!!!!!!!要添加disposeAlsBestMessage(msg)的处理模块!!!!!!!!!!!!!!!!!!!!
-		else if(msg.getType() == AlsMusDsaAgent.TYPE_ALSBEST_MESSAGE){
+		else if(msg.getType() == AlsMusDsa2Agent.TYPE_ALSBEST_MESSAGE){
 			disposeAlsBestMessage(msg);
 		}
 		else{
@@ -321,7 +338,8 @@ public class AlsMusDsaAgent extends AgentCycleAls{
 							return;
 						}
 					}
-					valueIndex = mySuggestValue;
+					valueIndex = mySuggestValue[((int)mySuggestValueTag)%domain.length];
+					mySuggestValueTag = mySuggestValueTag+0.1;
 					sendStep2Messages();
 				}
 				else{
