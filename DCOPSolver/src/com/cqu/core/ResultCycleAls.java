@@ -38,7 +38,27 @@ public class ResultCycleAls extends ResultCycle{
 				this.bestCostInCycle[i] = 0;
 			}
 		}
-		for(int i = 0; i < Math.min(bestCostInCycle.length, ((ResultCycleAls)rs).bestCostInCycle.length); i++){
+		if(bestCostInCycle.length < ((ResultCycleAls)rs).bestCostInCycle.length){
+			double[] tempCost = new double[((ResultCycleAls)rs).bestCostInCycle.length];
+			for(int i = 0; i < bestCostInCycle.length; i++){
+				tempCost[i] = bestCostInCycle[i];
+			}
+			for(int i = bestCostInCycle.length; i < ((ResultCycleAls)rs).bestCostInCycle.length; i++){
+				tempCost[i] = tempCost[i-1];
+			}
+			bestCostInCycle = tempCost;
+		}
+		else if(bestCostInCycle.length > ((ResultCycleAls)rs).bestCostInCycle.length){
+			double[] tempCost = new double[bestCostInCycle.length];
+			for(int i = 0; i < ((ResultCycleAls)rs).bestCostInCycle.length; i++){
+				tempCost[i] = ((ResultCycleAls)rs).bestCostInCycle[i];
+			}
+			for(int i = ((ResultCycleAls)rs).bestCostInCycle.length; i < bestCostInCycle.length; i++){
+				tempCost[i] = tempCost[i-1];
+			}
+			((ResultCycleAls)rs).bestCostInCycle = tempCost;;
+		}
+		for(int i = 0; i < bestCostInCycle.length; i++){
 			this.bestCostInCycle[i] += (((ResultCycleAls)rs).bestCostInCycle[i]/validCount);
 		}
 	}
@@ -52,7 +72,27 @@ public class ResultCycleAls extends ResultCycle{
 				this.bestCostInCycle[i] = 0;
 			}
 		}
-		for(int i = 0; i < Math.min(bestCostInCycle.length, ((ResultCycleAls)rs).bestCostInCycle.length); i++){
+		if(bestCostInCycle.length < ((ResultCycleAls)rs).bestCostInCycle.length){
+			double[] tempCost = new double[((ResultCycleAls)rs).bestCostInCycle.length];
+			for(int i = 0; i < bestCostInCycle.length; i++){
+				tempCost[i] = bestCostInCycle[i];
+			}
+			for(int i = bestCostInCycle.length; i < ((ResultCycleAls)rs).bestCostInCycle.length; i++){
+				tempCost[i] = tempCost[i-1];
+			}
+			bestCostInCycle = tempCost;
+		}
+		else if(bestCostInCycle.length > ((ResultCycleAls)rs).bestCostInCycle.length){
+			double[] tempCost = new double[bestCostInCycle.length];
+			for(int i = 0; i < ((ResultCycleAls)rs).bestCostInCycle.length; i++){
+				tempCost[i] = ((ResultCycleAls)rs).bestCostInCycle[i];
+			}
+			for(int i = ((ResultCycleAls)rs).bestCostInCycle.length; i < bestCostInCycle.length; i++){
+				tempCost[i] = tempCost[i-1];
+			}
+			((ResultCycleAls)rs).bestCostInCycle = tempCost;;
+		}
+		for(int i = 0; i < bestCostInCycle.length; i++){
 			this.bestCostInCycle[i] -= (((ResultCycleAls)rs).bestCostInCycle[i]/validCount);
 		}
 	}

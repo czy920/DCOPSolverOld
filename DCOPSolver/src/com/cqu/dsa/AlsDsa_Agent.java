@@ -7,6 +7,7 @@ import java.util.Map;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.ResultCycle;
+import com.cqu.core.ResultCycleAls;
 import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.cyclequeue.AgentCycleAls;
 import com.cqu.main.Debugger;
@@ -150,9 +151,10 @@ public class AlsDsa_Agent extends AgentCycleAls{
 		result.put(KEY_VALUE, this.domain[valueIndex]);
 		result.put(KEY_NCCC, this.nccc);
 		result.put(KEY_BESTCOST, this.bestCost);
+		result.put(KEY_BESTCOSTINCYCLE, bestCostInCycle);
 		
 		this.msgMailer.setResult(result);
-		System.out.println("Agent "+this.name+" stopped!");
+		//System.out.println("Agent "+this.name+" stopped!");
 	}
 	
 	
@@ -160,29 +162,30 @@ public class AlsDsa_Agent extends AgentCycleAls{
 	public Object printResults(List<Map<String, Object>> results) {
 		// TODO 自动生成的方法存根
 
+		ResultCycleAls ret=new ResultCycleAls();
 		int tag = 0;
 		int totalCost = 0;
 		int ncccTemp = 0;
 		for(Map<String, Object> result : results){
 			
-			int id_=(Integer)result.get(KEY_ID);
-			String name_=(String)result.get(KEY_NAME);
-			int value_=(Integer)result.get(KEY_VALUE);
+			//int id_=(Integer)result.get(KEY_ID);
+			//String name_=(String)result.get(KEY_NAME);
+			//int value_=(Integer)result.get(KEY_VALUE);
 			
 			if(ncccTemp < (Integer)result.get(KEY_NCCC))
 				ncccTemp = (Integer)result.get(KEY_NCCC);
 			if(tag == 0){
 				totalCost = ((Integer)result.get(KEY_BESTCOST));
+				ret.bestCostInCycle=(double[])result.get(KEY_BESTCOSTINCYCLE);
 				tag = 1;
 			}
-			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
-			System.out.println(displayStr);
+			//String displayStr="Agent "+name_+": id="+id_+" value="+value_;
+			//System.out.println(displayStr);
 		}
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost)+
 				" nccc: "+Infinity.infinityEasy((int)ncccTemp));
 		
-		ResultCycle ret=new ResultCycle();
 		ret.nccc=(int)ncccTemp;
 		ret.totalCost=(int)totalCost;
 		return ret;

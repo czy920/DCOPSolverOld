@@ -69,7 +69,43 @@ public class ResultCycle extends Result{
 				this.messageQuantityInCycle[i] = 0;
 			}
 		}
-		for(int i = 0; i < Math.min(totalCostInCycle.length, ((ResultCycle)rs).totalCostInCycle.length); i++){
+		if(totalCostInCycle.length < ((ResultCycle)rs).totalCostInCycle.length){
+			double[] tempCost = new double[((ResultCycle)rs).totalCostInCycle.length];
+			long[] tempTime = new long[((ResultCycle)rs).totalCostInCycle.length];
+			int[] tempMQ = new int[((ResultCycle)rs).totalCostInCycle.length];
+			for(int i = 0; i < totalCostInCycle.length; i++){
+				tempCost[i] = totalCostInCycle[i];
+				tempTime[i] = timeCostInCycle[i];
+				tempMQ[i] = messageQuantityInCycle[i];
+			}
+			for(int i = totalCostInCycle.length; i < ((ResultCycle)rs).totalCostInCycle.length; i++){
+				tempCost[i] = tempCost[i-1];
+				tempTime[i] = tempTime[i-1];
+				tempMQ[i] = tempMQ[i-1];
+			}
+			totalCostInCycle = tempCost;
+			timeCostInCycle = tempTime;
+			messageQuantityInCycle = tempMQ;
+		}
+		else if(totalCostInCycle.length > ((ResultCycle)rs).totalCostInCycle.length){
+			double[] tempCost = new double[totalCostInCycle.length];
+			long[] tempTime = new long[totalCostInCycle.length];
+			int[] tempMQ = new int[totalCostInCycle.length];
+			for(int i = 0; i < ((ResultCycle)rs).totalCostInCycle.length; i++){
+				tempCost[i] = ((ResultCycle)rs).totalCostInCycle[i];
+				tempTime[i] = ((ResultCycle)rs).timeCostInCycle[i];
+				tempMQ[i] = ((ResultCycle)rs).messageQuantityInCycle[i];
+			}
+			for(int i = ((ResultCycle)rs).totalCostInCycle.length; i < totalCostInCycle.length; i++){
+				tempCost[i] = tempCost[i-1];
+				tempTime[i] = tempTime[i-1];
+				tempMQ[i] = tempMQ[i-1];
+			}
+			((ResultCycle)rs).totalCostInCycle = tempCost;
+			((ResultCycle)rs).timeCostInCycle = tempTime;
+			((ResultCycle)rs).messageQuantityInCycle = tempMQ;
+		}
+		for(int i = 0; i < totalCostInCycle.length; i++){
 			this.totalCostInCycle[i] += (((ResultCycle)rs).totalCostInCycle[i]/validCount);
 			this.timeCostInCycle[i] += (((ResultCycle)rs).timeCostInCycle[i]/validCount);
 			this.messageQuantityInCycle[i] += (((ResultCycle)rs).messageQuantityInCycle[i]/validCount);
@@ -90,7 +126,43 @@ public class ResultCycle extends Result{
 				this.messageQuantityInCycle[i] = 0;
 			}
 		}
-		for(int i = 0; i < Math.min(totalCostInCycle.length, ((ResultCycle)rs).totalCostInCycle.length); i++){
+		if(totalCostInCycle.length < ((ResultCycle)rs).totalCostInCycle.length){
+			double[] tempCost = new double[((ResultCycle)rs).totalCostInCycle.length];
+			long[] tempTime = new long[((ResultCycle)rs).totalCostInCycle.length];
+			int[] tempMQ = new int[((ResultCycle)rs).totalCostInCycle.length];
+			for(int i = 0; i < totalCostInCycle.length; i++){
+				tempCost[i] = totalCostInCycle[i];
+				tempTime[i] = timeCostInCycle[i];
+				tempMQ[i] = messageQuantityInCycle[i];
+			}
+			for(int i = totalCostInCycle.length; i < ((ResultCycle)rs).totalCostInCycle.length; i++){
+				tempCost[i] = tempCost[i-1];
+				tempTime[i] = tempTime[i-1];
+				tempMQ[i] = tempMQ[i-1];
+			}
+			totalCostInCycle = tempCost;
+			timeCostInCycle = tempTime;
+			messageQuantityInCycle = tempMQ;
+		}
+		else if(totalCostInCycle.length > ((ResultCycle)rs).totalCostInCycle.length){
+			double[] tempCost = new double[totalCostInCycle.length];
+			long[] tempTime = new long[totalCostInCycle.length];
+			int[] tempMQ = new int[totalCostInCycle.length];
+			for(int i = 0; i < ((ResultCycle)rs).totalCostInCycle.length; i++){
+				tempCost[i] = ((ResultCycle)rs).totalCostInCycle[i];
+				tempTime[i] = ((ResultCycle)rs).timeCostInCycle[i];
+				tempMQ[i] = ((ResultCycle)rs).messageQuantityInCycle[i];
+			}
+			for(int i = ((ResultCycle)rs).totalCostInCycle.length; i < totalCostInCycle.length; i++){
+				tempCost[i] = tempCost[i-1];
+				tempTime[i] = tempTime[i-1];
+				tempMQ[i] = tempMQ[i-1];
+			}
+			((ResultCycle)rs).totalCostInCycle = tempCost;
+			((ResultCycle)rs).timeCostInCycle = tempTime;
+			((ResultCycle)rs).messageQuantityInCycle = tempMQ;
+		}
+		for(int i = 0; i < totalCostInCycle.length; i++){
 			this.totalCostInCycle[i] -= (((ResultCycle)rs).totalCostInCycle[i]/validCount);
 			this.timeCostInCycle[i] -= (((ResultCycle)rs).timeCostInCycle[i]/validCount);
 			this.messageQuantityInCycle[i] -= (((ResultCycle)rs).messageQuantityInCycle[i]/validCount);

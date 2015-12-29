@@ -675,6 +675,8 @@ public class AlsMusDsa3Agent extends AgentCycleAls{
 				sendStepDsaMessages();
 			}
 			else{
+				//valueIndex = (int)(Math.random()*(domain.length));
+				
 				prepareToReset = 2147483647;
 				if(Math.random() < selectSuggesterP){
 					myIdentity = SUGGESTER;
