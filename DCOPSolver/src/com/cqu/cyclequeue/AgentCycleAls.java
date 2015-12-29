@@ -26,8 +26,7 @@ public abstract class AgentCycleAls extends AgentCycle{
 	protected LinkedList<Integer> valueIndexList = new LinkedList<Integer>();
 	protected HashMap<Integer, LinkedList<Integer>> childrenMessageList = new HashMap<Integer, LinkedList<Integer>>();
 	
-	private int warning = 0;
-	
+	protected int warning = 0;
 	
 	public AgentCycleAls(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);

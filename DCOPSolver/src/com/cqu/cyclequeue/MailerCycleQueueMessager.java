@@ -91,8 +91,7 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 				dataInCycleIncrease();
 				//System.out.println("cycleCount: "+cycleCount);
 				cycleCount++;
-				
-				//System.out.println("cycleCount: "+cycleCount);
+
 				cycleEnd.set(false);
 				synchronized (cycleBegin) {
 					// modify by hechen, 2015.11.23
@@ -117,15 +116,14 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 		//数组长度修正
 		dataInCycleCorrection();
 		
-		//if(cycleCount != 39){
-		//	System.out.println("~~~"+cycleCount+"~~~wrong!!!!!!!!");
-		//	int a = 1;
-		//	a = a/0;
-		//}
-		
 		runFinished();
 	}
-
+	
+	public int getCycleCount(){
+		return cycleCount;
+		
+	}
+	
 	//保存每个回合的dataInCycle
 	protected void dataInCycleIncrease(){}
 	

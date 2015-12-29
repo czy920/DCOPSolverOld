@@ -12,6 +12,8 @@ import com.cqu.cyclequeue.AgentCycleAls;
 import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
 
+//程序中stopRunning()设置在了ALS框架中，当运行cycle被设置成0的时候，会陷入死循环
+
 public class AlsMusDsa2Agent extends AgentCycleAls{
 	
 	public final static int TYPE_STEP1_MESSAGE = 1;
@@ -39,7 +41,7 @@ public class AlsMusDsa2Agent extends AgentCycleAls{
 	private int[][] neighboursDegreeAndTag;							//[neighbour 的度数, neighbour的tag]
 	private int myTag;												//Suggester竞争标记
 	private String myIdentity;										//身份标记
-	private double mySuggestValueTag;									//给自己的建议值标记
+	private double mySuggestValueTag;								//给自己的建议值标记
 	private int[] mySuggestValue;									//给自己的建议值
 	private int[][] myNeighboursSuggestTable;						//给邻居的建议值
 	private int[] myNeighboursSuggestAgainTable;					//第二次接受者发送的建议值
@@ -99,7 +101,7 @@ public class AlsMusDsa2Agent extends AgentCycleAls{
 	
 	private void buildMyTable(){
 		int[] localMinCost = new int[domain.length];
-		int[] localMinValueIndex = new int[domain.length];
+		//int[] localMinValueIndex = new int[domain.length];
 		int[][] localMinTable = new int[domain.length][neighboursQuantity];
 		for(int i = 0; i < domain.length; i++)
 			localMinCost[i] = 2147483647;
@@ -284,6 +286,7 @@ public class AlsMusDsa2Agent extends AgentCycleAls{
 	
 	
 	private void disposeStep1Message(Message msg) {
+		//System.out.println("~~~"+id+"~~~"+cycleCount+"~~~");
 		
 		if(receivedQuantity==0)
 			cycleCount++;

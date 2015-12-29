@@ -30,14 +30,11 @@ public class ResultCycle extends Result{
 	{
 		if(this.totalCost > rs.totalCost){
 			this.totalCost = rs.totalCost;
-			this.totalCostInCycle = ((ResultCycle)rs).totalCostInCycle;
-		}
-		if(this.messageQuantity > rs.messageQuantity){
 			this.messageQuantity = rs.messageQuantity;
-			this.messageQuantityInCycle = ((ResultCycle)rs).messageQuantityInCycle;
-		}
-		if(this.totalTime > rs.totalTime){
 			this.totalTime = rs.totalTime;
+			
+			this.totalCostInCycle = ((ResultCycle)rs).totalCostInCycle;
+			this.messageQuantityInCycle = ((ResultCycle)rs).messageQuantityInCycle;
 			this.timeCostInCycle = ((ResultCycle)rs).timeCostInCycle;
 		}
 		this.lostRatio=Math.min(this.lostRatio, rs.lostRatio);
@@ -48,14 +45,11 @@ public class ResultCycle extends Result{
 	{
 		if(this.totalCost < rs.totalCost){
 			this.totalCost = rs.totalCost;
-			this.totalCostInCycle = ((ResultCycle)rs).totalCostInCycle;
-		}
-		if(this.messageQuantity < rs.messageQuantity){
 			this.messageQuantity = rs.messageQuantity;
-			this.messageQuantityInCycle = ((ResultCycle)rs).messageQuantityInCycle;
-		}
-		if(this.totalTime < rs.totalTime){
 			this.totalTime = rs.totalTime;
+			
+			this.totalCostInCycle = ((ResultCycle)rs).totalCostInCycle;
+			this.messageQuantityInCycle = ((ResultCycle)rs).messageQuantityInCycle;
 			this.timeCostInCycle = ((ResultCycle)rs).timeCostInCycle;
 		}
 		this.lostRatio=Math.max(this.lostRatio, rs.lostRatio);

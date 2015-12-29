@@ -81,6 +81,9 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 			{
 				//添加work()方法，确保如果本轮没有收到message也能执行操作
 				work(msgQueue.size());
+				if(msgQueue.isEmpty() == true){
+					System.out.println("!!!!! IsEmpty Judged Wrong !!!!!");
+				}
 				
 				while(msgQueue.isEmpty()==false)
 				{

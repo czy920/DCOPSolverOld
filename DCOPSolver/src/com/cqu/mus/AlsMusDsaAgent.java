@@ -12,6 +12,8 @@ import com.cqu.cyclequeue.AgentCycleAls;
 import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
 
+//程序中stopRunning()设置在了ALS框架中，当运行cycle被设置成0的时候，会陷入死循环
+
 public class AlsMusDsaAgent extends AgentCycleAls{
 	
 	public final static int TYPE_STEP1_MESSAGE = 1;
