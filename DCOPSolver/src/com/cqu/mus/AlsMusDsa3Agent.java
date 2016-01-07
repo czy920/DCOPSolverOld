@@ -62,12 +62,12 @@ public class AlsMusDsa3Agent extends AgentCycleAls{
 	private int prepareToReset = 2147483647;
 	protected LinkedList<int[]> localCostList = new LinkedList<int[]>();
 	
-	private int[] test = new int[9999];
-	private int[] testWho = new int[9999];
-	private int[] testSave = new int[9999];
-	private int testTag = 0;
-	private int alsReceived = 0;
-	private int[] alsReceivedWho = new int[9999];
+	//private int[] test = new int[99999];
+	//private int[] testWho = new int[99999];
+	//private int[] testSave = new int[99999];
+	//private int testTag = 0;
+	//private int alsReceived = 0;
+	//private int[] alsReceivedWho = new int[99999];
 	private int[] saveReset = new int[999];
 	private int[] saveResetTime = new int[999];
 	private int saveTag = 0;
@@ -293,7 +293,7 @@ public class AlsMusDsa3Agent extends AgentCycleAls{
 	protected void AlsWork(){
 		
 		warning = 0;
-		alsReceived = 0;
+		//alsReceived = 0;
 		
 		valueIndexList.add(valueIndex);
 		if(this.isLeafAgent() == false){
@@ -369,10 +369,10 @@ public class AlsMusDsa3Agent extends AgentCycleAls{
 	
 	
 	private void disposeStep1Message(Message msg) {
-		test[testTag] = 1;
-		testWho[testTag] = msg.getIdSender();
-		testSave[testTag] = msgMailer.getCycleCount();
-		testTag++;
+		//test[testTag] = 1;
+		//testWho[testTag] = msg.getIdSender();
+		//testSave[testTag] = msgMailer.getCycleCount();
+		//testTag++;
 		
 		//System.out.println("~~~"+id+"~~~"+cycleCount+"~~~");
 		STEP = 1;
@@ -446,10 +446,10 @@ public class AlsMusDsa3Agent extends AgentCycleAls{
 	
 	
 	private void disposeStep2Message(Message msg) {
-		test[testTag] = 2;
-		testWho[testTag] = msg.getIdSender();
-		testSave[testTag] = msgMailer.getCycleCount();
-		testTag++;
+		//test[testTag] = 2;
+		//testWho[testTag] = msg.getIdSender();
+		//testSave[testTag] = msgMailer.getCycleCount();
+		//testTag++;
 		
 		STEP = 2;
 		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
@@ -535,10 +535,10 @@ public class AlsMusDsa3Agent extends AgentCycleAls{
 	
 	
 	private void disposeStep3Message(Message msg) {
-		test[testTag] = 3;
-		testWho[testTag] = msg.getIdSender();
-		testSave[testTag] = msgMailer.getCycleCount();
-		testTag++;
+		//test[testTag] = 3;
+		//testWho[testTag] = msg.getIdSender();
+		//testSave[testTag] = msgMailer.getCycleCount();
+		//testTag++;
 		
 		STEP = 3;
 		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
@@ -628,10 +628,10 @@ public class AlsMusDsa3Agent extends AgentCycleAls{
 	
 	
 	private void disposeStepDsaMessage(Message msg){
-		test[testTag] = 4;
-		testWho[testTag] = msg.getIdSender();
-		testSave[testTag] = msgMailer.getCycleCount();
-		testTag++;
+		//test[testTag] = 4;
+		//testWho[testTag] = msg.getIdSender();
+		//testSave[testTag] = msgMailer.getCycleCount();
+		//testTag++;
 		
 		//System.out.println("~~~"+id+"~~~"+cycleCount+"~~~");
 		STEP = 4;
@@ -683,16 +683,16 @@ public class AlsMusDsa3Agent extends AgentCycleAls{
 					myTag = (int)(2147483647*Math.random());
 				}
 				sendStep1Messages();
-				testTag = 0;
+				//testTag = 0;
 			}
 		}
 	}
 	
 	
 	protected void disposeAlsCostMessage(Message msg){
-		alsReceived++;
-		if(level != 0)
-			alsReceivedWho[alsReceived] = msg.getIdSender();
+		//alsReceived++;
+		//if(level != 0)
+		//	alsReceivedWho[alsReceived] = msg.getIdSender();
 		
 		int senderIndex=0;
 		int senderId=msg.getIdSender();

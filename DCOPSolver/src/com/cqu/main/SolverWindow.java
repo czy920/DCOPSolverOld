@@ -612,6 +612,11 @@ public class SolverWindow {
 		else if(algorithmType.equals("ALSMGM")){
 			paramList.add(lspSpinnerCycleCountEnd);
 		}
+		else if(algorithmType.equals("ALSMGM2")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
+			paramList.add(lspSpinnerSelectRound);
+		}
 		else if(algorithmType.equals("ALS_DSA")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
