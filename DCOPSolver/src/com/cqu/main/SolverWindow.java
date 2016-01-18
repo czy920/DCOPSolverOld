@@ -419,7 +419,7 @@ public class SolverWindow {
 		lspSpinnerSelectProbabilityB=new LabelSpinnerParameter("选择概率B：", new SpinnerNumberModel(0.2, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityC=new LabelSpinnerParameter("选择概率C：", new SpinnerNumberModel(0.05, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityD=new LabelSpinnerParameter("选择概率D：", new SpinnerNumberModel(0.2, 0, 1, 0.1));
-		lspSpinnerSelectInterval=new LabelSpinnerParameter("控制间隔：", new SpinnerNumberModel(5, 0, 500, 1));
+		lspSpinnerSelectInterval=new LabelSpinnerParameter("控制间隔：", new SpinnerNumberModel(10, 0, 500, 1));
 		lspSpinnerSelectStepK1=new LabelSpinnerParameter("步长k：", new SpinnerNumberModel(5, 0, 50, 1));
 		lspSpinnerSelectStepK2=new LabelSpinnerParameter("步长K*：", new SpinnerNumberModel(5, 0, 50, 1));
 		lspSpinnerSelectRound=new LabelSpinnerParameter("重启轮数：", new SpinnerNumberModel(20, 0, 600, 1));
@@ -637,31 +637,38 @@ public class SolverWindow {
 			paramList.add(lspSpinnerSelectProbabilityD);
 			paramList.add(lspSpinnerSelectRound);
 		}
-		else if(algorithmType.equals("ALSMUS")){
+		else if(algorithmType.equals("ALSLMUS")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
 			paramList.add(lspSpinnerSelectProbabilityA);
 			paramList.add(lspSpinnerSelectProbabilityB);
 		}
-		else if(algorithmType.equals("ALSMUSDSA")){
+		else if(algorithmType.equals("ALSLMUSDSA")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectInterval);
 			paramList.add(lspSpinnerSelectProbability);
 			paramList.add(lspSpinnerSelectProbabilityA);
 			paramList.add(lspSpinnerSelectProbabilityB);
 		}
-		else if(algorithmType.equals("ALSMUSDSA2")){
+		else if(algorithmType.equals("ALSLMUSDSA2")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectInterval);
 			paramList.add(lspSpinnerSelectProbability);
 			paramList.add(lspSpinnerSelectProbabilityA);
 			paramList.add(lspSpinnerSelectProbabilityB);
 		}
-		else if(algorithmType.equals("ALSMUSDSA3")){
+		else if(algorithmType.equals("ALSLMUSDSA3")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectInterval);
 			paramList.add(lspSpinnerSelectProbability);
 			paramList.add(lspSpinnerSelectProbabilityA);
+			paramList.add(lspSpinnerSelectProbabilityB);
+		}
+		else if(algorithmType.equals("ALSLMUSDSA4")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectInterval);
+			paramList.add(lspSpinnerSelectProbability);
+			//paramList.add(lspSpinnerSelectProbabilityA);
 			paramList.add(lspSpinnerSelectProbabilityB);
 		}
 		else if(algorithmType.equals("DPOP"))

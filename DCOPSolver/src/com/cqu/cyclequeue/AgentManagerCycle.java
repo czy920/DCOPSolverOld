@@ -118,20 +118,24 @@ public class AgentManagerCycle {
 				agent=new AlsDsa_H2_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ALSMUS")){
+			else if(agentType.equals("ALSLMUS")){
 				agent=new AlsMusAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ALSMUSDSA")){
+			else if(agentType.equals("ALSLMUSDSA")){
 				agent=new AlsMusDsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ALSMUSDSA2")){
+			else if(agentType.equals("ALSLMUSDSA2")){
 				agent=new AlsMusDsa2Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ALSMUSDSA3")){
+			else if(agentType.equals("ALSLMUSDSA3")){
 				agent=new AlsMusDsa3Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if(agentType.equals("ALSLMUSDSA4")){
+				agent=new AlsLmusDsa4Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else{

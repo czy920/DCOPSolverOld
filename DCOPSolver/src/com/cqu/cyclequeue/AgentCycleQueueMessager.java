@@ -81,6 +81,16 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 			{
 				//添加work()方法，确保如果本轮没有收到message也能执行操作
 				work(msgQueue.size());
+				
+				while(msgQueue.size() == 0){
+					try {
+						Thread.sleep(1);
+						System.out.println("!!! sleep(1) !!!!!");
+					} catch (InterruptedException e) {
+						// TODO 自动生成的 catch 块
+						e.printStackTrace();
+					}
+				}
 				if(msgQueue.isEmpty() == true){
 					System.out.println("!!!!! IsEmpty Judged Wrong !!!!!");
 				}
