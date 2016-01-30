@@ -35,6 +35,10 @@ public class Problem {
 		agentProperty = new HashMap<Integer, Integer>(); 
 		VariableRelation = new HashMap<String, String>(); //对应的relation variable pair
 		VariableValue = new HashMap<String, String>(); //对应的relation value pair
+		
+		highNodes = new HashMap<Integer, int[]>();
+		lowNodes = new HashMap<Integer, int[]>();
+		priorities = new HashMap<Integer, Integer>();
 	}
 	
 	//all possible domains and costs
@@ -66,4 +70,15 @@ public class Problem {
 	
 	public Map<String, String> VariableRelation;
 	public Map<String, String> VariableValue;
+	
+	/*
+	 * 增加后，用于在使用ACO算法时保存优先级结构的属性
+	 * Add by hechen, 2016 - 1 - 22
+	 */
+	public Map<Integer, int[]> highNodes;
+	public Map<Integer, int[]> lowNodes;
+	public Map<Integer, Integer> priorities;
+	public int maxPriority;
+	public int minPriority;
+	public int[] allNodes;
 }

@@ -3,6 +3,7 @@ package com.cqu.heuristics;
 import com.cqu.parser.Problem;
 import com.cqu.util.StatisticUtil;
 import com.cqu.varOrdering.dfs.DFSview;
+import com.cqu.varOrdering.priority.PriorityView;
 
 public class MostConnectedHeuristic implements ScoringHeuristic<Short>{
 	private Problem problem; //主要是为了获取问题本身结点之间的约束关系
@@ -52,6 +53,27 @@ public class MostConnectedHeuristic implements ScoringHeuristic<Short>{
 		{
 			return neighbours[maxIndex];
 		}
+	}
+	@Override
+	public int getScores(PriorityView orderingView) {
+		// TODO Auto-generated method stub
+		int maxNeighbourCount=-1;
+		int maxNeighbourCountNodeId=-1;
+		/*
+		 * 寻找邻居结点最多的结点ID
+		 */
+		for(Integer nodeId : this.problem.neighbourAgents.keySet())
+		{
+			int temp=this.problem.neighbourAgents.get(nodeId).length;
+			if(orderingView.nodeIterated.get(nodeId) == true)
+				continue;
+			if(temp >= maxNeighbourCount)
+			{
+				maxNeighbourCount=temp;
+				maxNeighbourCountNodeId=nodeId;
+			}
+		}
+		return maxNeighbourCountNodeId;
 	}
 
 }

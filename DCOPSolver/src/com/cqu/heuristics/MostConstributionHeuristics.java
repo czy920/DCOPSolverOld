@@ -3,6 +3,7 @@ package com.cqu.heuristics;
 import com.cqu.parser.Problem;
 import com.cqu.util.StatisticUtil;
 import com.cqu.varOrdering.dfs.DFSview;
+import com.cqu.varOrdering.priority.PriorityView;
 
 public class MostConstributionHeuristics implements ScoringHeuristic<Short>{
 	private Problem problem; //主要是为了获取问题本身结点之间的约束关系
@@ -55,5 +56,12 @@ public class MostConstributionHeuristics implements ScoringHeuristic<Short>{
 		{
 			return neighbours[maxIndex];
 		}
+	}
+	
+	//未实现
+	@Override
+	public int getScores(PriorityView orderingView) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

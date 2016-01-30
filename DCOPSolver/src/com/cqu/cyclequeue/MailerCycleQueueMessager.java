@@ -15,12 +15,12 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 	
     private LinkedList<Message> msgQueue;
     
-    protected AtomicBoolean cycleBegin;
-    protected AtomicBoolean cycleEnd;
-    protected AtomicInteger cycleEndCount;
-    protected AtomicInteger totalAgentCount;
-    protected AtomicInteger OperateEndCount;
-    protected AtomicInteger totalAgentCountTemp;
+    protected AtomicBoolean cycleBegin;     //用于通知Agent开始
+    protected AtomicBoolean cycleEnd;       //用于Agent通知消息中心开始
+    protected AtomicInteger cycleEndCount;     //用于每轮Agent处理完信息标志
+    protected AtomicInteger totalAgentCount;   //用于每轮开始总共运行的Agent
+    protected AtomicInteger OperateEndCount;    //用于抑制消息中心太快更新totalAgentCount＝totalAgentCountTemp，而totalAgentCountTemp还未更新
+    protected AtomicInteger totalAgentCountTemp;   //用于每轮运行的Agent总数更新
     
     protected int cycleCount;
     

@@ -19,6 +19,7 @@ import com.cqu.main.DOTrenderer;
 import com.cqu.settings.Settings;
 import com.cqu.util.XmlUtil;
 import com.cqu.varOrdering.dfs.DFSgeneration;
+import com.cqu.varOrdering.priority.PriorityGeneration;
 
 public class ProblemParser {
 	
@@ -193,6 +194,17 @@ public class ProblemParser {
 		DFSgeneration.setRootHeuristics(new MostConnectedHeuristic(problem));
 		DFSgeneration.setNextNodeHeuristics(new MostConnectedHeuristic(problem));
 		treeGenerator.generate();
+		
+		PriorityGeneration varOrdering = new PriorityGeneration(problem.neighbourAgents);
+		varOrdering.setRootHeuristics(new MostConnectedHeuristic(problem));
+		varOrdering.setNextNodeHeuristics(new MostConnectedHeuristic(problem));
+		varOrdering.generate();
+		problem.highNodes = varOrdering.getHighNodes();
+		problem.lowNodes = varOrdering.getLowNodes();
+		problem.priorities = varOrdering.getPriorities();
+		problem.maxPriority = varOrdering.getMaxPriority();
+		problem.minPriority = varOrdering.getMinPriority();
+		problem.allNodes = varOrdering.getAllNodes();
 		
 		problem.agentLevels=treeGenerator.getNodeLevels();
 		for(Integer level:problem.agentLevels.values())

@@ -71,7 +71,7 @@ public class Solver {
 				agentType.equals("DSA_A")||agentType.equals("DSA_B")||agentType.equals("DSA_C")||agentType.equals("DSA_D")||agentType.equals("DSA_E")||
 				agentType.equals("MGM")||agentType.equals("MGM2")||agentType.equals("ALSDSA")||agentType.equals("ALSMGM")||agentType.equals("ALSMGM2")||
 				agentType.equals("ALS_DSA")||agentType.equals("ALS_H1_DSA")||agentType.equals("ALS_H2_DSA")||agentType.equals("ALSLMUS")||agentType.equals("ALSLMUSDSA")||
-				agentType.equals("ALSLMUSDSA2")||agentType.equals("ALSLMUSDSA3")||agentType.equals("ALSLMUSDSA4"))
+				agentType.equals("ALSLMUSDSA2")||agentType.equals("ALSLMUSDSA3")||agentType.equals("ALSLMUSDSA4")||agentType.equals("ACO"))
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
 			//construct agents

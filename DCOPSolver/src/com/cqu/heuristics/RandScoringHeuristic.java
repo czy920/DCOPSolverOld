@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.cqu.parser.Problem;
 import com.cqu.varOrdering.dfs.DFSview;
+import com.cqu.varOrdering.priority.PriorityView;
 
 public class RandScoringHeuristic implements ScoringHeuristic<Short>{
 	private Problem problem;
@@ -60,6 +61,22 @@ public class RandScoringHeuristic implements ScoringHeuristic<Short>{
 		}else {
 			return -1;
 		}
+	}
+	@Override
+	public int getScores(PriorityView orderingView) {
+		// TODO Auto-generated method stub
+		int[] nodes = new int[this.problem.neighbourAgents.size()];
+		int i = 0;
+		for(Map.Entry<Integer, int[]> entry : this.problem.neighbourAgents.entrySet()){
+			nodes[i] = entry.getKey();
+			i++;
+		}
+		
+		int randNodeId = (int)(Math.random() * nodes.length); //随机产生一个下标
+		while(orderingView.nodeIterated.get(randNodeId) == true){
+			randNodeId = (int)(Math.random() * nodes.length);
+		}
+		return nodes[randNodeId];
 	}
 
 }

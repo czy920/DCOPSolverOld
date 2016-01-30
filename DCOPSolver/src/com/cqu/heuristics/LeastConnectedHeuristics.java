@@ -3,6 +3,7 @@ package com.cqu.heuristics;
 import com.cqu.parser.Problem;
 import com.cqu.util.StatisticUtil;
 import com.cqu.varOrdering.dfs.DFSview;
+import com.cqu.varOrdering.priority.PriorityView;
 
 public class LeastConnectedHeuristics implements ScoringHeuristic<Short>{
 	private Problem problem;
@@ -54,6 +55,29 @@ public class LeastConnectedHeuristics implements ScoringHeuristic<Short>{
 		{
 			return neighbours[minIndex];
 		}
+	}
+
+	@Override
+	public int getScores(PriorityView orderingView) {
+		// TODO Auto-generated method stub
+		int minNeighbourCount=1000;
+		int minNeighbourCountNodeId=-1;
+		/*
+		 * 寻找邻居结点最多的结点ID
+		 */
+		for(Integer nodeId : this.problem.neighbourAgents.keySet())
+		{
+			int temp=this.problem.neighbourAgents.get(nodeId).length;
+			if(orderingView.nodeIterated.get(temp) == true)
+				continue;
+			if(temp <= minNeighbourCount)
+			{
+				minNeighbourCount=temp;
+				minNeighbourCountNodeId=nodeId;
+			}
+		}
+		//System.out.println("root: " + minNeighbourCountNodeId);
+		return minNeighbourCountNodeId;
 	}
 
 }

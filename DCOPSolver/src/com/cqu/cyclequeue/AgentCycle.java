@@ -26,6 +26,17 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 	protected int[] children;
 	protected int[] pseudoChildren;
 	
+	/*
+	 * ACO算法优先级时用到的属性
+	 * Add by hechen, 2016 - 1 - 22
+	 */
+	protected int[] highPriorities;
+	protected int[] lowPriorities;
+	protected int priority;
+	protected int[] allNodes;
+	protected int maxPriority;
+	protected int minPriority;
+	
 	protected Map<Integer, int[]> neighbourDomains;
 	protected Map<Integer, Integer> neighbourLevels;
 	protected Map<Integer, int[][]> constraintCosts;
@@ -82,6 +93,20 @@ public abstract class AgentCycle extends AgentCycleQueueMessager{
 		this.neighbourDomains=neighbourDomains;
 		this.constraintCosts=constraintCosts;
 		this.neighbourLevels=neighbourLevels;
+	}
+	
+	public void setNeibours(int[] neighbours, int parent, int[] children, int[] allParents, 
+			int[] allChildren, Map<Integer, int[]> neighbourDomains, Map<Integer, 
+			int[][]> constraintCosts, Map<Integer, Integer> neighbourLevels, 
+			int[] highPriorities, int[] lowPriorities, int priority, int[] allNodes, int maxPriority, int minPriority){
+		setNeibours(neighbours,parent,children,allParents,allChildren,neighbourDomains,constraintCosts,neighbourLevels);
+		this.highPriorities = highPriorities;
+		this.lowPriorities = lowPriorities;
+		this.priority = priority;
+		this.allNodes = allNodes;
+		this.maxPriority = maxPriority;
+		this.minPriority = minPriority;
+		
 	}
 	
 	public void setMessageMailer(MessageMailerCycle msgMailer)

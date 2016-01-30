@@ -138,6 +138,9 @@ public class AgentManagerCycle {
 				agent=new AlsLmusDsa4Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
+			else if(agentType.equals("ACO")){
+				
+			}
 			else{
 				agent=new AdoptAgentCycle(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
@@ -161,9 +164,16 @@ public class AgentManagerCycle {
 								problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])).length));
 			}
 			
-			agent.setNeibours(problem.neighbourAgents.get(agentId), problem.parentAgents.get(agentId), 
-					problem.childAgents.get(agentId), problem.allParentAgents.get(agentId), 
-					problem.allChildrenAgents.get(agentId), neighbourDomains, constraintCosts, neighbourLevels);
+			if(agentType.equals("ACO")){
+				agent.setNeibours(problem.neighbourAgents.get(agentId), problem.parentAgents.get(agentId), 
+						problem.childAgents.get(agentId), problem.allParentAgents.get(agentId), 
+						problem.allChildrenAgents.get(agentId), neighbourDomains, constraintCosts, neighbourLevels,
+						problem.highNodes.get(agentId),problem.lowNodes.get(agentId), problem.priorities.get(agentId), problem.allNodes, problem.maxPriority, problem.minPriority);
+			}else{
+				agent.setNeibours(problem.neighbourAgents.get(agentId), problem.parentAgents.get(agentId), 
+						problem.childAgents.get(agentId), problem.allParentAgents.get(agentId), 
+						problem.allChildrenAgents.get(agentId), neighbourDomains, constraintCosts, neighbourLevels);
+			}		
 			
 			agents.put(agent.getId(), agent);
 			
