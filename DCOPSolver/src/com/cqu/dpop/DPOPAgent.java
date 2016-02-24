@@ -288,7 +288,7 @@ public class DPOPAgent extends Agent{
 		//only send valueIndexes to children
 		for(int i=0;i<this.children.length;i++)
 		{
-			Message valueMsg=new Message(this.id, this.children[i], TYPE_VALUE_MESSAGE, CollectionUtil.copy(valueIndexes));
+			Message valueMsg=new Message(this.id, this.children[i], TYPE_VALUE_MESSAGE, new HashMap<Integer, Integer>(valueIndexes));
 			this.sendMessage(valueMsg);
 		}
 	}

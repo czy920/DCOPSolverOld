@@ -3,7 +3,7 @@ package com.cqu.util;
 public class StatisticUtil {
 	
 	/**
-	 * 
+	 * 返回arr[]中的最大元素序号
 	 * @param arr
 	 * @return maxIndex
 	 */
@@ -22,6 +22,11 @@ public class StatisticUtil {
 		return maxIndex;
 	}
 	
+	/**
+	 * 返回arr[]中的最小元素序号
+	 * @param arr
+	 * @return
+	 */
 	public static int min(int[] arr)
 	{
 		int minIndex=0;
@@ -37,7 +42,7 @@ public class StatisticUtil {
 		return minIndex;
 	}
 	/**
-	 * 
+	 * 返回arr[]中的最小元素，序号，最大元素，序号，平均值
 	 * @param arr
 	 * @return {minValue, minIndex, maxValue, maxIndex, avgValue}
 	 */

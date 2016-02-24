@@ -8,7 +8,8 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.border.EtchedBorder;
 import javax.swing.JComboBox;
-import com.cqu.core.DFSTree;
+
+import com.cqu.tree.DFSTree;
 
 public class DialogSetSettings extends JDialog {
 
@@ -48,7 +49,7 @@ public class DialogSetSettings extends JDialog {
 		panel.setLayout(null);
 		
 		combDFSHeuristics= new JComboBox<String>();
-		String[] heuristics=DFSTree.heuristics;
+		String[] heuristics=new String[]{DFSTree.HEURISTIC_RANDOM, DFSTree.HEURISTIC_MAXDEGREE, DFSTree.HEURISTIC_MINDEGREE};
 		for(int i=0;i<heuristics.length;i++)
 		{
 			combDFSHeuristics.addItem(heuristics[i]);
