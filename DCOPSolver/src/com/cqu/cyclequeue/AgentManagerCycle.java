@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.cqu.aco.AcoAgent;
 import com.cqu.adopt.AdoptAgentCycle;
 import com.cqu.adopt.AdoptAgentCycle_2;
 import com.cqu.bnbadopt.ADOPT_K;
@@ -139,7 +140,8 @@ public class AgentManagerCycle {
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else if(agentType.equals("ACO")){
-				
+				agent=new AcoAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else{
 				agent=new AdoptAgentCycle(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 

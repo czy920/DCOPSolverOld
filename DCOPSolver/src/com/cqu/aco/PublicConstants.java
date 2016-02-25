@@ -6,7 +6,7 @@ public class PublicConstants {
 	public static int[] antIds = new int[countAnt];
 	static {
 		for(int i = 1; i <= countAnt; i++){
-			antIds[i] =i;
+			antIds[i-1] =i;
 		}
 	}
 	//轮数
