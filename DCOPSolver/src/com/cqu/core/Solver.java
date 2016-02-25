@@ -14,6 +14,7 @@ import com.cqu.main.Debugger;
 import com.cqu.parser.Problem;
 import com.cqu.parser.ProblemParser;
 import com.cqu.settings.Settings;
+import com.cqu.tree.TreeGenerator;
 import com.cqu.util.FileUtil;
 import com.cqu.varOrdering.dfs.DFSgeneration;
 import com.cqu.visualtree.GraphFrame;

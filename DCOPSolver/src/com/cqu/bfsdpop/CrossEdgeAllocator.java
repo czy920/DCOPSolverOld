@@ -34,11 +34,16 @@ public abstract class CrossEdgeAllocator {
 			int[] children=problem.childAgents.get(agentId);
 			for(int i=0;i<neighbours.length;i++)
 			{
-				if(neighbours[i]==parent||CollectionUtil.indexOf(children, neighbours[i])!=-1)
+				if(neighbours[i]==parent)
 				{
 					crossNeighbours[i]=false;
 					considered[i]=true;
-				}else
+				}else if(CollectionUtil.indexOf(children, neighbours[i])!=-1)
+				{
+					crossNeighbours[i]=false;
+					considered[i]=false;
+				}
+				else
 				{
 					crossNeighbours[i]=true;
 					considered[i]=false;

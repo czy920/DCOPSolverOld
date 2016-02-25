@@ -1,16 +1,15 @@
 package com.cqu.varOrdering.dfs;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.cqu.core.TreeGenerator;
 import com.cqu.heuristics.ScoringHeuristic;
+import com.cqu.tree.TreeGenerator;
 import com.cqu.util.CollectionUtil;
 
-public class DFSgeneration implements TreeGenerator{
+public class DFSgeneration extends TreeGenerator{
 	private static DFSview dfsview ;
 	
 	/** The heuristic used to choose the root */
@@ -25,6 +24,9 @@ public class DFSgeneration implements TreeGenerator{
 	 */
 	public DFSgeneration (Map<Integer, int[]> neighbourNodes) 
 	{
+		super(neighbourNodes);
+		// TODO Auto-generated constructor stub
+		
 		dfsview = new DFSview (neighbourNodes);
 	}
 	
@@ -68,6 +70,9 @@ public class DFSgeneration implements TreeGenerator{
 				curNodeId=nextNodeId;
 			}
 		}
+		
+		this.calAllChildrenAndParentNodes();
+		this.calHeight();
 	}
 
 	/*
@@ -85,19 +90,18 @@ public class DFSgeneration implements TreeGenerator{
 	}
 	
 	@Override
-	public Map<Integer, int[]> getChildrenNodes() {
+	public Map<Integer, int[]> getChildren() {
 		// TODO Auto-generated method stub
 		return CollectionUtil.transform(dfsview.childrenNodes);
 	}
 
 	@Override
-	public Map<Integer, Integer> getParentNode() {
+	public Map<Integer, Integer> getParents() {
 		// TODO Auto-generated method stub
 		return dfsview.parentNode;
 	}
 
-	@Override
-	public long getPseduHeight() {
+	private void calHeight() {
 		// TODO Auto-generated method stub
 		Integer curNodeId=dfsview.rootId;		
 		boolean link=true;
@@ -115,21 +119,18 @@ public class DFSgeneration implements TreeGenerator{
 				}
 			}
 		}
-		return dfsview.pseduHeight;
+		
+		this.height=dfsview.pseduHeight;
 	}
 
 	@Override
-	public Map<Integer, Integer> getNodeLevels() {
+	public Map<Integer, Integer> getLevels() {
 		// TODO Auto-generated method stub
 		return dfsview.nodeLevel;
 	}
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	public Map[] getAllChildrenAndParentNodes() {
+	private void calAllChildrenAndParentNodes() {
 		// TODO Auto-generated method stub
-		Map<Integer, List<Integer>> allChildren=new HashMap<Integer, List<Integer>>();
-		Map<Integer, List<Integer>> allParents=new HashMap<Integer, List<Integer>>();
 		for(Integer nodeId : dfsview.neighbourNodes.keySet())
 		{
 			int[] neighbours=dfsview.neighbourNodes.get(nodeId);
@@ -186,7 +187,6 @@ public class DFSgeneration implements TreeGenerator{
 				allChildren.put(nodeId, allChildrenList);
 			}
 		}
-		return new Map[]{CollectionUtil.transform(allParents), CollectionUtil.transform(allChildren)};
 	}
 	
 	public static String toTreeString(Map<Integer, String> agentNames, Map<Integer, Integer> parentAgents, Map<Integer, int[]> childAgents)

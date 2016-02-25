@@ -12,11 +12,11 @@ import org.jdom2.Element;
 
 import com.cqu.bfsdpop.CEAllocatorFactory;
 import com.cqu.bfsdpop.CrossEdgeAllocator;
-import com.cqu.core.BFSTree;
-import com.cqu.core.TreeGenerator;
 import com.cqu.heuristics.MostConnectedHeuristic;
 import com.cqu.main.DOTrenderer;
 import com.cqu.settings.Settings;
+import com.cqu.tree.BFSTree;
+import com.cqu.tree.TreeGenerator;
 import com.cqu.util.XmlUtil;
 import com.cqu.varOrdering.dfs.DFSgeneration;
 import com.cqu.varOrdering.priority.PriorityGeneration;
@@ -206,15 +206,14 @@ public class ProblemParser {
 		problem.minPriority = varOrdering.getMinPriority();
 		problem.allNodes = varOrdering.getAllNodes();
 		
-		problem.agentLevels=treeGenerator.getNodeLevels();
+		problem.agentLevels=treeGenerator.getLevels();
 		for(Integer level:problem.agentLevels.values())
 			if(problem.treeDepth<(level+1))problem.treeDepth=level+1;
-		problem.pseudoHeight=treeGenerator.getPseduHeight();
-		problem.parentAgents=treeGenerator.getParentNode();
-		problem.childAgents=treeGenerator.getChildrenNodes();
-		Map[] allParentsAndChildren=treeGenerator.getAllChildrenAndParentNodes();
-		problem.allParentAgents=allParentsAndChildren[0];
-		problem.allChildrenAgents=allParentsAndChildren[1];
+		problem.pseudoHeight=treeGenerator.getHeight();
+		problem.parentAgents=treeGenerator.getParents();
+		problem.childAgents=treeGenerator.getChildren();
+		problem.allParentAgents=treeGenerator.getAllParents();
+		problem.allChildrenAgents=treeGenerator.getAllChildren();
 		
 		if(treeGeneratorType.equals(TreeGenerator.TREE_GENERATOR_TYPE_BFS))
 		{
