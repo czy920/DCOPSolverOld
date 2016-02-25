@@ -5,35 +5,50 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class BFSTree extends TreeGenerator{
-
-	private Map<Integer, Boolean> nodeIterated;
+/**
+ * 广度优先遍历
+ * @author hz
+ *
+ */
+public class GraphIteratorBFS extends GraphIterator{
 	
-	public BFSTree(Map<Integer, int[]> neighbors) {
-		super(neighbors);
+	/**
+	 * 记录是否遍历过
+	 */
+	private Map<Integer, Boolean> nodeIterated;
+
+	public GraphIteratorBFS(Map<Integer, int[]> neighbors, Integer rootNodeId,
+			NodeOperation nodeOp) {
+		super(neighbors, rootNodeId, nodeOp);
 		// TODO Auto-generated constructor stub
 		this.nodeIterated=new HashMap<Integer, Boolean>();
 		for(Integer nodeId : this.neighbors.keySet())
 		{
 			this.nodeIterated.put(nodeId, false);
 		}
-		
-		this.rootId=this.neighbors.keySet().iterator().next();
 	}
 
-	public void generate() {
+	@Override
+	public void iterate() {
 		// TODO Auto-generated method stub
-		Integer curLevel=0;
+		if(this.nodeOp==null)
+		{
+			return;
+		}
+		
 		Integer curNodeId=-1;
 		List<Integer> nodeQueue=new LinkedList<Integer>();
-		nodeQueue.add(this.rootId);
-		this.parents.put(this.rootId, -1);
-		this.levels.put(this.rootId, 0);
+		nodeQueue.add(this.rootNodeId);
 		while(nodeQueue.size()>0)
 		{
 			curNodeId=nodeQueue.remove(0);
 			this.nodeIterated.put(curNodeId, true);
-			curLevel=this.levels.get(curNodeId);
+			
+			this.nodeOp.operate(curNodeId);
+			if(this.itStatus==IteratingStatus.ENDEDAHEAD)
+			{
+				return;
+			}
 			
 			int[] curLevelNodes=this.neighbors.get(curNodeId);
 			for(int i=0;i<curLevelNodes.length;i++)
@@ -41,14 +56,9 @@ public class BFSTree extends TreeGenerator{
 				if(this.nodeIterated.get(curLevelNodes[i])==false)
 				{
 					nodeQueue.add(curLevelNodes[i]);
-					this.levels.put(curLevelNodes[i], curLevel+1);
-					
-					this.parents.put(curLevelNodes[i], curNodeId);
-					this.children.get(curNodeId).add(curLevelNodes[i]);
-					
-					this.nodeIterated.put(curLevelNodes[i], true);
 				}
 			}
 		}
 	}
+
 }

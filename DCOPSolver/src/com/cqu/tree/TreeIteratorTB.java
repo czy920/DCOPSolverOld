@@ -12,16 +12,16 @@ import java.util.Map;
 public class TreeIteratorTB extends TreeIterator{
 
 	public TreeIteratorTB(Map<Integer, Integer> parentNodesMap,
-			Map<Integer, int[]> childrenNodes, Integer rootNodeId,
+			Map<Integer, int[]> childrenNodesMap, Integer rootNodeId,
 			NodeOperation nodeOp) {
-		super(parentNodesMap, childrenNodes, rootNodeId, nodeOp);
+		super(parentNodesMap, childrenNodesMap, rootNodeId, nodeOp);
 		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public void iterate() {
 		// TODO Auto-generated method stub
-		if(this.parentNodesMap==null||this.childrenNodes==null||
+		if(this.parentNodesMap==null||this.childrenNodesMap==null||
 				this.rootNodeId==null||nodeOp==null)
 		{
 			return;
@@ -35,7 +35,7 @@ public class TreeIteratorTB extends TreeIterator{
 			Integer curNodeId=nodesToVisit.remove(0);
 			this.nodeOp.operate(curNodeId);
 			
-			int[] childrenNodes=this.childrenNodes.get(curNodeId);
+			int[] childrenNodes=this.childrenNodesMap.get(curNodeId);
 			for(Integer nodeId : childrenNodes)
 			{
 				nodesToVisit.add(nodeId);

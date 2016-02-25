@@ -17,7 +17,7 @@ public abstract class TreeIterator {
 	/**
 	 * 树子节点
 	 */
-	protected Map<Integer, int[]> childrenNodes;
+	protected Map<Integer, int[]> childrenNodesMap;
 	
 	/**
 	 * 树父节点
@@ -29,10 +29,10 @@ public abstract class TreeIterator {
 	 */
 	protected NodeOperation nodeOp;
 	
-	public TreeIterator(Map<Integer, Integer> parentNodesMap, Map<Integer, int[]> childrenNodes, Integer rootNodeId, NodeOperation nodeOp) {
+	public TreeIterator(Map<Integer, Integer> parentNodesMap, Map<Integer, int[]> childrenNodesMap, Integer rootNodeId, NodeOperation nodeOp) {
 		// TODO Auto-generated constructor stub
 		this.parentNodesMap=parentNodesMap;
-		this.childrenNodes=childrenNodes;
+		this.childrenNodesMap=childrenNodesMap;
 		this.rootNodeId=rootNodeId;
 		this.nodeOp=nodeOp;
 	}
