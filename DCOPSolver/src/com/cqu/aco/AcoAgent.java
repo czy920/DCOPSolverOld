@@ -26,7 +26,7 @@ public class AcoAgent extends AgentCycle{
 	private static final String KEY_LOCALCOST = "KEY_LOCALCOST";
 	
 	//保存每只在蚂蚁的上下文以及自己对应的取值
-	private HashMap<Integer, Context> currentContext = new HashMap<Integer, Context>();
+	private HashMap<Integer, Context> context = new HashMap<Integer, Context>();
 	private HashMap<Integer, Integer> selfView = new HashMap<Integer, Integer>();
 	private HashMap<Integer, Integer> currentCosts = new HashMap<Integer, Integer>();
 	//用于标志哪些蚂蚁已经选好值
@@ -82,10 +82,13 @@ public class AcoAgent extends AgentCycle{
 		localCost = this.localCost(ant,value);
 		for(int j =0; j< this.highPriorities.length;j++){
 			int highId = this.highPriorities[j];
-			int highValueIndex = this.currentContext.get(ant).getContext().get(highId);
-			sum += taus.get(ant).getTau()[value][highValueIndex];
+			int highValueIndex = this.context.get(ant).getContext().get(highId);
+			Pheromone pheromone = taus.get(highId);
+			double[][] tau = pheromone.getTau();
+			
+			sum += tau[value][highValueIndex];
 		}
-		ret = Math.pow(sum, PublicConstants.alpha)*Math.pow(1/(1+localCost), PublicConstants.beta);
+		ret = Math.pow(sum, PublicConstants.alpha)*Math.pow(1.0/(1+localCost), PublicConstants.beta);
 		return ret;
 	}
 	
@@ -101,7 +104,9 @@ public class AcoAgent extends AgentCycle{
 				valueIndex.add(i);
 			}
 		}
-		int index = (int) (1 + Math.random()*valueIndex.size());
+		int index = (int) Math.random()*valueIndex.size();
+		if(valueIndex.size() == 0)
+			return 0;
 		return valueIndex.get(index);
 	}
 
@@ -154,15 +159,24 @@ public class AcoAgent extends AgentCycle{
 	
 	private void union(int ant, int cost, Context context){
 		this.currentCosts.put(ant, this.currentCosts.get(ant)+cost);
-		this.currentContext.get(ant).merge(context);
+		this.context.get(ant).merge(context);
 	}
 	
 	private void sendValueMessages(){
 		//对于每只蚂蚁，将自己的上下文传递给优先级低的邻居
-		for(int antId : this.currentContext.keySet()){
+		for(int antId : this.context.keySet()){
+			boolean mark = true;
 			for(int j =0; j < this.lowPriorities.length;j++){
 				int lowId = this.lowPriorities[j];
-				ValueMsgContext obj = new ValueMsgContext(antId,this.currentCosts.get(antId).intValue(),this.currentContext.get(antId));
+				Context tempCotext = new Context(this.context.get(antId));
+				tempCotext.getContext().put(this.id, this.selfView.get(antId));
+				int localCost = this.localCost(antId, this.selfView.get(antId)) + this.currentCosts.get(antId).intValue();
+				ValueMsgContext obj = null;
+				if(mark == true)
+					obj = new ValueMsgContext(antId,localCost,tempCotext);
+				else
+					obj = new ValueMsgContext(antId,this.currentCosts.get(antId).intValue(),tempCotext);
+				mark = false;
 				Message msg=new Message(this.id, lowId, AcoAgent.TYPE_VALUE_MESSAGE, obj);
 				this.sendMessage(msg);
 			}
@@ -188,7 +202,7 @@ public class AcoAgent extends AgentCycle{
 			int antId = PublicConstants.antIds[i];
 			if(this.noHighNode()){
 				selectValue(antId);
-			}else if(this.currentContext.get(antId).getContext().size() == this.highPriorities.length){
+			}else if(this.enableValue(antId)){
 				selectValue(antId);
 			}
 		}
@@ -208,11 +222,34 @@ public class AcoAgent extends AgentCycle{
 				this.updtePhero();
 				PublicConstants.currentCycle++;
 				this.sendPheromone();
+				this.localCost = this.currentBestCost(bestAnt);
+				
+				//判断是否下一轮开始
+				if(PublicConstants.currentCycle < PublicConstants.MaxCycle){
+					startIteration();
+				}
+				else{        //停止agent
+					this.stopRunning();
+				}
 			}
 		}
 		
 	}
 	
+	private int currentBestCost(int bestAnt) {
+		// TODO Auto-generated method stub
+		return this.localCost(bestAnt, this.selfView.get(bestAnt)) + this.currentCosts.get(bestAnt);
+	}
+
+	private boolean enableValue(int antId) {
+		// TODO Auto-generated method stub
+		for(int id : this.highPriorities){
+			if(!this.context.get(antId).getContext().containsKey(id))
+				return false;
+		}
+		return true;
+	}
+
 	private void updtePhero(){
 		if(this.noHighNode()){
 			return;
@@ -220,18 +257,21 @@ public class AcoAgent extends AgentCycle{
 		for(int i = 0; i < this.highPriorities.length; i++){
 			int myValue = this.selfView.get(this.bestAnt);
 			int oppId = this.highPriorities[i];
-			int oppValue = this.currentContext.get(this.bestAnt).getContext().get(oppId);
-			double old_tau = this.taus.get(this.bestAnt).getTau()[myValue][oppValue];
+			int oppValue = this.context.get(this.bestAnt).getContext().get(oppId);
+			double old_tau = this.taus.get(oppId).getTau()[myValue][oppValue];
 			double new_tau = PublicConstants.update_tau(old_tau, this.delta);
-			this.taus.get(this.bestAnt).getTau()[myValue][oppValue] = new_tau;
+			this.taus.get(oppId).getTau()[myValue][oppValue] = new_tau;
 		}
 	}
 	
 	private void sendValueMessage() {
 		// TODO Auto-generated method stub
 		//发送的信息应该包括了代价，上下文，蚂蚁标识
-		for(int i : this.currentContext.keySet()){
-			ValueMsgContext obj = new ValueMsgContext(i,this.currentCosts.get(i).intValue(),this.currentContext.get(i));
+		for(int i : this.context.keySet()){
+			Context tempCotext = new Context(this.context.get(i));
+			tempCotext.getContext().put(this.id, this.selfView.get(i));
+			int localCost = this.localCost(i, this.selfView.get(i));
+			ValueMsgContext obj = new ValueMsgContext(i,this.currentCosts.get(i).intValue() + localCost,tempCotext);
 			Message msg=new Message(this.id, this.minPriority, AcoAgent.TYPE_VALUE_MESSAGE, obj);
 			this.sendMessage(msg);
 		}
@@ -268,7 +308,7 @@ public class AcoAgent extends AgentCycle{
 		double[] resultP = this.computeP(ant);
 		this.valueIndex = this.chooseValue(resultP);
 		this.selfView.put(ant, this.valueIndex);
-		this.currentContext.get(ant).getContext().put(this.id, this.valueIndex);	
+		//this.currentContext.get(ant).getContext().put(this.id, this.valueIndex);	
 		this.mark.put(ant, true);
 		
 	}
@@ -279,7 +319,7 @@ public class AcoAgent extends AgentCycle{
 			int antId = PublicConstants.antIds[i];
 			this.mark.put(antId, false);
 			Context context = new Context();
-			this.currentContext.put(antId, context);
+			this.context.put(antId, context);
 			this.currentCosts.put(antId, 0);
 			this.selfView.put(antId, -1);
 		}
@@ -310,7 +350,7 @@ public class AcoAgent extends AgentCycle{
 			highId=this.highPriorities[i];
 			for(int j=0;j<this.domain.length;j++)
 			{
-				highAgentValueIndex=currentContext.get(ant).getContext().get(highId);
+				highAgentValueIndex=context.get(ant).getContext().get(highId);
 				if(highAgentValueIndex==-1)
 				{
 					ret[j]+=0;
@@ -347,7 +387,7 @@ public class AcoAgent extends AgentCycle{
 		{
 			highId=this.highPriorities[i];
 			
-			highAgentValueIndex=currentContext.get(ant).getContext().get(highId);
+			highAgentValueIndex=context.get(ant).getContext().get(highId);
 			if(highAgentValueIndex==-1)
 			{
 				ret+=0;
@@ -377,7 +417,7 @@ public class AcoAgent extends AgentCycle{
 	}
 	
 	private boolean isSolution(int ant){
-		return this.currentContext.get(ant).getContext().size() == this.allNodes.length;
+		return this.context.get(ant).getContext().size() == this.allNodes.length - 1; //最后一个结点的取值未加入
 	}
 	
 	private boolean isAllSolution(){
@@ -418,7 +458,7 @@ public class AcoAgent extends AgentCycle{
 			int id_=(Integer) result.get(AgentCycle.KEY_ID);
 			String name_=(String) result.get(AgentCycle.KEY_NAME);
 			int value_=(Integer) result.get(AgentCycle.KEY_VALUE);
-			totalCost+=((double)((Integer)result.get(KEY_LOCALCOST)))/2;
+			totalCost+= (Integer)result.get(KEY_LOCALCOST);
 			
 			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
 			System.out.println(displayStr);

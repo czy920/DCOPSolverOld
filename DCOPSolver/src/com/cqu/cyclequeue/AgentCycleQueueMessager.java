@@ -82,6 +82,7 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 				//添加work()方法，确保如果本轮没有收到message也能执行操作
 				work(msgQueue.size());
 				
+				/*
 				while(msgQueue.size() == 0){
 					try {
 						Thread.sleep(1);
@@ -94,6 +95,7 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 				if(msgQueue.isEmpty() == true){
 					System.out.println("!!!!! IsEmpty Judged Wrong !!!!!");
 				}
+				*/
 				
 				while(msgQueue.isEmpty()==false)
 				{
@@ -110,6 +112,7 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 					}
 				}
 				
+				/*
 				if(msgQueue.isEmpty()==false){
 					System.out.println("Wrong!!!!!!!!!!!!!!!!!!!!!!!!!!");
 					int i = 1;
@@ -121,6 +124,8 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 					int i = 1;
 					i = 1/0;
 				}
+				
+				*/
 				
 				boolean lastAgent=true;
 				synchronized (cycleEndCount) {
