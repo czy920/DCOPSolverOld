@@ -1,6 +1,8 @@
 package com.cqu.tree;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 图遍历器
@@ -8,33 +10,6 @@ import java.util.Map;
  *
  */
 public abstract class GraphIterator {
-	
-	/**
-	 * 遍历状态
-	 * @author hz
-	 *
-	 */
-	public static enum IteratingStatus{
-		/**
-		 * 未开始
-		 */
-		INIT, 
-		
-		/**
-		 * 遍历中
-		 */
-		ON, 
-		
-		/**
-		 * 提前终止
-		 */
-		ENDEDAHEAD, 
-		
-		/**
-		 * 正常结束
-		 */
-		FINISHED
-	}
 	
 	/**
 	 * 深度优先遍历
@@ -64,7 +39,12 @@ public abstract class GraphIterator {
 	/**
 	 * 遍历状态
 	 */
-	protected IteratingStatus itStatus; 
+	protected IteratingStatus itStatus;
+	
+	/**
+	 * 记录是否遍历过
+	 */
+	protected Set<Integer> nodesIterated;
 	
 	public GraphIterator(Map<Integer, int[]> neighbors, Integer rootNodeId, NodeOperation nodeOp) {
 		// TODO Auto-generated constructor stub
@@ -72,6 +52,7 @@ public abstract class GraphIterator {
 		this.rootNodeId=rootNodeId;
 		this.nodeOp=nodeOp;
 		
+		this.nodesIterated=new HashSet<Integer>();
 		this.itStatus=IteratingStatus.INIT;
 	}
 	

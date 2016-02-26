@@ -7,11 +7,6 @@ import java.util.Set;
 public class GraphIteratorBlockingDFS extends GraphIterator{
 	
 	/**
-	 * 记录是否遍历过
-	 */
-	private Map<Integer, Boolean> nodeIterated;
-	
-	/**
 	 * 父节点
 	 */
 	protected Map<Integer, Integer> parents;
@@ -28,11 +23,6 @@ public class GraphIteratorBlockingDFS extends GraphIterator{
 		this.blockingNodesSet=blockingNodesSet;
 		
 		this.parents=new HashMap<Integer, Integer>();
-		this.nodeIterated=new HashMap<Integer, Boolean>();
-		for(Integer nodeId : this.neighbors.keySet())
-		{
-			this.nodeIterated.put(nodeId, false);
-		}
 	}
 
 	@Override
@@ -43,14 +33,12 @@ public class GraphIteratorBlockingDFS extends GraphIterator{
 			return;
 		}
 		
-		int iteratedCount=0;
 		Integer curNodeId=this.rootNodeId;
-		if(this.blockingNodesSet.contains(curNodeId))
+		if(this.blockingNodesSet.contains(this.rootNodeId))
 		{
 			return;
 		}
-		this.nodeIterated.put(curNodeId, true);
-		iteratedCount++;//根节点已遍历
+		this.nodesIterated.add(curNodeId);
 		
 		this.nodeOp.operate(curNodeId);
 		if(this.itStatus==IteratingStatus.ENDEDAHEAD)
@@ -58,19 +46,23 @@ public class GraphIteratorBlockingDFS extends GraphIterator{
 			return;
 		}
 		
-		int totalCount=neighbors.size();
-		while(iteratedCount<totalCount)
+		while(true)
 		{
 			Integer nextNodeId=this.getRandomNodeId(curNodeId);
 			if(nextNodeId==-1)
 			{
+				//遍历结束标志：回溯至根节点且无未遍历邻居节点
+				if(curNodeId.equals(this.rootNodeId))
+				{
+					return;
+				}
+				
 				//回溯
 				curNodeId=this.parents.get(curNodeId);
 			}else
 			{
 				this.parents.put(nextNodeId, curNodeId);
-				this.nodeIterated.put(nextNodeId, true);
-				iteratedCount++;
+				this.nodesIterated.add(nextNodeId);
 				
 				curNodeId=nextNodeId;
 				this.nodeOp.operate(curNodeId);
@@ -87,7 +79,7 @@ public class GraphIteratorBlockingDFS extends GraphIterator{
 		int[] neighbors=this.neighbors.get(nodeId);
 		for(int i=0;i<neighbors.length;i++)
 		{
-			if(this.nodeIterated.get(neighbors[i])==false)
+			if(this.nodesIterated.contains(neighbors[i])==false)
 			{
 				if(this.blockingNodesSet.contains(neighbors[i]))
 				{

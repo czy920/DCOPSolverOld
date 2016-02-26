@@ -2,8 +2,10 @@ package com.cqu.tree;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.cqu.util.CollectionUtil;
 
@@ -64,10 +66,13 @@ public abstract class TreeGenerator {
 	 */
 	protected Integer rootId=-1;
 	
+	protected Set<Integer> nodeIterated;
+	
 	public TreeGenerator(Map<Integer, int[]> neighbors)
 	{
 		this.neighbors=neighbors;
 		
+		this.nodeIterated=new HashSet<Integer>();
 		this.parents=new HashMap<Integer, Integer>();
 		this.allParents=new HashMap<Integer, List<Integer>>();
 		this.children=new HashMap<Integer, List<Integer>>();

@@ -7,6 +7,45 @@ import java.util.Map;
 
 public class CollectionUtil {
 	
+	public static void main(String[] args) {
+		Map<Integer, Double> testMap=new HashMap<Integer, Double>();
+		testMap.put(0, 0.1);
+		testMap.put(1, 0.02);
+		testMap.put(2, 0.05);
+		testMap.put(3, 0.4);
+		
+		System.out.println(CollectionUtil.min(testMap));
+	}
+	
+	/**
+	 * 获取最小者的key
+	 * @param data
+	 * @return
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <K, V> K min(Map<K, ? extends V> data)
+	{
+		if(data==null||data.isEmpty())
+		{
+			return null;
+		}
+		
+		K minKey=data.keySet().iterator().next();
+		try{
+			Comparable minValue=(Comparable) data.get(minKey);
+			for(K key : data.keySet())
+			{
+				if(minValue.compareTo(data.get(key))>0)
+				{
+					minValue=(Comparable) data.get(key);
+					minKey=key;
+				}
+			}
+			return minKey;
+		}catch(ClassCastException cce){}
+		return null;
+	}
+	
 	/**
 	 * 返回arrA-arrB
 	 * @param arrA

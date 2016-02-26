@@ -11,11 +11,6 @@ import java.util.Map;
 public class GraphIteratorDFS extends GraphIterator{
 	
 	/**
-	 * 记录是否遍历过
-	 */
-	private Map<Integer, Boolean> nodeIterated;
-	
-	/**
 	 * 父节点
 	 */
 	protected Map<Integer, Integer> parents;
@@ -25,11 +20,6 @@ public class GraphIteratorDFS extends GraphIterator{
 		super(neighbors, rootNodeId, nodeOp);
 		// TODO Auto-generated constructor stub
 		this.parents=new HashMap<Integer, Integer>();
-		this.nodeIterated=new HashMap<Integer, Boolean>();
-		for(Integer nodeId : this.neighbors.keySet())
-		{
-			this.nodeIterated.put(nodeId, false);
-		}
 	}
 
 	@Override
@@ -42,7 +32,7 @@ public class GraphIteratorDFS extends GraphIterator{
 		
 		int iteratedCount=0;
 		Integer curNodeId=this.rootNodeId;
-		this.nodeIterated.put(curNodeId, true);
+		this.nodesIterated.add(curNodeId);
 		iteratedCount++;//根节点已遍历
 		
 		this.nodeOp.operate(curNodeId);
@@ -62,7 +52,7 @@ public class GraphIteratorDFS extends GraphIterator{
 			}else
 			{
 				this.parents.put(nextNodeId, curNodeId);
-				this.nodeIterated.put(nextNodeId, true);
+				this.nodesIterated.add(nextNodeId);
 				iteratedCount++;
 				
 				curNodeId=nextNodeId;
@@ -80,7 +70,7 @@ public class GraphIteratorDFS extends GraphIterator{
 		int[] neighbors=this.neighbors.get(nodeId);
 		for(int i=0;i<neighbors.length;i++)
 		{
-			if(this.nodeIterated.get(neighbors[i])==false)
+			if(this.nodesIterated.contains(neighbors[i])==false)
 			{
 				return neighbors[i];
 			}

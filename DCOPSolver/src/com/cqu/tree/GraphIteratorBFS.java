@@ -1,9 +1,11 @@
 package com.cqu.tree;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 广度优先遍历
@@ -15,17 +17,12 @@ public class GraphIteratorBFS extends GraphIterator{
 	/**
 	 * 记录是否遍历过
 	 */
-	private Map<Integer, Boolean> nodeIterated;
+	private Set<Integer> nodeIterated;
 
 	public GraphIteratorBFS(Map<Integer, int[]> neighbors, Integer rootNodeId,
 			NodeOperation nodeOp) {
 		super(neighbors, rootNodeId, nodeOp);
 		// TODO Auto-generated constructor stub
-		this.nodeIterated=new HashMap<Integer, Boolean>();
-		for(Integer nodeId : this.neighbors.keySet())
-		{
-			this.nodeIterated.put(nodeId, false);
-		}
 	}
 
 	@Override
@@ -42,7 +39,7 @@ public class GraphIteratorBFS extends GraphIterator{
 		while(nodeQueue.size()>0)
 		{
 			curNodeId=nodeQueue.remove(0);
-			this.nodeIterated.put(curNodeId, true);
+			this.nodeIterated.add(curNodeId);
 			
 			this.nodeOp.operate(curNodeId);
 			if(this.itStatus==IteratingStatus.ENDEDAHEAD)
@@ -53,7 +50,7 @@ public class GraphIteratorBFS extends GraphIterator{
 			int[] curLevelNodes=this.neighbors.get(curNodeId);
 			for(int i=0;i<curLevelNodes.length;i++)
 			{
-				if(this.nodeIterated.get(curLevelNodes[i])==false)
+				if(this.nodeIterated.contains(curLevelNodes[i])==false)
 				{
 					nodeQueue.add(curLevelNodes[i]);
 				}

@@ -1,23 +1,19 @@
 package com.cqu.tree;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 广度优先搜索树
+ * @author hz
+ *
+ */
 public class BFSTree extends TreeGenerator{
 
-	private Map<Integer, Boolean> nodeIterated;
-	
 	public BFSTree(Map<Integer, int[]> neighbors) {
 		super(neighbors);
 		// TODO Auto-generated constructor stub
-		this.nodeIterated=new HashMap<Integer, Boolean>();
-		for(Integer nodeId : this.neighbors.keySet())
-		{
-			this.nodeIterated.put(nodeId, false);
-		}
-		
 		this.rootId=this.neighbors.keySet().iterator().next();
 	}
 
@@ -32,13 +28,13 @@ public class BFSTree extends TreeGenerator{
 		while(nodeQueue.size()>0)
 		{
 			curNodeId=nodeQueue.remove(0);
-			this.nodeIterated.put(curNodeId, true);
+			this.nodeIterated.add(curNodeId);
 			curLevel=this.levels.get(curNodeId);
 			
 			int[] curLevelNodes=this.neighbors.get(curNodeId);
 			for(int i=0;i<curLevelNodes.length;i++)
 			{
-				if(this.nodeIterated.get(curLevelNodes[i])==false)
+				if(this.nodeIterated.contains(curLevelNodes[i])==false)
 				{
 					nodeQueue.add(curLevelNodes[i]);
 					this.levels.put(curLevelNodes[i], curLevel+1);
@@ -46,7 +42,7 @@ public class BFSTree extends TreeGenerator{
 					this.parents.put(curLevelNodes[i], curNodeId);
 					this.children.get(curNodeId).add(curLevelNodes[i]);
 					
-					this.nodeIterated.put(curLevelNodes[i], true);
+					this.nodeIterated.add(curLevelNodes[i]);
 				}
 			}
 		}

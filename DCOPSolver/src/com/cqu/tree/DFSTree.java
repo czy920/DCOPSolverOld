@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.StatisticUtil;
 
 /**
- * 构造DFS生成树
+ * 深度优先搜索树
  * @author hz
  *
  */
@@ -32,19 +31,14 @@ public class DFSTree extends TreeGenerator{
 	
 	private String heuristic;
 
-	private Map<Integer, Boolean> nodeIterated;
 	private Map<Integer, int[]> neighborCounts;
 	
 	public DFSTree(Map<Integer, int[]> neighbors) {
 		super(neighbors);
 		// TODO Auto-generated constructor stub
-		
-		this.nodeIterated=new HashMap<Integer, Boolean>();
 		this.neighborCounts=new HashMap<Integer, int[]>();
 		for(Integer nodeId : this.neighbors.keySet())
 		{
-			this.nodeIterated.put(nodeId, false);
-			
 			int[] nodeNeighbors=this.neighbors.get(nodeId);
 			int[] nodeNeighborCounts=new int[nodeNeighbors.length];
 			for(int i=0;i<nodeNeighborCounts.length;i++)
@@ -73,7 +67,7 @@ public class DFSTree extends TreeGenerator{
 		int[] counts=this.neighborCounts.get(nodeId);
 		for(int i=0;i<counts.length;i++)
 		{
-			if(this.nodeIterated.get(neighbors[i])==true)
+			if(this.nodeIterated.contains(neighbors[i])==true)
 			{
 				counts[i]=-1;
 			}
@@ -94,7 +88,7 @@ public class DFSTree extends TreeGenerator{
 		int[] counts=this.neighborCounts.get(nodeId);
 		for(int i=0;i<counts.length;i++)
 		{
-			if(this.nodeIterated.get(neighbors[i])==true)
+			if(this.nodeIterated.contains(neighbors[i])==true)
 			{
 				counts[i]=-1;
 			}
@@ -109,12 +103,12 @@ public class DFSTree extends TreeGenerator{
 		}
 	}
 	
-	private Integer getRandomNodeId(Integer nodeId)
+	protected Integer getRandomNodeId(Integer nodeId)
 	{
 		int[] neighbors=this.neighbors.get(nodeId);
 		for(int i=0;i<neighbors.length;i++)
 		{
-			if(this.nodeIterated.get(neighbors[i])==false)
+			if(this.nodeIterated.contains(neighbors[i])==false)
 			{
 				return neighbors[i];
 			}
@@ -125,17 +119,14 @@ public class DFSTree extends TreeGenerator{
 	@Override
 	public void generate() {
 		// TODO Auto-generated method stub
-		int iteratedCount=0;
 		Integer curLevel=0;
 		
 		Integer curNodeId=this.rootId;
-		this.nodeIterated.put(curNodeId, true);
-		iteratedCount++;//根节点已遍历
+		this.nodeIterated.add(curNodeId);
 		this.parents.put(curNodeId, -1);
 		this.levels.put(curNodeId, curLevel);
 		
-		int totalCount=neighbors.size();
-		while(iteratedCount<totalCount)
+		while(true)
 		{
 			Integer nextNodeId=-1;
 			if(this.heuristic.equals(DFSTree.HEURISTIC_RANDOM))
@@ -150,6 +141,12 @@ public class DFSTree extends TreeGenerator{
 			}
 			if(nextNodeId==-1)
 			{
+				//遍历结束标志：回溯至根节点且无未遍历邻居节点
+				if(curNodeId.equals(this.rootId))
+				{
+					break;
+				}
+				
 				curLevel--;
 				//回溯
 				curNodeId=this.parents.get(curNodeId);
@@ -160,9 +157,8 @@ public class DFSTree extends TreeGenerator{
 				this.children.get(curNodeId).add(nextNodeId);
 				this.parents.put(nextNodeId, curNodeId);
 				
-				this.nodeIterated.put(nextNodeId, true);
+				this.nodeIterated.add(nextNodeId);
 				this.levels.put(nextNodeId, curLevel);
-				iteratedCount++;
 				
 				curNodeId=nextNodeId;
 			}
@@ -172,7 +168,7 @@ public class DFSTree extends TreeGenerator{
 		calHeight();
 	}
 	
-	private void calHeight() {
+	protected void calHeight() {
 		Integer curNodeId=this.rootId;		
 		boolean link=true;
 		while(link==true&&curNodeId!=(-1))
@@ -191,7 +187,7 @@ public class DFSTree extends TreeGenerator{
 		}
 	}
 
-	private void calAllParentsAndAllChildren() {
+	protected void calAllParentsAndAllChildren() {
 		// TODO Auto-generated method stub
 		for(Integer nodeId : this.neighbors.keySet())
 		{
