@@ -106,6 +106,15 @@ public abstract class TreeGenerator {
 	}
 	
 	/**
+	 * 初始化根节点，在generate()之前调用
+	 * @param root
+	 */
+	public void initRoot(Integer root)
+	{
+		this.rootId=root;
+	}
+	
+	/**
 	 * 构造生成树
 	 */
 	public abstract void generate();
