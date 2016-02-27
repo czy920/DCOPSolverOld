@@ -65,7 +65,7 @@ public class DynamicCutVertex {
 	}
 	
 	/**
-	 * 割点引导，选出最佳节点
+	 * 割点引导，选出最佳节点；若无候选节点中无割点，返回null
 	 * @param blockingNodes 阻断节点
 	 * @param candidateNodes 候选节点
 	 * @return
@@ -84,8 +84,15 @@ public class DynamicCutVertex {
 		
 		if(cvCutPartsSizesMap.size()<=1)
 		{
-			//无割点，随机选择第一个节点;或则有唯一割点，直接选择它即可
-			return candidateNodes.iterator().next();
+			if(cvCutPartsSizesMap.size()==0)
+			{
+				//无割点，返回null
+				return null;
+			}else
+			{
+				//有唯一割点，直接选择它即可
+				return candidateNodes.iterator().next();
+			}
 		}
 		Map<Integer, Double> cutVertexEvaluations=new HashMap<Integer, Double>();
 		for(Integer nodeId : candidateNodes)

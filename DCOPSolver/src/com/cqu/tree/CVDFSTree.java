@@ -97,7 +97,14 @@ public class CVDFSTree extends DFSTree{
 				return candidateNodes.iterator().next();
 			}else
 			{
-				return dcv.selectBest(nodeId, nodeIterated, candidateNodes);
+				Integer bestCutVertext=dcv.selectBest(nodeId, nodeIterated, candidateNodes);
+				if(bestCutVertext!=null)
+				{
+					return bestCutVertext;
+				}else
+				{
+					return this.getMaxNeighborsNodeId(candidateNodes);
+				}
 			}
 		}else
 		{

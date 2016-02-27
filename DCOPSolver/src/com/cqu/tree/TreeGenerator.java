@@ -164,4 +164,143 @@ public abstract class TreeGenerator {
 		return this.height;
 	}
 	
+	/**
+	 * 从nodesArr中选择度数最高的节点;
+	 * 如果nodesArr中的节点均已遍历过，返回-1；
+	 * @param nodeId
+	 * @return
+	 */
+	protected Integer getMaxNeighborsNodeId(int[] nodesArr)
+	{
+		if(nodesArr==null)
+		{
+			return -1;
+		}
+		
+		Integer maxDegreeNodeId=-1;
+		int maxDegree=-1;
+		for(Integer nodeId : nodesArr)
+		{
+			if(this.nodeIterated.contains(nodeId)==false)
+			{
+				if(maxDegree<this.neighbors.get(nodeId).length)
+				{
+					maxDegree=this.neighbors.get(nodeId).length;
+					maxDegreeNodeId=nodeId;
+				}
+			}
+		}
+		return maxDegreeNodeId;
+	}
+	
+	/**
+	 * 从nodesSet中选择度数最高的节点;
+	 * 如果nodesSet中的节点均已遍历过，返回null；
+	 * @param nodeId
+	 * @return
+	 */
+	protected Integer getMaxNeighborsNodeId(Set<Integer> nodesSet)
+	{
+		if(nodesSet==null)
+		{
+			return -1;
+		}
+		
+		Integer maxDegreeNodeId=-1;
+		int maxDegree=-1;
+		for(Integer nodeId : nodesSet)
+		{
+			if(this.nodeIterated.contains(nodeId)==false)
+			{
+				if(maxDegree<this.neighbors.get(nodeId).length)
+				{
+					maxDegree=this.neighbors.get(nodeId).length;
+					maxDegreeNodeId=nodeId;
+				}
+			}
+		}
+		return maxDegreeNodeId;
+	}
+	
+	/**
+	 * 从nodesArr中选择度数最低的节点;
+	 * 如果nodesArr中的节点均已遍历过，返回-1;
+	 * @param nodeId
+	 * @return
+	 */
+	protected Integer getMinNeighborsNodeId(int[] nodesArr)
+	{
+		if(nodesArr==null)
+		{
+			return -1;
+		}
+		
+		Integer minDegreeNodeId=-1;
+		int minDegree=Integer.MAX_VALUE;
+		for(Integer nodeId : nodesArr)
+		{
+			if(this.nodeIterated.contains(nodeId)==false)
+			{
+				if(minDegree>this.neighbors.get(nodeId).length)
+				{
+					minDegree=this.neighbors.get(nodeId).length;
+					minDegreeNodeId=nodeId;
+				}
+			}
+		}
+		return minDegreeNodeId;
+	}
+	
+	/**
+	 * 从nodesSet中选择度数最低的节点;
+	 * 如果nodesSet中的节点均已遍历过，返回-1;
+	 * @param nodeId
+	 * @return
+	 */
+	protected Integer getMinNeighborsNodeId(Set<Integer> nodesSet)
+	{
+		if(nodesSet==null)
+		{
+			return -1;
+		}
+		
+		Integer minDegreeNodeId=-1;
+		int minDegree=Integer.MAX_VALUE;
+		for(Integer nodeId : nodesSet)
+		{
+			if(this.nodeIterated.contains(nodeId)==false)
+			{
+				if(minDegree>this.neighbors.get(nodeId).length)
+				{
+					minDegree=this.neighbors.get(nodeId).length;
+					minDegreeNodeId=nodeId;
+				}
+			}
+		}
+		return minDegreeNodeId;
+	}
+	
+	/**
+	 * 从nodeId的邻居节点中随机选择一个节点；
+	 * 如果nodesArr中的节点均已遍历过，返回-1;
+	 * @param nodeId
+	 * @return
+	 */
+	protected Integer getRandomNodeId(int[] nodesArr)
+	{
+		if(nodesArr==null)
+		{
+			return -1;
+		}
+
+		for(int i=0;i<nodesArr.length;i++)
+		{
+			if(this.nodeIterated.contains(nodesArr[i])==false)
+			{
+				return nodesArr[i];
+			}
+		}
+		return -1;
+	}
+	
 }

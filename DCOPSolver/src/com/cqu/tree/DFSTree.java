@@ -1,11 +1,9 @@
 package com.cqu.tree;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.cqu.util.CollectionUtil;
-import com.cqu.util.StatisticUtil;
 
 /**
  * 深度优先搜索树
@@ -30,25 +28,11 @@ public class DFSTree extends TreeGenerator{
 	public final static String HEURISTIC_MINDEGREE="MINDEGREE";
 	
 	private String heuristic;
-
-	private Map<Integer, int[]> neighborCounts;
 	
 	public DFSTree(Map<Integer, int[]> neighbors) {
 		super(neighbors);
 		// TODO Auto-generated constructor stub
-		this.neighborCounts=new HashMap<Integer, int[]>();
-		for(Integer nodeId : this.neighbors.keySet())
-		{
-			int[] nodeNeighbors=this.neighbors.get(nodeId);
-			int[] nodeNeighborCounts=new int[nodeNeighbors.length];
-			for(int i=0;i<nodeNeighborCounts.length;i++)
-			{
-				nodeNeighborCounts[i]=this.neighbors.get(nodeNeighbors[i]).length;
-			}
-			this.neighborCounts.put(nodeId, nodeNeighborCounts);
-		}
-		
-		this.rootId=this.neighbors.keySet().iterator().next();
+		this.rootId=this.getMaxNeighborsNodeId(neighbors.keySet());
 		this.heuristic=DFSTree.HEURISTIC_RANDOM;
 	}
 	
@@ -59,61 +43,6 @@ public class DFSTree extends TreeGenerator{
 	public void setHeuristic(String heuristic)
 	{
 		this.heuristic=heuristic;
-	}
-	
-	private Integer getMaxNeighborsNodeId(Integer nodeId)
-	{
-		int[] neighbors=this.neighbors.get(nodeId);
-		int[] counts=this.neighborCounts.get(nodeId);
-		for(int i=0;i<counts.length;i++)
-		{
-			if(this.nodeIterated.contains(neighbors[i])==true)
-			{
-				counts[i]=-1;
-			}
-		}
-		int maxIndex=StatisticUtil.max(counts);
-		if(counts[maxIndex]==-1)
-		{
-			return -1;
-		}else
-		{
-			return neighbors[maxIndex];
-		}
-	}
-	
-	private Integer getMinNeighborsNodeId(Integer nodeId)
-	{
-		int[] neighbors=this.neighbors.get(nodeId);
-		int[] counts=this.neighborCounts.get(nodeId);
-		for(int i=0;i<counts.length;i++)
-		{
-			if(this.nodeIterated.contains(neighbors[i])==true)
-			{
-				counts[i]=-1;
-			}
-		}
-		int minIndex=StatisticUtil.min(counts);
-		if(counts[minIndex]==-1)
-		{
-			return -1;
-		}else
-		{
-			return neighbors[minIndex];
-		}
-	}
-	
-	protected Integer getRandomNodeId(Integer nodeId)
-	{
-		int[] neighbors=this.neighbors.get(nodeId);
-		for(int i=0;i<neighbors.length;i++)
-		{
-			if(this.nodeIterated.contains(neighbors[i])==false)
-			{
-				return neighbors[i];
-			}
-		}
-		return -1;
 	}
 
 	@Override
@@ -131,13 +60,13 @@ public class DFSTree extends TreeGenerator{
 			Integer nextNodeId=-1;
 			if(this.heuristic.equals(DFSTree.HEURISTIC_RANDOM))
 			{
-				nextNodeId=this.getRandomNodeId(curNodeId);
+				nextNodeId=this.getRandomNodeId(this.neighbors.get(curNodeId));
 			}else if(this.heuristic.equals(DFSTree.HEURISTIC_MAXDEGREE))
 			{
-				nextNodeId=this.getMaxNeighborsNodeId(curNodeId);
+				nextNodeId=this.getMaxNeighborsNodeId(this.neighbors.get(curNodeId));
 			}else if(this.heuristic.equals(DFSTree.HEURISTIC_MINDEGREE))
 			{
-				nextNodeId=this.getMinNeighborsNodeId(curNodeId);
+				nextNodeId=this.getMinNeighborsNodeId(this.neighbors.get(curNodeId));
 			}
 			if(nextNodeId==-1)
 			{
