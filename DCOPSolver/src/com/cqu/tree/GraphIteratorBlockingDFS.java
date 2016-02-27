@@ -81,7 +81,7 @@ public class GraphIteratorBlockingDFS extends GraphIterator{
 		{
 			if(this.nodesIterated.contains(neighbors[i])==false)
 			{
-				if(this.blockingNodesSet.contains(neighbors[i]))
+				if(this.blockingNodesSet.contains(neighbors[i])==false)
 				{
 					return neighbors[i];
 				}

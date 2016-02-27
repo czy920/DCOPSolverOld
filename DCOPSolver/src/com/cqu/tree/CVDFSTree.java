@@ -29,6 +29,9 @@ public class CVDFSTree extends DFSTree{
 		//初始化动态割点查找器
 		dcv.init();
 		
+		//确定根节点
+		this.rootId=this.getNextNodeByCutVertex(null);
+		
 		//由割点引导的DFS生成树构造
 		Integer curLevel=0;
 		Integer curNodeId=this.rootId;
@@ -72,12 +75,18 @@ public class CVDFSTree extends DFSTree{
 	{
 		Set<Integer> candidateNodes=new HashSet<Integer>();
 		
-		int[] neighbors=this.neighbors.get(nodeId);
-		for(int i=0;i<neighbors.length;i++)
+		if(nodeId==null)
 		{
-			if(this.nodeIterated.contains(neighbors[i])==false)
+			candidateNodes=this.neighbors.keySet();
+		}else
+		{
+			int[] neighbors=this.neighbors.get(nodeId);
+			for(int i=0;i<neighbors.length;i++)
 			{
-				candidateNodes.add(neighbors[i]);
+				if(this.nodeIterated.contains(neighbors[i])==false)
+				{
+					candidateNodes.add(neighbors[i]);
+				}
 			}
 		}
 		

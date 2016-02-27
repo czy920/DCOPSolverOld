@@ -6,7 +6,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 在阻断点阻断情况下，由下至上的逆序广度优先遍历
+ * 在阻断点阻断情况下，由下至上的逆序广度优先遍历；
+ * 注意，由于阻断点的限制更全面和灵活，故此遍历方
+ * 法不是默认针对下部子树，而是针对阻断点限定下的最大子树；
+ * 注意，因为允许根节点也为阻断点，故在此情况下，
+ * 会遍历多个非连通子树，一个上部子树和多个下部子树。
  * @author hz
  *
  */
@@ -16,6 +20,8 @@ public class TreeIteratorBlockingReverseBFS extends TreeIterator{
 	 * 阻断节点集
 	 */
 	private Set<Integer> blockingNodesSet;
+	
+	private List<Integer> nodesVisited;
 
 	public TreeIteratorBlockingReverseBFS(Map<Integer, Integer> parentNodesMap,
 			Map<Integer, int[]> childrenNodesMap, Integer rootNodeId,
@@ -23,6 +29,7 @@ public class TreeIteratorBlockingReverseBFS extends TreeIterator{
 		super(parentNodesMap, childrenNodesMap, rootNodeId, nodeOp);
 		// TODO Auto-generated constructor stub
 		this.blockingNodesSet=blockingNodesSet;
+		this.nodesVisited=new ArrayList<Integer>();
 	}
 
 	@Override
@@ -33,10 +40,61 @@ public class TreeIteratorBlockingReverseBFS extends TreeIterator{
 			return;
 		}
 		
-		List<Integer> nodesVisited=new ArrayList<Integer>();
-		List<Integer> nodesToVisit=new ArrayList<Integer>();
-		nodesToVisit.add(rootNodeId);
+		Integer oldestAncestor=-1;
+		Integer ancestorNode=this.parentNodesMap.get(this.rootNodeId);
+		while(ancestorNode!=-1)
+		{
+			if(blockingNodesSet.contains(ancestorNode))
+			{
+				break;
+			}else
+			{
+				oldestAncestor=ancestorNode;
+			}
+			ancestorNode=this.parentNodesMap.get(ancestorNode);
+		}
 		
+		List<Integer> nodesToVisit=new ArrayList<Integer>();
+		if(oldestAncestor!=-1)
+		{
+			nodesToVisit.add(oldestAncestor);
+			calNodesToIterate(nodesToVisit);
+		}
+		
+		if(this.blockingNodesSet.contains(rootNodeId)==false)
+		{
+			if(oldestAncestor==-1)
+			{
+				nodesToVisit.add(rootNodeId);
+				calNodesToIterate(nodesToVisit);
+			}
+		}else
+		{
+			nodesToVisit.clear();
+			int[] childrenNodes=this.childrenNodesMap.get(this.rootNodeId);
+			for(Integer nodeId : childrenNodes)
+			{
+				if(this.blockingNodesSet.contains(nodeId)==false)
+				{
+					nodesToVisit.add(nodeId);
+				}
+			}
+			calNodesToIterate(nodesToVisit);
+		}
+		
+		
+		for(int i=0;i<nodesVisited.size();i++)
+		{
+			this.nodeOp.operate(nodesVisited.get(nodesVisited.size()-1-i));
+			if(this.itStatus==IteratingStatus.ENDEDAHEAD)
+			{
+				return;
+			}
+		}
+	}
+	
+	private void calNodesToIterate(List<Integer> nodesToVisit)
+	{
 		while(nodesToVisit.size()>0)
 		{
 			Integer curNodeId=nodesToVisit.remove(0);
@@ -49,15 +107,6 @@ public class TreeIteratorBlockingReverseBFS extends TreeIterator{
 				{
 					nodesToVisit.add(nodeId);
 				}
-			}
-		}
-		
-		for(int i=0;i<nodesVisited.size();i++)
-		{
-			this.nodeOp.operate(nodesVisited.get(nodesVisited.size()-1-i));
-			if(this.itStatus==IteratingStatus.ENDEDAHEAD)
-			{
-				return;
 			}
 		}
 	}

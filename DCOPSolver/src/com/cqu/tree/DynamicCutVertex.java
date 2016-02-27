@@ -17,7 +17,8 @@ import com.cqu.util.CollectionUtil;
  */
 public class DynamicCutVertex {
 	
-	public static final int INVALID_ANCESTOR=1000000;
+	public static final int INVALID_ANCESTOR_MIN=-1;
+	public static final int INVALID_ANCESTOR_MAX=1000000;
 	
 	/**
 	 * 无向图（邻接表存储）
@@ -59,15 +60,6 @@ public class DynamicCutVertex {
 	 */
 	public void init()
 	{
-		oldestAncestorLevelMap=new HashMap<Integer, Integer>();
-		subTreeSizesMap=new HashMap<Integer, Integer>();
-		
-		for(Integer nodeId : neighbors.keySet())
-		{
-			oldestAncestorLevelMap.put(nodeId, DynamicCutVertex.INVALID_ANCESTOR);
-			subTreeSizesMap.put(nodeId, 0);
-		}
-		
 		dfsTree=new DFSTree(this.neighbors);
 		dfsTree.generate();
 	}
@@ -80,12 +72,29 @@ public class DynamicCutVertex {
 	 */
 	public Integer selectBest(Integer root, Set<Integer> blockingNodes, Set<Integer> candidateNodes)
 	{
+		oldestAncestorLevelMap=new HashMap<Integer, Integer>();
+		subTreeSizesMap=new HashMap<Integer, Integer>();
 		cvCutPartsSizesMap=new HashMap<Integer, Map<Integer, Integer>>();
+		
+		if(root==null)
+		{
+			root=dfsTree.getRoot();
+		}
 		collectCVInfo(root, blockingNodes);
 		
+		if(cvCutPartsSizesMap.size()<=1)
+		{
+			//无割点，随机选择第一个节点;或则有唯一割点，直接选择它即可
+			return candidateNodes.iterator().next();
+		}
 		Map<Integer, Double> cutVertexEvaluations=new HashMap<Integer, Double>();
 		for(Integer nodeId : candidateNodes)
 		{
+			if(cvCutPartsSizesMap.containsKey(nodeId)==false)
+			{
+				continue;
+			}
+			
 			Map<Integer, Integer> partsSizes=cvCutPartsSizesMap.get(nodeId);
 			double sum=0.0;
 			for(Integer value : partsSizes.values())
@@ -117,55 +126,106 @@ public class DynamicCutVertex {
 			@Override
 			public void operate(Integer curNodeId) {
 				// TODO Auto-generated method stub
+				//有效子分支数量
+				int validChildPartsCount=0;
+				for(Integer e : dfsTree.getChildren().get(curNodeId))
+				{
+					if(blockingNodes.contains(e)==false)
+					{
+						validChildPartsCount++;
+					}
+				}
+				//父分支是否有效
+				boolean isParentPartValid=false;
+				for(Integer e : dfsTree.getAllParents().get(curNodeId))
+				{
+					if(blockingNodes.contains(e)==false)
+					{
+						isParentPartValid=true;
+						break;
+					}
+				}
+				
 				//子树大小
 				int subTreeSize=0;
 				for(Integer e : dfsTree.getChildren().get(curNodeId))
 				{
-					subTreeSize+=subTreeSizesMap.get(e);
+					if(blockingNodes.contains(e)==false)
+					{
+						subTreeSize+=subTreeSizesMap.get(e);
+					}
 				}
 				subTreeSizesMap.put(curNodeId, subTreeSize+1);//须加上自己
 				
-				
-				//通过回边连接的最高祖先
+				//通过回边连接的最高祖先-除本节点之外的子节点
 				List<Integer> ancestorNodes=new ArrayList<Integer>();
-				Integer parent=dfsTree.getParents().get(curNodeId);
-				for(Integer e : dfsTree.getAllParents().get(curNodeId))
-				{
-					if(parent.equals(e)==false)
-					{
-						ancestorNodes.add(dfsTree.getLevels().get(e));
-					}
-				}
 				for(Integer e : dfsTree.getChildren().get(curNodeId))
 				{
-					ancestorNodes.add(oldestAncestorLevelMap.get(e));
+					if(blockingNodes.contains(e)==false)
+					{
+						ancestorNodes.add(oldestAncestorLevelMap.get(e));
+					}
+				}
+				if(ancestorNodes.isEmpty())
+				{
+					ancestorNodes.add(DynamicCutVertex.INVALID_ANCESTOR_MAX);
 				}
 				oldestAncestorLevelMap.put(curNodeId, Collections.min(ancestorNodes));
 				
 				//判定割点
-				if(oldestAncestorLevelMap.get(curNodeId)<=dfsTree.getLevels().get(curNodeId))
+				if(oldestAncestorLevelMap.get(curNodeId)>=dfsTree.getLevels().get(curNodeId))
 				{
-					Map<Integer, Integer> cutPartsSizes=new HashMap<Integer, Integer>();
-					//子分支大小
-					for(Integer e : dfsTree.getChildren().get(curNodeId))
+					if(validChildPartsCount>=2||(validChildPartsCount==1&&isParentPartValid==true))
 					{
-						cutPartsSizes.put(e, subTreeSizesMap.get(e));
-					}
-					//父分支大小
-					Integer parentId=dfsTree.getParents().get(curNodeId);
-					parentPartSize=0;
-					Set<Integer> blockingNodesSetTemp=new HashSet<Integer>(blockingNodes);
-					blockingNodesSetTemp.add(curNodeId);
-					new GraphIteratorBlockingDFS(neighbors, parentId, new NodeOperation() {
-						
-						@Override
-						public void operate(Integer curNodeId) {
-							// TODO Auto-generated method stub
-							parentPartSize++;
+						Map<Integer, Integer> cutPartsSizes=new HashMap<Integer, Integer>();
+						//下部子分支大小
+						for(Integer e : dfsTree.getChildren().get(curNodeId))
+						{
+							if(blockingNodes.contains(e)==false)
+							{
+								cutPartsSizes.put(e, subTreeSizesMap.get(e));
+							}
 						}
-					}, blockingNodesSetTemp).iterate();
-					cutPartsSizes.put(parentId, parentPartSize);
-					cvCutPartsSizesMap.put(curNodeId, cutPartsSizes);
+						
+						//上部祖先分支大小
+						if(isParentPartValid==true)
+						{
+							parentPartSize=0;
+							Set<Integer> blockingNodesSetTemp=new HashSet<Integer>(blockingNodes);
+							int[] nodeAllChildren=dfsTree.getAllChildren().get(curNodeId);
+							for(int childNodeId : nodeAllChildren)
+							{
+								blockingNodesSetTemp.add(childNodeId);
+							}
+							new GraphIteratorBlockingDFS(neighbors, curNodeId, new NodeOperation() {
+								
+								@Override
+								public void operate(Integer curNodeId) {
+									// TODO Auto-generated method stub
+									parentPartSize++;
+								}
+							}, blockingNodesSetTemp).iterate();
+							cutPartsSizes.put(curNodeId, parentPartSize-1);//减一是排除当前节点
+						}
+						cvCutPartsSizesMap.put(curNodeId, cutPartsSizes);
+					}
+				}
+				
+				//通过回边连接的最高祖先-本节点
+				if(dfsTree.getAllParents().get(curNodeId).length>1)
+				{
+					Integer parent=dfsTree.getParents().get(curNodeId);
+					for(Integer e : dfsTree.getAllParents().get(curNodeId))
+					{
+						if(parent.equals(e)==false)
+						{
+							if(blockingNodes.contains(e)==false)
+							{
+								ancestorNodes.add(dfsTree.getLevels().get(e));
+							}
+						}
+					}
+					oldestAncestorLevelMap.put(curNodeId, Collections.min(ancestorNodes));
 				}
 			}
 		}, blockingNodes).iterate();
