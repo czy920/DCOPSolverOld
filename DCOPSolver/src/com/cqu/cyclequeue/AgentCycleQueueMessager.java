@@ -112,6 +112,8 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 					}
 				}
 				
+				allMessageDisposed();
+				
 				/*
 				if(msgQueue.isEmpty()==false){
 					System.out.println("Wrong!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -211,6 +213,8 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 	protected abstract void disposeMessage(Message msg);
 	
 	protected abstract void messageLost(Message msg);
+	
+	protected void allMessageDisposed(){};
 	
 
 }

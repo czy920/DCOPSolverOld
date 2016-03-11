@@ -13,13 +13,14 @@ import com.cqu.hybriddpop.LabelPhaseHybridDPOP;
 import com.cqu.hybridmbdpop.HybridMBDPOP;
 import com.cqu.hybridmbdpop.LabelPhase;
 import com.cqu.hybridmbdpop.LabelPhaseHybridMBDPOP;
+import com.cqu.maxsum.MaxSumADVPAgent;
 import com.cqu.parser.Problem;
 import com.cqu.util.CollectionUtil;
 
 public class AgentManager {
 	
 	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "HybridDPOP", "HybridMBDPOP", "AgileDPOP", "ADOPT", "BNBADOPT","ADOPT_K","BDADOPT","SynAdopt","SynAdopt2",
-		"DSA_A","DSA_B","DSA_C","DSA_D","DSA_E","MGM","MGM2","ALSDSA","ALSMGM","ALSMGM2","ALS_DSA","ALS_H1_DSA","ALS_H2_DSA","ALSLMUS","ALSLMUSDSA","ALSLMUSDSA2","ALSLMUSDSA3","ALSLMUSDSA4", "ACO"};
+		"DSA_A","DSA_B","DSA_C","DSA_D","DSA_E","MGM","MGM2","ALSDSA","ALSMGM","ALSMGM2","ALS_DSA","ALS_H1_DSA","ALS_H2_DSA","ALSLMUS","ALSLMUSDSA","ALSLMUSDSA2","ALSLMUSDSA3","ALSLMUSDSA4", "ACO","MAXSUM","MAXSUM_ADVP"};
 	
 	private Map<Integer, Agent> agents;
 	private int treeHeight=0;
@@ -62,6 +63,8 @@ public class AgentManager {
 			{
 				agent=new BFSDPOPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)), problem.crossConstraintAllocation.get(agentId));
+			}else if (agentType.equals("MAXSUM_ADVP")) {
+				agent=new MaxSumADVPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), problem.domains.get(problem.agentDomains.get(agentId)));
 			}else
 			{
 				agent=new AdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 

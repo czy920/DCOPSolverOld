@@ -14,6 +14,7 @@ import com.cqu.bnbmergeadopt.AgentModel;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.dsa.*;
+import com.cqu.maxsum.MaxSumAgent;
 import com.cqu.mgm.*;
 import com.cqu.mus.*;
 import com.cqu.parser.Problem;
@@ -142,6 +143,8 @@ public class AgentManagerCycle {
 			else if(agentType.equals("ACO")){
 				agent=new AcoAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
 						problem.domains.get(problem.agentDomains.get(agentId)));
+			}else if (agentType.equals("MAXSUM")) {
+				agent=new MaxSumAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else{
 				agent=new AdoptAgentCycle(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
