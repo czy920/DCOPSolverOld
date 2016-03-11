@@ -63,13 +63,13 @@ public class AcoAgent extends AgentCycle{
 			}
 			return ret;
 		}
+		double fenzi = 0.0;
+		double fenmu = 0.0;
+		for(int j = 0;j< this.domain.length;j++){
+			fenmu += this.computePPart(ant, j);
+		}
 		for(int i = 0; i<this.domain.length;i++){
-			double fenzi = 0.0;
-			double fenmu = 0.0;
 			fenzi = this.computePPart(ant, i);
-			for(int j = 0;j< this.domain.length;j++){
-				fenmu += this.computePPart(ant, j);
-			}
 			ret[i] = fenzi/fenmu;
 		}
 		return ret;
@@ -104,9 +104,10 @@ public class AcoAgent extends AgentCycle{
 				valueIndex.add(i);
 			}
 		}
-		int index = (int) Math.random()*valueIndex.size();
+		double random = Math.random();
+		int index = (int) (random * valueIndex.size());
 		if(valueIndex.size() == 0)
-			return 0;
+			return (int) (random * this.domain.length);
 		return valueIndex.get(index);
 	}
 
@@ -202,7 +203,7 @@ public class AcoAgent extends AgentCycle{
 			int antId = PublicConstants.antIds[i];
 			if(this.noHighNode()){
 				selectValue(antId);
-			}else if(this.enableValue(antId)){
+			}else if(this.enableValue(antId) && this.mark.get(antId) == false){
 				selectValue(antId);
 			}
 		}
@@ -218,11 +219,11 @@ public class AcoAgent extends AgentCycle{
 			}else if(this.isAllSolution()){
 				int bestAnt = this.selectBestAnt();
 				//更新信息素并广播更新的信息素delta
-				this.delta = PublicConstants.computeDelta(this.currentCosts.get(this.bestAnt));
+				this.delta = PublicConstants.computeDelta(this.solutionCost(this.bestAnt));
 				this.updtePhero();
 				PublicConstants.currentCycle++;
 				this.sendPheromone();
-				this.localCost = this.currentBestCost(bestAnt);
+				this.localCost = this.solutionCost(bestAnt);
 				
 				//判断是否下一轮开始
 				if(PublicConstants.currentCycle < PublicConstants.MaxCycle){
@@ -236,7 +237,7 @@ public class AcoAgent extends AgentCycle{
 		
 	}
 	
-	private int currentBestCost(int bestAnt) {
+	private int solutionCost(int bestAnt) {
 		// TODO Auto-generated method stub
 		return this.localCost(bestAnt, this.selfView.get(bestAnt)) + this.currentCosts.get(bestAnt);
 	}
@@ -281,9 +282,10 @@ public class AcoAgent extends AgentCycle{
 		int ret =0;
 		int best = Infinity.INFINITY;
 		for(int i : this.currentCosts.keySet()){
-			if(best > this.currentCosts.get(i).intValue()){
+			int cost = this.solutionCost(i);
+			if(best > cost){
 				ret = i;
-				best = this.currentCosts.get(i).intValue();
+				best = cost;
 			}
 		}
 		this.bestAnt = ret;

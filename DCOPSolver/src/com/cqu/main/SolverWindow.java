@@ -1,5 +1,6 @@
 package com.cqu.main;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -45,6 +46,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.swing.ImageIcon;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
@@ -52,6 +54,7 @@ import javax.swing.JButton;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JTextArea;
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.FlowLayout;
@@ -90,6 +93,15 @@ public class SolverWindow {
 	private LabelSpinnerParameter lspSpinnerSelectStepK1;
 	private LabelSpinnerParameter lspSpinnerSelectStepK2;
 	private LabelSpinnerParameter lspSpinnerSelectRound;
+	
+	//蚁群算法参数设置
+	private LabelSpinnerParameter lspSpinnerMaxCycle;
+	private LabelSpinnerParameter lspSpinnercountAnt;
+	private LabelSpinnerParameter lspSpinneralpha;
+	private LabelSpinnerParameter lspSpinnerbeta;
+	private LabelSpinnerParameter lspSpinnerrho;
+	private LabelSpinnerParameter lspSpinnerMin_tau;
+	private LabelSpinnerParameter lspSpinnerMax_tau;
 	
 	//BFSDPOP移簇方式选择
 	private LabelSpinnerParameter lspSpinnerClusterRemovingChoice;
@@ -409,6 +421,22 @@ public class SolverWindow {
 		lspSpinnerMaxDimensionsInMBDPOP=new LabelSpinnerParameter("维度限制：", new SpinnerNumberModel(8, 3, 20, 1));
 		lspSpinnerADOPT_K=new LabelSpinnerParameter("K值：", new SpinnerNumberModel(0, 0, 10000, 100));
 		
+		//蚁群算法参数设置
+		lspSpinnerMaxCycle = new LabelSpinnerParameter("最大回合数：", new SpinnerNumberModel(100, 20, 150, 10));
+		lspSpinnerMaxCycle.setSize(new Dimension(40,22));
+		lspSpinnercountAnt = new LabelSpinnerParameter("蚂蚁数量：", new SpinnerNumberModel(2, 2, 50, 5));
+		lspSpinnercountAnt.setSize(new Dimension(40,22));
+		lspSpinneralpha = new LabelSpinnerParameter("alpha：", new SpinnerNumberModel(2, 1, 10, 1));
+		lspSpinneralpha.setSize(new Dimension(40,22));
+		lspSpinnerbeta = new LabelSpinnerParameter("beta：", new SpinnerNumberModel(8, 1, 10, 1));
+		lspSpinnerbeta.setSize(new Dimension(40,22));
+		lspSpinnerrho = new LabelSpinnerParameter("rho：", new SpinnerNumberModel(0.02, 0, 1, 0.01));
+		lspSpinnerrho.setSize(new Dimension(40,22));
+		lspSpinnerMin_tau = new LabelSpinnerParameter("max_tau：", new SpinnerNumberModel(10, 10, 15, 0.5));
+		lspSpinnerMin_tau.setSize(new Dimension(40,22));
+		lspSpinnerMax_tau = new LabelSpinnerParameter("min_tau：", new SpinnerNumberModel(0.1, 0, 5, 0.5));
+		lspSpinnerMax_tau.setSize(new Dimension(40,22));
+		
 		//BFSDPOP
 		lspSpinnerClusterRemovingChoice=new LabelSpinnerParameter("移簇方式：", new SpinnerNumberModel(0, 0, 1, 1));
 		
@@ -709,6 +737,14 @@ public class SolverWindow {
 		}else if(algorithmType.equals("SynAdopt2"))
 		{
 			paramList.add(lspSpinnerMessageTransmissionNCCC);
+		}else if(algorithmType.equals("ACO")){
+			paramList.add(lspSpinnerMaxCycle);
+			paramList.add(lspSpinnercountAnt);
+			paramList.add(lspSpinneralpha);
+			paramList.add(lspSpinnerbeta);
+			paramList.add(lspSpinnerrho);
+			paramList.add(lspSpinnerMin_tau);
+			paramList.add(lspSpinnerMax_tau);
 		}
 		return paramList;
 	}
@@ -919,6 +955,16 @@ public class SolverWindow {
 		Settings.settings.setDisplayGraphFrame(cbGraphFrame.isSelected());
 		Settings.settings.setMaxDimensionsInMBDPOP((Integer)lspSpinnerMaxDimensionsInMBDPOP.getSpinner().getValue());
 		Settings.settings.setADOPT_K((Integer)lspSpinnerADOPT_K.getSpinner().getValue());
+		
+		//蚁群算法参数
+		Settings.settings.setMaxCycle((Integer)lspSpinnerMaxCycle.getSpinner().getValue());
+		Settings.settings.setCountAnt((Integer)lspSpinnercountAnt.getSpinner().getValue());
+		Settings.settings.setAlpha((Integer)lspSpinneralpha.getSpinner().getValue());
+		Settings.settings.setBeta((Integer)lspSpinnerbeta.getSpinner().getValue());
+		Settings.settings.setRho((Double)lspSpinnerrho.getSpinner().getValue());
+		Settings.settings.setMin_tau((Double)lspSpinnerMin_tau.getSpinner().getValue());
+		Settings.settings.setMax_tau((Double)lspSpinnerMax_tau.getSpinner().getValue());
+		
 		
 		//BFSDPOP
 		Settings.settings.setClusterRemovingChoice((Integer)lspSpinnerClusterRemovingChoice.getSpinner().getValue());

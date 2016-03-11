@@ -12,6 +12,15 @@ public class Settings {
 	private int ADOPT_K;
 	private int maxDimensionInMBDPOP;
 	
+	//蚁群算法参数设置
+	private long MaxCycle;
+	private long countAnt;
+	private int alpha;
+	private int beta;
+	private double rho;
+	private double Min_tau;
+	private double Max_tau;
+	
 	//BFSDPOP
 	private int clusterRemovingChoice;
 	
@@ -39,6 +48,15 @@ public class Settings {
 		this.displayGraphFrame=true;
 		this.maxDimensionInMBDPOP=3;
 		
+		//蚁群算法参数设置
+		this.MaxCycle = 100;
+		this.countAnt = 2;
+		this.alpha = 2;
+		this.beta = 8;
+		this.rho = 0.02;
+		this.Min_tau = 0.1;
+		this.Max_tau = 10;
+		
 		//BFSDPOP
 		this.clusterRemovingChoice=0;
 		
@@ -65,6 +83,64 @@ public class Settings {
 
 	public void setADOPT_K(int aDOPT_K) {
 		ADOPT_K = aDOPT_K;
+	}
+	
+	
+
+	public long getMaxCycle() {
+		return MaxCycle;
+	}
+
+	public void setMaxCycle(long maxCycle) {
+		MaxCycle = maxCycle;
+	}
+
+	public long getCountAnt() {
+		return countAnt;
+	}
+
+	public void setCountAnt(long countAnt) {
+		this.countAnt = countAnt;
+	}
+
+	public int getAlpha() {
+		return alpha;
+	}
+
+	public void setAlpha(int alpha) {
+		this.alpha = alpha;
+	}
+
+	public int getBeta() {
+		return beta;
+	}
+
+	public void setBeta(int beta) {
+		this.beta = beta;
+	}
+
+	public double getRho() {
+		return rho;
+	}
+
+	public void setRho(double rho) {
+		this.rho = rho;
+	}
+
+	public double getMin_tau() {
+		return Min_tau;
+	}
+
+	public void setMin_tau(double min_tau) {
+		Min_tau = min_tau;
+	}
+
+	public double getMax_tau() {
+		return Max_tau;
+	}
+
+	public void setMax_tau(double max_tau) {
+		Max_tau = max_tau;
 	}
 
 	public int getCommunicationTimeInDPOPs() {
