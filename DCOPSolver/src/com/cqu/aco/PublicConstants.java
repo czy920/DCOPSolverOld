@@ -31,11 +31,26 @@ public class PublicConstants {
 	//tau_agent更新
 	public static double update_tau(double tau, double delta){
 		double new_tau = -1;
-		new_tau = (1 - rho) * tau + delta;
+		//new_tau = (1 - rho) * tau + delta;
+		new_tau = tau + delta;
 		if(new_tau < Min_tau) new_tau = Min_tau;
 		if(new_tau > Max_tau) new_tau = Max_tau;
 		return new_tau;
 		
-	}	
+	}
+	//蒸发信息素
+	public static void evaporate(double[][] tau, int i, int j){
+		tau[i][j] = (1 - rho) * tau[i][j];
+	}
+	
+	public static void paramsInit(long maxCycle, int countAnt, int alpha, int beta, double rho, double max_tau, double min_tau){
+		PublicConstants.MaxCycle = maxCycle;
+		PublicConstants.countAnt = countAnt;
+		PublicConstants.alpha = alpha;
+		PublicConstants.beta = beta;
+		PublicConstants.rho = rho;
+		PublicConstants.Max_tau = max_tau;
+		PublicConstants.Min_tau = min_tau;
+	}
 
 }

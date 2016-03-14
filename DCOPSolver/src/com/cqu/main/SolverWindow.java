@@ -423,19 +423,12 @@ public class SolverWindow {
 		
 		//蚁群算法参数设置
 		lspSpinnerMaxCycle = new LabelSpinnerParameter("最大回合数：", new SpinnerNumberModel(100, 20, 150, 10));
-		lspSpinnerMaxCycle.setSize(new Dimension(40,22));
 		lspSpinnercountAnt = new LabelSpinnerParameter("蚂蚁数量：", new SpinnerNumberModel(2, 2, 50, 5));
-		lspSpinnercountAnt.setSize(new Dimension(40,22));
 		lspSpinneralpha = new LabelSpinnerParameter("alpha：", new SpinnerNumberModel(2, 1, 10, 1));
-		lspSpinneralpha.setSize(new Dimension(40,22));
 		lspSpinnerbeta = new LabelSpinnerParameter("beta：", new SpinnerNumberModel(8, 1, 10, 1));
-		lspSpinnerbeta.setSize(new Dimension(40,22));
 		lspSpinnerrho = new LabelSpinnerParameter("rho：", new SpinnerNumberModel(0.02, 0, 1, 0.01));
-		lspSpinnerrho.setSize(new Dimension(40,22));
 		lspSpinnerMin_tau = new LabelSpinnerParameter("max_tau：", new SpinnerNumberModel(10, 10, 15, 0.5));
-		lspSpinnerMin_tau.setSize(new Dimension(40,22));
 		lspSpinnerMax_tau = new LabelSpinnerParameter("min_tau：", new SpinnerNumberModel(0.1, 0, 5, 0.5));
-		lspSpinnerMax_tau.setSize(new Dimension(40,22));
 		
 		//BFSDPOP
 		lspSpinnerClusterRemovingChoice=new LabelSpinnerParameter("移簇方式：", new SpinnerNumberModel(0, 0, 1, 1));
@@ -957,7 +950,7 @@ public class SolverWindow {
 		Settings.settings.setADOPT_K((Integer)lspSpinnerADOPT_K.getSpinner().getValue());
 		
 		//蚁群算法参数
-		Settings.settings.setMaxCycle((Integer)lspSpinnerMaxCycle.getSpinner().getValue());
+		Settings.settings.setMaxCycle((Long)lspSpinnerMaxCycle.getSpinner().getValue());
 		Settings.settings.setCountAnt((Integer)lspSpinnercountAnt.getSpinner().getValue());
 		Settings.settings.setAlpha((Integer)lspSpinneralpha.getSpinner().getValue());
 		Settings.settings.setBeta((Integer)lspSpinnerbeta.getSpinner().getValue());

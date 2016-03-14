@@ -11,6 +11,7 @@ import com.cqu.core.Message;
 import com.cqu.core.ResultAdopt;
 import com.cqu.core.ResultCycle;
 import com.cqu.cyclequeue.AgentCycle;
+import com.cqu.settings.Settings;
 
 /**
  * ant solver for dcop 
@@ -40,6 +41,13 @@ public class AcoAgent extends AgentCycle{
 	public AcoAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
+		PublicConstants.MaxCycle = Settings.settings.getMaxCycle();
+		PublicConstants.countAnt = Settings.settings.getCountAnt();
+		PublicConstants.alpha = Settings.settings.getAlpha();
+		PublicConstants.beta = Settings.settings.getBeta();
+		PublicConstants.rho = Settings.settings.getRho();
+		PublicConstants.Max_tau = Settings.settings.getMax_tau();
+		PublicConstants.Min_tau = Settings.settings.getMin_tau();
 	}
 	
 	private void initTaU() {
@@ -255,6 +263,18 @@ public class AcoAgent extends AgentCycle{
 		if(this.noHighNode()){
 			return;
 		}
+		//执行蒸发
+		for(int i = 0; i < this.highPriorities.length; i++){
+			int oppId = this.highPriorities[i];
+			double[][] old_tau = this.taus.get(oppId).getTau();
+			for(int myValue=0;myValue<this.domain.length;myValue++){
+				for(int oppValue=0;oppValue<this.neighbourDomains.get(oppId).length;oppValue++){
+					PublicConstants.evaporate(old_tau, myValue, oppValue);
+				}
+			}
+		}
+		
+		//再对相应路径增加信息素
 		for(int i = 0; i < this.highPriorities.length; i++){
 			int myValue = this.selfView.get(this.bestAnt);
 			int oppId = this.highPriorities[i];

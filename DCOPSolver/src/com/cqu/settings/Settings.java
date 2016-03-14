@@ -14,7 +14,7 @@ public class Settings {
 	
 	//蚁群算法参数设置
 	private long MaxCycle;
-	private long countAnt;
+	private int countAnt;
 	private int alpha;
 	private int beta;
 	private double rho;
@@ -95,11 +95,11 @@ public class Settings {
 		MaxCycle = maxCycle;
 	}
 
-	public long getCountAnt() {
+	public int getCountAnt() {
 		return countAnt;
 	}
 
-	public void setCountAnt(long countAnt) {
+	public void setCountAnt(int countAnt) {
 		this.countAnt = countAnt;
 	}
 

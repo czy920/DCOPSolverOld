@@ -32,7 +32,7 @@ public final class LabelSpinnerParameter extends JPanel {
 		{
 			spinnerParam.setModel(model);
 		}
-		spinnerParam.setPreferredSize(new Dimension(60, 22));
+		spinnerParam.setPreferredSize(new Dimension(45, 22));
 		add(spinnerParam);
 
 	}
