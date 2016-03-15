@@ -13,7 +13,7 @@ public class Settings {
 	private int maxDimensionInMBDPOP;
 	
 	//蚁群算法参数设置
-	private long MaxCycle;
+	private int MaxCycle;
 	private int countAnt;
 	private int alpha;
 	private int beta;
@@ -87,11 +87,11 @@ public class Settings {
 	
 	
 
-	public long getMaxCycle() {
+	public int getMaxCycle() {
 		return MaxCycle;
 	}
 
-	public void setMaxCycle(long maxCycle) {
+	public void setMaxCycle(int maxCycle) {
 		MaxCycle = maxCycle;
 	}
 

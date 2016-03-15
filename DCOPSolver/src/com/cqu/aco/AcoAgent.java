@@ -35,8 +35,10 @@ public class AcoAgent extends AgentCycle{
 	int bestAnt;
 	double delta;
 	
-	private int bestCost = Infinity.INFINITY;
-	private Context bestSolution = null;
+	private int bestCost = Infinity.INFINITY;   //保留最优级代价
+	private Context bestSolution = null;   //仅最后一个结点知道全局解
+	private int bestValueIndex = -1;       //保留最好的解对应的取值
+	private String endBestAnt = null;      //保留最好解是哪一轮哪只蚂蚁
 	
 	//信息素
 	private HashMap<Integer, Pheromone> taus = new HashMap<Integer, Pheromone>();
@@ -51,8 +53,8 @@ public class AcoAgent extends AgentCycle{
 		PublicConstants.rho = Settings.settings.getRho();
 		PublicConstants.Max_tau = Settings.settings.getMax_tau();
 		PublicConstants.Min_tau = Settings.settings.getMin_tau();
-		PublicConstants.aco_bestCostInCycle = new int[999];
-		PublicConstants.aco_totalCostInCycle = new int[999];
+		PublicConstants.aco_bestCostInCycle = new int[PublicConstants.MaxCycle];
+		PublicConstants.aco_totalCostInCycle = new int[PublicConstants.MaxCycle];
 	}
 	
 	private void initTaU() {
@@ -150,6 +152,12 @@ public class AcoAgent extends AgentCycle{
 		PheroMsgContext obj = (PheroMsgContext) msg.getValue();
 		this.bestAnt = obj.getAnt();
 		this.delta = obj.getDelta();
+		
+		if(this.endBestAnt == null || !this.endBestAnt.equals(obj.getEndBestAnt())){
+			this.bestCost = obj.getBestCost();
+			this.endBestAnt = obj.getEndBestAnt();
+			this.bestValueIndex = this.selfView.get(this.bestAnt);
+		}
 	
 		//为每条信息素边更新信息素
 		this.updtePhero();
@@ -200,7 +208,7 @@ public class AcoAgent extends AgentCycle{
 	
 	private void sendPheromone(){
 		//向所有agent广播信息素更新值delta
-		PheroMsgContext obj = new PheroMsgContext(this.bestAnt, this.delta);
+		PheroMsgContext obj = new PheroMsgContext(this.bestAnt, this.delta, this.bestCost, this.endBestAnt);
 		for(int i=0 ; i < this.allNodes.length; i++){
 			int otherId = this.allNodes[i];
 			if(otherId != this.id){
@@ -235,17 +243,21 @@ public class AcoAgent extends AgentCycle{
 				this.delta = PublicConstants.computeDelta(this.solutionCost(this.bestAnt));
 				this.updtePhero();
 				PublicConstants.currentCycle++;
-				this.sendPheromone();
+				
 				this.localCost = this.solutionCost(bestAnt);
 				if(this.localCost < this.bestCost){
 					this.bestCost = this.localCost;
 					Context temp = new Context(this.context.get(bestAnt));
 					temp.getContext().put(this.id, this.selfView.get(bestAnt));
 					this.bestSolution = temp;
+					this.bestValueIndex = this.selfView.get(this.bestAnt);
+					this.endBestAnt = "" + PublicConstants.currentCycle + this.bestAnt;
 					temp = null;
 				}
 				
 				PublicConstants.dataInCycleIncrease(this.localCost, this.bestCost);
+				
+				this.sendPheromone();
 				
 				//判断是否下一轮开始
 				if(PublicConstants.currentCycle < PublicConstants.MaxCycle){

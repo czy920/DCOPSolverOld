@@ -48,8 +48,8 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		this.timeCostInCycle = new long[999];
 		this.messageQuantityInCycle = new int[999];
 		
-		this.aco_totalCostInCycle = new int[999];
-		this.aco_bestCostInCycle = new int[999];
+		this.aco_totalCostInCycle = new int[PublicConstants.MaxCycle];
+		this.aco_bestCostInCycle = new int[PublicConstants.MaxCycle];
 	}
 	
 	public void setResult(Map<String, Object> result)

@@ -10,7 +10,7 @@ public class PublicConstants {
 		}
 	}
 	//轮数
-	public static long MaxCycle = 100;
+	public static int MaxCycle = 100;
 	public static int currentCycle;
 	//alpha参数
 	public static int alpha = 2;
@@ -24,8 +24,8 @@ public class PublicConstants {
 	public static double Max_tau = 10;
 	
 	//保存每一轮的代价
-	public static int[] aco_bestCostInCycle = new int[999];   //当前发现的最好的解的代价
-	public static int[] aco_totalCostInCycle = new int[999];   //每一轮里最好蚂蚁的解的代价
+	public static int[] aco_bestCostInCycle = new int[PublicConstants.MaxCycle];   //当前发现的最好的解的代价
+	public static int[] aco_totalCostInCycle = new int[PublicConstants.MaxCycle];   //每一轮里最好蚂蚁的解的代价
 	
 	//Delta计算
 	public static double computeDelta(int solution_cost){
@@ -47,7 +47,7 @@ public class PublicConstants {
 		tau[i][j] = (1 - rho) * tau[i][j];
 	}
 	
-	public static void paramsInit(long maxCycle, int countAnt, int alpha, int beta, double rho, double max_tau, double min_tau){
+	public static void paramsInit(int maxCycle, int countAnt, int alpha, int beta, double rho, double max_tau, double min_tau){
 		PublicConstants.MaxCycle = maxCycle;
 		PublicConstants.countAnt = countAnt;
 		PublicConstants.alpha = alpha;
@@ -61,7 +61,8 @@ public class PublicConstants {
 	protected static void dataInCycleIncrease(int totalcost, int bestcost) {
 		if (currentCycle == 0) // 除去初始化时Cost混乱时的统计
 			return;
-		if (currentCycle > aco_totalCostInCycle.length) {
+		
+		/*if (currentCycle > aco_totalCostInCycle.length) {
 			int[] templist1 = new int[2 * aco_totalCostInCycle.length];
 			int[] templist2 = new int[2 * aco_totalCostInCycle.length];
 			for (int i = 0; i < aco_totalCostInCycle.length; i++) {
@@ -70,8 +71,8 @@ public class PublicConstants {
 			}
 			aco_totalCostInCycle = templist1;
 			aco_bestCostInCycle = templist2;
-		}
-		// System.out.println(cycleCount);
+		}*/
+		
 		aco_totalCostInCycle[currentCycle - 1] = totalcost;
 		aco_bestCostInCycle[currentCycle - 1] = bestcost;
 	}
