@@ -35,6 +35,9 @@ public class AcoAgent extends AgentCycle{
 	int bestAnt;
 	double delta;
 	
+	private int bestCost = Infinity.INFINITY;
+	private Context bestSolution = null;
+	
 	//信息素
 	private HashMap<Integer, Pheromone> taus = new HashMap<Integer, Pheromone>();
 	
@@ -48,6 +51,8 @@ public class AcoAgent extends AgentCycle{
 		PublicConstants.rho = Settings.settings.getRho();
 		PublicConstants.Max_tau = Settings.settings.getMax_tau();
 		PublicConstants.Min_tau = Settings.settings.getMin_tau();
+		PublicConstants.aco_bestCostInCycle = new int[999];
+		PublicConstants.aco_totalCostInCycle = new int[999];
 	}
 	
 	private void initTaU() {
@@ -232,6 +237,15 @@ public class AcoAgent extends AgentCycle{
 				PublicConstants.currentCycle++;
 				this.sendPheromone();
 				this.localCost = this.solutionCost(bestAnt);
+				if(this.localCost < this.bestCost){
+					this.bestCost = this.localCost;
+					Context temp = new Context(this.context.get(bestAnt));
+					temp.getContext().put(this.id, this.selfView.get(bestAnt));
+					this.bestSolution = temp;
+					temp = null;
+				}
+				
+				PublicConstants.dataInCycleIncrease(this.localCost, this.bestCost);
 				
 				//判断是否下一轮开始
 				if(PublicConstants.currentCycle < PublicConstants.MaxCycle){

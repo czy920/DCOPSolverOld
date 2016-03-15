@@ -950,7 +950,7 @@ public class SolverWindow {
 		Settings.settings.setADOPT_K((Integer)lspSpinnerADOPT_K.getSpinner().getValue());
 		
 		//蚁群算法参数
-		Settings.settings.setMaxCycle((Long)lspSpinnerMaxCycle.getSpinner().getValue());
+		Settings.settings.setMaxCycle((Integer)lspSpinnerMaxCycle.getSpinner().getValue());
 		Settings.settings.setCountAnt((Integer)lspSpinnercountAnt.getSpinner().getValue());
 		Settings.settings.setAlpha((Integer)lspSpinneralpha.getSpinner().getValue());
 		Settings.settings.setBeta((Integer)lspSpinnerbeta.getSpinner().getValue());

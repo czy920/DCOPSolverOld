@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.cqu.aco.PublicConstants;
 import com.cqu.core.EventListener;
 import com.cqu.core.Message;
 import com.cqu.core.Result;
@@ -26,6 +27,10 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
     private double[] totalCostInCycle;
     private long[] timeCostInCycle;
     private int[] messageQuantityInCycle;
+    
+    //蚁群算法使用的保存每一轮的信息
+    private int[] aco_totalCostInCycle;
+    private int[] aco_bestCostInCycle;
 	
 	private List<EventListener> eventListeners;
 	
@@ -42,6 +47,9 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		this.totalCostInCycle = new double[999];
 		this.timeCostInCycle = new long[999];
 		this.messageQuantityInCycle = new int[999];
+		
+		this.aco_totalCostInCycle = new int[999];
+		this.aco_bestCostInCycle = new int[999];
 	}
 	
 	public void setResult(Map<String, Object> result)
@@ -114,6 +122,8 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 			tempCycle.totalCostInCycle = this.totalCostInCycle;
 			tempCycle.timeCostInCycle = this.timeCostInCycle;
 			tempCycle.messageQuantityInCycle = this.messageQuantityInCycle;
+			tempCycle.ant_totalCostInCyle = PublicConstants.aco_totalCostInCycle;
+			tempCycle.ant_bestCostInCycle = PublicConstants.aco_bestCostInCycle;
 			resultReturned = (Result)tempCycle;
 		}
 		else

@@ -24,6 +24,7 @@ public class Solver {
 	
 	private List<Result> results=new ArrayList<Result>();
 	private List<Result> resultsRepeated;
+	private String algorithmType = null;
 
 	public void solve(String problemPath, String agentType, boolean showTreeFrame, boolean debug, EventListener el)
 	{
@@ -278,7 +279,7 @@ public class Solver {
 			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
 			FileUtil.writeString(nccc, path+"\\nccc.txt");
 		}
-		else if(rs instanceof ResultCycle){
+		else if(rs instanceof ResultCycle && !this.algorithmType.equals("ACO")){
 			String totalTime="";
 			String messageQuantity="";
 			String totalCost="";
@@ -309,6 +310,36 @@ public class Solver {
 			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
 			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
 			FileUtil.writeString(nccc, path+"\\nccc.txt");
+		}
+		//蚁群算法引入
+		else if(rs instanceof ResultCycle && this.algorithmType.equals("ACO")){
+			String totalTime="";
+			String messageQuantity="";
+			String totalCost="";
+		
+			String AnttotalCostInCycle = "";
+			String AntbestCostInCycle = "";
+			
+			for(int i=0;i<results.size();i++)
+			{
+				ResultCycle result=(ResultCycle) results.get(i);
+				totalTime+=result.totalTime+"\n";
+				messageQuantity+=result.messageQuantity+"\n";
+				totalCost+=result.totalCost+"\n";
+				
+				AnttotalCostInCycle = "";
+				AntbestCostInCycle = "";
+				
+				for(int j = 0; j < result.ant_totalCostInCyle.length; j++){
+					AnttotalCostInCycle += result.ant_totalCostInCyle[j] +"\n";
+					AntbestCostInCycle += result.ant_bestCostInCycle[j] + "\n";
+				}
+				FileUtil.writeString(AnttotalCostInCycle, path + "\\AnttotalCostInCycle_" + i + ".txt");
+				FileUtil.writeString(AntbestCostInCycle, path + "\\AntbestCostInCycle_" + i + ".txt");
+			}
+			FileUtil.writeString(totalTime, path+"\\totalTime.txt");
+			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
+			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
 		}
 		else{
 			String totalTime="";
@@ -376,6 +407,7 @@ public class Solver {
 	private void batSolveEach(String problemPath, String algorithmType, final AtomicBoolean problemSolved)
 	{
 		String treeGeneratorType=null;
+		this.algorithmType = algorithmType;
 		if(algorithmType.equals("BFSDPOP") || algorithmType.equals("ALSDSA") || algorithmType.equals("ALSMGM")  || algorithmType.equals("ALSMGM2") || algorithmType.equals("ALS_DSA") 
 				|| algorithmType.equals("ALS_H1_DSA") || algorithmType.equals("ALS_H2_DSA") || algorithmType.equals("ALSLMUS") || algorithmType.equals("ALSLMUSDSA")
 				|| algorithmType.equals("ALSLMUSDSA2") || algorithmType.equals("ALSLMUSDSA3") || algorithmType.equals("ALSLMUSDSA4"))
@@ -423,7 +455,7 @@ public class Solver {
 		};
 		
 		//采用同步消息机制的算法
-		if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT_K")||algorithmType.equals("BDADOPT")||algorithmType.equals("SynAdopt1")||algorithmType.equals("SynAdopt2")||
+		if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT_K")||algorithmType.equals("BDADOPT")||algorithmType.equals("ACO")||algorithmType.equals("SynAdopt1")||algorithmType.equals("SynAdopt2")||
 				algorithmType.equals("DSA_A")||algorithmType.equals("DSA_B")||algorithmType.equals("DSA_C")||algorithmType.equals("DSA_D")||algorithmType.equals("DSA_E")||
 				algorithmType.equals("MGM")||algorithmType.equals("MGM2")||algorithmType.equals("ALSDSA")||algorithmType.equals("ALSMGM")||algorithmType.equals("ALSMGM2")||algorithmType.equals("ALS_DSA")||
 				algorithmType.equals("ALS_H1_DSA")||algorithmType.equals("ALS_H2_DSA")||algorithmType.equals("ALSLMUS")||algorithmType.equals("ALSLMUSDSA")||algorithmType.equals("ALSLMUSDSA2")||
