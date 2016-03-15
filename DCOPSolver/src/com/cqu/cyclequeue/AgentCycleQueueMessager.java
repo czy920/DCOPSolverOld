@@ -77,26 +77,13 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 					}
 				}
 			}
+			
 			if(cycleBegin.get()==true)
 			{
 				//添加work()方法，确保如果本轮没有收到message也能执行操作
 				work(msgQueue.size());
-				
-				/*
-				while(msgQueue.size() == 0){
-					try {
-						Thread.sleep(1);
-						System.out.println("!!! sleep(1) !!!!!");
-					} catch (InterruptedException e) {
-						// TODO 自动生成的 catch 块
-						e.printStackTrace();
-					}
-				}
-				if(msgQueue.isEmpty() == true){
-					System.out.println("!!!!! IsEmpty Judged Wrong !!!!!");
-				}
-				*/
-				
+				localSearchCheck();
+								
 				while(msgQueue.isEmpty()==false)
 				{
 					Message msg=null;
@@ -120,13 +107,11 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 					int i = 1;
 					i = 1/0;
 				}
-
 				if(msgQueue.size() != 0){
 					System.out.println("Wrong!!!!!!!!!!!!!!!!!!!!!!!!!!");
 					int i = 1;
 					i = 1/0;
 				}
-				
 				*/
 				
 				boolean lastAgent=true;
@@ -209,6 +194,10 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 	 * 添加work()方法，确保如果本轮没有收到message也能执行操作
 	 */
 	protected void work(int i){}
+	/*
+	 * 添加localSearchCheck()()方法，用于局部搜索算法中避免错误
+	 */
+	protected void localSearchCheck(){};
 	
 	protected abstract void disposeMessage(Message msg);
 	

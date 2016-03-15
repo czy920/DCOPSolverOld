@@ -658,39 +658,17 @@ public class SolverWindow {
 			paramList.add(lspSpinnerSelectProbabilityD);
 			paramList.add(lspSpinnerSelectRound);
 		}
-		else if(algorithmType.equals("ALSLMUS")){
-			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectProbability);
-			paramList.add(lspSpinnerSelectProbabilityA);
-			paramList.add(lspSpinnerSelectProbabilityB);
-		}
-		else if(algorithmType.equals("ALSLMUSDSA")){
-			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectInterval);
-			paramList.add(lspSpinnerSelectProbability);
-			paramList.add(lspSpinnerSelectProbabilityA);
-			paramList.add(lspSpinnerSelectProbabilityB);
-		}
-		else if(algorithmType.equals("ALSLMUSDSA2")){
-			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectInterval);
-			paramList.add(lspSpinnerSelectProbability);
-			paramList.add(lspSpinnerSelectProbabilityA);
-			paramList.add(lspSpinnerSelectProbabilityB);
-		}
-		else if(algorithmType.equals("ALSLMUSDSA3")){
-			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectInterval);
-			paramList.add(lspSpinnerSelectProbability);
-			paramList.add(lspSpinnerSelectProbabilityA);
-			paramList.add(lspSpinnerSelectProbabilityB);
-		}
 		else if(algorithmType.equals("ALSLMUSDSA4")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectInterval);
 			paramList.add(lspSpinnerSelectProbability);
 			//paramList.add(lspSpinnerSelectProbabilityA);
 			paramList.add(lspSpinnerSelectProbabilityB);
+		}
+		else if(algorithmType.equals("ALSDSAMGM")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectInterval);
+			paramList.add(lspSpinnerSelectProbability);
 		}
 		else if(algorithmType.equals("DPOP"))
 		{
