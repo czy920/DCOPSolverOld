@@ -121,32 +121,22 @@ public class AgentManagerCycle {
 				agent=new AlsDsa_H2_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ALSLMUS")){
-				agent=new AlsMusAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
-			else if(agentType.equals("ALSLMUSDSA")){
-				agent=new AlsMusDsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
-			else if(agentType.equals("ALSLMUSDSA2")){
-				agent=new AlsMusDsa2Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
-			else if(agentType.equals("ALSLMUSDSA3")){
-				agent=new AlsMusDsa3Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
 			else if(agentType.equals("ALSLMUSDSA4")){
 				agent=new AlsLmusDsa4Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if(agentType.equals("ALSDSAMGM")){
+				agent=new AlsDsaMgmAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else if(agentType.equals("ACO")||agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||
 					agentType.equals("ACO_line")||agentType.equals("ACO_final")){
 				agent=new AcoAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if (agentType.equals("MAXSUM")) {
-				agent=new MaxSumAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if (agentType.equals("MAXSUM")) {
+				agent=new MaxSumAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else{
 				agent=new AdoptAgentCycle(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 

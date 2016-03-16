@@ -65,23 +65,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 	private int prepareToReset = 2147483647;
 	protected LinkedList<int[]> localCostList = new LinkedList<int[]>();
 	
-	//private int[] test = new int[99999];
-	//private int[] testWho = new int[99999];
-	//private int[] testSave = new int[99999];
-	//private int testTag = 0;
-	//private int alsReceived = 0;
-	//private int[] alsReceivedWho = new int[99999];
-	private int[] saveReset = new int[999];
-	private int[] saveResetTime = new int[999];
-	private int saveTag = 0;
-	private int testNow = -1;
-	private int testBefore = -1;
-	private int testBeforeBefore = -1;
-	private int envolve = 0;
-	private int dsaCount = 0;
-	private int wrong;
-	private int wrongNumber;
-	private int receivedWrongNumber = 0;
 	
 	public AlsLmusDsa4Agent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
@@ -291,7 +274,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 	protected void AlsWork(){
 		
 		warning = 0;
-		//alsReceived = 0;
 		
 		valueIndexList.add(valueIndex);
 		if(this.isLeafAgent() == false){
@@ -310,29 +292,10 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 		//	System.out.println("Agent "+this.id+"~~~costMessage~~~"+cycleCount);
 		//}
 	};
-
-	
-	protected void work(int i){
-		wrong = 0;
-		if(i > 2*neighboursQuantity+1){
-			wrong = 1;
-			wrongNumber = i;
-		}
-	}
 	
 	
 	@Override
 	protected void disposeMessage(Message msg) {
-		
-		if(wrong == 1 && level > 1){
-			receivedWrongNumber++;
-			System.out.println("Agent "+this.id+"____"+"cycleCount "+cycleCount+"____"+"neighbour数 "+neighboursQuantity+"____"+"收到 "+wrongNumber+"____"+"邻居"+msg.getIdSender()+"____"+
-					"第 "+receivedQuantity+"____"+"类型 "+msg.getType());
-			if(receivedWrongNumber == wrongNumber){
-				int ii = 1;
-				//ii = ii/0;
-			}
-		}
 		//System.out.println("~~~id-"+id+"~~~cycle-"+cycleCount+"~~~step-"+STEP+"~~~"+msg.getType());
 		
 		if(msg.getType() == TYPE_STEP1_MESSAGE){
@@ -367,11 +330,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 	
 	
 	private void disposeStep1Message(Message msg) {
-		//test[testTag] = 1;
-		//testWho[testTag] = msg.getIdSender();
-		//testSave[testTag] = msgMailer.getCycleCount();
-		//testTag++;
-		
 		//System.out.println("~~~"+id+"~~~"+cycleCount+"~~~");
 		STEP = 1;
 		if(receivedQuantity==0)
@@ -430,9 +388,9 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 					}
 					//System.out.println("Id "+id+"    I am Syggester!!!!!!!!");
 					waitTime = 0;
-					myTagStandard = (int)(myTagStandard*0.97);
+					myTagStandard = (int)(myTagStandard*0.99);
 					valueIndex = mySuggestValue[((int)mySuggestValueTag)%domain.length];
-					mySuggestValueTag = mySuggestValueTag+0.1;
+					mySuggestValueTag = mySuggestValueTag+0.5;
 					sendStep2Messages();
 				}
 				else{
@@ -447,11 +405,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 	
 	
 	private void disposeStep2Message(Message msg) {
-		//test[testTag] = 2;
-		//testWho[testTag] = msg.getIdSender();
-		//testSave[testTag] = msgMailer.getCycleCount();
-		//testTag++;
-		
 		STEP = 2;
 		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
 		
@@ -536,11 +489,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 	
 	
 	private void disposeStep3Message(Message msg) {
-		//test[testTag] = 3;
-		//testWho[testTag] = msg.getIdSender();
-		//testSave[testTag] = msgMailer.getCycleCount();
-		//testTag++;
-		
 		STEP = 3;
 		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
 		
@@ -614,24 +562,17 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 			for(int i = 0; i < neighbours.length; i++){
 				neighboursTag[i] = 0;
 			}
-			myIdentity = NONE;
+			//myIdentity = NONE;
 			mySuggestersNumber = 0;
 			
 			sendStepDsaMessages();
 			stayUnchanged = 0;
 			resetLock = false;
-			dsaCount = 0;
-			
 		}
 	}
 	
 	
 	private void disposeStepDsaMessage(Message msg){
-		//test[testTag] = 4;
-		//testWho[testTag] = msg.getIdSender();
-		//testSave[testTag] = msgMailer.getCycleCount();
-		//testTag++;
-		
 		//System.out.println("~~~"+id+"~~~"+cycleCount+"~~~");
 		STEP = 4;
 		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
@@ -647,28 +588,15 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 		neighboursValueIndex[senderIndex] = (int)((Integer)msg.getValue());
 		
 		if(receivedQuantity==0){
-			dsaCount++;
 			prepareToReset--;
-			if(prepareToReset < 10){
-				saveReset[saveTag] = prepareToReset;
-				saveResetTime[saveTag] = msgMailer.getCycleCount();
-				saveTag++;
-			}
-			if(testNow == msgMailer.getCycleCount()){
-				System.out.println("wrong in disposeStepDsaMessage!!!!!!!!");
-			}
-			else{
-				testBeforeBefore = testBefore;
-				testBefore = testNow;
-				testNow = msgMailer.getCycleCount();
-			}
 			
 			//if(prepareToReset < 10)
 			//	System.out.println("~~~ID "+id+"~~~"+"dsaCount "+dsaCount+"~~~"+prepareToReset+"~~~");
 			
 			localCost=localCost();
 			AlsWork();
-			DsaWork();
+			if(myIdentity != SUGGESTER)
+				DsaWork();
 			
 			if(prepareToReset > 0){
 				sendStepDsaMessages();
@@ -679,20 +607,18 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 				prepareToReset = 2147483647;
 				if(Math.random() < selectSuggesterP){
 					myIdentity = SUGGESTER;
-					myTag = (int)(50*Math.random()+myTagStandard)*neighboursQuantity;
+					myTag = (int)(100*Math.random()+myTagStandard)*neighboursQuantity;
 				}
+				else
+					myIdentity = NONE;
 				sendStep1Messages();
 				//valueIndex = (int)(Math.random()*(domain.length));				//不要重置，效果不好
-				//testTag = 0;
 			}
 		}
 	}
 	
 	
 	protected void disposeAlsCostMessage(Message msg){
-		//alsReceived++;
-		//if(level != 0)
-		//	alsReceivedWho[alsReceived] = msg.getIdSender();
 		
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
@@ -744,7 +670,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 					bestCostTemp = accumulativeCost;
 					if(theSTEP == 4)
 						stayUnchanged = 0;
-					envolve++;
 				}
 				else{
 					if(theSTEP == 4 && resetLock == false){
@@ -753,9 +678,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 							stayUnchanged = -2147483646;
 							prepareToReset = totalHeight + 1;
 							resetLock = true;
-							saveReset[saveTag] = prepareToReset;
-							saveResetTime[saveTag] = msgMailer.getCycleCount();
-							saveTag++;
 							sendResetMessages();
 						}
 					}
@@ -808,8 +730,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 	
 	private void disposeAlsResetMessage(Message msg){
 		prepareToReset = (Integer)msg.getValue();
-		saveReset[saveTag] = prepareToReset;
-		saveResetTime[saveTag] = msgMailer.getCycleCount();
 		sendResetMessages();
 		
 	}
@@ -843,7 +763,20 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 		}
 	}
 	
-	
+	protected void localSearchCheck(){
+		while(msgQueue.size() == 0){
+			try {
+				Thread.sleep(1);
+				System.out.println("!!! sleep(1) !!!!!");
+			} catch (InterruptedException e) {
+				// TODO 自动生成的 catch 块
+				e.printStackTrace();
+			}
+		}
+		if(msgQueue.isEmpty() == true){
+			System.out.println("!!!!! IsEmpty Judged Wrong !!!!!");
+		}
+	}
 	
 	private int localCost(){
 		int localCostTemp=0;
