@@ -422,13 +422,13 @@ public class SolverWindow {
 		lspSpinnerADOPT_K=new LabelSpinnerParameter("K值：", new SpinnerNumberModel(0, 0, 10000, 100));
 		
 		//蚁群算法参数设置
-		lspSpinnerMaxCycle = new LabelSpinnerParameter("最大回合数：", new SpinnerNumberModel(100, 20, 150, 10));
-		lspSpinnercountAnt = new LabelSpinnerParameter("蚂蚁数量：", new SpinnerNumberModel(2, 2, 50, 5));
+		lspSpinnerMaxCycle = new LabelSpinnerParameter("最大回合数：", new SpinnerNumberModel(100, 20, 300, 10));
+		lspSpinnercountAnt = new LabelSpinnerParameter("蚂蚁数量：", new SpinnerNumberModel(10, 2, 50, 5));
 		lspSpinneralpha = new LabelSpinnerParameter("alpha：", new SpinnerNumberModel(2, 1, 10, 1));
 		lspSpinnerbeta = new LabelSpinnerParameter("beta：", new SpinnerNumberModel(8, 1, 10, 1));
 		lspSpinnerrho = new LabelSpinnerParameter("rho：", new SpinnerNumberModel(0.02, 0, 1, 0.01));
-		lspSpinnerMin_tau = new LabelSpinnerParameter("max_tau：", new SpinnerNumberModel(10, 10, 15, 0.5));
-		lspSpinnerMax_tau = new LabelSpinnerParameter("min_tau：", new SpinnerNumberModel(0.1, 0, 5, 0.5));
+		lspSpinnerMax_tau = new LabelSpinnerParameter("max_tau：", new SpinnerNumberModel(10, 10, 15, 0.5));
+		lspSpinnerMin_tau = new LabelSpinnerParameter("min_tau：", new SpinnerNumberModel(0.1, 0, 5, 0.5));
 		
 		//BFSDPOP
 		lspSpinnerClusterRemovingChoice=new LabelSpinnerParameter("移簇方式：", new SpinnerNumberModel(0, 0, 1, 1));
@@ -730,7 +730,8 @@ public class SolverWindow {
 		}else if(algorithmType.equals("SynAdopt2"))
 		{
 			paramList.add(lspSpinnerMessageTransmissionNCCC);
-		}else if(algorithmType.equals("ACO")){
+		}else if(algorithmType.equals("ACO")||algorithmType.equals("ACO_tree")||algorithmType.equals("ACO_bf")||algorithmType.equals("ACO_phase")||
+				algorithmType.equals("ACO_line")||algorithmType.equals("ACO_final")){
 			paramList.add(lspSpinnerMaxCycle);
 			paramList.add(lspSpinnercountAnt);
 			paramList.add(lspSpinneralpha);

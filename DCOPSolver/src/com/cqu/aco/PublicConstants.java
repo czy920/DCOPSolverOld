@@ -2,10 +2,12 @@ package com.cqu.aco;
 
 public class PublicConstants {
 	//蚂蚁的个数
-	public static int countAnt = 2;
-	public static int[] antIds = new int[countAnt];
+	public static final String[] ACO_TYPE= {"ACO","ACO_tree","ACO_bf","ACO_phase","ACO_line","ACO_final"};
+	public static String ACO_type = "ACO";
+	public static int countAnt = 10;
+	public static int[] antIds = new int[50];
 	static {
-		for(int i = 1; i <= countAnt; i++){
+		for(int i = 1; i <= 50; i++){
 			antIds[i-1] =i;
 		}
 	}

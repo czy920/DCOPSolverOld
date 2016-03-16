@@ -39,6 +39,7 @@ public class AcoAgent extends AgentCycle{
 	private Context bestSolution = null;   //仅最后一个结点知道全局解
 	private int bestValueIndex = -1;       //保留最好的解对应的取值
 	private String endBestAnt = null;      //保留最好解是哪一轮哪只蚂蚁
+	private Context bestContext = null;    //保留最好解对应的上下文
 	
 	//信息素
 	private HashMap<Integer, Pheromone> taus = new HashMap<Integer, Pheromone>();
@@ -157,6 +158,7 @@ public class AcoAgent extends AgentCycle{
 			this.bestCost = obj.getBestCost();
 			this.endBestAnt = obj.getEndBestAnt();
 			this.bestValueIndex = this.selfView.get(this.bestAnt);
+			this.bestContext = new Context(this.context.get(bestAnt));
 		}
 	
 		//为每条信息素边更新信息素
@@ -241,7 +243,7 @@ public class AcoAgent extends AgentCycle{
 				int bestAnt = this.selectBestAnt();
 				//更新信息素并广播更新的信息素delta
 				this.delta = PublicConstants.computeDelta(this.solutionCost(this.bestAnt));
-				this.updtePhero();
+				
 				PublicConstants.currentCycle++;
 				
 				this.localCost = this.solutionCost(bestAnt);
@@ -252,11 +254,12 @@ public class AcoAgent extends AgentCycle{
 					this.bestSolution = temp;
 					this.bestValueIndex = this.selfView.get(this.bestAnt);
 					this.endBestAnt = "" + PublicConstants.currentCycle + this.bestAnt;
+					this.bestContext = new Context(this.context.get(bestAnt));
 					temp = null;
 				}
 				
 				PublicConstants.dataInCycleIncrease(this.localCost, this.bestCost);
-				
+				this.updtePhero();
 				this.sendPheromone();
 				
 				//判断是否下一轮开始
@@ -308,6 +311,17 @@ public class AcoAgent extends AgentCycle{
 			double old_tau = this.taus.get(oppId).getTau()[myValue][oppValue];
 			double new_tau = PublicConstants.update_tau(old_tau, this.delta);
 			this.taus.get(oppId).getTau()[myValue][oppValue] = new_tau;
+		}
+		//再对最好解路径信息素更新
+		if(PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[2])){
+			for(int i = 0; i < this.highPriorities.length; i++){
+				int myValue = this.bestValueIndex;
+				int oppId = this.highPriorities[i];
+				int oppValue = this.bestContext.getContext().get(oppId);
+				double old_tau = this.taus.get(oppId).getTau()[myValue][oppValue];
+				double new_tau = PublicConstants.update_tau(old_tau,PublicConstants.computeDelta(this.bestCost));
+				this.taus.get(oppId).getTau()[myValue][oppValue] = new_tau;
+			}
 		}
 	}
 	

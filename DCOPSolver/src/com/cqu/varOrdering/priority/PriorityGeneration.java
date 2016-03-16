@@ -1,11 +1,12 @@
 package com.cqu.varOrdering.priority;
 
-import java.util.List;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 import com.cqu.heuristics.ScoringHeuristic;
+import com.cqu.tree.TreeGenerator;
 import com.cqu.util.CollectionUtil;
-import com.cqu.varOrdering.dfs.DFSgeneration;
 
 public class PriorityGeneration {
 	
@@ -62,16 +63,47 @@ public class PriorityGeneration {
 		
 	}
 	
+	//根据伪树构造优先级，即树型结构
+	public void generate(TreeGenerator treeGenerator) {
+		// TODO Auto-generated method stub
+		
+		orderingView.maxPriority = treeGenerator.getRoot();
+		int curNodeId = orderingView.maxPriority;
+		
+		Queue<Integer> list = new LinkedList<Integer>();
+		list.add(curNodeId);
+		//优先级生成
+		while(!list.isEmpty()){
+			curNodeId = (Integer) list.poll();
+			orderingView.priority.put(curNodeId, treeGenerator.getLevels().get(curNodeId)+1);
+		
+			int[] low = treeGenerator.getAllChildren().get(curNodeId);
+			int[] high = treeGenerator.getAllParents().get(curNodeId);
+			for(int i=0;i<low.length;i++ ){
+				orderingView.lowNodes.get(curNodeId).add(low[i]);
+			}
+			for(int i=0;i<high.length;i++ ){
+				orderingView.highNodes.get(curNodeId).add(high[i]);
+			}		
+			for(int child:treeGenerator.getChildren().get(curNodeId)){
+				list.add(child);
+			}
+			if(list.isEmpty() && treeGenerator.getChildren().get(curNodeId).length == 0){
+				orderingView.minPriority = curNodeId;
+			}
+		}
+	}
+	
 	/*
 	 * 选择最高优先级结点策略
 	 */
-	public static void setRootHeuristics (ScoringHeuristic<Short> rootHeuristic){
+	public void setRootHeuristics (ScoringHeuristic<Short> rootHeuristic){
 		PriorityGeneration.rootElectionHeuristic = rootHeuristic;
 	}
 	/*
 	 * 选择下一优先级结点策略
 	 */
-	public static void setNextNodeHeuristics (ScoringHeuristic<Short> nextNodeHeuristics) 
+	public void setNextNodeHeuristics (ScoringHeuristic<Short> nextNodeHeuristics) 
 	{
 		PriorityGeneration.NextNodeHeuristics = nextNodeHeuristics ;
 	}

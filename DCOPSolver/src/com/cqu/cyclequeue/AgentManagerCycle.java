@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.aco.AcoAgent;
+import com.cqu.aco.PublicConstants;
 import com.cqu.adopt.AdoptAgentCycle;
 import com.cqu.adopt.AdoptAgentCycle_2;
 import com.cqu.bnbadopt.ADOPT_K;
@@ -140,7 +141,8 @@ public class AgentManagerCycle {
 				agent=new AlsLmusDsa4Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ACO")){
+			else if(agentType.equals("ACO")||agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||
+					agentType.equals("ACO_line")||agentType.equals("ACO_final")){
 				agent=new AcoAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}else if (agentType.equals("MAXSUM")) {
@@ -169,7 +171,8 @@ public class AgentManagerCycle {
 								problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])).length));
 			}
 			
-			if(agentType.equals("ACO")){
+			if(agentType.equals("ACO")||agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||
+					agentType.equals("ACO_line")||agentType.equals("ACO_final")){
 				agent.setNeibours(problem.neighbourAgents.get(agentId), problem.parentAgents.get(agentId), 
 						problem.childAgents.get(agentId), problem.allParentAgents.get(agentId), 
 						problem.allChildrenAgents.get(agentId), neighbourDomains, constraintCosts, neighbourLevels,

@@ -10,6 +10,7 @@ import java.util.Set;
 import org.jdom2.Document;
 import org.jdom2.Element;
 
+import com.cqu.aco.PublicConstants;
 import com.cqu.bfsdpop.CEAllocatorFactory;
 import com.cqu.bfsdpop.CrossEdgeAllocator;
 import com.cqu.heuristics.MostConnectedHeuristic;
@@ -196,9 +197,15 @@ public class ProblemParser {
 		treeGenerator.generate();
 		
 		PriorityGeneration varOrdering = new PriorityGeneration(problem.neighbourAgents);
-		varOrdering.setRootHeuristics(new MostConnectedHeuristic(problem));
-		varOrdering.setNextNodeHeuristics(new MostConnectedHeuristic(problem));
-		varOrdering.generate();
+		if(PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[1])||PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[4])){	
+			varOrdering.generate(treeGenerator);
+		}else{
+			varOrdering.setRootHeuristics(new MostConnectedHeuristic(problem));
+			varOrdering.setNextNodeHeuristics(new MostConnectedHeuristic(problem));
+			varOrdering.generate();
+		}
+		
+
 		problem.highNodes = varOrdering.getHighNodes();
 		problem.lowNodes = varOrdering.getLowNodes();
 		problem.priorities = varOrdering.getPriorities();

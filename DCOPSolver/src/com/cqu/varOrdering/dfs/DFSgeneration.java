@@ -38,6 +38,7 @@ public class DFSgeneration extends TreeGenerator{
 		Integer curLevel=0;
 		
 		dfsview.rootId = DFSgeneration.rootElectionHeuristic.getScores();
+		this.rootId =  dfsview.rootId;
 		
 		Integer curNodeId=dfsview.rootId;
 		dfsview.nodeIterated.put(curNodeId, true);
