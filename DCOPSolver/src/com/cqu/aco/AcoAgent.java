@@ -35,6 +35,8 @@ public class AcoAgent extends AgentCycle{
 	int bestAnt;
 	double delta;
 	
+	HashMap<Integer,Double> betterSolution;
+	
 	private int bestCost = Infinity.INFINITY;   //保留最优级代价
 	private Context bestSolution = null;   //仅最后一个结点知道全局解
 	private int bestValueIndex = -1;       //保留最好的解对应的取值
@@ -56,6 +58,7 @@ public class AcoAgent extends AgentCycle{
 		PublicConstants.Min_tau = Settings.settings.getMin_tau();
 		PublicConstants.aco_bestCostInCycle = new int[PublicConstants.MaxCycle];
 		PublicConstants.aco_totalCostInCycle = new int[PublicConstants.MaxCycle];
+		PublicConstants.betterAntCount = PublicConstants.countAnt/3;
 	}
 	
 	private void initTaU() {
@@ -152,8 +155,7 @@ public class AcoAgent extends AgentCycle{
 	private void disposePheromone(Message msg) {
 		PheroMsgContext obj = (PheroMsgContext) msg.getValue();
 		this.bestAnt = obj.getAnt();
-		this.delta = obj.getDelta();
-		
+			
 		if(this.endBestAnt == null || !this.endBestAnt.equals(obj.getEndBestAnt())){
 			this.bestCost = obj.getBestCost();
 			this.endBestAnt = obj.getEndBestAnt();
@@ -162,7 +164,14 @@ public class AcoAgent extends AgentCycle{
 		}
 	
 		//为每条信息素边更新信息素
-		this.updtePhero();
+		if(PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[3]) && PublicConstants.currentCycle  < PublicConstants.MaxCycle / 2){
+			this.betterSolution = obj.betterSolution;
+			this.updatePheros();
+		}else{
+			this.delta = obj.getDelta();
+			this.updatePhero();
+		}
+		
 		//判断是否下一轮开始
 		if(PublicConstants.currentCycle < PublicConstants.MaxCycle){
 			startIteration();
@@ -220,6 +229,18 @@ public class AcoAgent extends AgentCycle{
 		}
 	}
 	
+	private void sendPheromones(){
+		//向所有agent广播信息素更新值delta
+		PheroMsgContext obj = new PheroMsgContext(this.bestAnt, this.betterSolution, this.bestCost, this.endBestAnt);
+		for(int i=0 ; i < this.allNodes.length; i++){
+			int otherId = this.allNodes[i];
+			if(otherId != this.id){
+				Message msg=new Message(this.id, otherId, AcoAgent.TYPE_VALUE_PHEROMONE, obj);
+				this.sendMessage(msg);
+			}
+		}
+	}
+	
 	private void checkView(){
 		//对于每只蚂蚁进行判断是否收到优先级高的邻居的取值
 		for(int i = 0; i < PublicConstants.countAnt; i++){
@@ -259,8 +280,15 @@ public class AcoAgent extends AgentCycle{
 				}
 				
 				PublicConstants.dataInCycleIncrease(this.localCost, this.bestCost);
-				this.updtePhero();
-				this.sendPheromone();
+				if(PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[3]) && PublicConstants.currentCycle  < PublicConstants.MaxCycle / 2){
+					this.betterSolution = this.selectBetterSolution();
+				
+					this.updatePheros();
+					this.sendPheromones();
+				}else{
+					this.updatePhero();
+					this.sendPheromone();
+				}
 				
 				//判断是否下一轮开始
 				if(PublicConstants.currentCycle < PublicConstants.MaxCycle){
@@ -271,7 +299,6 @@ public class AcoAgent extends AgentCycle{
 				}
 			}
 		}
-		
 	}
 	
 	private int solutionCost(int bestAnt) {
@@ -288,7 +315,7 @@ public class AcoAgent extends AgentCycle{
 		return true;
 	}
 
-	private void updtePhero(){
+	private void updatePhero(){
 		if(this.noHighNode()){
 			return;
 		}
@@ -312,6 +339,46 @@ public class AcoAgent extends AgentCycle{
 			double new_tau = PublicConstants.update_tau(old_tau, this.delta);
 			this.taus.get(oppId).getTau()[myValue][oppValue] = new_tau;
 		}
+		//再对最好解路径信息素更新
+		if(PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[2])){
+			for(int i = 0; i < this.highPriorities.length; i++){
+				int myValue = this.bestValueIndex;
+				int oppId = this.highPriorities[i];
+				int oppValue = this.bestContext.getContext().get(oppId);
+				double old_tau = this.taus.get(oppId).getTau()[myValue][oppValue];
+				double new_tau = PublicConstants.update_tau(old_tau,PublicConstants.computeDelta(this.bestCost));
+				this.taus.get(oppId).getTau()[myValue][oppValue] = new_tau;
+			}
+		}
+	}
+	
+	private void updatePheros(){
+		if(this.noHighNode()){
+			return;
+		}
+		//执行蒸发
+		for(int i = 0; i < this.highPriorities.length; i++){
+			int oppId = this.highPriorities[i];
+			double[][] old_tau = this.taus.get(oppId).getTau();
+			for(int myValue=0;myValue<this.domain.length;myValue++){
+				for(int oppValue=0;oppValue<this.neighbourDomains.get(oppId).length;oppValue++){
+					PublicConstants.evaporate(old_tau, myValue, oppValue);
+				}
+			}
+		}
+		
+		//再对相应路径增加信息素
+		for(int andId : this.betterSolution.keySet()){
+			for(int i = 0; i < this.highPriorities.length; i++){
+				int myValue = this.selfView.get(andId);
+				int oppId = this.highPriorities[i];
+				int oppValue = this.context.get(andId).getContext().get(oppId);
+				double old_tau = this.taus.get(oppId).getTau()[myValue][oppValue];
+				double new_tau = PublicConstants.update_tau(old_tau, this.betterSolution.get(andId));
+				this.taus.get(oppId).getTau()[myValue][oppValue] = new_tau;
+			}
+		}
+		
 		//再对最好解路径信息素更新
 		if(PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[2])){
 			for(int i = 0; i < this.highPriorities.length; i++){
@@ -352,6 +419,35 @@ public class AcoAgent extends AgentCycle{
 		return ret;
 	}
 	
+	private HashMap<Integer, Double> selectBetterSolution(){
+		HashMap<Integer, Double> ret = new HashMap<Integer,Double>();
+		HashMap<Integer, Integer> tmp = new HashMap<Integer, Integer>();
+		int maxAnt = -1;
+		for(int andId: this.currentCosts.keySet()){
+			int cost = this.solutionCost(andId);
+			if(tmp.size() < PublicConstants.betterAntCount){
+				tmp.put(andId, cost);
+				if(maxAnt == -1 || cost > tmp.get(maxAnt))
+					maxAnt = andId;
+			}else if(cost < tmp.get(maxAnt)){
+				tmp.remove(maxAnt);
+				tmp.put(andId, cost);
+				maxAnt = -1;
+				for(int iter : tmp.keySet()){
+					cost = tmp.get(iter);
+					if(maxAnt == -1 || cost > tmp.get(maxAnt))
+						maxAnt = andId;
+				}
+			}
+		}
+		for(int andId : tmp.keySet()){
+			double delta = PublicConstants.computeDelta(tmp.get(andId));
+			ret.put(andId, delta);
+		}
+		tmp = null;
+		return ret;
+	}
+	
 	private boolean isAllAntSelected(){
 		for(int i : this.mark.keySet()){
 			if(this.mark.get(i).booleanValue() == false){
@@ -386,6 +482,7 @@ public class AcoAgent extends AgentCycle{
 			this.selfView.put(antId, -1);
 		}
 		this.bestAnt = -1;
+		this.betterSolution = new HashMap<Integer, Double>(PublicConstants.betterAntCount);
 		this.delta = -1;
 		
 		//直接调用检查函数

@@ -25,6 +25,8 @@ public class PublicConstants {
 	//Max_tau参数
 	public static double Max_tau = 10;
 	
+	public static int betterAntCount = 3;
+	
 	//保存每一轮的代价
 	public static int[] aco_bestCostInCycle = new int[PublicConstants.MaxCycle];   //当前发现的最好的解的代价
 	public static int[] aco_totalCostInCycle = new int[PublicConstants.MaxCycle];   //每一轮里最好蚂蚁的解的代价

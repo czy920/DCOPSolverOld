@@ -1,16 +1,26 @@
 package com.cqu.aco;
 
-import com.cqu.core.Infinity;
+import java.util.HashMap;
 
 public class PheroMsgContext {
 	int ant;
 	double delta;
+	HashMap<Integer, Double> betterSolution;
+	double[] betterDelta;
 	int bestCost;
 	String endBestAnt;
 	public PheroMsgContext(int ant, double delta, int bestCost, String endBestAnt) {
 		super();
 		this.ant = ant;
 		this.delta = delta;
+		this.bestCost = bestCost;
+		this.endBestAnt = endBestAnt;
+	}
+	
+	public PheroMsgContext(int ant, HashMap<Integer, Double> betterSolution, int bestCost, String endBestAnt) {
+		super();
+		this.ant = ant;
+		this.betterSolution = betterSolution;
 		this.bestCost = bestCost;
 		this.endBestAnt = endBestAnt;
 	}
