@@ -670,6 +670,12 @@ public class SolverWindow {
 			paramList.add(lspSpinnerSelectInterval);
 			paramList.add(lspSpinnerSelectProbability);
 		}
+		else if(algorithmType.equals("ALSDSAMGMEVO")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectInterval);
+			paramList.add(lspSpinnerSelectProbability);
+			paramList.add(lspSpinnerSelectNewProbability);
+		}
 		else if(algorithmType.equals("DPOP"))
 		{
 			paramList.add(lspSpinnerMessageTransmissionTime);

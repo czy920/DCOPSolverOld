@@ -19,9 +19,9 @@ import com.cqu.util.CollectionUtil;
 
 public class AgentManager {
 	
-	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "HybridDPOP", "HybridMBDPOP", "AgileDPOP", "ADOPT", "BNBADOPT","ADOPT_K","BDADOPT","SynAdopt","SynAdopt2",
-		"DSA_A","DSA_B","DSA_C","DSA_D","DSA_E","MGM","MGM2","ALSDSA","ALSMGM","ALSMGM2","ALS_DSA","ALS_H1_DSA","ALS_H2_DSA","ALSLMUSDSA4","ALSDSAMGM","MAXSUM","MAXSUM_ADVP",
-		"ACO","ACO_tree","ACO_bf","ACO_phase","ACO_line","ACO_final"};
+	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "HybridDPOP", "HybridMBDPOP", "AgileDPOP", "ADOPT", "BNBADOPT", "ADOPT_K", "BDADOPT",
+		"SynAdopt", "SynAdopt2", "DSA_A", "DSA_B", "DSA_C", "DSA_D", "DSA_E", "MGM", "MGM2", "ALSDSA", "ALSMGM", "ALSMGM2", "ALS_DSA", "ALS_H1_DSA", "ALS_H2_DSA", 
+		"ALSLMUSDSA4", "ALSDSAMGM", "ALSDSAMGMEVO", "MAXSUM", "MAXSUM_ADVP", "ACO", "ACO_tree", "ACO_bf", "ACO_phase", "ACO_line", "ACO_final"};
 	
 	private Map<Integer, Agent> agents;
 	private int treeHeight=0;

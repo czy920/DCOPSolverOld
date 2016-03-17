@@ -12,7 +12,7 @@ import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.cyclequeue.AgentCycleAls;
 import com.cqu.settings.Settings;
 
-public class AlsDsaMgmAgent extends AgentCycleAls{
+public class AlsDsaMgmEvoAgent extends AgentCycleAls{
 	
 	public final static int TYPE_DSA_VALUE_MESSAGE = 0;
 	public final static int TYPE_MGM_VALUE_MESSAGE = 1;
@@ -21,10 +21,15 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 	
 	public final static int DSA = 0;
 	public final static int MGM = 1;
+	public final static String YESYES="YESYES";				//前一个YES或NO是全局的，后一个是对临时的
+	public final static String YESNO="YESNO";				//前一个YES或NO是全局的，后一个是对临时的
+	public final static String NOYES="NOYES";				//前一个YES或NO是全局的，后一个是对临时的
+	public final static String NONO="NONO";					//前一个YES或NO是全局的，后一个是对临时的
 	
 	private static int cycleCountEnd;
 	private static int stayDsaCountInterval;
 	private static double p;
+	private static double interActProbability;
 	
 	private int receivedDsaValueQuantity=0;
 	private int receivedMgmValueQuantity=0;
@@ -50,8 +55,10 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 	protected LinkedList<int[]> localCostList = new LinkedList<int[]>();
 	private int dsaCycle = 0;
 	private int mgmCycle = 0;
+	private int candidate = 0;
+	private String tempTag = null;
 	
-	public AlsDsaMgmAgent(int id, String name, int level, int[] domain) {
+	public AlsDsaMgmEvoAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 	}
 
@@ -61,11 +68,12 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 		cycleCountEnd = Settings.settings.getCycleCountEnd();
 		p = Settings.settings.getSelectProbability();
 		stayDsaCountInterval = Settings.settings.getSelectInterval();
+		interActProbability = Settings.settings.getSelectNewProbability();
 			
-		localCost=2147483647;
-		valueIndex=(int)(Math.random()*(domain.length));
-		neighboursQuantity=neighbours.length;
-		neighboursGain=new int[neighboursQuantity];
+		localCost = 2147483647;
+		valueIndex = (int)(Math.random()*(domain.length));
+		neighboursQuantity = neighbours.length;
+		neighboursGain = new int[neighboursQuantity];
 		neighboursValueIndex = new int[neighboursQuantity];
 		for(int i = 0; i<neighbours.length; i++)
 			neighboursValueIndex[i] = 0;
@@ -86,7 +94,7 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 		}
 	}
 	
-	private void sendGainMessages(){
+	private void sendMgmGainMessages(){
 		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
 			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_MGM_GAIN_MESSAGE, gainValue);
 			this.sendMessage(msg);
@@ -234,12 +242,25 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 				}
 				gainValue=localCost-newLocalCost;
 				//System.out.println("agent"+this.id+"_______"+cycleCount+"_______"+gainValue+"________");
-				sendGainMessages();
+				sendMgmGainMessages();
 			}
 			else{
 				prepareToReset = 2147483647;
 				resetLock = false;
-				valueIndex=(int)(Math.random()*(domain.length));
+
+				if(cycleCount > 1){
+					if(cycleCount % 2 == 0){
+						if(Math.random() < interActProbability)
+							valueIndex = bestValue;
+						else
+							valueIndex = candidate;
+					}
+					else{
+						valueIndex = (int)(Math.random()*(domain.length));
+					}
+				}
+				else
+					valueIndex = (int)(Math.random()*(domain.length));
 				sendDsaValueMessages();
 			}
 		}
@@ -279,7 +300,20 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 			else{
 				prepareToReset = 2147483647;
 				resetLock = false;
-				valueIndex=(int)(Math.random()*(domain.length));
+				
+				if(cycleCount > 1){
+					if(cycleCount % 2 == 0){
+						if(Math.random() < interActProbability)
+							valueIndex = bestValue;
+						else
+							valueIndex = candidate;
+					}
+					else{
+						valueIndex = (int)(Math.random()*(domain.length));
+					}
+				}
+				else
+					valueIndex = (int)(Math.random()*(domain.length));
 				sendDsaValueMessages();
 			}
 		}
@@ -337,20 +371,22 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 				if(resetLock == false){
 					if(theSTEP == DSA && dsaResetLock == false){
 						mgmResetLock = false;
-						//System.out.println("cycle   "+dsacycle+"   !!!!!!!!");
+						//System.out.println("Cycle   "+dsaCycle+"   !!!!!!!!");
 						if(accumulativeCost < bestCostTemp){
 							bestCostTemp = accumulativeCost;
+							tempTag = YES;
 							stayUnchanged = 0;
 							//System.out.println("stayUnchanged   "+stayUnchanged+"   !!!!!!!!");
 						}
 						else{
+							tempTag = NO;
 							stayUnchanged++;
 							//System.out.println("stayUnchanged   "+stayUnchanged+"   !!!!!!!!");
 							if(stayUnchanged >= stayDsaCountInterval){
-								//System.out.println("dsacycle   "+dsacycle+"   !!!!!!!!");
-								//dsacycle = 0;
-								bestCostTemp = 2147483647;
-								stayUnchanged = -2147483646;
+								//System.out.println("dsaCycle   "+dsaCycle+"   !!!!!!!!");
+								//dsaCycle = 0;
+								bestCostTemp = 2147483644;
+								stayUnchanged = 0;
 								prepareToReset = totalHeight + 1;
 								resetLock = true;
 								dsaResetLock = true;
@@ -360,31 +396,46 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 					}
 					else if(theSTEP == MGM && mgmResetLock == false){
 						dsaResetLock = false;
+						stayUnchanged = 0;
 						bestCostTemp3 = bestCostTemp2;
 						bestCostTemp2 = bestCostTemp1;
 						bestCostTemp1 = accumulativeCost;
-						if(bestCostTemp3 == bestCostTemp2 && bestCostTemp2 == bestCostTemp1){
-							//System.out.println("mgmcycle   "+mgmcycle+"   !!!!!!!!");
-							//mgmcycle = 0;
-							bestCostTemp1 = 2147483645;
-							bestCostTemp2 = 2147483646;
-							bestCostTemp3 = 2147483647;
-							prepareToReset = totalHeight + 1;
-							resetLock = true;
-							mgmResetLock = true;
-							sendResetMessages();
+						if(accumulativeCost < bestCostTemp){
+							bestCostTemp = accumulativeCost;
+							tempTag = YES;
+						}
+						else{
+							tempTag = NO;
+							if(bestCostTemp3 == bestCostTemp2 && bestCostTemp2 == bestCostTemp1){
+								//System.out.println("mgmCycle   "+mgmCycle+"   !!!!!!!!");
+								//mgmCycle = 0;
+								bestCostTemp1 = 2147483645;
+								bestCostTemp2 = 2147483646;
+								bestCostTemp3 = 2147483647;
+								prepareToReset = totalHeight + 1;
+								resetLock = true;
+								mgmResetLock = true;
+								sendResetMessages();
+							}
 						}
 					}
 				}
 				
 				if(accumulativeCost < bestCost){
-					bestValue = valueIndexList.removeFirst();
 					bestCost = accumulativeCost;
-					isChanged = YES;
+					bestValue = valueIndexList.removeFirst();
+					candidate = bestValue;
+					isChanged = YESYES;
 				}
 				else{
-					valueIndexList.removeFirst();
-					isChanged = NO;
+					if(tempTag == YES){
+						candidate = valueIndexList.removeFirst();
+						isChanged = NOYES;
+					}
+					else{
+						valueIndexList.removeFirst();
+						isChanged = NONO;
+					}
 				}
 				
 				if(bestCostInCycle.length > AlsCycleCount){
@@ -419,6 +470,52 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 			stopRunning();
 		}
 		//System.out.println("Agent "+this.name+"~~~~~~"+AlsCycleCount);
+	}
+	
+	protected void disposeAlsBestMessage(Message msg){
+		String Temp = (String)msg.getValue();
+		if(Temp == YESYES){
+			bestValue = valueIndexList.remove();
+			candidate = bestValue;
+			isChanged = YESYES;
+		}
+		else if(Temp == YESNO){
+			bestValue = valueIndexList.remove();
+			isChanged = YESNO;
+		}
+		else if(Temp == NOYES){
+			candidate = valueIndexList.remove();
+			isChanged = NOYES;
+		}
+		else if(Temp == NONO){
+			valueIndexList.remove();
+			isChanged = NONO;
+		}
+		else{
+			System.out.println("wrong in AlsBestMessage!!!!!!!!");
+			int a = 1;
+			a=a/0;
+		}
+		if(this.isLeafAgent() == false)
+			sendAlsBestMessage();
+		
+		//System.out.println("Agent "+this.name+"~~~best~~~"+AlsCycleCount);
+		
+		//if(id == 40){
+		//	System.out.println("Agent "+this.id+"~~~~bestMessage~~~"+cycleCount);
+		//	if(cycleCount > 10){
+		//		cycleCount++;
+		//	}
+		//}
+		
+		if(valueIndexList.isEmpty() == true){
+			valueIndex = bestValue;
+			stopRunning();
+			
+			//if(id == 40 && cycleCount != 19){
+			//	System.out.println("~~~"+cycleCount+"~~~wrong!!!!!!!!");
+			//}
+		}
 	}
 	
 	protected void AlsWork(){

@@ -12,7 +12,7 @@ public abstract class AgentCycleAls extends AgentCycle{
 	public final static int TYPE_ALSCOST_MESSAGE=345;
 	public final static int TYPE_ALSBEST_MESSAGE=346;
 	
-	public final static String YES="Yes";
+	public final static String YES="YES";
 	public final static String NO="NO";
 	
 	protected int AlsCycleCount = 0;

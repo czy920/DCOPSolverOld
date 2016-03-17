@@ -36,7 +36,7 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 	private static int cycleCountEnd;
 	private static int stayDsaCountInterval;						//设置DSA操作若干轮无优化效果及重启
 	private static double p;
-	private static double selectSuggesterP = 1;
+	private static double selectSuggesterP = 0;
 	private static double selectAccepterP;
 	
 	private int receivedQuantity=0;

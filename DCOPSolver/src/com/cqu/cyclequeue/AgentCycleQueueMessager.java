@@ -195,7 +195,7 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 	 */
 	protected void work(int i){}
 	/*
-	 * 添加localSearchCheck()()方法，用于局部搜索算法中避免错误
+	 * 添加localSearchCheck()方法，用于局部搜索算法中避免错误
 	 */
 	protected void localSearchCheck(){};
 	
