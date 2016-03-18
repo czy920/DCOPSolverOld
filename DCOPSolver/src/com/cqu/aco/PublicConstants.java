@@ -13,7 +13,7 @@ public class PublicConstants {
 	}
 	//轮数
 	public static int MaxCycle = 100;
-	public static int currentCycle;
+
 	//alpha参数
 	public static int alpha = 2;
 	//beta参数
@@ -26,6 +26,9 @@ public class PublicConstants {
 	public static double Max_tau = 10;
 	
 	public static int betterAntCount = 3;
+	
+	//用于流水线方式时定义存储结构的长度，分析应该是树的深度+2
+	public static int dataLength = 50;   
 	
 	//保存每一轮的代价
 	public static int[] aco_bestCostInCycle = new int[PublicConstants.MaxCycle];   //当前发现的最好的解的代价
@@ -62,9 +65,7 @@ public class PublicConstants {
 	}
 	
 	//保存每个回合的totalCost
-	protected static void dataInCycleIncrease(int totalcost, int bestcost) {
-		if (currentCycle == 0) // 除去初始化时Cost混乱时的统计
-			return;
+	protected static void dataInCycleIncrease(int cycle, int totalcost, int bestcost) {
 		
 		/*if (currentCycle > aco_totalCostInCycle.length) {
 			int[] templist1 = new int[2 * aco_totalCostInCycle.length];
@@ -77,8 +78,8 @@ public class PublicConstants {
 			aco_bestCostInCycle = templist2;
 		}*/
 		
-		aco_totalCostInCycle[currentCycle - 1] = totalcost;
-		aco_bestCostInCycle[currentCycle - 1] = bestcost;
+		aco_totalCostInCycle[cycle] = totalcost;
+		aco_bestCostInCycle[cycle] = bestcost;
 	}
 
 }
