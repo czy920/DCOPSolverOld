@@ -20,24 +20,19 @@ import com.cqu.settings.Settings;
 //当需要两者交互时要注意先后顺序
 //Suggester遍历选择value~~~~~~~~~~~~
 
-public class AlsLmusDsa4Agent extends AgentCycleAls{
+public class AlsMluDsaAgent extends AgentCycleAls{
 	
 	public final static int TYPE_STEP1_MESSAGE = 1;
 	public final static int TYPE_STEP2_MESSAGE = 2;
-	public final static int TYPE_STEP3_MESSAGE = 3;
 	public final static int TYPE_STEPDSA_MESSAGE = 4;
 	public final static int TYPE_RESET_MESSAGE = 5;
 	
-	public final static String NONE = "NONE";
 	public final static String SUGGESTER = "SUGGESTER";
-	public final static String ACCEPTER1 = "ACCEPTER1";
-	public final static String ACCEPTER2 = "ACCEPTER2";
+	public final static String ACCEPTER = "ACCEPTER";
 	
 	private static int cycleCountEnd;
 	private static int stayDsaCountInterval;						//设置DSA操作若干轮无优化效果及重启
 	private static double p;
-	private static double selectSuggesterP = 0;
-	private static double selectAccepterP = 0;
 	
 	private int receivedQuantity=0;
 	private int cycleCount=0;
@@ -54,7 +49,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 	private int waitTime = 0;
 	private int[] mySuggestValue;									//给自己的建议值
 	private int[][] myNeighboursSuggestTable;						//给邻居的建议值
-	private int[] myNeighboursSuggestAgainTable;					//第二次接受者发送的建议值
 	private int mySuggestersNumber;									//周围建议者的数量
 	private int mySuggesters[];										//各建议者的标号
 	private int mySuggestedValue[];									//建议者发来的建议值
@@ -66,7 +60,7 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 	protected LinkedList<int[]> localCostList = new LinkedList<int[]>();
 	
 	
-	public AlsLmusDsa4Agent(int id, String name, int level, int[] domain) {
+	public AlsMluDsaAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 	}
 	
@@ -77,8 +71,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 		cycleCountEnd = Settings.settings.getCycleCountEnd();
 		stayDsaCountInterval = Settings.settings.getSelectInterval();
 		p = Settings.settings.getSelectProbability();
-		//selectSuggesterP = Settings.settings.getSelectProbabilityA();
-		//selectAccepterP = Settings.settings.getSelectProbabilityB();
 		
 		localCost = 2147483647;
 		valueIndex = (int)(Math.random()*(domain.length));
@@ -91,20 +83,15 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 		for(int i = 0; i < neighbours.length; i++){
 			neighboursTag[i] = 0;
 		}
-		if(Math.random() < selectSuggesterP){
-			myIdentity = SUGGESTER;
-			myTag = (int)(100*Math.random()+myTagStandard)*neighboursQuantity;
-		}
-		else{
-			myIdentity = NONE;
-		}
+		myIdentity = SUGGESTER;
+		myTag = (int)(100*Math.random()+myTagStandard)*neighboursQuantity;
+		
 		mySuggestersNumber = 0;
 		mySuggesters = new int[neighboursQuantity];
 		mySuggestValueTag = 0;
 		mySuggestValue = new int[domain.length];
 		myNeighboursSuggestTable = new int[domain.length][neighboursQuantity];
 		mySuggestedValue = new int[neighboursQuantity];
-		myNeighboursSuggestAgainTable = new int[neighboursQuantity];
 		buildMyTable();
 		sendStep1Messages();
 	}
@@ -170,33 +157,18 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 	
 	
 	private void sendStep1Messages(){
-		if(myIdentity == NONE){
-			int[] box = new int[1];
-			box[0] = valueIndex;
-			for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++){
-				Message msg = new Message(this.id, neighbours[neighbourIndex], TYPE_STEP1_MESSAGE, box);
-				this.sendMessage(msg);
-			}
-		}
-		else if(myIdentity == SUGGESTER){
-			int[] box = new int[2];
-			box[0] = valueIndex;
-			box[1] = myTag;
-			for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++){
-				Message msg = new Message(this.id, neighbours[neighbourIndex], TYPE_STEP1_MESSAGE, box);
-				this.sendMessage(msg);
-			}
-		}
-		else{
-			System.out.println("wrong in sendStep1Messages!!!!!!!!");
-			int a = 1;
-			a = a/0;
+		int[] box = new int[2];
+		box[0] = valueIndex;
+		box[1] = myTag;
+		for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++){
+			Message msg = new Message(this.id, neighbours[neighbourIndex], TYPE_STEP1_MESSAGE, box);
+			this.sendMessage(msg);
 		}
 	}
 
 
 	private void sendStep2Messages(){
-		if(myIdentity == NONE){
+		if(myIdentity == ACCEPTER){
 			int[] box = new int[1];
 			box[0] = valueIndex;
 			for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++){
@@ -220,40 +192,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 		}
 	}
 
-
-	private void sendStep3Messages(){
-		if(myIdentity == NONE || myIdentity == SUGGESTER || myIdentity == ACCEPTER2){
-			int[] box = new int[1];
-			box[0] = valueIndex;
-			for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
-				Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_STEP3_MESSAGE, box);
-				this.sendMessage(msg);
-			}
-		}
-		else if(myIdentity == ACCEPTER1){
-			for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++){
-				if(neighbourIndex != mySuggesters[0]){
-					int[] box = new int[2];
-					box[0] = valueIndex;
-					box[1] = myNeighboursSuggestAgainTable[neighbourIndex];
-					Message msg = new Message(this.id, neighbours[neighbourIndex], TYPE_STEP3_MESSAGE, box);
-					this.sendMessage(msg);
-				}
-				else{
-					int[] box = new int[1];
-					box[0] = valueIndex;
-					Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_STEP3_MESSAGE, box);
-					this.sendMessage(msg);
-				}
-			}
-		}
-		else{
-			System.out.println("wrong in sendStep3Messages!!!!!!!!");
-			int a = 1;
-			a = a/0;
-		}
-	}
-	
 	
 	private void sendStepDsaMessages(){
 		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
@@ -304,9 +242,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 		else if(msg.getType() == TYPE_STEP2_MESSAGE){
 			disposeStep2Message(msg);
 		}
-		else if(msg.getType() == TYPE_STEP3_MESSAGE){
-			disposeStep3Message(msg);
-		}
 		else if(msg.getType() == TYPE_STEPDSA_MESSAGE){
 			disposeStepDsaMessage(msg);
 		}
@@ -346,19 +281,9 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 		}
 		
 		int[] tempBox = (int[])msg.getValue();
-		if(myIdentity == NONE){
+		if(tempBox.length == 2){
 			neighboursValueIndex[senderIndex] = tempBox[0];
-		}
-		else if(myIdentity == SUGGESTER){
-			if(tempBox.length == 2){
-				neighboursValueIndex[senderIndex] = tempBox[0];
-				neighboursTag[senderIndex] = tempBox[1];
-			}
-		}
-		else{
-			System.out.println("wrong!!!!!!!!~~~in~~~" + STEP + " ~ Agent "+id+"~~~I am " + myIdentity);
-			int a = 1;
-			a=a/0;
+			neighboursTag[senderIndex] = tempBox[1];
 		}
 		
 		if(receivedQuantity==0){
@@ -369,18 +294,13 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 				//!!!!!!!要获取localCost的值，该方法必须要位于localCost()方法之后，!!!!!!!
 				AlsWork();
 				
-				if(myIdentity == NONE){
-					DsaWork();
-					sendStep2Messages();
-				}
-				else if(myIdentity == SUGGESTER){
 					for(int i = 0; i < neighboursQuantity; i++){
 						if(myTag <= neighboursTag[i])
 						{
 							waitTime++;
 							myTagStandard = (int)(myTagStandard*(1+1/(waitTime*100)));
 							//myTagStandard = (int)(myTagStandard*1.01);
-							myIdentity = NONE;
+							myIdentity = ACCEPTER;
 							DsaWork();
 							sendStep2Messages();
 							return;
@@ -392,12 +312,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 					valueIndex = mySuggestValue[((int)mySuggestValueTag)%domain.length];
 					mySuggestValueTag = mySuggestValueTag+0.5;
 					sendStep2Messages();
-				}
-				else{
-					System.out.println("wrong!!!!!!!!~~~in~~~" + STEP + " ~ Agent "+id+"~~~I am " + myIdentity);
-					int a = 1;
-					a=a/0;
-				}
 			}
 			bestCostTemp = 2147483647;
 		}
@@ -420,7 +334,7 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 		int[] tempBox = (int[])msg.getValue();
 		neighboursValueIndex[senderIndex] = tempBox[0];
 		if(tempBox.length == 2){
-			if(myIdentity == NONE){
+			if(myIdentity == ACCEPTER){
 				mySuggesters[mySuggestersNumber] = senderIndex;
 				mySuggestedValue[mySuggestersNumber] = tempBox[1];
 				mySuggestersNumber++;
@@ -434,100 +348,49 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 		
 		if(receivedQuantity==0){
 			localCost=localCost();
-			
 			//!!!!!!!!!!!!!!!!!!!!进行ALS框架操作，调用父类方法!!!!!!!!!!!!!!!!!!!!
 			//!!!!!!!要获取localCost的值，该方法必须要位于localCost()方法之后，!!!!!!!!
 			AlsWork();
 			
-			if(myIdentity == NONE){
+			if(myIdentity == ACCEPTER){
 				if(mySuggestersNumber == 0){
 					DsaWork();
 				}
 				else{
-					myIdentity = ACCEPTER2;
-					DsaWork();
-				}
-			}
-			sendStep3Messages();
-		}
-	}
-	
-	
-	private void disposeStep3Message(Message msg) {
-		STEP = 3;
-		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
-		
-		int senderIndex=0;
-		int senderId=msg.getIdSender();
-		for(int i=0; i<neighbours.length; i++){
-			if(neighbours[i]==senderId){
-				senderIndex=i;
-				break;
-			}
-		}
-		
-		int[] tempBox = (int[])msg.getValue();
-		neighboursValueIndex[senderIndex] = tempBox[0];
-		if(tempBox.length == 2){
-			if(myIdentity == ACCEPTER2){
-				mySuggesters[mySuggestersNumber] = senderIndex;
-				mySuggestedValue[mySuggestersNumber] = tempBox[1];
-				mySuggestersNumber++;
-			}
-			else if(myIdentity == SUGGESTER){
-				System.out.println("wrong!!!!!!!!~~~in~~~" + STEP + " ~ Agent "+id+"~~~I am " + myIdentity);
-				int a = 1;
-				a=a/0;
-			}
-		}
-		
-		if(receivedQuantity==0){
-			localCost=localCost();
-			//!!!!!!!!!!!!!!!!!!!!进行ALS框架操作，调用父类方法!!!!!!!!!!!!!!!!!!!!
-			//!!!!!!!要获取localCost的值，该方法必须要位于localCost()方法之后，!!!!!!!!
-			AlsWork();
-			
-			if(myIdentity == NONE){
-				DsaWork();
-			}
-			else if(myIdentity == ACCEPTER2){
-				
-				int mySuggestersList[] = new int[neighboursQuantity];
-				for(int i = 0; i < mySuggestersNumber; i++){
-					mySuggestersList[i] = 0;
-				}
-				for(int i = 0; i < mySuggestersNumber; i++){
-					mySuggestersList[mySuggesters[i]] = 1;
-				}
-				
-				int selectValueIndex = 0;
-				int selectCost = 2147483647;
-				for(int i = 0; i < domain.length; i++){
+					int mySuggestersList[] = new int[neighboursQuantity];
+					for(int i = 0; i < mySuggestersNumber; i++){
+						mySuggestersList[i] = 0;
+					}
+					for(int i = 0; i < mySuggestersNumber; i++){
+						mySuggestersList[mySuggesters[i]] = 1;
+					}
 					
-					int tempSelectCost = 0;
-					for(int j = 0; j < neighbours.length; j++){
-						if(mySuggestersList[j] == 1){
-							if(this.id < neighbours[j])
-								tempSelectCost += constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];
-							else
-								tempSelectCost += constraintCosts.get(neighbours[j])[neighboursValueIndex[j]][i];
+					int selectValueIndex = 0;
+					int selectCost = 2147483647;
+					for(int i = 0; i < domain.length; i++){
+						
+						int tempSelectCost = 0;
+						for(int j = 0; j < neighbours.length; j++){
+							if(mySuggestersList[j] == 1){
+								if(this.id < neighbours[j])
+									tempSelectCost += constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];
+								else
+									tempSelectCost += constraintCosts.get(neighbours[j])[neighboursValueIndex[j]][i];
+							}
+						}
+						if(tempSelectCost < selectCost){
+							selectValueIndex = i;
+							selectCost = tempSelectCost;
 						}
 					}
-					if(tempSelectCost < selectCost){
-						selectValueIndex = i;
-						selectCost = tempSelectCost;
-					}
+					
+					valueIndex = selectValueIndex;
 				}
-				
-				valueIndex = selectValueIndex;
 			}
-			/*
-			 * 一轮结束初始化数据
-			 */
+			
 			for(int i = 0; i < neighbours.length; i++){
 				neighboursTag[i] = 0;
 			}
-			//myIdentity = NONE;
 			mySuggestersNumber = 0;
 			
 			sendStepDsaMessages();
@@ -562,7 +425,6 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 			AlsWork();
 			if(myIdentity != SUGGESTER)
 				DsaWork();
-			
 			if(prepareToReset > 0){
 				sendStepDsaMessages();
 			}
@@ -570,12 +432,9 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 				//valueIndex = (int)(Math.random()*(domain.length));
 				
 				prepareToReset = 2147483647;
-				if(Math.random() < selectSuggesterP){
-					myIdentity = SUGGESTER;
-					myTag = (int)(100*Math.random()+myTagStandard)*neighboursQuantity;
-				}
-				else
-					myIdentity = NONE;
+				myIdentity = SUGGESTER;
+				myTag = (int)(100*Math.random()+myTagStandard)*neighboursQuantity;
+				
 				sendStep1Messages();
 				//valueIndex = (int)(Math.random()*(domain.length));				//不要重置，效果不好
 			}

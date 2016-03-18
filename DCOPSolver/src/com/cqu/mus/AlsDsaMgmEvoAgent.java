@@ -192,6 +192,7 @@ public class AlsDsaMgmEvoAgent extends AgentCycleAls{
 			else{
 				prepareToReset = 2147483647;
 				resetLock = false;
+				//valueIndex = candidate; 
 				sendMgmValueMessages();
 			}
 		}
