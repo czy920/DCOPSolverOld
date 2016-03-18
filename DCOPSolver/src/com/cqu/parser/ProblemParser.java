@@ -35,6 +35,7 @@ public class ProblemParser {
 	private static final String TYPE_GRAPH_COLORING="DisCSP";
 	
 	private String xmlPath;
+	private String problemBenchmark;//For SensorNetwork
 	private String problemFormat;
 	private String problemType;
 	private String treeGeneratorType;
@@ -68,9 +69,10 @@ public class ProblemParser {
 			return null;
 		}
 		
-		ContentParser parser=null;
-		if(problemFormat.equals(FORMAT_DISCHOCO))
-		{
+		ContentParser parser = null;
+		if(problemFormat.equals(FORMAT_DISCHOCO) && problemBenchmark.equals("GSensorDCSP")){
+			parser = new ParserSensorNetwork(root,problemType);
+		}else if(problemFormat.equals(FORMAT_DISCHOCO)){
 			parser=new ParserGeneral(root, problemType);
 		}else if(problemFormat.equals(FORMAT_FRODO))
 		{
@@ -243,7 +245,9 @@ public class ProblemParser {
 		{
 			return false;
 		}
-		problemFormat=element.getAttributeValue(FORMAT);
+		problemFormat = element.getAttributeValue(FORMAT);
+		problemBenchmark = element.getAttributeValue("benchmark");
+//		System.out.println(problemBenchmark);
 		if(problemFormat.equals(FORMAT_DISCHOCO))
 		{
 			problemType=element.getAttributeValue(TYPE);
