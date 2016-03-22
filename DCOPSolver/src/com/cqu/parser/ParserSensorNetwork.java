@@ -148,11 +148,11 @@ public class ParserSensorNetwork extends ContentParser{
 		for(int i=0; i<f.size(); i++){//is compatibility?
 			for(int j=0; j<s.size(); j++){
 				if(relation.containsKey(f.get(i)) == false){
-					costs[i*f.size()+j] = 1000;
+					costs[i*s.size()+j] = 1000;
 				}else if(relation.get(f.get(i)).contains(s.get(j)) == false){
-					costs[i*f.size()+j] = 1000;
+					costs[i*s.size()+j] = 1000;
 				}else{
-					costs[i*f.size()+j] = 0;
+					costs[i*s.size()+j] = 0;
 				}
 			}
 		}
@@ -160,14 +160,15 @@ public class ParserSensorNetwork extends ContentParser{
 		for(int i=0; i<f.size(); i++){
 			for(int j=0; j<s.size(); j++){
 				if(i == j){
-					costs[i*f.size()+j] = 1000;
+					costs[i*s.size()+j] = 1000;
 				}else{
-					costs[i*f.size()+j] = 0;
+					costs[i*s.size()+j] = 0;
 				}
 				
 			}
 		}
 	    return costs;
+	    
 	}
 	
 	private int[] interCosts(List<Integer> f,List<Integer> s){

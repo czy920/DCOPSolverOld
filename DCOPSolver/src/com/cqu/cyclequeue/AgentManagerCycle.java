@@ -167,10 +167,18 @@ public class AgentManagerCycle {
 			String[] neighbourAgentCostNames=problem.agentConstraintCosts.get(agentId);
 			for(int i=0;i<neighbourAgentCostNames.length;i++)
 			{
-				constraintCosts.put(neighbourAgentIds[i], 
-						CollectionUtil.toTwoDimension(problem.costs.get(neighbourAgentCostNames[i]), 
-								problem.domains.get(problem.agentDomains.get(agentId)).length, 
-								problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])).length));
+				if(agentId < neighbourAgentIds[i]){
+					constraintCosts.put(neighbourAgentIds[i], 
+							CollectionUtil.toTwoDimension(problem.costs.get(neighbourAgentCostNames[i]), 
+									problem.domains.get(problem.agentDomains.get(agentId)).length, 
+									problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])).length));
+				}else{
+					int[][] temp = CollectionUtil.toTwoDimension(problem.costs.get(neighbourAgentCostNames[i]), 
+							problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])).length, 
+							problem.domains.get(problem.agentDomains.get(agentId)).length);
+					
+					constraintCosts.put(neighbourAgentIds[i], CollectionUtil.reverse(temp));
+				}
 			}
 			
 			if(agentType.equals("ACO")||agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||
