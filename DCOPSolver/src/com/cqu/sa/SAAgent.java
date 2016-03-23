@@ -1,153 +1,138 @@
-package com.cqu.dsa;
+package com.cqu.sa;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.lang.Math;
 
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.ResultCycle;
 import com.cqu.cyclequeue.AgentCycle;
+import com.cqu.dsa.DsaA_Agent;
 import com.cqu.main.Debugger;
+import com.cqu.mgm.MgmAgent;
 import com.cqu.settings.Settings;
 
-public class DsaE_Agent extends AgentCycle {
+public class SAAgent extends AgentCycle{
 	
-	public final static int TYPE_VALUE_MESSAGE=0;
+	public final static int TYPE_VALUE_MESSAGE=1;
 	private static int cycleCountEnd;
-	private static double p;
+	private final static double T=800;
+	private final static double Tmin=20;
+	private final static double r=0.5;
+	private double t = T;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
 	public final static String KEY_NCCC="KEY_NCCC";
-
-	private int nccc = 0;
-	private int localMinCost;
-	private int receivedQuantity;
-	private int cycleCount=0;
-	private int neighboursQuantity=0;	
-	private HashMap<Integer, Integer> neighboursValueIndex;			//<neighbour 的 Index, neighbourValue 的  Index>
-	//
 	
-	public DsaE_Agent(int id, String name, int level, int[] domain) {
+	private int nccc = 0;
+	private int selectValueIndex;
+	private int receivedQuantity;
+	private int cycleCount;
+	private int neighboursQuantity;	
+	private int neighboursGain[];
+	private HashMap<Integer, Integer> neighboursValueIndex;			//<neighbour 鐨� Index, neighbourValue 鐨�  Index>
+	
+	public SAAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
 	}
 	
-	
 	protected void initRun() {
 		super.initRun();
-
-		cycleCountEnd = Settings.settings.getCycleCountEnd();
-		p = Settings.settings.getSelectProbability();
 		
-		receivedQuantity=0;
+		cycleCountEnd = Settings.settings.getCycleCountEnd();
+		
 		localCost=2147483647;
 		valueIndex=(int)(Math.random()*(domain.length));
+		selectValueIndex=0;
+		receivedQuantity=0;
+		cycleCount=0;
 		neighboursValueIndex=new HashMap<Integer, Integer>();
 		neighboursQuantity=neighbours.length;
+		neighboursGain=new int[neighboursQuantity];
 		for(int i=0; i<neighbours.length; i++)
 			neighboursValueIndex.put((Integer)i, (Integer)0);
-		localMinCost();
 		sendValueMessages();
 	}
 	
-	
 	private void sendValueMessages(){
 		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
-			Message msg=new Message(this.id, neighbours[neighbourIndex], DsaE_Agent.TYPE_VALUE_MESSAGE, valueIndex);
+			Message msg=new Message(this.id, neighbours[neighbourIndex], DsaA_Agent.TYPE_VALUE_MESSAGE, valueIndex);
 			this.sendMessage(msg);
 		}
 	}
-
 	
-	@Override
-	protected void disposeMessage(Message msg) {
-		// TODO Auto-generated method stub
-		if(receivedQuantity==0)
+	protected void disposeMessage(Message msg){
+		if (receivedQuantity==0)
 			cycleCount++;
 		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
+		
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
-		for(int i=0; i<neighbours.length; i++){
-			if(neighbours[i]==senderId){
-				senderIndex=i;
+		
+		for (int neighbourindex=0; neighbourindex<neighbours.length;neighbourindex++){
+			if(senderId == neighbours[neighbourindex]){
+				senderIndex = neighbourindex;
 				break;
 			}
 		}
+		
 		neighboursValueIndex.put((Integer)senderIndex, (Integer)msg.getValue());
 		
-		if(receivedQuantity==0){
-			localCost=localCost();
-			
-			if(cycleCount>=cycleCountEnd){
-				stopRunning();
-			}else{
-				int[] selectMinCost=new int[domain.length];
-				for(int i=0; i<domain.length; i++){
-					selectMinCost[i]=0;
-				}
-				for(int i=0; i<domain.length; i++){
-					for(int j=0; j<neighbours.length; j++){
-//						if(this.id < neighbours[j])
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-//						else
-//							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
-					}
+        if (receivedQuantity == 0){
+        	if (t >Tmin){
+        		
+                localCost = localCost();
+				
+				int saved_localCost = 0;
+				for (int neighbourindex=1;neighbourindex<neighboursQuantity;neighbourindex++){
+//					if(this.id < neighbours[neighbourindex])      
+						saved_localCost+=constraintCosts.get(neighbours[neighbourindex])[selectValueIndex][neighboursValueIndex.get(neighbourindex)];		
+//					else
+//						saved_localCost+=constraintCosts.get(neighbours[neighbourindex])[neighboursValueIndex.get(neighbourindex)][selectValueIndex];	
 				}
 				
-				int selectOneMinCost = selectMinCost[0];
-				int selectValueIndex = 0;
-				for(int i = 1; i < domain.length; i++){
-					if(selectOneMinCost >= selectMinCost[i] || selectValueIndex != valueIndex){
-						selectOneMinCost = selectMinCost[i];
-						selectValueIndex = i;
-					}
+				int randomValueIndex = (int)(Math.random()*(domain.length));
+				int newLocalCost = 0;
+				
+				for (int neighbourindex=1;neighbourindex<neighboursQuantity;neighbourindex++){
+//					if(this.id < neighbours[neighbourindex])      
+						newLocalCost+=constraintCosts.get(neighbours[neighbourindex])[randomValueIndex][neighboursValueIndex.get(neighbourindex)];		
+//					else
+//						newLocalCost+=constraintCosts.get(neighbours[neighbourindex])[neighboursValueIndex.get(neighbourindex)][randomValueIndex];	
 				}
-					
-				if(selectOneMinCost < localCost){
+				
+				if (newLocalCost < localCost){
+					selectValueIndex = randomValueIndex;
 					valueIndex = selectValueIndex;
-				}else if(selectOneMinCost == localCost){
-					if(Math.random() < p){
+				}else if (newLocalCost > localCost){
+					if(Math.random() < Math.exp(-(newLocalCost - localCost)/t)){
+						selectValueIndex = randomValueIndex;
 						valueIndex = selectValueIndex;
 					}
 				}
-				nccc++;
-				sendValueMessages();
-			}
-		}
+				
+				t=t*r;
+				sendValueMessages();	
+				
+        	}else{
+        		stopRunning();
+        	}
+        }
+
 	}
-	
 	
 	private int localCost(){
 		int localCostTemp=0;
-		for(int i=0; i<neighbours.length; i++){
-			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];
+		for(int i=0; i<neighboursQuantity; i++){
+//			if(this.id < neighbours[i])
+				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
+//			else
+//				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex.get(i)][valueIndex];	
 		}
 		return localCostTemp;
 	}
-	
-	
-	private void localMinCost(){
-		localMinCost=localCost;
-		for(int i=0; i<domain.length; i++){
-			int tempLocalCost=0;
-			for(int j=0; j<neighboursQuantity; j++){
-				
-				int oneMinCost;
-				oneMinCost=constraintCosts.get(neighbours[j])[i][0];
-				
-				for(int k=1; k<neighbourDomains.get(neighbours[j]).length; k++){	
-					if(oneMinCost>constraintCosts.get(neighbours[j])[i][k])
-						oneMinCost=constraintCosts.get(neighbours[j])[i][k];
-				}
-				tempLocalCost+=oneMinCost;
-			}
-			if(tempLocalCost<localMinCost)
-				localMinCost=tempLocalCost;	
-		}
-	}
-	
 	
 	protected void runFinished(){
 		super.runFinished();
@@ -163,11 +148,9 @@ public class DsaE_Agent extends AgentCycle {
 		System.out.println("Agent "+this.name+" stopped!");
 	}
 	
-	
 	@Override
 	public Object printResults(List<Map<String, Object>> results) {
 		// TODO Auto-generated method stub
-		
 		double totalCost=0;
 		int ncccTemp = 0;
 		for(Map<String, Object> result : results){
@@ -193,37 +176,37 @@ public class DsaE_Agent extends AgentCycle {
 		return ret;
 	}
 
+	private void increaseNccc(){
+		nccc++;
+	}
 	
 	@Override
-	public String easyMessageContent(Message msg, AgentCycle sender,
-			AgentCycle receiver) {
-		// TODO Auto-generated method stub
-		return "from "+sender.getName()+" to "+receiver.getName()+" type "+DsaE_Agent.messageContent(msg);
+	public String easyMessageContent(Message msg, AgentCycle sender, AgentCycle receiver) {
+		// TODO 鑷姩鐢熸垚鐨勬柟娉曞瓨鏍�
+		return "from "+sender.getName()+" to "+receiver.getName()+" type "+MgmAgent.messageContent(msg);
 	}
-
 	
 	public static String messageContent(Message msg){
 		switch (msg.getType()) {
-		case DsaE_Agent.TYPE_VALUE_MESSAGE:
-		{
+		case MgmAgent.TYPE_VALUE_MESSAGE :
 			int val=(Integer) msg.getValue();
 			int valueIndex=val;
 			return "value["+valueIndex+"]";
-		}
+		case MgmAgent.TYPE_GAIN_MESSAGE :
+			int gainValue=(Integer) msg.getValue();
+			return "gain["+gainValue+"]";
 		default:
 			return "unknown";
 		}
 	}
 	
-	
 	@Override
 	protected void messageLost(Message msg) {
-		// TODO Auto-generated method stub
+		// TODO 鑷姩鐢熸垚鐨勬柟娉曞瓨鏍�
 		if(Debugger.debugOn==true)
 		{
 			System.out.println(Thread.currentThread().getName()+": message lost in agent "+
 					this.name+" "+this.msgMailer.easyMessageContent(msg));
 		}
 	}
-
 }

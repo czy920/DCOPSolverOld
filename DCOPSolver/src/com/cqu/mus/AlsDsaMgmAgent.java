@@ -161,10 +161,8 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 					}
 					for(int i=0; i<domain.length; i++){
 						for(int j=0; j<neighbours.length; j++){
-							if(this.id < neighbours[j])
 								selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];		
-							else
-								selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex[j]][i];	
+							
 						}
 					}
 					int selectValueIndex=0;
@@ -219,10 +217,7 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 				}
 				for(int i=0; i<domain.length; i++){
 					for(int j=0; j<neighboursQuantity; j++){
-						if(this.id < neighbours[j])
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];		
-						else
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex[j]][i];		
+							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];	
 					}
 				}
 				int newLocalCost=localCost;
@@ -467,10 +462,7 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighbours.length; i++){
-			if(this.id < neighbours[i])
 				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex[i]];
-			else
-				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex[i]][valueIndex];
 		}
 		return localCostTemp;
 	}
