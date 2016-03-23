@@ -161,10 +161,7 @@ public class AlsDsa_H2_Agent extends AgentCycleAls {
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighbours.length; i++){
-			if(this.id < neighbours[i])
-				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
-			else
-				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex.get(i)][valueIndex];	
+			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
 		}
 		return localCostTemp;
 	}
@@ -177,20 +174,11 @@ public class AlsDsa_H2_Agent extends AgentCycleAls {
 			for(int j=0; j<neighboursQuantity; j++){
 				
 				int oneMinCost;
-				if(this.id < neighbours[j])
-					oneMinCost=constraintCosts.get(neighbours[j])[i][0];
-				else
-					oneMinCost=constraintCosts.get(neighbours[j])[0][i];
+				oneMinCost=constraintCosts.get(neighbours[j])[i][0];
 				
 				for(int k=1; k<neighbourDomains.get(neighbours[j]).length; k++){	
-					if(this.id < neighbours[j]){
-						if(oneMinCost>constraintCosts.get(neighbours[j])[i][k])
-							oneMinCost=constraintCosts.get(neighbours[j])[i][k];
-					}
-					else{
-						if(oneMinCost>constraintCosts.get(neighbours[j])[k][i])
-							oneMinCost=constraintCosts.get(neighbours[j])[k][i];						
-					}
+					if(oneMinCost>constraintCosts.get(neighbours[j])[i][k])
+						oneMinCost=constraintCosts.get(neighbours[j])[i][k];
 				}
 				tempLocalCost+=oneMinCost;
 			}
