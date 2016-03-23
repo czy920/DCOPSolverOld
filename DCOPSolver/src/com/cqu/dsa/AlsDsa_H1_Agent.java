@@ -121,10 +121,7 @@ public class AlsDsa_H1_Agent  extends AgentCycleAls{
 						}
 						for(int i=0; i<domain.length; i++){
 							for(int j=0; j<neighbours.length; j++){
-								if(this.id < neighbours[j])
-									selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-								else
-									selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];	
+									selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];
 							}					
 						}				
 						int selectValueIndex = 0;

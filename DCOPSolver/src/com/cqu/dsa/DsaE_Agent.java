@@ -89,10 +89,10 @@ public class DsaE_Agent extends AgentCycle {
 				}
 				for(int i=0; i<domain.length; i++){
 					for(int j=0; j<neighbours.length; j++){
-						if(this.id < neighbours[j])
+//						if(this.id < neighbours[j])
 							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-						else
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
+//						else
+//							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
 					}
 				}
 				

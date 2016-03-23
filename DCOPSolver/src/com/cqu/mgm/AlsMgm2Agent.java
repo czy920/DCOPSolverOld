@@ -267,10 +267,7 @@ public class AlsMgm2Agent extends AgentCycleAls {
 					}
 					for(int i=0; i<domain.length; i++){
 						for(int j=0; j<neighboursQuantity; j++){
-							if(this.id < neighbours[j])
 								selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-							else
-								selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];			
 						}					
 					}
 					int newLocalCost=localCost;
@@ -295,12 +292,8 @@ public class AlsMgm2Agent extends AgentCycleAls {
 						int selectGroupCost[] = new int[domain.length];
 						for(int i=0; i<neighbourDomains.get(neighbours[coordinate]).length; i++){
 							for(int j=0; j<domain.length; j++){
-								if(this.id < neighbours[coordinate])
 									selectGroupCost[j]=selectMinCost[j]-constraintCosts.get(neighbours[coordinate])[j][neighboursValueIndex.get(coordinate)]
 											+constraintCosts.get(neighbours[coordinate])[j][i];
-								else
-									selectGroupCost[j]=selectMinCost[j]-constraintCosts.get(neighbours[coordinate])[neighboursValueIndex.get(coordinate)][j]
-											+constraintCosts.get(neighbours[coordinate])[i][j];
 							}
 							int findTheMin=0;
 							for(int j=0; j<domain.length; j++){
@@ -361,17 +354,11 @@ public class AlsMgm2Agent extends AgentCycleAls {
 			
 			for(int i=0; i<tempList.length; i++){
 				tempList[i][2]+=localCost;
-				if(this.id < neighbours[senderIndex])
 					tempList[i][2]-=constraintCosts.get(neighbours[senderIndex])[valueIndex][neighboursValueIndex.get(senderIndex)];
-				else
-					tempList[i][2]-=constraintCosts.get(neighbours[senderIndex])[neighboursValueIndex.get(senderIndex)][valueIndex];
 				
 				for(int j=0; j<neighbours.length; j++){
 					if(j!=senderIndex)
-						if(this.id < neighbours[j])
 							tempList[i][2]-=constraintCosts.get(neighbours[j])[tempList[i][0]][neighboursValueIndex.get(j)];
-						else
-							tempList[i][2]-=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][tempList[i][0]];
 				}
 				increaseNccc();
 			}
