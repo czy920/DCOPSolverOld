@@ -35,8 +35,13 @@ public class PublicConstants {
 	public static int[] aco_totalCostInCycle = new int[PublicConstants.MaxCycle];   //每一轮里最好蚂蚁的解的代价
 	
 	//Delta计算
-	public static double computeDelta(int solution_cost){
-		return 1.0/(1+solution_cost);
+	/*public static double computeDelta(int solution_cost) {
+		return 1.0 / (1 + solution_cost);
+	}*/
+	
+	//Delta计算
+	public static double computeLogDelta(int solution_cost){
+		return 1.0/(Math.log10(2+solution_cost));
 	}
 	
 	//tau_agent更新

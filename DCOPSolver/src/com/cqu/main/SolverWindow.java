@@ -95,7 +95,7 @@ public class SolverWindow {
 	private LabelSpinnerParameter lspSpinnerSelectRound;
 	
 	//蚁群算法参数设置
-	private LabelSpinnerParameter lspSpinnerMaxCycle;
+	//private LabelSpinnerParameter lspSpinnerMaxCycle;
 	private LabelSpinnerParameter lspSpinnercountAnt;
 	private LabelSpinnerParameter lspSpinneralpha;
 	private LabelSpinnerParameter lspSpinnerbeta;
@@ -422,7 +422,7 @@ public class SolverWindow {
 		lspSpinnerADOPT_K=new LabelSpinnerParameter("K值：", new SpinnerNumberModel(0, 0, 10000, 100));
 		
 		//蚁群算法参数设置
-		lspSpinnerMaxCycle = new LabelSpinnerParameter("最大回合数：", new SpinnerNumberModel(100, 20, 300, 10));
+		//lspSpinnerMaxCycle = new LabelSpinnerParameter("最大回合数：", new SpinnerNumberModel(100, 20, 300, 10));
 		lspSpinnercountAnt = new LabelSpinnerParameter("蚂蚁数量：", new SpinnerNumberModel(10, 2, 50, 5));
 		lspSpinneralpha = new LabelSpinnerParameter("alpha：", new SpinnerNumberModel(2, 1, 10, 1));
 		lspSpinnerbeta = new LabelSpinnerParameter("beta：", new SpinnerNumberModel(8, 1, 10, 1));
@@ -725,7 +725,8 @@ public class SolverWindow {
 			paramList.add(lspSpinnerMessageTransmissionNCCC);
 		}else if(algorithmType.equals("ACO")||algorithmType.equals("ACO_tree")||algorithmType.equals("ACO_bf")||algorithmType.equals("ACO_phase")||
 				algorithmType.equals("ACO_line")||algorithmType.equals("ACO_final")){
-			paramList.add(lspSpinnerMaxCycle);
+			//paramList.add(lspSpinnerMaxCycle);
+			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnercountAnt);
 			paramList.add(lspSpinneralpha);
 			paramList.add(lspSpinnerbeta);
@@ -944,7 +945,7 @@ public class SolverWindow {
 		Settings.settings.setADOPT_K((Integer)lspSpinnerADOPT_K.getSpinner().getValue());
 		
 		//蚁群算法参数
-		Settings.settings.setMaxCycle((Integer)lspSpinnerMaxCycle.getSpinner().getValue());
+		//Settings.settings.setMaxCycle((Integer)lspSpinnerMaxCycle.getSpinner().getValue());
 		Settings.settings.setCountAnt((Integer)lspSpinnercountAnt.getSpinner().getValue());
 		Settings.settings.setAlpha((Integer)lspSpinneralpha.getSpinner().getValue());
 		Settings.settings.setBeta((Integer)lspSpinnerbeta.getSpinner().getValue());
