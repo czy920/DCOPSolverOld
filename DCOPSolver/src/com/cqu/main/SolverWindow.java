@@ -29,6 +29,7 @@ import com.cqu.heuristics.DFSHeuristicsManager;
 import com.cqu.problemgenerator.DialogGraphColoring;
 import com.cqu.problemgenerator.DialogMeetingScheduling;
 import com.cqu.problemgenerator.DialogRandomDCOP;
+import com.cqu.problemgenerator.DialogSensorNetwork;
 import com.cqu.settings.DialogSetSettings;
 import com.cqu.settings.Settings;
 import com.cqu.util.DateUtil;
@@ -271,6 +272,15 @@ public class SolverWindow {
 		JMenu mnp = new JMenu("问题(P)");
 		mnp.setMnemonic('P');
 		menuBar.add(mnp);
+		
+		JMenuItem miSensorNetwork = new JMenuItem("传感器网络");
+		miSensorNetwork.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DialogSensorNetwork dlg=new DialogSensorNetwork();
+				dlg.setVisible(true);
+			}
+		});
+		mnp.add(miSensorNetwork);
 		
 		JMenuItem miMeetingScheduling = new JMenuItem("会议调度");
 		miMeetingScheduling.addActionListener(new ActionListener() {
