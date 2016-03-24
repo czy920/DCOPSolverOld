@@ -49,7 +49,6 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 	
 	public AlsDsaLucAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
-		
 	}
 	
 	protected void initRun() {
@@ -204,8 +203,8 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 				AlsWork();
 				if(prepareToReset > 0){
 					
-					localUtilityAct();
-					
+					//localUtilityAct();
+					DsaWork();
 					sendValueMessages();
 				}
 				else{
@@ -216,32 +215,6 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 					sendValueMessages();
 				}
 			}
-		}
-	}
-	
-	private void localUtlityCheck(){
-		double myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
-		if(myPercentage > 0.7 && Math.random() < 0.7){
-			localAct = true;
-			sendSuggestMessages();
-		}
-	}
-	
-	private void disposeSuggestMessage(Message msg) {
-		if(Math.random() < 0.3 && localAct == false){
-			int senderIndex=0;
-			int senderId=msg.getIdSender();
-			for(int i=0; i<neighbours.length; i++){
-				if(neighbours[i]==senderId){
-					senderIndex=i;
-					break;
-				}
-			}
-			step[mySuggestersNumber] = msgMailer.getCycleCount();
-			mySuggesters[mySuggestersNumber] = senderIndex;
-			mySuggestedValue[mySuggestersNumber] = (Integer)msg.getValue();
-			mySuggestersNumber++;
-			localActCoordinate = true;
 		}
 	}
 	
@@ -288,6 +261,32 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 		}
 	}
 	
+	private void localUtlityCheck(){
+		double myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
+		if(myPercentage > 0.7 && Math.random() < 0.7){
+			localAct = true;
+			sendSuggestMessages();
+		}
+	}
+	
+	private void disposeSuggestMessage(Message msg) {
+		if(Math.random() < 0.3 && localAct == false){
+			int senderIndex=0;
+			int senderId=msg.getIdSender();
+			for(int i=0; i<neighbours.length; i++){
+				if(neighbours[i]==senderId){
+					senderIndex=i;
+					break;
+				}
+			}
+			step[mySuggestersNumber] = msgMailer.getCycleCount();
+			mySuggesters[mySuggestersNumber] = senderIndex;
+			mySuggestedValue[mySuggestersNumber] = (Integer)msg.getValue();
+			mySuggestersNumber++;
+			localActCoordinate = true;
+		}
+	}
+	
 	private void DsaWork(){
 		if(Math.random()<p){
 			int[] selectMinCost=new int[domain.length];
@@ -312,7 +311,7 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 				valueIndex = selectValueIndex;
 			else{
 				double myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
-				if(myPercentage > 0.3 && Math.random() < 0.3){
+				if(myPercentage > 0.3){
 					abandon();
 				}
 			}
@@ -328,6 +327,7 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 			selectMinCost[i]=0;
 		}
 		int[] abandonValueIndex = new int[neighboursQuantity];
+		int[][] abandonNeighbourIndex = new int[neighboursQuantity][domain.length];
 		int[] abandonCost = new int[neighboursQuantity];
 		for(int h = 0; h < neighbours.length; h++){
 			for(int i=0; i<domain.length; i++){
@@ -344,7 +344,7 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 					}
 				}
 				selectMinCost[i] += tempCost;
-				//tempIndex
+				abandonNeighbourIndex[h][i] = tempIndex;
 			}
 			int selectOneMinCost=selectMinCost[0];
 			for(int i = 1; i < domain.length; i++){
@@ -353,7 +353,6 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 					abandonValueIndex[h] = i;
 				}
 			}
-			
 			abandonCost[h] = selectOneMinCost;
 		}
 		int abandonIndex = 0;
@@ -361,7 +360,7 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 			if(abandonCost[i] < abandonCost[abandonIndex])
 				abandonIndex = i;
 		}
-		valueIndex = abandonIndex;
+		valueIndex = abandonValueIndex[abandonIndex];
 	}
 	
 	protected void disposeAlsCostMessage(Message msg){
