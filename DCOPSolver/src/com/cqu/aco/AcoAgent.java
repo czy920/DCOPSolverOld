@@ -176,7 +176,7 @@ public class AcoAgent extends AgentCycle{
 	
 		//为每条信息素边更新信息素
 		if((PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[3]) ||
-				PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[5]))	&& this.currentCycle  < PublicConstants.MaxCycle / 2){
+				PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[5]))	&& this.currentCycle  < PublicConstants.MaxCycle / 3){
 			tmp.betterSolution = obj.betterSolution;
 			this.updatePheros(cycle);
 		}else{
@@ -185,12 +185,15 @@ public class AcoAgent extends AgentCycle{
 		}
 		
 		//更新信息素后，数据初始化，用于保存下一轮的消息
+		int tempValueIndex = tmp.selfView.get(tmp.bestAnt);
 		this.infos[cycle%PublicConstants.dataLength].initVariable();
 		
 		this.currentCycle ++;
 		if(PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[4]) ||
 				PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[5])){
 			if(this.currentCycle >= PublicConstants.MaxCycle){
+				this.endDecision(tempValueIndex);
+				//this.endBestDecison();
 				this.stopRunning();
 			}
 		}else{
@@ -199,6 +202,8 @@ public class AcoAgent extends AgentCycle{
 				startIteration();
 			}
 			else{        //停止agent
+				this.endDecision(tempValueIndex);
+				//this.endBestDecison();
 				this.stopRunning();
 			}
 		}	
@@ -337,7 +342,7 @@ public class AcoAgent extends AgentCycle{
 						this.bestCost);
 				if ((PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[3]) ||
 						PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[5]))
-						&& this.currentCycle < PublicConstants.MaxCycle / 2) {
+						&& this.currentCycle < PublicConstants.MaxCycle / 3) {
 					tmpInfo.betterSolution = this.selectBetterSolution(cycle);
 					this.updatePheros(cycle);
 					this.sendPheromones(cycle);
@@ -348,18 +353,24 @@ public class AcoAgent extends AgentCycle{
 				}
 				
 				//更新信息素后，数据初始化，用于保存后面的消息
+				int tempValueIndex = tmpInfo.selfView.get(tmpInfo.bestAnt);
 				this.infos[cycle%PublicConstants.dataLength].initVariable();
 				
 				this.currentCycle ++ ;
 				// 判断是否下一轮开始
 				if ((PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[4]) ||
 						PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[5]))){
-					if(this.currentCycle >= PublicConstants.MaxCycle)
+					if(this.currentCycle >= PublicConstants.MaxCycle){
+						this.endDecision(tempValueIndex);
+						//this.endBestDecison();
 						this.stopRunning();
+					}
 				}else{
 					if (this.currentCycle < PublicConstants.MaxCycle) {
 						startIteration();
 					} else { // 停止agent
+						this.endDecision(tempValueIndex);
+						//this.endBestDecison();
 						this.stopRunning();
 					}
 				}
@@ -367,6 +378,17 @@ public class AcoAgent extends AgentCycle{
 		}
 	}
 	
+	private void endDecision(int tempBestValueIndex) {
+		// TODO Auto-generated method stub
+		this.valueIndex = tempBestValueIndex;
+	}
+	
+	private void endBestDecison(){
+		if(this.id == this.minPriority)
+			this.localCost = this.bestCost;
+		this.valueIndex = this.bestValueIndex;
+	}
+
 	private int solutionCost(int cycle, int bestAnt) {
 		// TODO Auto-generated method stub
 		EachCycleInfo tmp = getInfo(cycle);
@@ -659,7 +681,13 @@ public class AcoAgent extends AgentCycle{
 		result.put(AgentCycle.KEY_ID, this.id);
 		result.put(AgentCycle.KEY_NAME, this.name);
 		result.put(AgentCycle.KEY_VALUE, this.domain[valueIndex]);
+		result.put("BEST_VALUE", this.domain[this.bestValueIndex]);
 		result.put(KEY_LOCALCOST, this.localCost);
+		if(this.id == this.minPriority){
+			result.put("BEST_LOCALCOST", this.bestCost);
+		}else{
+			result.put("BEST_LOCALCOST", 0);
+		}
 	
 		this.msgMailer.setResult(result);
 		System.out.println("Agent "+this.name+" stopped!");
@@ -669,6 +697,7 @@ public class AcoAgent extends AgentCycle{
 	public Object printResults(List<Map<String, Object>> results) {
 		// TODO Auto-generated method stub
 		double totalCost=0;
+		double bestCost = 0;
 		int ncccTemp = 0;
 		for(Map<String, Object> result : results)
 		{
@@ -676,12 +705,15 @@ public class AcoAgent extends AgentCycle{
 			String name_=(String) result.get(AgentCycle.KEY_NAME);
 			int value_=(Integer) result.get(AgentCycle.KEY_VALUE);
 			totalCost+= (Integer)result.get(KEY_LOCALCOST);
+			int bestValue_ = (Integer) result.get("BEST_VALUE");
+			bestCost += (Integer)result.get("BEST_LOCALCOST");
 			
-			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
+			String displayStr="Agent "+name_+": id="+id_+" value="+value_ + " bestvalue=" + bestValue_;
 			System.out.println(displayStr);
 		}
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost));
+		System.out.println("bestCost: "+Infinity.infinityEasy((int)bestCost));
 		
 		ResultCycle ret=new ResultCycle();
 		ret.nccc=(int)ncccTemp;   //在ACO算法中暂时不用
@@ -733,6 +765,7 @@ class EachCycleInfo{
 			this.context.put(antId, context);
 			this.currentCosts.put(antId, 0);
 			this.selfView.put(antId, -1);
+			this.betterSolution.clear();
 		}
 		bestAnt = -1;
 	    delta = -1;
