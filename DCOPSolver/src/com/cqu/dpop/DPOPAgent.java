@@ -214,13 +214,13 @@ public class DPOPAgent extends Agent{
 			for(int i=0;i<allParents.length;i++)
 			{
 				//原始数据中id小的为行，id大的为列
-				if(this.id<allParents[i])
-				{
+				//if(this.id<allParents[i])
+				//{
 					costSum+=this.constraintCosts.get(allParents[i])[agentValueIndexes[agentValueIndexes.length-1]][agentValueIndexes[i]];
-				}else
-				{
-					costSum+=this.constraintCosts.get(allParents[i])[agentValueIndexes[i]][agentValueIndexes[agentValueIndexes.length-1]];
-				}
+				//}else
+				//{
+				//	costSum+=this.constraintCosts.get(allParents[i])[agentValueIndexes[i]][agentValueIndexes[agentValueIndexes.length-1]];
+				//}
 			}
 			data[dataIndex]=costSum;
 			

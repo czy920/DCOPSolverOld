@@ -13,7 +13,7 @@ public class Settings {
 	private int maxDimensionInMBDPOP;
 	
 	//蚁群算法参数设置
-	private int MaxCycle;
+	//private int MaxCycle;
 	private int countAnt;
 	private int alpha;
 	private int beta;
@@ -49,7 +49,7 @@ public class Settings {
 		this.maxDimensionInMBDPOP=3;
 		
 		//蚁群算法参数设置
-		this.MaxCycle = 100;
+		//this.MaxCycle = 100;
 		this.countAnt = 2;
 		this.alpha = 2;
 		this.beta = 8;
@@ -83,16 +83,6 @@ public class Settings {
 
 	public void setADOPT_K(int aDOPT_K) {
 		ADOPT_K = aDOPT_K;
-	}
-	
-	
-
-	public int getMaxCycle() {
-		return MaxCycle;
-	}
-
-	public void setMaxCycle(int maxCycle) {
-		MaxCycle = maxCycle;
 	}
 
 	public int getCountAnt() {

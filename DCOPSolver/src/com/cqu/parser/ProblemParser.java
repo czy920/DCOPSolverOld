@@ -199,12 +199,12 @@ public class ProblemParser {
 		treeGenerator.generate();
 		
 		PriorityGeneration varOrdering = new PriorityGeneration(problem.neighbourAgents);
-		if(PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[1])||PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[4])){	
-			varOrdering.generate(treeGenerator);
-		}else{
+		if(PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[0])){	
 			varOrdering.setRootHeuristics(new MostConnectedHeuristic(problem));
 			varOrdering.setNextNodeHeuristics(new MostConnectedHeuristic(problem));
 			varOrdering.generate();
+		}else{
+			varOrdering.generate(treeGenerator);
 		}
 		
 
