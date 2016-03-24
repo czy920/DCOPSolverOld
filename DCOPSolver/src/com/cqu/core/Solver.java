@@ -285,7 +285,7 @@ public class Solver {
 			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
 			FileUtil.writeString(nccc, path+"\\nccc.txt");
 		}
-		else if(rs instanceof ResultCycle && !this.algorithmType.equals("ACO")){
+		else if(rs instanceof ResultCycle && !this.algorithmType.startsWith("ACO")){
 			String totalTime="";
 			String messageQuantity="";
 			String totalCost="";
@@ -318,13 +318,15 @@ public class Solver {
 			FileUtil.writeString(nccc, path+"\\nccc.txt");
 		}
 		//蚁群算法引入
-		else if(rs instanceof ResultCycle && this.algorithmType.equals("ACO")){
+		else if(rs instanceof ResultCycle && this.algorithmType.startsWith("ACO")){
 			String totalTime="";
 			String messageQuantity="";
 			String totalCost="";
 		
 			String AnttotalCostInCycle = "";
 			String AntbestCostInCycle = "";
+			String myMessageQuantityInCycle = "";
+			String myTimeCostInCycle = "";
 			
 			for(int i=0;i<results.size();i++)
 			{
@@ -335,13 +337,19 @@ public class Solver {
 				
 				AnttotalCostInCycle = "";
 				AntbestCostInCycle = "";
+				myMessageQuantityInCycle = "";
+				myTimeCostInCycle = "";
 				
 				for(int j = 0; j < result.ant_totalCostInCyle.length; j++){
 					AnttotalCostInCycle += result.ant_totalCostInCyle[j] +"\n";
 					AntbestCostInCycle += result.ant_bestCostInCycle[j] + "\n";
+					myMessageQuantityInCycle +=result.messageQuantityInCycle[j] + "\n";
+					myTimeCostInCycle +=result.timeCostInCycle[j] + "\n";
 				}
 				FileUtil.writeString(AnttotalCostInCycle, path + "\\AnttotalCostInCycle_" + i + ".txt");
 				FileUtil.writeString(AntbestCostInCycle, path + "\\AntbestCostInCycle_" + i + ".txt");
+				FileUtil.writeString(myMessageQuantityInCycle, path+"\\messageQuantityInCycle_"+i+".txt");
+				FileUtil.writeString(myTimeCostInCycle, path+"\\timeCostInCycle_"+i+".txt");
 			}
 			FileUtil.writeString(totalTime, path+"\\totalTime.txt");
 			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
