@@ -47,6 +47,13 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 	private boolean localActCoordinate = false;
 	private int[] step;
 	
+	private int[] abandonGuggestGain;
+	private int suggestValue;
+	private int suggestGain;
+	private int wait = 0;
+	private int suggestTag = 0;
+	private int suggester;
+	
 	public AlsDsaLucAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 	}
@@ -73,6 +80,7 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 		mySuggestValue = new int[domain.length];
 		myNeighboursSuggestTable = new int[domain.length][neighboursQuantity];
 		mySuggestedValue = new int[neighboursQuantity];
+		abandonGuggestGain = new int[2];
 		buildMyTable();
 		//valueIndex = mySuggestValue[0];
 		sendValueMessages();
@@ -145,12 +153,10 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 		}
 	}
 	
-	private void sendSuggestMessages() {
-		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
-			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_SUGGEST_MESSAGE, 
-					myNeighboursSuggestTable[mySuggestValueTag][neighbourIndex]);
-			this.sendMessage(msg);
-		}
+	private void sendSuggestMessages(int neighbourIndex) {
+		Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_SUGGEST_MESSAGE, 
+				abandonGuggestGain);;
+		this.sendMessage(msg);
 	}
 	
 	private void sendResetMessages(){
@@ -204,7 +210,28 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 				if(prepareToReset > 0){
 					
 					//localUtilityAct();
-					DsaWork();
+					if(wait == 0 && suggestTag == 0)
+						DsaWork();
+					else if(suggestTag == 1){
+						suggestTag = 0;
+						
+						int localCostTemp=0;
+						for(int i=0; i<neighbours.length; i++){
+							localCostTemp+=constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
+						}
+						if(localCostTemp < localCost){
+							valueIndex = suggestValue;
+							System.out.println("accept!!!!!!!!");
+						}
+						else{
+							System.out.println("reject!!!!!!!!");
+							if(prepareToReset > 1){
+								abandonChain();
+							}
+						}
+					}
+					else
+						wait = 0;
 					sendValueMessages();
 				}
 				else{
@@ -218,75 +245,6 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 		}
 	}
 	
-	private void localUtilityAct(){
-		if(localAct == true){
-			localAct = false;
-			localActCoordinate = false;
-			valueIndex = mySuggestValue[mySuggestValueTag];
-			mySuggestValueTag = (mySuggestValueTag+1) % domain.length;
-		}
-		else if(localActCoordinate == true){
-			localActCoordinate = false;
-			
-			int mySuggestersList[] = new int[neighboursQuantity];
-			for(int i = 0; i < mySuggestersNumber; i++){
-				mySuggestersList[i] = 0;
-			}
-			for(int i = 0; i < mySuggestersNumber; i++){
-				mySuggestersList[mySuggesters[i]] = 1;
-			}
-			
-			int selectValueIndex = 0;
-			int selectCost = 2147483647;
-			for(int i = 0; i < domain.length; i++){
-				
-				int tempSelectCost = 0;
-				for(int j = 0; j < neighbours.length; j++){
-					if(mySuggestersList[j] == 1){
-							tempSelectCost += constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];
-					}
-				}
-				if(tempSelectCost < selectCost){
-					selectValueIndex = i;
-					selectCost = tempSelectCost;
-				}
-			}
-			valueIndex = selectValueIndex;
-			mySuggestersNumber = 0;
-		}
-		else{
-			DsaWork();
-			if(prepareToReset > 1 && localActCoordinate == false)
-				localUtlityCheck();
-		}
-	}
-	
-	private void localUtlityCheck(){
-		double myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
-		if(myPercentage > 0.7 && Math.random() < 0.7){
-			localAct = true;
-			sendSuggestMessages();
-		}
-	}
-	
-	private void disposeSuggestMessage(Message msg) {
-		if(Math.random() < 0.3 && localAct == false){
-			int senderIndex=0;
-			int senderId=msg.getIdSender();
-			for(int i=0; i<neighbours.length; i++){
-				if(neighbours[i]==senderId){
-					senderIndex=i;
-					break;
-				}
-			}
-			step[mySuggestersNumber] = msgMailer.getCycleCount();
-			mySuggesters[mySuggestersNumber] = senderIndex;
-			mySuggestedValue[mySuggestersNumber] = (Integer)msg.getValue();
-			mySuggestersNumber++;
-			localActCoordinate = true;
-		}
-	}
-	
 	private void DsaWork(){
 		if(Math.random()<p){
 			int[] selectMinCost=new int[domain.length];
@@ -295,7 +253,7 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 			}
 			for(int i=0; i<domain.length; i++){
 				for(int j=0; j<neighbours.length; j++){
-						selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];	
+					selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];	
 				}
 			}				
 			int selectValueIndex=0;
@@ -307,44 +265,47 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 				}
 			}
 			
+//			if(selectOneMinCost < localCost)
+//				valueIndex = selectValueIndex;
+//			else{
+//				double myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
+//				if(myPercentage > 0.2 && prepareToReset > 2 && suggestTag == 0){
+//					abandon(selectOneMinCost);
+//				}
+//			}
+			
 			if(selectOneMinCost < localCost)
 				valueIndex = selectValueIndex;
-			else{
-				double myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
-				if(myPercentage > 0.3){
-					abandon();
-				}
+			double myPercentage = ((double)(selectOneMinCost-myMinCost))/((double)(myMaxCost-myMinCost));
+			if(myPercentage > 0.3 && prepareToReset > 2 && suggestTag == 0){
+				abandon(selectOneMinCost);
 			}
 		}
 	}
 	
-	private void abandon() {
+	private void abandon(int nature) {
 		if(Math.random() > utilityPercentage)
 			return;
 		
 		int[] selectMinCost=new int[domain.length];
-		for(int i=0; i<domain.length; i++){
-			selectMinCost[i]=0;
-		}
 		int[] abandonValueIndex = new int[neighboursQuantity];
 		int[][] abandonNeighbourIndex = new int[neighboursQuantity][domain.length];
 		int[] abandonCost = new int[neighboursQuantity];
-		for(int h = 0; h < neighbours.length; h++){
-			for(int i=0; i<domain.length; i++){
-				for(int j=0; j<neighbours.length && j != h; j++){
+		for(int h = 0; h < neighbours.length; h++){						//遍历邻居
+			for(int i=0; i<domain.length; i++){							//遍历值域
+				for(int j=0; j<neighbours.length && j != h; j++)
 						selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];
-				}
-				
+																		//累计邻居以外的cost值
 				int tempIndex = 0;
 				int tempCost = constraintCosts.get(neighbours[h])[i][tempIndex];
 				for(int hValue = 0; hValue < constraintCosts.get(neighbours[h])[i].length; hValue++){
 					if(constraintCosts.get(neighbours[h])[i][hValue] < tempCost){
 						tempCost = constraintCosts.get(neighbours[h])[i][hValue];
-						tempIndex = hValue;
+						tempIndex = hValue;								//找到选定的最小值，记录value和cost
 					}
 				}
-				selectMinCost[i] += tempCost;
-				abandonNeighbourIndex[h][i] = tempIndex;
+				selectMinCost[i] += tempCost;							//做累计
+				abandonNeighbourIndex[h][i] = tempIndex;				//记录对应的邻居号和自己value对应的邻居的value建议
 			}
 			int selectOneMinCost=selectMinCost[0];
 			for(int i = 1; i < domain.length; i++){
@@ -353,14 +314,81 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 					abandonValueIndex[h] = i;
 				}
 			}
-			abandonCost[h] = selectOneMinCost;
+			abandonCost[h] = selectOneMinCost;							//找到每一个邻居对应的自己最小的value
 		}
 		int abandonIndex = 0;
-		for(int i = 0; i < neighboursQuantity; i++){
+		for(int i = 1; i < neighboursQuantity; i++){
 			if(abandonCost[i] < abandonCost[abandonIndex])
-				abandonIndex = i;
+				abandonIndex = i;										//找到差值最小的邻居，选作舍弃
 		}
-		valueIndex = abandonValueIndex[abandonIndex];
+		if(abandonCost[abandonIndex] < nature){
+			valueIndex = abandonValueIndex[abandonIndex];
+//			abandonGuggestGain[0] = abandonNeighbourIndex[abandonIndex][valueIndex];
+//			abandonGuggestGain[1] = nature - abandonCost[abandonIndex];
+//			sendSuggestMessages(abandonIndex);
+//			wait = 1;
+			//System.out.println(nature - abandonCost[abandonIndex]+"~~~~~");
+		}
+	}
+	
+	private void disposeSuggestMessage(Message msg) {
+		if(wait != 1 && suggestTag !=1 && Math.random() < 0.1){
+			int senderIndex=0;
+			int senderId=msg.getIdSender();
+			for(int i=0; i<neighbours.length; i++){
+				if(neighbours[i]==senderId){
+					senderIndex=i;
+					break;
+				}
+			}
+			suggester = senderIndex;
+			suggestValue = ((int[])msg.getValue())[0];
+			suggestGain = ((int[])msg.getValue())[1];
+			suggestTag = 1;
+		}
+	}
+	
+	private void abandonChain(){
+		int selectMinCost = 0;
+		int[] abandonValueIndex = new int[neighboursQuantity];
+		int[] abandonNeighbourIndex = new int[neighboursQuantity];
+		int[] abandonCost = new int[neighboursQuantity];
+		for(int h = 0; h < neighbours.length && h != suggester; h++){		//遍历邻居
+			
+			for(int j=0; j<neighbours.length && j != h ; j++)
+					selectMinCost+=constraintCosts.get(neighbours[j])[suggestValue][neighboursValueIndex[j]];
+																			//累计邻居以外的cost值
+			int tempIndex = 0;
+			int tempCost = constraintCosts.get(neighbours[h])[suggestValue][tempIndex];
+			for(int hValue = 0; hValue < constraintCosts.get(neighbours[h])[0].length; hValue++){
+				if(constraintCosts.get(neighbours[h])[suggestValue][hValue] < tempCost){
+					tempCost = constraintCosts.get(neighbours[h])[suggestValue][hValue];
+					tempIndex = hValue;										//找到选定的最小值，记录value和cost
+				}
+			}
+			selectMinCost += tempCost;										//做累计
+			abandonNeighbourIndex[h] = tempIndex;							//记录对应的邻居号对应的邻居的value建议
+			
+			abandonCost[h] = selectMinCost;									//找到每一个邻居对应的自己最小的value
+		}
+		int abandonIndex = 0;
+		for(int i = 1; i < neighboursQuantity; i++){
+			if(abandonCost[i] < abandonCost[abandonIndex])
+				abandonIndex = i;											//找到差值最小的邻居，选作舍弃
+		}
+		if(abandonCost[abandonIndex] < localCost){
+			System.out.println("yes!!!!!!!!");
+			valueIndex = suggestValue;
+			abandonGuggestGain[0] = abandonNeighbourIndex[abandonIndex];
+			abandonGuggestGain[1] = localCost - abandonCost[abandonIndex];
+			sendSuggestMessages(abandonIndex);
+			wait = 1;
+			//System.out.println(nature - abandonCost[abandonIndex]+"~~~~~");
+		}
+		else{
+			System.out.println("no!!!!!!!!!!!!!!!!!!!!!");
+			DsaWork();
+		}
 	}
 	
 	protected void disposeAlsCostMessage(Message msg){
