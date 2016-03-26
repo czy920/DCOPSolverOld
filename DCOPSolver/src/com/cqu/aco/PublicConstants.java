@@ -35,9 +35,9 @@ public class PublicConstants {
 	public static int[] aco_totalCostInCycle = new int[PublicConstants.MaxCycle];   //每一轮里最好蚂蚁的解的代价
 	
 	//Delta计算
-	/*public static double computeDelta(int solution_cost) {
+	public static double computeDelta(int solution_cost) {
 		return 1.0 / (1 + solution_cost);
-	}*/
+	}
 	
 	//Delta计算
 	public static double computeLogDelta(int solution_cost){
@@ -57,6 +57,12 @@ public class PublicConstants {
 	//蒸发信息素
 	public static void evaporate(double[][] tau, int i, int j){
 		tau[i][j] = (1 - rho) * tau[i][j];
+		if(tau[i][j] < PublicConstants.Min_tau){
+			tau[i][j] = PublicConstants.Min_tau;
+		}
+		if(tau[i][j] > PublicConstants.Max_tau){
+			tau[i][j] = PublicConstants.Max_tau;
+		}
 	}
 	
 	public static void paramsInit(int maxCycle, int countAnt, int alpha, int beta, double rho, double max_tau, double min_tau){

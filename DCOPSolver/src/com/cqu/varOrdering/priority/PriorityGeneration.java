@@ -40,7 +40,6 @@ public class PriorityGeneration {
 			Integer nextNodeId=PriorityGeneration.NextNodeHeuristics.getScores(orderingView);
 			orderingView.nodeIterated.put(nextNodeId, true);
 			orderingView.priority.put(nextNodeId, priorityBegin++);
-		    System.out.println("node: " + nextNodeId + "priority: " + orderingView.priority.get(nextNodeId));
 			
 			if(iteratedCount == totalCount - 1){
 				orderingView.minPriority = nextNodeId;

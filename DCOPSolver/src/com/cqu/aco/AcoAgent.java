@@ -249,7 +249,7 @@ public class AcoAgent extends AgentCycle{
 				if(mark == true)
 					obj = new ValueMsgContext(cycle,antId,localCost,tempCotext);
 				else
-					obj = new ValueMsgContext(cycle,antId,tmpInfo.currentCosts.get(antId).intValue(),tempCotext);
+					obj = new ValueMsgContext(cycle,antId,0,tempCotext);
 				
 				MsgObj.getMsgContext().add(obj);
 				
