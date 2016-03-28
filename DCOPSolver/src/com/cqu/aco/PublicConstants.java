@@ -1,5 +1,9 @@
 package com.cqu.aco;
 
+import java.io.File;
+
+import com.cqu.util.FileUtil;
+
 public class PublicConstants {
 	//蚂蚁的个数
 	public static final String[] ACO_TYPE= {"ACO","ACO_tree","ACO_bf","ACO_phase","ACO_line","ACO_final"};
@@ -13,6 +17,48 @@ public class PublicConstants {
 	}
 	//轮数
 	public static int MaxCycle = 100;
+	
+	public static String path = "result\\";
+	//public static String path = "C:\\Users\\hechen\\Desktop\\result\\";
+	public static String solution = path + "solution.txt";
+	public static String probility =path + "probility.txt";
+	public static String bestcost = path+"bestCost.txt";
+	public static String totalcost= path + "totalcost.txt";
+	public static String tau = path + "tau.txt";
+	
+	public static void writeSolution(String context){
+		FileUtil.writeStringAppend(context, solution);
+	}
+	
+	public static void writeTau(String context){
+		FileUtil.writeStringAppend(context, tau);
+	}
+	
+	public static void writeBestCost(String context){
+		FileUtil.writeStringAppend(context, bestcost);
+	}
+	
+	public static void writeTotalCost(String context){
+		FileUtil.writeStringAppend(context, totalcost);
+	}
+	
+	public static void clearFile(){
+		File f=new File(path);
+		if(f.exists()==false)
+		{
+			f.mkdir();
+		}
+		
+		FileUtil.writeString("", solution);
+		FileUtil.writeString("", probility);
+		FileUtil.writeString("", bestcost);
+		FileUtil.writeString("", totalcost);
+		FileUtil.writeString("", tau);
+	}
+	
+    public static void writeProbility(String context){
+    	FileUtil.writeStringAppend(context, probility);
+	}
 
 	//alpha参数
 	public static int alpha = 2;

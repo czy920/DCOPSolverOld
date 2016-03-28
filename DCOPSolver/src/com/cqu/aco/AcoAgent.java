@@ -1,5 +1,6 @@
 package com.cqu.aco;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -72,12 +73,7 @@ public class AcoAgent extends AgentCycle{
 	
 	public double[] computeP(int cycle, int ant){
 		double[] ret = new double[this.domain.length];
-		if(this.noHighNode() == true){
-			for(int i = 0; i < ret.length; i++){
-				ret[i] = PublicConstants.Min_tau;
-			}
-			return ret;
-		}
+		
 		double fenzi = 0.0;
 		double fenmu = 0.0;
 		for(int j = 0;j< this.domain.length;j++){
@@ -93,6 +89,13 @@ public class AcoAgent extends AgentCycle{
 	public double computePPart(int cycle, int ant, int value){
 		double ret = 0.0;
 		double sum = 0.0;
+		
+		if(this.noHighNode() == true){
+			sum = PublicConstants.Min_tau;
+			ret = Math.pow(sum, PublicConstants.alpha);
+			return ret;
+		}
+		
 		int localCost;
 		EachCycleInfo tmp = this.getInfo(cycle);
 		localCost = this.localCost(cycle,ant,value);
@@ -104,7 +107,8 @@ public class AcoAgent extends AgentCycle{
 			
 			sum += tau[value][highValueIndex];
 		}
-		ret = Math.pow(sum, PublicConstants.alpha)*Math.pow(logCompute(localCost), PublicConstants.beta);
+		//ret = Math.pow(sum, PublicConstants.alpha)*Math.pow(logCompute(localCost), PublicConstants.beta);
+		ret = Math.pow(sum, PublicConstants.alpha);
 		return ret;
 	}
 	
@@ -116,29 +120,33 @@ public class AcoAgent extends AgentCycle{
 		return 1.0/(1+localCost);
 	}
 	
+	public double[] transferP(double[] resultP){
+		double ret[] = new double[resultP.length];
+		double sum = 0.0;
+		for(int i = 0; i < ret.length; i++){
+			sum += resultP[i];
+			ret[i] = sum;
+		}
+		return ret;
+	}
+	
 	public int chooseValue(double[] resultP){
-		List<Integer> valueIndex = new LinkedList<Integer>();
-		double max =0.0;
-		for(int i = 0;i< resultP.length; i++){
-			if(max < resultP[i]){
-				valueIndex.clear();
-				valueIndex.add(i);
-				max = resultP[i];
-			}else if( max == resultP[i]){
-				valueIndex.add(i);
+		double[] tmp = this.transferP(resultP);
+		int index = 0;
+		double random = Math.random();
+		for(int i = 0; i<tmp.length; i++){
+			if(random < tmp[i]){
+				index = i;
+				break;
 			}
 		}
-		double random = Math.random();
-		int index = (int) (random * valueIndex.size());
-		if(valueIndex.size() == 0)
-			return (int) (random * this.domain.length);
-		return valueIndex.get(index);
+		return index;
 	}
 
 	@Override
 	protected void initRun() {
 		super.initRun();
-		
+		PublicConstants.clearFile();
 		initTaU();
 		this.infos = EachCycleInfo.getInstances();
 		this.cycle = 0;
@@ -183,6 +191,8 @@ public class AcoAgent extends AgentCycle{
 			tmp.delta = obj.getDelta();
 			this.updatePhero(cycle);
 		}
+		
+		PublicConstants.writeTau("cycle " + cycle + "\t" +  this.name + "\n" + this.taus.toString() + "\n");
 		
 		//更新信息素后，数据初始化，用于保存下一轮的消息
 		int tempValueIndex = tmp.selfView.get(tmp.bestAnt);
@@ -321,7 +331,7 @@ public class AcoAgent extends AgentCycle{
 			} else if (this.isAllSolution(cycle)) {
 				int bestAnt = this.selectBestAnt(cycle);
 				// 更新信息素并广播更新的信息素delta
-				tmpInfo.delta = PublicConstants.computeLogDelta(this
+				tmpInfo.delta = PublicConstants.computeDelta(this
 						.solutionCost(cycle,tmpInfo.bestAnt));
 
 				this.localCost = this.solutionCost(cycle, bestAnt);
@@ -351,6 +361,17 @@ public class AcoAgent extends AgentCycle{
 					this.updatePhero(cycle);
 					this.sendPheromone(cycle);
 				}
+				
+				PublicConstants.writeSolution("cycle " + cycle + "\n");
+				for(int andId: tmpInfo.context.keySet()){
+					Context temp = new Context(tmpInfo.context.get(andId));
+					temp.getContext().put(this.id,
+							tmpInfo.selfView.get(andId));
+					PublicConstants.writeSolution("Ant " + andId + ": ");
+					PublicConstants.writeSolution(temp.toString() + "\n");
+				}
+				PublicConstants.writeSolution("bestAnt: " + bestAnt + "\t" + this.bestCost + "\t" + this.localCost + "\t" + tmpInfo.delta + "\n");
+				PublicConstants.writeTau("cycle " + cycle + "\t" +  this.name + "\n" + this.taus.toString() + "\n");
 				
 				//更新信息素后，数据初始化，用于保存后面的消息
 				int tempValueIndex = tmpInfo.selfView.get(tmpInfo.bestAnt);
@@ -430,8 +451,9 @@ public class AcoAgent extends AgentCycle{
 			double new_tau = PublicConstants.update_tau(old_tau, tmp.delta);
 			this.taus.get(oppId).getTau()[myValue][oppValue] = new_tau;
 		}
+		
 		//再对最好解路径信息素更新
-		if(PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[2])){
+		/*if(PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[2])){
 			for(int i = 0; i < this.highPriorities.length; i++){
 				int myValue = this.bestValueIndex;
 				int oppId = this.highPriorities[i];
@@ -440,7 +462,7 @@ public class AcoAgent extends AgentCycle{
 				double new_tau = PublicConstants.update_tau(old_tau,PublicConstants.computeLogDelta(this.bestCost));
 				this.taus.get(oppId).getTau()[myValue][oppValue] = new_tau;
 			}
-		}
+		}*/
 	}
 	
 	private void updatePheros(int cycle){
@@ -471,7 +493,7 @@ public class AcoAgent extends AgentCycle{
 		}
 		
 		//再对最好解路径信息素更新
-		if(PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[2])){
+		/*if(PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[2])){
 			for(int i = 0; i < this.highPriorities.length; i++){
 				int myValue = this.bestValueIndex;
 				int oppId = this.highPriorities[i];
@@ -480,7 +502,7 @@ public class AcoAgent extends AgentCycle{
 				double new_tau = PublicConstants.update_tau(old_tau,PublicConstants.computeLogDelta(this.bestCost));
 				this.taus.get(oppId).getTau()[myValue][oppValue] = new_tau;
 			}
-		}
+		}*/
 	}
 	
 	private void sendValueMessage(int cycle) {
@@ -537,7 +559,7 @@ public class AcoAgent extends AgentCycle{
 			}
 		}
 		for(int andId : tmp.keySet()){
-			double delta = PublicConstants.computeLogDelta(tmp.get(andId));
+			double delta = PublicConstants.computeDelta(tmp.get(andId));
 			ret.put(andId, delta);
 		}
 		tmp = null;
@@ -565,6 +587,9 @@ public class AcoAgent extends AgentCycle{
 		this.valueIndex = this.chooseValue(resultP);
 		tmpInfo.selfView.put(ant, this.valueIndex);	
 		tmpInfo.mark.put(ant, true);
+		
+		PublicConstants.writeProbility("cycle " + cycle + "\t" +  this.name + "\t" +
+		" Ant " + ant + "\t " + tmpInfo.selfView.get(ant) + "\n" + tmpInfo.context.get(ant).getContext().toString() + "\n"  + Arrays.toString(resultP) + "\n");
 		
 	}
 	

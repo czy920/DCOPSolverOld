@@ -1,5 +1,7 @@
 package com.cqu.aco;
 
+import java.util.Arrays;
+
 public class Pheromone {
 	
 	private double[][] tau;
@@ -30,6 +32,22 @@ public class Pheromone {
 	public void setTau(double[][] tau) {
 		this.tau = tau;
 	}
+
+
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		String str = "[";
+		for(int i = 0; i< tau.length; i++){
+			str += Arrays.toString(tau[i]);
+			if(i != tau.length-1)
+				str += ",";
+		}
+		str += "]";
+		return str;
+	}
+	
+	
 	
 
 }
