@@ -693,7 +693,9 @@ public class SolverWindow {
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectInterval);
 			paramList.add(lspSpinnerSelectProbability);
-			paramList.add(lspSpinnerSelectNewProbability);
+			paramList.add(lspSpinnerSelectProbabilityA);
+			paramList.add(lspSpinnerSelectProbabilityB);
+			
 		}
 		else if(algorithmType.equals("DPOP"))
 		{
