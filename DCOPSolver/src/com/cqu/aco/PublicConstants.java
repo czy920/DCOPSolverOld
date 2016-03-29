@@ -18,8 +18,8 @@ public class PublicConstants {
 	//轮数
 	public static int MaxCycle = 100;
 	
-	public static String path = "result\\";
-	//public static String path = "C:\\Users\\hechen\\Desktop\\result\\";
+	//public static String path = "result\\";
+	public static String path = "C:\\Users\\hechen\\Desktop\\result\\";
 	public static String solution = path + "solution.txt";
 	public static String probility =path + "probility.txt";
 	public static String bestcost = path+"bestCost.txt";
@@ -81,13 +81,18 @@ public class PublicConstants {
 	public static int[] aco_totalCostInCycle = new int[PublicConstants.MaxCycle];   //每一轮里最好蚂蚁的解的代价
 	
 	//Delta计算
-	public static double computeDelta(int solution_cost) {
-		return 1.0 / (1 + solution_cost);
-	}
+	//public static double computeDelta(int solution_cost) {
+	//	return 1.0 / (1 + solution_cost);
+	//}
 	
 	//Delta计算
 	public static double computeLogDelta(int solution_cost){
-		return 1.0/(Math.log10(2+solution_cost));
+		
+		return 1.0/(Math.log(2+solution_cost)/Math.log(3/2));
+		//return 1.0/(Math.log(2+solution_cost)/Math.log(8/5));
+		//return 1.0/(Math.log(2+solution_cost));
+		//return 1.0/(Math.log(2+solution_cost)/Math.log(2));
+		//return 1.0/(Math.sqrt(solution_cost));
 	}
 	
 	//tau_agent更新

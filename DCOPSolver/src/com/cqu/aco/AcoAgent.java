@@ -113,7 +113,11 @@ public class AcoAgent extends AgentCycle{
 	}
 	
 	public double logCompute(int localCost){
-		return 1.0/Math.log10(2+localCost);
+		return 1.0/(Math.log(2+localCost)/Math.log(3/2));
+		//return 1.0/(Math.log(2+localCost)/Math.log(9/5));
+		//return 1.0/(Math.log(2+localCost)/Math.log(2));
+		//return 1.0/Math.log(2+localCost);
+		//return 1.0/Math.sqrt(localCost);
 	}
 	
 	public double daosuCompute(int localCost){
@@ -331,7 +335,7 @@ public class AcoAgent extends AgentCycle{
 			} else if (this.isAllSolution(cycle)) {
 				int bestAnt = this.selectBestAnt(cycle);
 				// 更新信息素并广播更新的信息素delta
-				tmpInfo.delta = PublicConstants.computeDelta(this
+				tmpInfo.delta = PublicConstants.computeLogDelta(this
 						.solutionCost(cycle,tmpInfo.bestAnt));
 
 				this.localCost = this.solutionCost(cycle, bestAnt);
@@ -559,7 +563,7 @@ public class AcoAgent extends AgentCycle{
 			}
 		}
 		for(int andId : tmp.keySet()){
-			double delta = PublicConstants.computeDelta(tmp.get(andId));
+			double delta = PublicConstants.computeLogDelta(tmp.get(andId));
 			ret.put(andId, delta);
 		}
 		tmp = null;
