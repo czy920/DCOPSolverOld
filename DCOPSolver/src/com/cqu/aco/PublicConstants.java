@@ -88,10 +88,10 @@ public class PublicConstants {
 	//Delta计算
 	public static double computeLogDelta(int solution_cost){
 		
-		return 1.0/(Math.log(2+solution_cost)/Math.log(3/2));
-		//return 1.0/(Math.log(2+solution_cost)/Math.log(8/5));
-		//return 1.0/(Math.log(2+solution_cost));
+		return 1.0/(Math.log(2+solution_cost)/Math.log(3.0/2.0));
+		//return 1.0/(Math.log(2+solution_cost)/Math.log(9.0/5.0));
 		//return 1.0/(Math.log(2+solution_cost)/Math.log(2));
+		//return 1.0/(Math.log(2+solution_cost));
 		//return 1.0/(Math.sqrt(solution_cost));
 	}
 	

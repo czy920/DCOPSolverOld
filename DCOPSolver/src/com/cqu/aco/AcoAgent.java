@@ -113,8 +113,8 @@ public class AcoAgent extends AgentCycle{
 	}
 	
 	public double logCompute(int localCost){
-		return 1.0/(Math.log(2+localCost)/Math.log(3/2));
-		//return 1.0/(Math.log(2+localCost)/Math.log(9/5));
+		return 1.0/(Math.log(2+localCost)/Math.log(3.0/2.0));
+		//return 1.0/(Math.log(2+localCost)/Math.log(9.0/5.0));
 		//return 1.0/(Math.log(2+localCost)/Math.log(2));
 		//return 1.0/Math.log(2+localCost);
 		//return 1.0/Math.sqrt(localCost);
@@ -376,6 +376,8 @@ public class AcoAgent extends AgentCycle{
 				}
 				PublicConstants.writeSolution("bestAnt: " + bestAnt + "\t" + this.bestCost + "\t" + this.localCost + "\t" + tmpInfo.delta + "\n");
 				PublicConstants.writeTau("cycle " + cycle + "\t" +  this.name + "\n" + this.taus.toString() + "\n");
+				PublicConstants.writeBestCost(PublicConstants.aco_bestCostInCycle[this.currentCycle] + "\n");
+				PublicConstants.writeTotalCost(PublicConstants.aco_totalCostInCycle[this.currentCycle] + "\n");
 				
 				//更新信息素后，数据初始化，用于保存后面的消息
 				int tempValueIndex = tmpInfo.selfView.get(tmpInfo.bestAnt);
