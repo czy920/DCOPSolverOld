@@ -48,7 +48,6 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 	private int wait = 0;
 	private int suggestTag = 0;
 	private int suggester;
-	private int start = 0;
 	
 	public AlsDsaLucAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
@@ -198,7 +197,6 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 		if(receivedQuantity==0){
 			prepareToReset--;
 			localCost=localCost();
-			myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
 			if(newCycle == true){
 				cycleCount++;
 				newCycle = false;
@@ -216,21 +214,19 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 						for(int i=0; i<neighbours.length; i++){
 							localCostTemp+=constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
 						}
-						if(localCostTemp < localCost){
+						myPercentage = ((double)(localCostTemp-myMinCost))/((double)(myMaxCost-myMinCost));
+						if(localCostTemp < localCost || myPercentage < utilityPercentage){
 							valueIndex = suggestValue;
 							//System.out.println("accept!!!!!!!!");
 						}
 						else{
 							//System.out.println("reject!!!!!!!!");
-							if(prepareToReset > 1){
-								abandonChain();
-							}
+							abandonChain();
 						}
 					}
 					else
 						wait = 0;
 					sendValueMessages();
-					start = 1;
 				}
 				else{
 					prepareToReset = 2147483647;
@@ -244,6 +240,7 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 	}
 	
 	private void DsaWork(){
+		int done = 0;
 		if(Math.random()<p){
 			int[] selectMinCost=new int[domain.length];
 			for(int i=0; i<domain.length; i++){
@@ -265,40 +262,29 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 			
 			if(selectOneMinCost < localCost){
 				valueIndex = selectValueIndex;
+				done = 1;
 			}
-			else{
-				myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
-				if(prepareToReset > 2 && suggestTag == 0 && start == 1){
-					
-//					for(int i = 0; i < neighboursQuantity; i++){
-//						if((int)(myPercentage*1000) < neighbourPercentage[i])
-//							return;
-//					}
-//					abandon(selectOneMinCost);
-					
-					if(myPercentage > utilityPercentage){
-						abandon(localCost);
-					}
-					
-//					if(myPercentage > utilityPercentage){
-//						utilityPercentage = utilityPercentage*1.1;
-//						abandon(selectOneMinCost);
-//					}
-//					else
-//						utilityPercentage = utilityPercentage*0.95;
+		}
+		if(done == 0){
+			myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
+			if(prepareToReset > 2 && suggestTag == 0){
+				if(myPercentage > utilityPercentage){
+					abandon(localCost);
 				}
 			}
-			
-//			if(selectOneMinCost < localCost){
-//				valueIndex = selectValueIndex;
-//			}
-//			for(int i = 0; i < neighboursQuantity; i++){
-//				if((int)(myPercentage*1000) < neighbourPercentage[i])
-//					return;
-//			}
-//			abandon(selectOneMinCost);
-//			
 		}
+		
+//		if(done == 0){
+//			myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
+//			if(prepareToReset > 2 && suggestTag == 0){
+//				if(myPercentage > utilityPercentage){
+//					utilityPercentage = utilityPercentage*1.02;
+//					abandon(localCost);
+//				}
+//				else
+//					utilityPercentage = utilityPercentage*0.99;
+//			}
+//		}
 	}
 	
 	private void abandon(int nature) {
