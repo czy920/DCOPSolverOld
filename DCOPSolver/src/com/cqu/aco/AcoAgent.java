@@ -390,6 +390,7 @@ public class AcoAgent extends AgentCycle{
 					if(this.currentCycle >= PublicConstants.MaxCycle){
 						this.endDecision(tempValueIndex);
 						//this.endBestDecison();
+						PublicConstants.dataInCycleCorrection();
 						this.stopRunning();
 					}
 				}else{
@@ -398,6 +399,7 @@ public class AcoAgent extends AgentCycle{
 					} else { // 停止agent
 						this.endDecision(tempValueIndex);
 						//this.endBestDecison();
+						PublicConstants.dataInCycleCorrection();
 						this.stopRunning();
 					}
 				}

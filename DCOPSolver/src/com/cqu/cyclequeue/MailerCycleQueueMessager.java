@@ -117,7 +117,6 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 		}
 		//数组长度修正
 		dataInCycleCorrection();
-		PublicConstants.dataInCycleCorrection();
 		
 		runFinished();
 	}

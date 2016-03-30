@@ -115,8 +115,8 @@ public class PublicConstants {
 	
 	//数组长度修正
 	public static void dataInCycleCorrection(){
-		double[] correcttotalCost = new double[PublicConstants.realCycle-1];
-		double[] correctbestCost = new double[PublicConstants.realCycle-1];
+		double[] correcttotalCost = new double[PublicConstants.realCycle+1];
+		double[] correctbestCost = new double[PublicConstants.realCycle+1];
 		double totalcost = -1;
 		double bestcost = -1;
 		assert aco_totalCostInCycle[correcttotalCost.length-1] != 0;
