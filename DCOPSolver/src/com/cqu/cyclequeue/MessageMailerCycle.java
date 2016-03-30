@@ -27,10 +27,6 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
     private double[] totalCostInCycle;
     private long[] timeCostInCycle;
     private int[] messageQuantityInCycle;
-    
-    //蚁群算法使用的保存每一轮的信息
-    private int[] aco_totalCostInCycle;
-    private int[] aco_bestCostInCycle;
 	
 	private List<EventListener> eventListeners;
 	
@@ -47,9 +43,6 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 		this.totalCostInCycle = new double[999];
 		this.timeCostInCycle = new long[999];
 		this.messageQuantityInCycle = new int[999];
-		
-		this.aco_totalCostInCycle = new int[PublicConstants.MaxCycle];
-		this.aco_bestCostInCycle = new int[PublicConstants.MaxCycle];
 	}
 	
 	public void setResult(Map<String, Object> result)

@@ -17,48 +17,17 @@ public class PublicConstants {
 	}
 	//轮数
 	public static int MaxCycle = 100;
+	public static int realCycle = 0;
 	
-	//public static String path = "result\\";
-	public static String path = "C:\\Users\\hechen\\Desktop\\result\\";
+	public static String path = "result\\";
+	//public static String path = "C:\\Users\\hechen\\Desktop\\result\\";
 	public static String solution = path + "solution.txt";
 	public static String probility =path + "probility.txt";
 	public static String bestcost = path+"bestCost.txt";
 	public static String totalcost= path + "totalcost.txt";
 	public static String tau = path + "tau.txt";
 	
-	public static void writeSolution(String context){
-		FileUtil.writeStringAppend(context, solution);
-	}
 	
-	public static void writeTau(String context){
-		FileUtil.writeStringAppend(context, tau);
-	}
-	
-	public static void writeBestCost(String context){
-		FileUtil.writeStringAppend(context, bestcost);
-	}
-	
-	public static void writeTotalCost(String context){
-		FileUtil.writeStringAppend(context, totalcost);
-	}
-	
-	public static void clearFile(){
-		File f=new File(path);
-		if(f.exists()==false)
-		{
-			f.mkdir();
-		}
-		
-		FileUtil.writeString("", solution);
-		FileUtil.writeString("", probility);
-		FileUtil.writeString("", bestcost);
-		FileUtil.writeString("", totalcost);
-		FileUtil.writeString("", tau);
-	}
-	
-    public static void writeProbility(String context){
-    	FileUtil.writeStringAppend(context, probility);
-	}
 
 	//alpha参数
 	public static int alpha = 2;
@@ -77,8 +46,8 @@ public class PublicConstants {
 	public static int dataLength = 50;   
 	
 	//保存每一轮的代价
-	public static int[] aco_bestCostInCycle = new int[PublicConstants.MaxCycle];   //当前发现的最好的解的代价
-	public static int[] aco_totalCostInCycle = new int[PublicConstants.MaxCycle];   //每一轮里最好蚂蚁的解的代价
+	public static double[] aco_bestCostInCycle = new double[PublicConstants.MaxCycle];   //当前发现的最好的解的代价
+	public static double[] aco_totalCostInCycle = new double[PublicConstants.MaxCycle];   //每一轮里最好蚂蚁的解的代价
 	
 	//Delta计算
 	//public static double computeDelta(int solution_cost) {
@@ -129,19 +98,75 @@ public class PublicConstants {
 	//保存每个回合的totalCost
 	protected static void dataInCycleIncrease(int cycle, int totalcost, int bestcost) {
 		
-		/*if (currentCycle > aco_totalCostInCycle.length) {
-			int[] templist1 = new int[2 * aco_totalCostInCycle.length];
-			int[] templist2 = new int[2 * aco_totalCostInCycle.length];
+		if (cycle >= aco_totalCostInCycle.length) {
+			double[] templist1 = new double[aco_totalCostInCycle.length + PublicConstants.MaxCycle];
+			double[] templist2 = new double[aco_totalCostInCycle.length + PublicConstants.MaxCycle];
 			for (int i = 0; i < aco_totalCostInCycle.length; i++) {
 				templist1[i] = aco_totalCostInCycle[i];
 				templist2[i] = aco_bestCostInCycle[i];
 			}
 			aco_totalCostInCycle = templist1;
 			aco_bestCostInCycle = templist2;
-		}*/
+		}
 		
 		aco_totalCostInCycle[cycle] = totalcost;
 		aco_bestCostInCycle[cycle] = bestcost;
+	}
+	
+	//数组长度修正
+	public static void dataInCycleCorrection(){
+		double[] correcttotalCost = new double[PublicConstants.realCycle+1];
+		double[] correctbestCost = new double[PublicConstants.realCycle+1];
+		double totalcost = -1;
+		double bestcost = -1;
+		assert aco_totalCostInCycle[correcttotalCost.length-1] != 0;
+		for(int i = 0; i < correcttotalCost.length; i++){
+			if(aco_bestCostInCycle[i] != 0){
+				totalcost = aco_totalCostInCycle[i];
+				bestcost = aco_bestCostInCycle[i];
+				correcttotalCost[i] = totalcost;
+				correctbestCost[i] = bestcost;
+			}else if(totalcost != -1){
+				correcttotalCost[i] = totalcost;
+				correctbestCost[i] = bestcost;
+			}
+		}
+		aco_totalCostInCycle = correcttotalCost;
+		aco_bestCostInCycle = correctbestCost;
+	}
+	
+	public static void writeSolution(String context){
+		FileUtil.writeStringAppend(context, solution);
+	}
+	
+	public static void writeTau(String context){
+		FileUtil.writeStringAppend(context, tau);
+	}
+	
+	public static void writeBestCost(String context){
+		FileUtil.writeStringAppend(context, bestcost);
+	}
+	
+	public static void writeTotalCost(String context){
+		FileUtil.writeStringAppend(context, totalcost);
+	}
+	
+	public static void clearFile(){
+		File f=new File(path);
+		if(f.exists()==false)
+		{
+			f.mkdir();
+		}
+		
+		FileUtil.writeString("", solution);
+		FileUtil.writeString("", probility);
+		FileUtil.writeString("", bestcost);
+		FileUtil.writeString("", totalcost);
+		FileUtil.writeString("", tau);
+	}
+	
+    public static void writeProbility(String context){
+    	FileUtil.writeStringAppend(context, probility);
 	}
 
 }
