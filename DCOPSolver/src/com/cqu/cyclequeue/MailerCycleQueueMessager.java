@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.cqu.aco.PublicConstants;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.ProcessThread;
@@ -90,6 +91,7 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 				
 				dataInCycleIncrease();
 				//System.out.println("cycleCount: "+cycleCount);
+				PublicConstants.realCycle = cycleCount;  //仅仅用于蚁群，不影响其他部分
 				cycleCount++;
 
 				cycleEnd.set(false);
@@ -115,6 +117,7 @@ public abstract class MailerCycleQueueMessager extends ProcessThread{
 		}
 		//数组长度修正
 		dataInCycleCorrection();
+		PublicConstants.dataInCycleCorrection();
 		
 		runFinished();
 	}

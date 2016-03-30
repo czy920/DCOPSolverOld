@@ -52,8 +52,8 @@ public class AcoAgent extends AgentCycle{
 		PublicConstants.rho = Settings.settings.getRho();
 		PublicConstants.Max_tau = Settings.settings.getMax_tau();
 		PublicConstants.Min_tau = Settings.settings.getMin_tau();
-		PublicConstants.aco_bestCostInCycle = new int[PublicConstants.MaxCycle];
-		PublicConstants.aco_totalCostInCycle = new int[PublicConstants.MaxCycle];
+		PublicConstants.aco_bestCostInCycle = new double[PublicConstants.MaxCycle];
+		PublicConstants.aco_totalCostInCycle = new double[PublicConstants.MaxCycle];
 		PublicConstants.betterAntCount = PublicConstants.countAnt/3;
 		PublicConstants.dataLength = (int) (treeDepth + 2);
 	}
@@ -107,8 +107,8 @@ public class AcoAgent extends AgentCycle{
 			
 			sum += tau[value][highValueIndex];
 		}
-		//ret = Math.pow(sum, PublicConstants.alpha)*Math.pow(logCompute(localCost), PublicConstants.beta);
-		ret = Math.pow(sum, PublicConstants.alpha);
+		ret = Math.pow(sum, PublicConstants.alpha)*Math.pow(logCompute(localCost), PublicConstants.beta);
+		//ret = Math.pow(sum, PublicConstants.alpha);
 		return ret;
 	}
 	
@@ -352,8 +352,8 @@ public class AcoAgent extends AgentCycle{
 					temp = null;
 				}
 
-				PublicConstants.dataInCycleIncrease(this.currentCycle, this.localCost,
-						this.bestCost);
+				PublicConstants.dataInCycleIncrease(PublicConstants.realCycle, this.localCost, this.bestCost);
+				
 				if ((PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[3]) ||
 						PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[5]))
 						&& this.currentCycle < PublicConstants.MaxCycle / 3) {
@@ -376,8 +376,8 @@ public class AcoAgent extends AgentCycle{
 				}
 				PublicConstants.writeSolution("bestAnt: " + bestAnt + "\t" + this.bestCost + "\t" + this.localCost + "\t" + tmpInfo.delta + "\n");
 				PublicConstants.writeTau("cycle " + cycle + "\t" +  this.name + "\n" + this.taus.toString() + "\n");
-				PublicConstants.writeBestCost(PublicConstants.aco_bestCostInCycle[this.currentCycle] + "\n");
-				PublicConstants.writeTotalCost(PublicConstants.aco_totalCostInCycle[this.currentCycle] + "\n");
+				PublicConstants.writeBestCost(this.bestCost + "\n");
+				PublicConstants.writeTotalCost(this.localCost + "\n");
 				
 				//更新信息素后，数据初始化，用于保存后面的消息
 				int tempValueIndex = tmpInfo.selfView.get(tmpInfo.bestAnt);
