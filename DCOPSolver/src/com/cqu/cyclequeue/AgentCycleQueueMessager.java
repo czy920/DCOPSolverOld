@@ -81,8 +81,8 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 			if(cycleBegin.get()==true)
 			{
 				//添加work()方法，确保如果本轮没有收到message也能执行操作
-				work(msgQueue.size());
 				localSearchCheck();
+				work(msgQueue.size());
 								
 				while(msgQueue.isEmpty()==false)
 				{

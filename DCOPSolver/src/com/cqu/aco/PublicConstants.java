@@ -98,7 +98,7 @@ public class PublicConstants {
 	//保存每个回合的totalCost
 	protected static void dataInCycleIncrease(int cycle, int totalcost, int bestcost) {
 		
-		if (cycle >= aco_totalCostInCycle.length) {
+		while (cycle >= aco_totalCostInCycle.length) {
 			double[] templist1 = new double[aco_totalCostInCycle.length + PublicConstants.MaxCycle];
 			double[] templist2 = new double[aco_totalCostInCycle.length + PublicConstants.MaxCycle];
 			for (int i = 0; i < aco_totalCostInCycle.length; i++) {
