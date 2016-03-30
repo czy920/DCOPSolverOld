@@ -210,12 +210,18 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 					else if(suggestTag == 1){
 						suggestTag = 0;
 						
-						int localCostTemp=0;
+						int localCostTemp = 0, compareTemp = 0;
 						for(int i=0; i<neighbours.length; i++){
 							localCostTemp+=constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
+							if(i != suggester){
+								compareTemp += constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex[i]];
+								compareTemp -= constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
+								
+							}
 						}
+						compareTemp += suggestGain;
 						myPercentage = ((double)(localCostTemp-myMinCost))/((double)(myMaxCost-myMinCost));
-						if(localCostTemp < localCost || myPercentage < utilityPercentage){
+						if(localCostTemp < localCost || myPercentage < utilityPercentage || compareTemp > 0){
 							valueIndex = suggestValue;
 							//System.out.println("accept!!!!!!!!");
 						}
