@@ -167,7 +167,7 @@ public class DsaA_Agent extends AgentCycle {
 		result.put(KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
-		System.out.println("Agent "+this.name+" stopped!");
+//		System.out.println("Agent "+this.name+" stopped!");
 	}
 	
 	
@@ -179,16 +179,16 @@ public class DsaA_Agent extends AgentCycle {
 		int ncccTemp = 0;
 		for(Map<String, Object> result : results){
 			
-			int id_=(Integer)result.get(KEY_ID);
-			String name_=(String)result.get(KEY_NAME);
-			int value_=(Integer)result.get(KEY_VALUE);
+//			int id_=(Integer)result.get(KEY_ID);
+//			String name_=(String)result.get(KEY_NAME);
+//			int value_=(Integer)result.get(KEY_VALUE);
 			
 			if(ncccTemp < (Integer)result.get(KEY_NCCC))
 				ncccTemp = (Integer)result.get(KEY_NCCC);
 			totalCost+=((double)((Integer)result.get(KEY_LOCALCOST)))/2;
 			
-			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
-			System.out.println(displayStr);
+//			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
+//			System.out.println(displayStr);
 		}
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost)+
