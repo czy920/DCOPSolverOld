@@ -84,7 +84,7 @@ public class MaxSumADVPFunctionNode extends MaxSumADVPNode{
 			sendMessages[messageIndex++]=new Message(getParentAgentId(), 
 					targetId, 
 					AbstractNode.MSG_TYPE_TO_VARIABLE_NODE, 
- 					new MessageContent(localFunction.resovle(targetId, HyperCube.HYPER_CUBE_OPERATE_MAX_SUM, assignMap)));
+ 					new MessageContent(localFunction.resovle(targetId, HyperCube.HYPER_CUBE_OPERATE_MAX_SUM, assignMap,null)));
 		}
 		return sendMessages;
 	}

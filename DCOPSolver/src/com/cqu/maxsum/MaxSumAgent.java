@@ -10,12 +10,15 @@ import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.settings.Settings;
 
 public class MaxSumAgent extends AgentCycle {
+	private static final int PROCESS_TYPE_VARIABLE = 0;
+	private static final int PROCESS_TYPE_FUNCTION  = 1;
 	
 	private MaxSumFunctionNode functionNode;
 	private MaxSumVariableNode variableNode;
 	private int cycleEnd;
 	private Map<Integer, Integer> lastKnownValueIndex;
 	private boolean isStartMessage = false;
+	private int processType;
 
 	public MaxSumAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
@@ -34,7 +37,7 @@ public class MaxSumAgent extends AgentCycle {
 			stringBuffer.append((Integer)map.get("id"));
 			stringBuffer.append(" optimalVal:");
 			stringBuffer.append((Integer)map.get("val"));  
-			//System.out.println(stringBuffer.toString());
+			System.out.println(stringBuffer.toString());
 			totalCost+=((double)((Integer)map.get("localCost")))/2;
 		}
 		ResultCycle retResult=new ResultCycle();
@@ -120,11 +123,18 @@ public class MaxSumAgent extends AgentCycle {
 		super.allMessageDisposed();
 		if (isStartMessage) {
 			broadcastMessages(functionNode.handleMessage(null));
+			processType = PROCESS_TYPE_VARIABLE;
 			//System.out.println(id+" start round");
 			return;
 		}
-		broadcastMessages(variableNode.handleMessage(null));
-		broadcastMessages(functionNode.handleMessage(null));
+		if (processType == PROCESS_TYPE_VARIABLE) {
+			broadcastMessages(variableNode.handleMessage(null));
+			processType = PROCESS_TYPE_FUNCTION;
+		}
+		else {
+			broadcastMessages(functionNode.handleMessage(null));
+			processType = PROCESS_TYPE_VARIABLE;
+		}
 		if (--cycleEnd <= 0) {
 			stopRunning();
 		}
@@ -190,11 +200,7 @@ private void printMessage(Message message){
 		stringBuffer.append(" currentIndex:");
 		stringBuffer.append(content.getCurrentValueIndex());
 		if (content.getLargerHyperCube() != null) {
-			stringBuffer.append(" hypercube:[");
-			for(int i=0;i<content.getLargerHyperCube().utilLength();i++){
-				stringBuffer.append(content.getLargerHyperCube().indexUtils(i)+" ");
-			}
-			stringBuffer.append("]");
+			stringBuffer.append(" hypercube:" + content.getLargerHyperCube().toString());
 		}		
 		System.out.println(stringBuffer.toString());
 	}

@@ -11,12 +11,13 @@ import com.cqu.core.Message;
 import com.cqu.core.ResultCycle;
 import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.settings.Settings;
-import com.sun.org.apache.bcel.internal.generic.NEW;
 
 public class MaxSumStructureRefineAgent extends AgentCycle {
 	
 	private static Random random = new Random();
 	private static final int MSG_TYPE_FACTOR_GRAPH = 8;
+	private static final int PROCESS_TYPE_VARIABLE = 0;
+	private static final int PROCESS_TYPE_FUNCTION  = 1;
 	
 	private MaxSumFunctionNode functionNode;
 	private MaxSumVariableNode variableNode;
@@ -27,6 +28,7 @@ public class MaxSumStructureRefineAgent extends AgentCycle {
 	private List<Integer> controlledNeighbours;
 	private int degree;
 	private int randomVal;
+	private int processType;
 	
 	public MaxSumStructureRefineAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
@@ -176,13 +178,16 @@ public class MaxSumStructureRefineAgent extends AgentCycle {
 		if (isStartMessage) {
 			if (functionNode != null) {
 				broadcastMessages(functionNode.handleMessage(null));
+				processType = PROCESS_TYPE_VARIABLE;
 			}			
 			//System.out.println(id+" start round");
 			return;
 		}
-		if(functionNode != null)
-			broadcastMessages(functionNode.handleMessage(null));
-		broadcastMessages(variableNode.handleMessage(null));
+		if (processType == PROCESS_TYPE_FUNCTION)
+			if(functionNode != null)
+				broadcastMessages(functionNode.handleMessage(null));
+		if (processType == PROCESS_TYPE_VARIABLE)
+			broadcastMessages(variableNode.handleMessage(null));
 		if (--cycleEnd <= 0) {
 			stopRunning();
 		}

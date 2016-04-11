@@ -1,18 +1,35 @@
 package com.cqu.maxsum;
 
+import java.util.List;
+import java.util.Map;
+
 public class MessageContent {
 
 	private int currentValueIndex = -1;
 	private HyperCube hyperCube;
+	private LargerHyperCube largerHyperCube;
+	private List<Map<Integer, Integer>> optimalList;
+	private int degree;
+	private int random;
+	
 	public MessageContent(LargerHyperCube largerHyperCube) {
 		super();
 		this.largerHyperCube = largerHyperCube;
 	}
+	
+	public MessageContent(LargerHyperCube largerHyperCube, List<Map<Integer, Integer>> optimalList){
+		this(largerHyperCube);
+		this.optimalList = optimalList;
+	}
+	
+	public MessageContent(int degree, int radom){
+		this.degree = degree;
+		this.random = radom;
+	}
+	
 	public MessageContent(){
 		
-	}
-
-	private LargerHyperCube largerHyperCube;
+	}	
 	
 	public MessageContent(HyperCube hyperCube){
 		this.hyperCube=hyperCube;
@@ -46,6 +63,16 @@ public class MessageContent {
 	
 	public void setLargerHyperCube(LargerHyperCube largerHyperCube) {
 		this.largerHyperCube = largerHyperCube;
+	}
+	
+	public List<Map<Integer, Integer>> getOptimalList() {
+		return optimalList;
+	}
+	public int getDegree() {
+		return degree;
+	}
+	public int getRandom() {
+		return random;
 	}
 	
 }

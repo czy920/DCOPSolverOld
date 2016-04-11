@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class LargerHyperCube {
@@ -28,7 +29,7 @@ public class LargerHyperCube {
 			int[][] subUtil = new int[subCost.length][subCost[0].length];
 			for (int i = 0; i < subCost.length; i++)
 				for (int j = 0; j < subCost[i].length; j++)
-					subUtil[i][j] = -subCost[i][j];			
+					subUtil[i][j] = -subCost[i][j];
 			this.utils.put(id, subUtil);
 		}
 		cubes = new ArrayList<LargerHyperCube>();
@@ -129,7 +130,7 @@ public class LargerHyperCube {
 		return createSimpleLargerUtil(mainId, resovledUtil);
 	}
 	
-	public LargerHyperCube resovle(int target, String operate, Map<Integer, Integer> fixedAssignment) {
+	public LargerHyperCube resovle(int target, String operate, Map<Integer, Integer> fixedAssignment, List<Map<Integer, Integer>> optimList) {
 		int[] targetUtil = new int[domainLength(target)];
 		if (operate.equals(HYPER_CUBE_OPERATE_MAX_SUM)) {
 			Arrays.fill(targetUtil, Integer.MIN_VALUE);
@@ -158,8 +159,12 @@ public class LargerHyperCube {
 //		}
 		Map<Integer, int[][]> tmpUtil = generateTmpUtil();
 		List<Map<Integer, Integer>> optimalList = calcuOptimals(tmpUtil, target);
+		AtomicInteger index = new AtomicInteger();
 		for(int i = 0; i < targetUtil.length; i++){
-			targetUtil[i] = calcuMaxUtility(optimalList, tmpUtil, target, i);
+			targetUtil[i] = calcuMaxUtility(optimalList, tmpUtil, target, i, index);
+			if (optimList != null) {
+				optimList.add(optimalList.get(index.get()));
+			}
 		}
 		cubes.clear();
 		return createSimpleLargerUtil(target, targetUtil);
@@ -235,11 +240,12 @@ public class LargerHyperCube {
 		return optimals;
 	}
 	
-	private int calcuMaxUtility(List<Map<Integer,Integer>> optimals, Map<Integer, int[][]> tmpUtil, int target, int targetVal)
+	private int calcuMaxUtility(List<Map<Integer,Integer>> optimals, Map<Integer, int[][]> tmpUtil, int target, int targetVal, AtomicInteger index)
 	{
 		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
 		if (target == mainId) {
 			map.put(target, targetVal);
+			index.set(targetVal);
 			return indexUtils(tmpUtil, target, map) + optimals.get(targetVal).get(KEY_TAOTAL_UTIL);
 		}
 		int maxUtility = Integer.MIN_VALUE;		
@@ -250,6 +256,7 @@ public class LargerHyperCube {
 			util += indexUtils(tmpUtil,mainId,map);
 			if (util > maxUtility) {
 				maxUtility = util;
+				index.set(i);
 			}
 			map.clear();
 		}
@@ -276,8 +283,14 @@ public class LargerHyperCube {
 		return new LargerHyperCube(new int[]{id}, id, utilMap);
 	}
 
-
-	
-	
-	
+	@Override
+	public String toString() {
+		StringBuffer stringBuffer = new StringBuffer();
+		stringBuffer.append("[");
+		for (int i = 0; i < utilLength(); i++){
+			stringBuffer.append(indexUtils(i) + " ");
+		}
+		stringBuffer.append("]");
+		return stringBuffer.toString();
+	}
 }

@@ -12,8 +12,8 @@ import com.sun.org.apache.bcel.internal.generic.NEW;
 
 public class MaxSumFunctionNode extends MaxSumNode {
 
-	private LargerHyperCube localFunction;
-	private int selfDomainSize;
+	protected LargerHyperCube localFunction;
+	protected int selfDomainSize;
 	
 	public MaxSumFunctionNode(int parentAgent,LargerHyperCube localFunction,int domainSize) {
 		super(parentAgent);
@@ -57,7 +57,7 @@ public class MaxSumFunctionNode extends MaxSumNode {
 			sendMessages[messageIndex++]=new Message(getParentAgentId(), 
 					destId, 
 					AbstractNode.MSG_TYPE_TO_VARIABLE_NODE, 
-					new MessageContent(localFunction.resovle(destId, LargerHyperCube.HYPER_CUBE_OPERATE_MAX_SUM, null)));
+					new MessageContent(localFunction.resovle(destId, LargerHyperCube.HYPER_CUBE_OPERATE_MAX_SUM, null, null)));
 		}
 		return sendMessages;
 	}

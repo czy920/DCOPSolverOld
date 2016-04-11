@@ -34,6 +34,10 @@ public class MaxSumVariableNode extends MaxSumNode {
 		LargerHyperCube hyperCube = LargerHyperCube.createSimpleLargerUtil(getParentAgentId(), domainSize, 0);
 		comingMessages.put(neighbourInfo.getAgentId(), hyperCube);
 	}
+	
+	public void removeNeighbour(int neighbour){
+		comingMessages.remove(neighbour);
+	}
 
 	public void addMessage(Message message){
 		comingMessages.put(message.getIdSender(), ((MessageContent)message.getValue()).getLargerHyperCube());
