@@ -697,6 +697,12 @@ public class SolverWindow {
 			paramList.add(lspSpinnerSelectProbabilityB);
 			
 		}
+		else if(algorithmType.equals("ALSMGMLUC")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbabilityA);
+			paramList.add(lspSpinnerSelectProbabilityB);
+			
+		}
 		else if(algorithmType.equals("DPOP"))
 		{
 			paramList.add(lspSpinnerMessageTransmissionTime);
