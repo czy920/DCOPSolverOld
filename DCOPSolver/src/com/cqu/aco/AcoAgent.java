@@ -189,7 +189,7 @@ public class AcoAgent extends AgentCycle{
 		//为每条信息素边更新信息素
 		if((PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[3]) ||
 				PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[5]))	&& this.currentCycle  < PublicConstants.MaxCycle / 3){
-			tmp.betterSolution = obj.betterSolution;
+			tmp.betterDelta = obj.betterDelta;
 			this.updatePheros(cycle);
 		}else{
 			tmp.delta = obj.getDelta();
@@ -283,10 +283,11 @@ public class AcoAgent extends AgentCycle{
 	private void sendPheromone(int cycle){
 		//向所有agent广播信息素更新值delta
 		EachCycleInfo tmp = getInfo(cycle);
-		PheroMsgContext obj = new PheroMsgContext(cycle, tmp.bestAnt, tmp.delta, this.bestCost, this.endBestAnt);
+		
 		for(int i=0 ; i < this.allNodes.length; i++){
 			int otherId = this.allNodes[i];
 			if(otherId != this.id){
+				PheroMsgContext obj = new PheroMsgContext(cycle, tmp.bestAnt, tmp.delta, this.bestCost, this.endBestAnt);
 				Message msg=new Message(this.id, otherId, AcoAgent.TYPE_VALUE_PHEROMONE, obj);
 				this.sendMessage(msg);
 			}
@@ -296,10 +297,11 @@ public class AcoAgent extends AgentCycle{
 	private void sendPheromones(int cycle){
 		//向所有agent广播信息素更新值delta
 		EachCycleInfo tmp = getInfo(cycle);
-		PheroMsgContext obj = new PheroMsgContext(cycle, tmp.bestAnt, tmp.betterSolution, this.bestCost, this.endBestAnt);
+		
 		for(int i=0 ; i < this.allNodes.length; i++){
 			int otherId = this.allNodes[i];
 			if(otherId != this.id){
+				PheroMsgContext obj = new PheroMsgContext(cycle, tmp.bestAnt, tmp.betterDelta, this.bestCost, this.endBestAnt);
 				Message msg=new Message(this.id, otherId, AcoAgent.TYPE_VALUE_PHEROMONE, obj);
 				this.sendMessage(msg);
 			}
@@ -357,7 +359,7 @@ public class AcoAgent extends AgentCycle{
 				if ((PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[3]) ||
 						PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[5]))
 						&& this.currentCycle < PublicConstants.MaxCycle / 3) {
-					tmpInfo.betterSolution = this.selectBetterSolution(cycle);
+					tmpInfo.betterDelta = this.selectBetterSolution(cycle);
 					this.updatePheros(cycle);
 					this.sendPheromones(cycle);
 				} else {
@@ -489,13 +491,13 @@ public class AcoAgent extends AgentCycle{
 		}
 		EachCycleInfo tmpInfo = this.getInfo(cycle);
 		//再对相应路径增加信息素
-		for(int andId : tmpInfo.betterSolution.keySet()){
+		for(int andId : tmpInfo.betterDelta.keySet()){
 			for(int i = 0; i < this.highPriorities.length; i++){
 				int myValue = tmpInfo.selfView.get(andId);
 				int oppId = this.highPriorities[i];
 				int oppValue = tmpInfo.context.get(andId).getContext().get(oppId);
 				double old_tau = this.taus.get(oppId).getTau()[myValue][oppValue];
-				double new_tau = PublicConstants.update_tau(old_tau, tmpInfo.betterSolution.get(andId));
+				double new_tau = PublicConstants.update_tau(old_tau, tmpInfo.betterDelta.get(andId));
 				this.taus.get(oppId).getTau()[myValue][oppValue] = new_tau;
 			}
 		}
@@ -780,14 +782,14 @@ class EachCycleInfo{
 	protected int bestAnt;
 	protected double delta;
 	
-	protected HashMap<Integer,Double> betterSolution;
+	protected HashMap<Integer,Double> betterDelta;
 	
 	private EachCycleInfo(){
 		context = new HashMap<Integer, Context>();
 		selfView = new HashMap<Integer, Integer>();
 		currentCosts = new HashMap<Integer, Integer>();
 		mark = new HashMap<Integer, Boolean>();
-		betterSolution = new HashMap<Integer, Double>(PublicConstants.betterAntCount);
+		betterDelta = new HashMap<Integer, Double>(PublicConstants.betterAntCount);
 	}
 	
 	public void initVariable(){
@@ -798,7 +800,7 @@ class EachCycleInfo{
 			this.context.put(antId, context);
 			this.currentCosts.put(antId, 0);
 			this.selfView.put(antId, -1);
-			this.betterSolution.clear();
+			this.betterDelta.clear();
 		}
 		bestAnt = -1;
 	    delta = -1;
