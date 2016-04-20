@@ -249,12 +249,13 @@ public class AlsMgm2Agent extends AgentCycleAls {
 		neighboursValueIndex.put((Integer)senderIndex, (Integer)msg.getValue());
 		
 		if(receivedQuantity==0){
+			localCost=localCost();
+			AlsWork();
 			
 			if(cycleCount>=cycleCountEnd){
+				STOPRUNNING = true;
 				//stopRunning();
 			}else{
-				localCost=localCost();
-				AlsWork();
 				
 				if(cycleCount % r == 0){
 					valueIndex=(int)(Math.random()*(domain.length));

@@ -92,12 +92,10 @@ public class AlsDsa_Agent extends AgentCycleAls{
 		
 		if(receivedQuantity==0){
 			localCost=localCost();
-			
+			//!!!!!!!!!!!!!!!!!!!!进行ALS框架操作，调用父类方法!!!!!!!!!!!!!!!!!!!!
+			//!!!!!!!要获取localCost的值，该方法必须要位于localCost()方法之后，!!!!!!!!
+			AlsWork();
 			if(cycleCount <= cycleCountEnd){
-				//!!!!!!!!!!!!!!!!!!!!进行ALS框架操作，调用父类方法!!!!!!!!!!!!!!!!!!!!
-				//!!!!!!!要获取localCost的值，该方法必须要位于localCost()方法之后，!!!!!!!!
-				AlsWork();
-				
 				if(Math.random()<p){
 					int[] selectMinCost=new int[domain.length];
 					for(int i=0; i<domain.length; i++){
@@ -123,6 +121,8 @@ public class AlsDsa_Agent extends AgentCycleAls{
 				}
 				sendValueMessages();
 			}
+			else
+				STOPRUNNING = true;
 		}
 	}
 	

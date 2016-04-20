@@ -36,7 +36,7 @@ public class Solver {
 		}
 		if(agentType.equals("BFSDPOP")||agentType.equals("ALSDSA")||agentType.equals("ALSMGM")||agentType.equals("ALSMGM2")||agentType.equals("ALS_DSA")||
 				agentType.equals("ALS_H1_DSA")||agentType.equals("ALS_H2_DSA")||agentType.equals("ALSLMUSDSA4")||agentType.equals("ALSMLUDSA")||agentType.equals("ALSDSAMGM")||
-				agentType.equals("ALSDSAMGMEVO")||agentType.equals("ALSDSALUC")||agentType.equals("ALSMGMLUC"))
+				agentType.equals("ALSDSAMGMEVO")||agentType.equals("ALSDSALUC")||agentType.equals("ALSMGMLUC")||agentType.equals("ALSMGM2LUC"))
 		{
 			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
@@ -77,7 +77,7 @@ public class Solver {
 				agentType.equals("DSA_A")||agentType.equals("DSA_B")||agentType.equals("DSA_C")||agentType.equals("DSA_D")||agentType.equals("DSA_E")||
 				agentType.equals("MGM")||agentType.equals("MGM2")||agentType.equals("ALSDSA")||agentType.equals("ALSMGM")||agentType.equals("ALSMGM2")||
 				agentType.equals("ALS_DSA")||agentType.equals("ALS_H1_DSA")||agentType.equals("ALS_H2_DSA")||agentType.equals("ALSLMUSDSA4")||agentType.equals("ALSMLUDSA")||
-				agentType.equals("ALSDSAMGM")||agentType.equals("ALSDSAMGMEVO")||agentType.equals("ALSDSALUC")||agentType.equals("ALSMGMLUC")||agentType.equals("MAXSUM")||agentType.equals("ACO")||
+				agentType.equals("ALSDSAMGM")||agentType.equals("ALSDSAMGMEVO")||agentType.equals("ALSDSALUC")||agentType.equals("ALSMGMLUC")||agentType.equals("ALSMGM2LUC")||agentType.equals("MAXSUM")||agentType.equals("ACO")||
 				agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||agentType.equals("ACO_line")||agentType.equals("ACO_final"))
 
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
@@ -427,8 +427,8 @@ public class Solver {
 		}
 		if(algorithmType.equals("BFSDPOP") || algorithmType.equals("ALSDSA") || algorithmType.equals("ALSMGM")  || algorithmType.equals("ALSMGM2") 
 				|| algorithmType.equals("ALS_DSA") || algorithmType.equals("ALS_H1_DSA") || algorithmType.equals("ALS_H2_DSA") || algorithmType.equals("ALSLMUSDSA4") 
-				|| algorithmType.equals("ALSMLUDSA") || algorithmType.equals("ALSDSAMGM") || algorithmType.equals("ALSDSAMGMEVO") || algorithmType.equals("ALSDSALUC") 
-				|| algorithmType.equals("ALSMGMLUC"))
+				|| algorithmType.equals("ALSMLUDSA") || algorithmType.equals("ALSDSAMGM") || algorithmType.equals("ALSDSAMGMEVO") || algorithmType.equals("ALSDSALUC")
+				|| algorithmType.equals("ALSMGMLUC") || algorithmType.equals("ALSMGM2LUC"))
 		{
 			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
@@ -477,7 +477,7 @@ public class Solver {
 				algorithmType.equals("DSA_A")||algorithmType.equals("DSA_B")||algorithmType.equals("DSA_C")||algorithmType.equals("DSA_D")||algorithmType.equals("DSA_E")||
 				algorithmType.equals("MGM")||algorithmType.equals("MGM2")||algorithmType.equals("ALSDSA")||algorithmType.equals("ALSMGM")||algorithmType.equals("ALSMGM2")||
 				algorithmType.equals("ALS_DSA")||algorithmType.equals("ALS_H1_DSA")||algorithmType.equals("ALS_H2_DSA")||algorithmType.equals("ALSLMUSDSA4")||algorithmType.equals("ALSMLUDSA")||
-				algorithmType.equals("ALSDSAMGM")||algorithmType.equals("ALSDSAMGMEVO")||algorithmType.equals("ALSDSALUC")||algorithmType.equals("ALSMGMLUC")||algorithmType.equals("ACO")||algorithmType.equals("ACO_tree")||
+				algorithmType.equals("ALSDSAMGM")||algorithmType.equals("ALSDSAMGMEVO")||algorithmType.equals("ALSDSALUC")||algorithmType.equals("ALSMGMLUC")||algorithmType.equals("ALSMGM2LUC")||algorithmType.equals("ACO")||algorithmType.equals("ACO_tree")||
 				algorithmType.equals("ACO_bf")||algorithmType.equals("ACO_phase")||algorithmType.equals("ACO_line")||algorithmType.equals("ACO_final"))
 		//if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT"))
 		{

@@ -106,10 +106,9 @@ public class AlsDsa_H2_Agent extends AgentCycleAls {
 		
 		if(receivedQuantity==0){
 			localCost=localCost();
+			AlsWork();
 			
 			if(cycleCount<=cycleCountEnd){
-				
-				AlsWork();
 				
 				if(cycleCount % r != 0){
 					int[] selectMinCost=new int[domain.length];
@@ -151,6 +150,8 @@ public class AlsDsa_H2_Agent extends AgentCycleAls {
 					valueIndex = (int) (Math.random() * domain.length);
 				sendValueMessages();
 			}
+			else
+				STOPRUNNING = true;
 		}
 	}
 	

@@ -25,6 +25,7 @@ public abstract class AgentCycleAls extends AgentCycle{
 	protected LinkedList<Integer> localCostList = new LinkedList<Integer>();
 	protected LinkedList<Integer> valueIndexList = new LinkedList<Integer>();
 	protected HashMap<Integer, LinkedList<Integer>> childrenMessageList = new HashMap<Integer, LinkedList<Integer>>();
+	protected boolean STOPRUNNING = false;
 	
 	protected int warning = 0;
 	
@@ -148,7 +149,7 @@ public abstract class AgentCycleAls extends AgentCycle{
 				//}
 			}
 		}
-		if(valueIndexList.isEmpty() == true){
+		if(valueIndexList.isEmpty() == true && STOPRUNNING == true){
 			if(level == 0){
 				double temp[] = new double[AlsCycleCount];
 				for(int i = 0; i < AlsCycleCount; i++){

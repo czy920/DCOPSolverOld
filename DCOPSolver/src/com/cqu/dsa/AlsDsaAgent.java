@@ -131,13 +131,14 @@ public class AlsDsaAgent extends AgentCycleAls {
 		
 		if(receivedQuantity==0){
 			localCost=localCost();
+			//进行ALS框架操作
+			AlsWork();
 			
 			if(cycleCount>=cycleCountEnd){
+				STOPRUNNING = true;
 				//stopRunning();
 				//!!!!!!!!!!!!!!!!!!!!在Als框架下，线程终止操作不在这里进行!!!!!!!!!!!!!!!!!!!!
 			}else{
-				//进行ALS框架操作
-				AlsWork();
 				
 				if(Math.random()<p){
 					int[] selectMinCost=new int[domain.length];
@@ -250,7 +251,7 @@ public class AlsDsaAgent extends AgentCycleAls {
 				//System.out.println("cycleCount~~~"+cycleCount+"~~~bestCost~~~"+bestCost);
 			}
 		}
-		if(valueIndexList.isEmpty() == true){
+		if(valueIndexList.isEmpty() == true && STOPRUNNING == true){
 			//bestCost = bestCost/2;
 			stopRunning();
 		}

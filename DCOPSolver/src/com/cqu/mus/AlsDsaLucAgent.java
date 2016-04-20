@@ -197,12 +197,12 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 		if(receivedQuantity==0){
 			prepareToReset--;
 			localCost=localCost();
+			AlsWork();
 			if(newCycle == true){
 				cycleCount++;
 				newCycle = false;
 			}
 			if(cycleCount <= cycleCountEnd){
-				AlsWork();
 				if(prepareToReset > 0){
 					
 					if(wait == 0 && suggestTag == 0)
@@ -242,6 +242,8 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 					sendValueMessages();
 				}
 			}
+			else
+				STOPRUNNING = true;
 		}
 	}
 	
@@ -361,8 +363,8 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 	}
 	
 	private void abandonChain(){
-		if(Math.random() > abandonProbability)
-			return;
+//		if(Math.random() > abandonProbability)
+//			return;
 		
 		int[] abandonNeighbourIndex = new int[neighboursQuantity];
 		int[] abandonCost = new int[neighboursQuantity];
@@ -504,7 +506,7 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 				//}
 			}
 		}
-		if(valueIndexList.isEmpty() == true){
+		if(valueIndexList.isEmpty() == true && 	STOPRUNNING == true){
 			if(level == 0){
 				double temp[] = new double[AlsCycleCount];
 				for(int i = 0; i < AlsCycleCount; i++){

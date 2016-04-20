@@ -277,11 +277,11 @@ public class AlsMluDsaAgent extends AgentCycleAls{
 		
 		if(receivedQuantity==0){
 			localCost=localCost();
+			//!!!!!!!!!!!!!!!!!!!!进行ALS框架操作，调用父类方法!!!!!!!!!!!!!!!!!!!
+			//!!!!!!!要获取localCost的值，该方法必须要位于localCost()方法之后，!!!!!!!
+			AlsWork();
 			
 			if(cycleCount <= cycleCountEnd){
-				//!!!!!!!!!!!!!!!!!!!!进行ALS框架操作，调用父类方法!!!!!!!!!!!!!!!!!!!
-				//!!!!!!!要获取localCost的值，该方法必须要位于localCost()方法之后，!!!!!!!
-				AlsWork();
 				
 					for(int i = 0; i < neighboursQuantity; i++){
 						if(myTag <= neighboursTag[i])
@@ -302,6 +302,8 @@ public class AlsMluDsaAgent extends AgentCycleAls{
 					mySuggestValueTag = mySuggestValueTag+0.5;
 					sendStep2Messages();
 			}
+			else
+				STOPRUNNING = true;
 			bestCostTemp = 2147483647;
 		}
 	}
@@ -523,7 +525,7 @@ public class AlsMluDsaAgent extends AgentCycleAls{
 				//}
 			}
 		}
-		if(valueIndexList.isEmpty() == true){
+		if(valueIndexList.isEmpty() == true && STOPRUNNING == true){
 			if(level == 0){
 				double temp[] = new double[AlsCycleCount];
 				for(int i = 0; i < AlsCycleCount; i++){

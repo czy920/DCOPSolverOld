@@ -27,7 +27,7 @@ public class MgmAgent extends AgentCycle {
 	private int cycleCount;
 	private int neighboursQuantity;	
 	private int neighboursGain[];
-	private HashMap<Integer, Integer> neighboursValueIndex;			//<neighbour 的 Index, neighbourValue 的  Index>
+	private int[] neighboursValueIndex;	
 	
 	public MgmAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
@@ -44,11 +44,9 @@ public class MgmAgent extends AgentCycle {
 		selectValueIndex=0;
 		receivedQuantity=0;
 		cycleCount=0;
-		neighboursValueIndex=new HashMap<Integer, Integer>();
 		neighboursQuantity=neighbours.length;
+		neighboursValueIndex = new int[neighboursQuantity];
 		neighboursGain=new int[neighboursQuantity];
-		for(int i=0; i<neighbours.length; i++)
-			neighboursValueIndex.put((Integer)i, (Integer)0);
 		sendValueMessages();
 	}
 	
@@ -69,7 +67,7 @@ public class MgmAgent extends AgentCycle {
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighboursQuantity; i++){
-			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
+			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex[i]];		
 		}
 		return localCostTemp;
 	}
@@ -113,8 +111,8 @@ public class MgmAgent extends AgentCycle {
 			}
 		}
 		*/
-		
-		neighboursValueIndex.put((Integer)senderIndex, (Integer)msg.getValue());
+
+		neighboursValueIndex[senderIndex] = (Integer)(msg.getValue());
 		
 		if(receivedQuantity==0){
 			/*
@@ -141,7 +139,7 @@ public class MgmAgent extends AgentCycle {
 				for(int i=0; i<domain.length; i++){
 					for(int j=0; j<neighboursQuantity; j++){
 //						if(this.id < neighbours[j])
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
+							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];		
 //						else
 //							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
 					}

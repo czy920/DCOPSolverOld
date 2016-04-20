@@ -33,7 +33,7 @@ public class AlsMgmLucAgent extends AgentCycle {
 	private int neighboursGain[];
 	private int[] neighboursValueIndex;	
 
-	private int[] neighbourPercentage;
+//	private int[] neighbourPercentage;
 	private double myPercentage;
 	private int[] abandonSuggestGain;
 	private int suggestValue;
@@ -55,6 +55,8 @@ public class AlsMgmLucAgent extends AgentCycle {
 		super.initRun();
 		
 		cycleCountEnd = Settings.settings.getCycleCountEnd();
+		utilityPercentage = Settings.settings.getSelectProbabilityA();
+		abandonProbability = Settings.settings.getSelectProbabilityB();
 		
 		localCost=2147483647;
 		valueIndex=(int)(Math.random()*(domain.length));
@@ -64,19 +66,13 @@ public class AlsMgmLucAgent extends AgentCycle {
 		neighboursQuantity=neighbours.length;
 		neighboursValueIndex = new int[neighboursQuantity];
 		neighboursGain=new int[neighboursQuantity];
-		for(int i=0; i<neighbours.length; i++)
-			neighboursValueIndex[i] = 0;
-		
-		utilityPercentage = Settings.settings.getSelectProbabilityA();
-		abandonProbability = Settings.settings.getSelectProbabilityB();
 		
 		mySuggestValue = new int[domain.length];
 		myNeighboursSuggestTable = new int[domain.length][neighboursQuantity];
 		abandonSuggestGain = new int[2];
 		buildMyTable();
 		myPercentage = 1;
-		neighbourPercentage = new int[neighboursQuantity];
-		//valueIndex = mySuggestValue[0];
+//		neighbourPercentage = new int[neighboursQuantity];
 		sendValueMessages();
 	}
 	
@@ -168,7 +164,7 @@ public class AlsMgmLucAgent extends AgentCycle {
 		}
 		return localCostTemp;
 	}
-
+	
 	@Override
 	protected void disposeMessage(Message msg) {
 		if(Debugger.debugOn==true)
@@ -260,7 +256,7 @@ public class AlsMgmLucAgent extends AgentCycle {
 		
 		if(receivedQuantity==0){
 			
-			if(wait != 0){
+			if(wait == 1){
 				wait = 0;
 				sendValueMessages();
 				return;
@@ -280,6 +276,8 @@ public class AlsMgmLucAgent extends AgentCycle {
 				myPercentage = ((double)(localCostTemp-myMinCost))/((double)(myMaxCost-myMinCost));
 				if(localCostTemp < localCost || myPercentage < utilityPercentage || compareTemp > 0){
 					valueIndex = suggestValue;
+					sendValueMessages();
+					return;
 					//System.out.println("accept!!!!!!!!");
 				}
 				else{
@@ -371,8 +369,8 @@ public class AlsMgmLucAgent extends AgentCycle {
 	}
 	
 	private boolean abandonChain(){
-		if(Math.random() > abandonProbability)
-			return false;
+//		if(Math.random() > abandonProbability)
+//			return false;
 		
 		int[] abandonNeighbourIndex = new int[neighboursQuantity];
 		int[] abandonCost = new int[neighboursQuantity];

@@ -148,17 +148,18 @@ public class AlsDsaMgmEvoAgent extends AgentCycleAls{
 		
 		if(receivedDsaValueQuantity==0){
 			dsaCycle++;
+			prepareToReset--;
+			localCost=localCost();
+			AlsWork();
 			
 			if(STEP == MGM){
 				cycleCount++;
 				if(cycleCount > cycleCountEnd){
+					STOPRUNNING = true;
 					return;
 				}
 				STEP = DSA;
 			}
-			prepareToReset--;
-			localCost=localCost();
-			AlsWork();
 			
 			if(prepareToReset > 0){
 
@@ -453,7 +454,7 @@ public class AlsDsaMgmEvoAgent extends AgentCycleAls{
 				//}
 			}
 		}
-		if(valueIndexList.isEmpty() == true){
+		if(valueIndexList.isEmpty() == true && STOPRUNNING == true){
 			if(level == 0){
 				double temp[] = new double[AlsCycleCount];
 				for(int i = 0; i < AlsCycleCount; i++){

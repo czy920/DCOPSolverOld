@@ -352,12 +352,11 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 		
 		if(receivedQuantity==0){
 			localCost=localCost();
+			//!!!!!!!!!!!!!!!!!!!!进行ALS框架操作，调用父类方法!!!!!!!!!!!!!!!!!!!
+			//!!!!!!!要获取localCost的值，该方法必须要位于localCost()方法之后，!!!!!!!
+			AlsWork();
 			
 			if(cycleCount <= cycleCountEnd){
-				//!!!!!!!!!!!!!!!!!!!!进行ALS框架操作，调用父类方法!!!!!!!!!!!!!!!!!!!
-				//!!!!!!!要获取localCost的值，该方法必须要位于localCost()方法之后，!!!!!!!
-				AlsWork();
-				
 				if(myIdentity == NONE){
 					DsaWork();
 					sendStep2Messages();
@@ -388,6 +387,8 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 					a=a/0;
 				}
 			}
+			else
+				STOPRUNNING = true;
 			bestCostTemp = 2147483647;
 		}
 	}
@@ -664,7 +665,7 @@ public class AlsLmusDsa4Agent extends AgentCycleAls{
 				//}
 			}
 		}
-		if(valueIndexList.isEmpty() == true){
+		if(valueIndexList.isEmpty() == true && STOPRUNNING == true){
 			if(level == 0){
 				double temp[] = new double[AlsCycleCount];
 				for(int i = 0; i < AlsCycleCount; i++){
