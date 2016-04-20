@@ -5,8 +5,7 @@ import java.util.HashMap;
 public class PheroMsgContext {
 	int ant;
 	double delta;
-	HashMap<Integer, Double> betterSolution;
-	double[] betterDelta;
+	HashMap<Integer, Double> betterDelta;
 	int bestCost;
 	String endBestAnt;
 	int cycle;
@@ -20,11 +19,12 @@ public class PheroMsgContext {
 		this.endBestAnt = endBestAnt;
 	}
 	
-	public PheroMsgContext(int cycle, int ant, HashMap<Integer, Double> betterSolution, int bestCost, String endBestAnt) {
+	public PheroMsgContext(int cycle, int ant, HashMap<Integer, Double> betterDelta, int bestCost, String endBestAnt) {
 		super();
 		this.cycle = cycle;
 		this.ant = ant;
-		this.betterSolution = betterSolution;
+		this.betterDelta = new HashMap<Integer, Double>();
+		this.betterDelta.putAll(betterDelta);
 		this.bestCost = bestCost;
 		this.endBestAnt = endBestAnt;
 	}
