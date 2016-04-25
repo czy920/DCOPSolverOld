@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class ContentWriter {
 
-    public static final String PROBLEM_SCALE_FREE_NETWORK = "scale free network";
+    public static final String PROBLEM_SCALE_FREE_NETWORK = "scalefreenetwork";
 
     private int nbInstance;
     private String dirPath;

@@ -127,10 +127,11 @@ public class AcoAgent extends AgentCycle{
 	public double[] transferP(double[] resultP){
 		double ret[] = new double[resultP.length];
 		double sum = 0.0;
-		for(int i = 0; i < ret.length; i++){
+		for(int i = 0; i < ret.length-1; i++){
 			sum += resultP[i];
 			ret[i] = sum;
 		}
+		ret[ret.length-1] = 1;
 		return ret;
 	}
 	
@@ -725,7 +726,7 @@ public class AcoAgent extends AgentCycle{
 		}
 	
 		this.msgMailer.setResult(result);
-		System.out.println("Agent "+this.name+" stopped!");
+		//System.out.println("Agent "+this.name+" stopped!");
 	}
 	
 	@Override
@@ -744,7 +745,7 @@ public class AcoAgent extends AgentCycle{
 			bestCost += (Integer)result.get("BEST_LOCALCOST");
 			
 			String displayStr="Agent "+name_+": id="+id_+" value="+value_ + " bestvalue=" + bestValue_;
-			System.out.println(displayStr);
+			//System.out.println(displayStr);
 		}
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost));
