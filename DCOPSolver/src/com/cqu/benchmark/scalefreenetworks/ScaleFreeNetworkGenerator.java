@@ -23,7 +23,7 @@ public class ScaleFreeNetworkGenerator extends AbstractGraph {
         this.m2 = m2;
         edgeCounter = new HashMap<Integer,Integer>();
         random = new Random();
-        connected = new LinkedHashSet<Integer>();
+        connected = new HashSet<Integer>();
     }
 
     private void generateInitConnectedGraph(){
@@ -40,9 +40,11 @@ public class ScaleFreeNetworkGenerator extends AbstractGraph {
             agents[index] = agents[agents.length - 1 - i];
         }
 
+     
         for (int i = 0; i < m1 - 1; i++){
-            source.add(sampled[i]);
-            dest.add(sampled[i + 1]);
+        	
+            source.add(sampled[i] < sampled[i + 1] ? sampled[i] :sampled[i + 1]);
+            dest.add(sampled[i] > sampled[i + 1] ? sampled[i] :sampled[i + 1]);
             edgeCounter.put(sampled[i],edgeCounter.get(sampled[i]) + 1);
             edgeCounter.put(sampled[i + 1],edgeCounter.get(sampled[i + 1]) + 1);
             nbConstraint++;
@@ -65,19 +67,24 @@ public class ScaleFreeNetworkGenerator extends AbstractGraph {
                 double randVal = Math.random();
                 double right = 0;
                 int correctNbRelation = 2 * nbRelation;
-                for (int k = 0; k < j ; k++){
-                    correctNbRelation -= edgeCounter.get(target[k]);
-                }
-                for (int id : connected){
-                    right += (edgeCounter.get(id) / (double)correctNbRelation);
-                    if (randVal < right) {
-                        target[j] = id;
-                        break;
+                if (correctNbRelation != 0){
+                    for (int k = 0; k < j ; k++){
+                        correctNbRelation -= edgeCounter.get(target[k]);
                     }
-                    System.out.println("randVal:" + randVal + " right:" + right);
+                    for (int id : connected){
+                        right += (edgeCounter.get(id) / (double)correctNbRelation);
+                        if (randVal < right) {
+                            target[j] = id;
+                            break;
+                        }
+                        System.out.println("randVal:" + randVal + " right:" + right);
+                    }
                 }
-                source.add(i);
-                dest.add(target[j]);
+                else {
+                    target[0] = sampled[0];
+                }
+                source.add(i < target[j] ? i : target[j]);
+                dest.add(i > target[j] ? i : target[j]);
                 connected.remove(target[j]);
             }
             for (int j = 0; j < m2; j++){
