@@ -156,12 +156,7 @@ public class AgentModel extends AgentCycle {
 				if (oppositeAgentValueIndex == -1) {
 					ret[j] += 0;
 				} else {
-					// 保证id小的为行，id大的为列
-					if (this.id < parentId) {
-						ret[j] += this.constraintCosts.get(parentId)[j][oppositeAgentValueIndex];
-					} else {
-						ret[j] += this.constraintCosts.get(parentId)[oppositeAgentValueIndex][j];
-					}
+					ret[j] += this.constraintCosts.get(parentId)[j][oppositeAgentValueIndex];
 				}
 			}
 		}

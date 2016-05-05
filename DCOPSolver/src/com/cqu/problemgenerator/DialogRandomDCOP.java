@@ -136,7 +136,7 @@ public class DialogRandomDCOP extends JDialog {
 		spinnerInstanceNum.setBounds(177, 7, 234, 22);
 		contentPanel.add(spinnerInstanceNum);
 		
-		spinnerAgentNum = new JSpinner(new SpinnerNumberModel(20, 5, 50, 1));
+		spinnerAgentNum = new JSpinner(new SpinnerNumberModel(20, 5, 200, 1));
 		spinnerAgentNum.setBounds(177, 32, 234, 22);
 		contentPanel.add(spinnerAgentNum);
 		

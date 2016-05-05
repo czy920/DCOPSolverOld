@@ -5,6 +5,7 @@ import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,7 @@ import java.util.Map;
  */
 public class ContentWriter {
 
-    public static final String PROBLEM_SCALE_FREE_NETWORK = "scale free network";
+    public static final String PROBLEM_SCALE_FREE_NETWORK = "scalefreenetwork";
 
     private int nbInstance;
     private String dirPath;
@@ -36,12 +37,28 @@ public class ContentWriter {
         this.extraParameter = extraParameter;
     }
 
+    public void setExtraParameter(Map<String, Object> extraParameter) {
+        this.extraParameter = extraParameter;
+    }
+
     public void generate() throws Exception{
         Format format = Format.getPrettyFormat();
         format.setEncoding("UTF-8");
         XMLOutputter outputter = new XMLOutputter(format);
+        int base = 0;
+        String filenameBase =dirPath + "\\" + problemType + "_" + nbAgent + "_" + domainSize + "_";
+        for (String key : extraParameter.keySet()){
+            filenameBase += key + "_";
+            filenameBase += extraParameter.get(key) + "_";
+        }
+        while (true){
+            String fileName = filenameBase + base + ".xml";
+            if (!new File(fileName).exists())
+                break;
+            base++;
+        }
         for (int i = 0; i < nbInstance; i++){
-            FileOutputStream stream = new FileOutputStream(dirPath + "\\" + problemType + "_" + nbAgent + "_" + domainSize + "_" + i + ".xml");
+            FileOutputStream stream = new FileOutputStream(filenameBase+ (base + i) + ".xml");
             Element root = new Element("instance");
             if (problemType.equals(PROBLEM_SCALE_FREE_NETWORK)) {
                 AbstractGraph graph = new ScaleFreeNetworkGenerator("instance" + i,nbAgent,domainSize,minCost,maxCost,(Integer)extraParameter.get("m1"),(Integer)extraParameter.get("m2"));
@@ -61,10 +78,10 @@ public class ContentWriter {
     }
 
     public static void main(String[] args) throws Exception{
-        Map<String,Object> para = new HashMap<String,Object>();
+        Map<String,Object> para = new HashMap<String, Object>();
         para.put("m1",2);
-        para.put("m2",2);
-        ContentWriter writer = new ContentWriter(1,".\\problems\\scalefree",25,2,1,20,PROBLEM_SCALE_FREE_NETWORK,para);
+        para.put("m2",1);
+        ContentWriter writer = new ContentWriter(1,".\\problems\\scalefree",15,9,1,10,PROBLEM_SCALE_FREE_NETWORK,para);
         writer.generate();
     }
 }
