@@ -1,4 +1,4 @@
-package com.cqu.mus;
+package com.cqu.pds;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -13,7 +13,7 @@ import com.cqu.cyclequeue.AgentCycleAls;
 import com.cqu.dsa.AlsDsa_Agent;
 import com.cqu.settings.Settings;
 
-public class AlsDsaLucAgent extends AgentCycleAls{
+public class Pds_AlsDsaAgent extends AgentCycleAls{
 	
 	public final static int TYPE_VALUE_MESSAGE = 1;
 	public final static int TYPE_SUGGEST_MESSAGE = 2;
@@ -29,6 +29,7 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 	private int cycleCount=0;
 	private int neighboursQuantity;	
 	private int[] neighboursValueIndex;	
+	private int[] neighboursValueIndexEx;	
 	
 	private int bestCostTemp = 2147483647;
 	private int[] mySuggestValue;									//给自己的建议值
@@ -49,7 +50,7 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 	private int suggestTag = 0;
 	private int suggester;
 	
-	public AlsDsaLucAgent(int id, String name, int level, int[] domain) {
+	public Pds_AlsDsaAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 	}
 	
@@ -66,8 +67,7 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 		valueIndex = (int)(Math.random()*(domain.length));
 		neighboursQuantity = neighbours.length;
 		neighboursValueIndex = new int[neighboursQuantity];
-		for(int i = 0; i<neighbours.length; i++)
-			neighboursValueIndex[i] = 0;
+		neighboursValueIndexEx = new int[neighboursQuantity];
 		
 		mySuggestValue = new int[domain.length];
 		myNeighboursSuggestTable = new int[domain.length][neighboursQuantity];
@@ -191,6 +191,7 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 				break;
 			}
 		}
+		neighboursValueIndexEx[senderIndex] = neighboursValueIndex[senderIndex];
 		neighboursValueIndex[senderIndex] = ((int[])(msg.getValue()))[0];
 		neighbourPercentage[senderIndex] = ((int[])(msg.getValue()))[1];
 		
@@ -214,9 +215,8 @@ public class AlsDsaLucAgent extends AgentCycleAls{
 						for(int i=0; i<neighbours.length; i++){
 							localCostTemp+=constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
 							if(i != suggester){
-								compareTemp += constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex[i]];
+								compareTemp += constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndexEx[i]];
 								compareTemp -= constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
-								
 							}
 						}
 						compareTemp += suggestGain;

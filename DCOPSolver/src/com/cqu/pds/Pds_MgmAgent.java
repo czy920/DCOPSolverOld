@@ -1,4 +1,4 @@
-package com.cqu.mus;
+package com.cqu.pds;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +11,7 @@ import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
 
-public class AlsMgmLucAgent extends AgentCycle {
+public class Pds_MgmAgent extends AgentCycle {
 
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_GAIN_MESSAGE=1;
@@ -32,6 +32,7 @@ public class AlsMgmLucAgent extends AgentCycle {
 	private int neighboursQuantity;	
 	private int neighboursGain[];
 	private int[] neighboursValueIndex;	
+	private int[] neighboursValueIndexEx;	
 
 //	private int[] neighbourPercentage;
 	private double myPercentage;
@@ -47,7 +48,7 @@ public class AlsMgmLucAgent extends AgentCycle {
 	private int[][] myNeighboursSuggestTable;						//给邻居的建议值
 	
 	
-	public AlsMgmLucAgent(int id, String name, int level, int[] domain) {
+	public Pds_MgmAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 	}
 	
@@ -65,11 +66,12 @@ public class AlsMgmLucAgent extends AgentCycle {
 		cycleCount=0;
 		neighboursQuantity=neighbours.length;
 		neighboursValueIndex = new int[neighboursQuantity];
+		neighboursValueIndexEx = new int[neighboursQuantity];
 		neighboursGain=new int[neighboursQuantity];
 		
 		mySuggestValue = new int[domain.length];
 		myNeighboursSuggestTable = new int[domain.length][neighboursQuantity];
-		abandonSuggestGain = new int[2];
+		abandonSuggestGain = new int[3];
 		buildMyTable();
 		myPercentage = 1;
 //		neighbourPercentage = new int[neighboursQuantity];
@@ -199,6 +201,7 @@ public class AlsMgmLucAgent extends AgentCycle {
 			}
 		}
 		
+		neighboursValueIndexEx[senderIndex] = neighboursValueIndex[senderIndex];
 		neighboursValueIndex[senderIndex] = (Integer)(msg.getValue());
 
 		if(receivedQuantity==0){
@@ -226,7 +229,7 @@ public class AlsMgmLucAgent extends AgentCycle {
 				}
 				gainValue=localCost-newLocalCost;
 				
-				if(gainValue == 0){
+				if(gainValue == 0 && suggestTag != 1){
 					myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
 					if(suggestTag == 0){
 						if(myPercentage > utilityPercentage){
@@ -267,7 +270,7 @@ public class AlsMgmLucAgent extends AgentCycle {
 				for(int i=0; i<neighbours.length; i++){
 					localCostTemp+=constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
 					if(i != suggester){
-						compareTemp += constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex[i]];
+						compareTemp += constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndexEx[i]];
 						compareTemp -= constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
 						
 					}
@@ -345,6 +348,7 @@ public class AlsMgmLucAgent extends AgentCycle {
 			
 			abandonSuggestGain[0] = abandonNeighbourIndex[abandonIndex][valueIndex];
 			abandonSuggestGain[1] = nature - abandonCost[abandonIndex];
+			abandonSuggestGain[2] = valueIndex;
 			sendSuggestMessages(abandonIndex);
 			wait = 1;
 			//System.out.println(nature - abandonCost[abandonIndex]+"~~~~~");
@@ -364,6 +368,7 @@ public class AlsMgmLucAgent extends AgentCycle {
 			suggester = senderIndex;
 			suggestValue = ((int[])msg.getValue())[0];
 			suggestGain = ((int[])msg.getValue())[1];
+			neighboursValueIndex[suggester] = ((int[])msg.getValue())[2];
 			suggestTag = 1;
 		}
 	}
@@ -407,6 +412,7 @@ public class AlsMgmLucAgent extends AgentCycle {
 			valueIndex = suggestValue;
 			abandonSuggestGain[0] = abandonNeighbourIndex[abandonIndex];
 			abandonSuggestGain[1] = localCost - abandonCost[abandonIndex];
+			abandonSuggestGain[2] = valueIndex;
 			sendSuggestMessages(abandonIndex);
 			wait = 1;
 			return true;

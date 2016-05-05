@@ -689,7 +689,7 @@ public class SolverWindow {
 			paramList.add(lspSpinnerSelectProbability);
 			paramList.add(lspSpinnerSelectNewProbability);
 		}
-		else if(algorithmType.equals("ALSDSALUC")){
+		else if(algorithmType.equals("PDSALSDSA")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectInterval);
 			paramList.add(lspSpinnerSelectProbability);
@@ -697,13 +697,13 @@ public class SolverWindow {
 			paramList.add(lspSpinnerSelectProbabilityB);
 			
 		}
-		else if(algorithmType.equals("ALSMGMLUC")){
+		else if(algorithmType.equals("PDSMGM")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbabilityA);
 			paramList.add(lspSpinnerSelectProbabilityB);
 			
 		}
-		else if(algorithmType.equals("ALSMGM2LUC")){
+		else if(algorithmType.equals("PDSMGM2")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
 			paramList.add(lspSpinnerSelectProbabilityA);
