@@ -55,7 +55,10 @@ public class DensityConvertor {
     }
 
     public static void main(String[] args){
-        DensityConvertor convertor = new DensityConvertor(0.6,".\\problems\\scalefree",12,10,20,5);
-        convertor.generate();
+    	for(int i = 24; i >= 20; i-=2){
+    		String dirpath = ".\\problems\\scalefree\\" + i + "_0.2";
+    		DensityConvertor convertor = new DensityConvertor(0.2,dirpath,i,4,20,10);
+            convertor.generate();
+    	}     
     }
 }

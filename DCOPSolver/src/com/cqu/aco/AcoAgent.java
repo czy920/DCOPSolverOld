@@ -30,7 +30,7 @@ public class AcoAgent extends AgentCycle{
 	//非流水线方式只有infos[0], 流水线方式则长度不只1
 	private EachCycleInfo[] infos;
 	private int cycle;   //根结点用于标记触发的轮数
-	private int currentCycle; //用于每个结点当前的轮数
+	private int currentCycle; //用于每个结点信息素更新的当前的轮数
 	
 	private int bestCost = Infinity.INFINITY;   //保留最优解代价
 	private Context bestSolution = null;   //仅最后一个结点知道全局解
@@ -52,10 +52,14 @@ public class AcoAgent extends AgentCycle{
 		PublicConstants.rho = Settings.settings.getRho();
 		PublicConstants.Max_tau = Settings.settings.getMax_tau();
 		PublicConstants.Min_tau = Settings.settings.getMin_tau();
+		PublicConstants.dataLength = (int) (treeDepth + 2);
+		PublicConstants.betterAntCount = PublicConstants.countAnt/3;
+		
+		//用于记录每一轮信息，对算法无作用
 		PublicConstants.aco_bestCostInCycle = new double[PublicConstants.MaxCycle];
 		PublicConstants.aco_totalCostInCycle = new double[PublicConstants.MaxCycle];
-		PublicConstants.betterAntCount = PublicConstants.countAnt/3;
-		PublicConstants.dataLength = (int) (treeDepth + 2);
+		
+		
 	}
 	
 	private void initTaU() {
@@ -524,8 +528,8 @@ public class AcoAgent extends AgentCycle{
 		for(int i : tmpInfo.context.keySet()){
 			Context tempCotext = new Context(tmpInfo.context.get(i));
 			tempCotext.getContext().put(this.id, tmpInfo.selfView.get(i));
-			int localCost = this.localCost(cycle,i, tmpInfo.selfView.get(i));
-			ValueMsgContext obj = new ValueMsgContext(cycle,i,tmpInfo.currentCosts.get(i).intValue() + localCost,tempCotext);
+			int localCost = this.localCost(cycle,i, tmpInfo.selfView.get(i)) + tmpInfo.currentCosts.get(i).intValue();
+			ValueMsgContext obj = new ValueMsgContext(cycle,i, localCost, tempCotext);
 			MsgObj.getMsgContext().add(obj);
 		}
 		Message msg=new Message(this.id, this.minPriority, AcoAgent.TYPE_VALUE_MESSAGE, MsgObj);
@@ -618,7 +622,7 @@ public class AcoAgent extends AgentCycle{
 		checkView(0);
 	}
 	
-	private int[] localCosts(int cycle, int ant)
+	/*private int[] localCosts(int cycle, int ant)
 	{
 		int[] ret=new int[this.domain.length];
 		EachCycleInfo tmp = this.getInfo(cycle);
@@ -649,7 +653,7 @@ public class AcoAgent extends AgentCycle{
 			}
 		}
 		return ret;
-	}
+	}*/
 	
 	private int localCost(int cycle, int ant, int di)
 	{

@@ -85,7 +85,7 @@ public class PublicConstants {
 		}
 	}
 	
-	public static void paramsInit(int maxCycle, int countAnt, int alpha, int beta, double rho, double max_tau, double min_tau){
+	/*public static void paramsInit(int maxCycle, int countAnt, int alpha, int beta, double rho, double max_tau, double min_tau){
 		PublicConstants.MaxCycle = maxCycle;
 		PublicConstants.countAnt = countAnt;
 		PublicConstants.alpha = alpha;
@@ -93,7 +93,7 @@ public class PublicConstants {
 		PublicConstants.rho = rho;
 		PublicConstants.Max_tau = max_tau;
 		PublicConstants.Min_tau = min_tau;
-	}
+	}*/
 	
 	//保存每个回合的totalCost
 	protected static void dataInCycleIncrease(int cycle, int totalcost, int bestcost) {
