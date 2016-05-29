@@ -18,6 +18,7 @@ import com.cqu.dsa.*;
 import com.cqu.maxsum.MaxSumAgent;
 import com.cqu.mgm.*;
 import com.cqu.mus.*;
+import com.cqu.pds.*;
 import com.cqu.parser.Problem;
 import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
@@ -137,16 +138,16 @@ public class AgentManagerCycle {
 				agent=new AlsDsaMgmEvoAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ALSDSALUC")){
-				agent=new AlsDsaLucAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+			else if(agentType.equals("PDSALSDSA")){
+				agent=new Pds_AlsDsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ALSMGMLUC")){
-				agent=new AlsMgmLucAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+			else if(agentType.equals("PDSMGM")){
+				agent=new Pds_MgmAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ALSMGM2LUC")){
-				agent=new AlsMgm2LucAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+			else if(agentType.equals("PDSMGM2")){
+				agent=new Pds_Mgm2Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else if(agentType.equals("ACO")||agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||
