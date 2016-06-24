@@ -94,6 +94,9 @@ public class SolverWindow {
 	private LabelSpinnerParameter lspSpinnerSelectStepK1;
 	private LabelSpinnerParameter lspSpinnerSelectStepK2;
 	private LabelSpinnerParameter lspSpinnerSelectRound;
+	private LabelSpinnerParameter lspSpinnerT;
+	private LabelSpinnerParameter lspSpinnerTmin;
+	private LabelSpinnerParameter lspSpinnerR;
 	
 	//蚁群算法参数设置
 	//private LabelSpinnerParameter lspSpinnerMaxCycle;
@@ -443,17 +446,21 @@ public class SolverWindow {
 		//BFSDPOP
 		lspSpinnerClusterRemovingChoice=new LabelSpinnerParameter("移簇方式：", new SpinnerNumberModel(0, 0, 1, 1));
 		
-		lspSpinnerCycleCountEnd=new LabelSpinnerParameter("回合限制：", new SpinnerNumberModel(20, 0, 1000, 1));
+		//局部搜索算法参数设置
+		lspSpinnerCycleCountEnd=new LabelSpinnerParameter("迭代次数：", new SpinnerNumberModel(20, 0, 1000, 1));
 		lspSpinnerSelectProbability=new LabelSpinnerParameter("选择概率p：", new SpinnerNumberModel(0.3, 0, 1, 0.1));
 		lspSpinnerSelectNewProbability=new LabelSpinnerParameter("选择概率p*：", new SpinnerNumberModel(0.5, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityA=new LabelSpinnerParameter("选择概率A：", new SpinnerNumberModel(0.1, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityB=new LabelSpinnerParameter("选择概率B：", new SpinnerNumberModel(0.2, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityC=new LabelSpinnerParameter("选择概率C：", new SpinnerNumberModel(0.05, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityD=new LabelSpinnerParameter("选择概率D：", new SpinnerNumberModel(0.2, 0, 1, 0.1));
-		lspSpinnerSelectInterval=new LabelSpinnerParameter("控制间隔：", new SpinnerNumberModel(15, 0, 500, 1));
+		lspSpinnerSelectInterval=new LabelSpinnerParameter("持续控制：", new SpinnerNumberModel(15, 0, 1000, 1));
 		lspSpinnerSelectStepK1=new LabelSpinnerParameter("步长k：", new SpinnerNumberModel(5, 0, 50, 1));
 		lspSpinnerSelectStepK2=new LabelSpinnerParameter("步长K*：", new SpinnerNumberModel(5, 0, 50, 1));
 		lspSpinnerSelectRound=new LabelSpinnerParameter("重启轮数：", new SpinnerNumberModel(20, 0, 600, 1));
+		lspSpinnerT=new LabelSpinnerParameter("初始温度：", new SpinnerNumberModel(100, 0, 1000, 100));
+		lspSpinnerTmin=new LabelSpinnerParameter("最低温度：", new SpinnerNumberModel(0, 0, 500, 10));
+		lspSpinnerR=new LabelSpinnerParameter("降温率：", new SpinnerNumberModel(0.9, 0, 1, 0.1));
 		
 	/*	
 		//选择根结点
@@ -629,6 +636,10 @@ public class SolverWindow {
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
 		}
+		else if(algorithmType.equals("DSAN")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectInterval);
+		}
 		else if(algorithmType.equals("MGM")){
 			paramList.add(lspSpinnerCycleCountEnd);
 		}
@@ -689,6 +700,18 @@ public class SolverWindow {
 			paramList.add(lspSpinnerSelectProbability);
 			paramList.add(lspSpinnerSelectNewProbability);
 		}
+		else if(algorithmType.equals("ALSDSADSAEVO")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectInterval);
+			paramList.add(lspSpinnerSelectProbability);
+			paramList.add(lspSpinnerSelectNewProbability);
+			paramList.add(lspSpinnerSelectProbabilityC);
+		}
+		else if(algorithmType.equals("ALSDGA")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
+			paramList.add(lspSpinnerSelectNewProbability);
+		}
 		else if(algorithmType.equals("PDSALSDSA")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectInterval);
@@ -696,6 +719,12 @@ public class SolverWindow {
 			paramList.add(lspSpinnerSelectProbabilityA);
 			paramList.add(lspSpinnerSelectProbabilityB);
 			
+		}
+		else if(algorithmType.equals("PDSDSAN")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectInterval);
+			paramList.add(lspSpinnerSelectProbabilityA);
+			paramList.add(lspSpinnerSelectProbabilityB);
 		}
 		else if(algorithmType.equals("PDSMGM")){
 			paramList.add(lspSpinnerCycleCountEnd);
@@ -993,5 +1022,8 @@ public class SolverWindow {
 		Settings.settings.setSelectStepK1((Integer)lspSpinnerSelectStepK1.getSpinner().getValue());
 		Settings.settings.setSelectStepK2((Integer)lspSpinnerSelectStepK2.getSpinner().getValue());
 		Settings.settings.setSelectRound((Integer)lspSpinnerSelectRound.getSpinner().getValue());
+		Settings.settings.setT((Integer)lspSpinnerT.getSpinner().getValue());
+		Settings.settings.setTmin((Integer)lspSpinnerTmin.getSpinner().getValue());
+		Settings.settings.setR((Double)lspSpinnerR.getSpinner().getValue());
 	}
 }

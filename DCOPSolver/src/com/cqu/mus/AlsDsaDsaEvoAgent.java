@@ -12,15 +12,13 @@ import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.cyclequeue.AgentCycleAls;
 import com.cqu.settings.Settings;
 
-public class AlsDsaMgmEvoAgent extends AgentCycleAls{
+public class AlsDsaDsaEvoAgent extends AgentCycleAls{
 	
 	public final static int TYPE_DSA_VALUE_MESSAGE = 0;
-	public final static int TYPE_MGM_VALUE_MESSAGE = 1;
-	public final static int TYPE_MGM_GAIN_MESSAGE = 2;
 	public final static int TYPE_RESET_MESSAGE = 5;
 	
-	public final static int DSA = 0;
-	public final static int MGM = 1;
+	public final static int DSASTEP1 = 0;
+	public final static int DSASTEP2 = 1;
 	public final static String YESYES="YESYES";				//前一个YES或NO是全局的，后一个是对临时的
 	public final static String YESNO="YESNO";				//前一个YES或NO是全局的，后一个是对临时的
 	public final static String NOYES="NOYES";				//前一个YES或NO是全局的，后一个是对临时的
@@ -28,28 +26,21 @@ public class AlsDsaMgmEvoAgent extends AgentCycleAls{
 	
 	private static int cycleCountEnd;
 	private static int stayDsaCountInterval;
-	private static double p;
+	private static double pH;
+	private static double pL;
 	private static double interActProbability;
 	
 	private int receivedDsaValueQuantity=0;
-	private int receivedMgmValueQuantity=0;
-	private int receivedMgmGainQuantity=0;
 	private int cycleCount=0;
 	private int neighboursQuantity;	
-	private int gainValue;
-	private int selectValueIndex;
-	private int neighboursGain[];
 	private int[] neighboursValueIndex;								//[neighbour 的 Index, neighbourValue 的  Index]
 	//private HashMap<Integer, Integer> neighboursValueIndex;		//<neighbour 的 Index, neighbourValue 的  Index>
 
 	private int bestCostTemp = 2147483644;
-	private int bestCostTemp1 = 2147483645;
-	private int bestCostTemp2 = 2147483646;
-	private int bestCostTemp3 = 2147483647;
-	private int STEP = MGM;
+	private int STEP = DSASTEP1;
 	private boolean resetLock = false;
-	private boolean dsaResetLock = false;
-	private boolean mgmResetLock = false;
+	private boolean ResetLock1 = false;
+	private boolean ResetLock2 = false;
 	private int stayUnchanged = 0;
 	private int prepareToReset = 2147483647;
 	protected LinkedList<int[]> localCostList = new LinkedList<int[]>();
@@ -57,9 +48,10 @@ public class AlsDsaMgmEvoAgent extends AgentCycleAls{
 	private int mgmCycle = 0;
 	private int candidate = 0;
 	private String tempTag = null;
-	private int dsaStep = 0;
+	private String NEWCYCLE = YES;
+	private double p;
 	
-	public AlsDsaMgmEvoAgent(int id, String name, int level, int[] domain) {
+	public AlsDsaDsaEvoAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 	}
 
@@ -67,14 +59,14 @@ public class AlsDsaMgmEvoAgent extends AgentCycleAls{
 		super.initRun();
 		
 		cycleCountEnd = Settings.settings.getCycleCountEnd();
-		p = Settings.settings.getSelectProbability();
+		pH = Settings.settings.getSelectProbability();
+		pL = Settings.settings.getSelectNewProbability();
 		stayDsaCountInterval = Settings.settings.getSelectInterval();
-		interActProbability = Settings.settings.getSelectNewProbability();
+		interActProbability = Settings.settings.getSelectProbabilityC();
 			
 		localCost = 2147483647;
 		valueIndex = (int)(Math.random()*(domain.length));
 		neighboursQuantity = neighbours.length;
-		neighboursGain = new int[neighboursQuantity];
 		neighboursValueIndex = new int[neighboursQuantity];
 		for(int i = 0; i<neighbours.length; i++)
 			neighboursValueIndex[i] = 0;
@@ -84,20 +76,6 @@ public class AlsDsaMgmEvoAgent extends AgentCycleAls{
 	private void sendDsaValueMessages(){
 		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
 			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_DSA_VALUE_MESSAGE, valueIndex);
-			this.sendMessage(msg);
-		}
-	}
-	
-	private void sendMgmValueMessages(){
-		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
-			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_MGM_VALUE_MESSAGE, valueIndex);
-			this.sendMessage(msg);
-		}
-	}
-	
-	private void sendMgmGainMessages(){
-		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
-			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_MGM_GAIN_MESSAGE, gainValue);
 			this.sendMessage(msg);
 		}
 	}
@@ -113,12 +91,6 @@ public class AlsDsaMgmEvoAgent extends AgentCycleAls{
 		
 		if(msg.getType() == TYPE_DSA_VALUE_MESSAGE){
 			disposeDsaValueMessage(msg);
-		}
-		else if(msg.getType() == TYPE_MGM_VALUE_MESSAGE){
-			disposeMgmValueMessage(msg);
-		}
-		else if(msg.getType() == TYPE_MGM_GAIN_MESSAGE){
-			disposeMgmGainMessage(msg);
 		}
 		else if(msg.getType() == TYPE_RESET_MESSAGE){
 			disposeAlsResetMessage(msg);
@@ -153,13 +125,15 @@ public class AlsDsaMgmEvoAgent extends AgentCycleAls{
 			localCost=localCost();
 			AlsWork();
 			
-			if(STEP == MGM){
+			if(NEWCYCLE == YES){
+				NEWCYCLE = NO;
 				cycleCount++;
 				if(cycleCount > cycleCountEnd){
 					STOPRUNNING = true;
 					return;
 				}
-				STEP = DSA;
+				STEP = DSASTEP1;
+				p = pH;
 			}
 			
 			if(prepareToReset > 0){
@@ -190,163 +164,31 @@ public class AlsDsaMgmEvoAgent extends AgentCycleAls{
 			else{
 				prepareToReset = 2147483647;
 				resetLock = false;
-				//valueIndex = candidate; 
-				sendMgmValueMessages();
-			}
-			
-//			dsaStep++;
-//			if(dsaStep <= stayDsaCountInterval){
-//				if(Math.random()<p){
-//					int[] selectMinCost=new int[domain.length];
-//					for(int i=0; i<domain.length; i++){
-//						selectMinCost[i]=0;
-//					}
-//					for(int i=0; i<domain.length; i++){
-//						for(int j=0; j<neighbours.length; j++){
-//								selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];	
-//						}
-//					}
-//					int selectValueIndex=0;
-//					int selectOneMinCost=selectMinCost[0];
-//					for(int i = 1; i < domain.length; i++){
-//						if(selectOneMinCost > selectMinCost[i]){
-//							selectOneMinCost = selectMinCost[i];
-//							selectValueIndex = i;
-//						}
-//					}
-//					if(selectOneMinCost < localCost){
-//						valueIndex = selectValueIndex;
-//					}
-//				}
-//				sendDsaValueMessages();
-//			}
-//			else{
-//				dsaStep = 0;
-//				prepareToReset = 2147483647;
-//				resetLock = false;
-//				//valueIndex = candidate; 
-//				sendMgmValueMessages();
-//			}
-			
-		}
-	}
-	
-	private void disposeMgmValueMessage(Message msg) {
-		receivedMgmValueQuantity=(receivedMgmValueQuantity+1)%neighboursQuantity;
-		
-		int senderIndex=0;
-		int senderId=msg.getIdSender();
-		for(int i=0; i<neighboursQuantity; i++){
-			if(neighbours[i]==senderId){
-				senderIndex=i;
-				break;
-			}
-		}
-		
-		neighboursValueIndex[senderIndex] = (int)((Integer)msg.getValue());
-		
-		if(receivedMgmValueQuantity==0){
-			mgmCycle++;
-			
-			STEP = MGM;
-			prepareToReset--;
-			localCost=localCost();
-			AlsWork();
-			
-			if(prepareToReset > 0){
 				
-				int[] selectMinCost=new int[domain.length];
-				for(int i=0; i<domain.length; i++){
-					selectMinCost[i]=0;
+//				NEWCYCLE = YES;
+				if(STEP == DSASTEP1){
+					STEP = DSASTEP2;
+					p = pL;
 				}
-				for(int i=0; i<domain.length; i++){
-					for(int j=0; j<neighboursQuantity; j++){
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];	
+				else{
+					NEWCYCLE = YES;
+					if(cycleCount > 1){
+						if(cycleCount % 2 == 0){
+							if(Math.random() < interActProbability)
+								valueIndex = bestValue;
+							else
+								valueIndex = candidate;
+						}
+						else{
+							valueIndex = (int)(Math.random()*(domain.length));
+						}
 					}
-				}
-				int newLocalCost=localCost;
-				for(int i=0; i<domain.length; i++){
-					if(selectMinCost[i]<newLocalCost){
-						newLocalCost=selectMinCost[i];
-						selectValueIndex=i;
-					}
-				}
-				gainValue=localCost-newLocalCost;
-				//System.out.println("agent"+this.id+"_______"+cycleCount+"_______"+gainValue+"________");
-				sendMgmGainMessages();
-			}
-			else{
-				prepareToReset = 2147483647;
-				resetLock = false;
-
-				if(cycleCount > 1){
-					if(cycleCount % 2 == 0){
-						if(Math.random() < interActProbability)
-							valueIndex = bestValue;
-						else
-							valueIndex = candidate;
-					}
-					else{
+					else
 						valueIndex = (int)(Math.random()*(domain.length));
-					}
 				}
-				else
-					valueIndex = (int)(Math.random()*(domain.length));
 				sendDsaValueMessages();
 			}
-		}
-	}
-	
-	private void disposeMgmGainMessage(Message msg) {
-		receivedMgmGainQuantity=(receivedMgmGainQuantity+1)%neighboursQuantity;
-		
-		int senderIndex=0;
-		int senderId=msg.getIdSender();
-		for(int i=0; i<neighboursQuantity; i++){
-			if(neighbours[i]==senderId){
-				senderIndex=i;
-				break;
-			}
-		}
-		neighboursGain[senderIndex]=(Integer)msg.getValue();
-		
-		if(receivedMgmGainQuantity==0){
-			mgmCycle++;
 			
-			prepareToReset--;
-			AlsWork();
-			if(prepareToReset > 0){
-				for(int i=0; i<neighboursQuantity; i++){
-					if(neighboursGain[i]>=gainValue){
-						sendMgmValueMessages();
-						return;
-					}
-				}
-				valueIndex=selectValueIndex;
-				//if(cycleCount == 9){
-				//	System.out.println("agent"+this.id+"_______"+"Gain_ready"+"________"+gainValue);
-				//}
-				sendMgmValueMessages();
-			}
-			else{
-				prepareToReset = 2147483647;
-				resetLock = false;
-				
-				if(cycleCount > 1){
-					if(cycleCount % 2 == 0){
-						if(Math.random() < interActProbability)
-							valueIndex = bestValue;
-						else
-							valueIndex = candidate;
-					}
-					else{
-						valueIndex = (int)(Math.random()*(domain.length));
-					}
-				}
-				else
-					valueIndex = (int)(Math.random()*(domain.length));
-				sendDsaValueMessages();
-			}
 		}
 	}
 	
@@ -397,11 +239,9 @@ public class AlsDsaMgmEvoAgent extends AgentCycleAls{
 			}
 			else{
 				accumulativeCost = accumulativeCost/2;
-
 				if(resetLock == false){
-					if(theSTEP == DSA && dsaResetLock == false){
-						mgmResetLock = false;
-						//System.out.println("Cycle   "+dsaCycle+"   !!!!!!!!");
+					if(theSTEP == DSASTEP1 && ResetLock1 == false){
+						ResetLock2 = false;
 						if(accumulativeCost < bestCostTemp){
 							bestCostTemp = accumulativeCost;
 							tempTag = YES;
@@ -419,36 +259,36 @@ public class AlsDsaMgmEvoAgent extends AgentCycleAls{
 								stayUnchanged = 0;
 								prepareToReset = totalHeight + 1;
 								resetLock = true;
-								dsaResetLock = true;
+								ResetLock1 = true;
 								sendResetMessages();
 							}
 						}
 					}
-					else if(theSTEP == MGM && mgmResetLock == false){
-						dsaResetLock = false;
-						stayUnchanged = 0;
-						bestCostTemp3 = bestCostTemp2;
-						bestCostTemp2 = bestCostTemp1;
-						bestCostTemp1 = accumulativeCost;
+					else if(theSTEP == DSASTEP2 && ResetLock2 == false){
+						ResetLock1 = false;
 						if(accumulativeCost < bestCostTemp){
 							bestCostTemp = accumulativeCost;
 							tempTag = YES;
+							stayUnchanged = 0;
+							//System.out.println("stayUnchanged   "+stayUnchanged+"   !!!!!!!!");
 						}
 						else{
 							tempTag = NO;
-							if(bestCostTemp3 == bestCostTemp2 && bestCostTemp2 == bestCostTemp1){
-								//System.out.println("mgmCycle   "+mgmCycle+"   !!!!!!!!");
-								//mgmCycle = 0;
-								bestCostTemp1 = 2147483645;
-								bestCostTemp2 = 2147483646;
-								bestCostTemp3 = 2147483647;
+							stayUnchanged++;
+							//System.out.println("stayUnchanged   "+stayUnchanged+"   !!!!!!!!");
+							if(stayUnchanged >= stayDsaCountInterval){
+								//System.out.println("dsaCycle   "+dsaCycle+"   !!!!!!!!");
+								//dsaCycle = 0;
+								bestCostTemp = 2147483644;
+								stayUnchanged = 0;
 								prepareToReset = totalHeight + 1;
 								resetLock = true;
-								mgmResetLock = true;
+								ResetLock2 = true;
 								sendResetMessages();
 							}
 						}
 					}
+					
 				}
 				
 				if(accumulativeCost < bestCost){

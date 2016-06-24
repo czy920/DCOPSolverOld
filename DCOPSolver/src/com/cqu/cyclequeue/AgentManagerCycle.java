@@ -15,6 +15,7 @@ import com.cqu.bnbmergeadopt.AgentModel;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.dsa.*;
+import com.cqu.dsan.*;
 import com.cqu.maxsum.MaxSumAgent;
 import com.cqu.mgm.*;
 import com.cqu.mus.*;
@@ -90,6 +91,10 @@ public class AgentManagerCycle {
 				agent=new DsaE_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
+			else if(agentType.equals("DSAN")){
+				agent=new DsanAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
 			else if(agentType.equals("MGM")){
 				agent=new MgmAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
@@ -138,8 +143,20 @@ public class AgentManagerCycle {
 				agent=new AlsDsaMgmEvoAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
+			else if(agentType.equals("ALSDSADSAEVO")){
+				agent=new AlsDsaDsaEvoAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if(agentType.equals("ALSDGA")){
+				agent=new AlsDgaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
 			else if(agentType.equals("PDSALSDSA")){
 				agent=new Pds_AlsDsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if(agentType.equals("PDSDSAN")){
+				agent=new Pds_DsanAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else if(agentType.equals("PDSMGM")){
