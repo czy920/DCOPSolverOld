@@ -58,7 +58,8 @@ public class DFSTree extends TreeGenerator{
 		while(true)
 		{
 			Integer nextNodeId=-1;
-			if(this.heuristic.equals(DFSTree.HEURISTIC_RANDOM))
+			nextNodeId=this.getMaxNeighborsNodeId(this.neighbors.get(curNodeId));
+			/*if(this.heuristic.equals(DFSTree.HEURISTIC_RANDOM))
 			{
 				nextNodeId=this.getRandomNodeId(this.neighbors.get(curNodeId));
 			}else if(this.heuristic.equals(DFSTree.HEURISTIC_MAXDEGREE))
@@ -67,7 +68,7 @@ public class DFSTree extends TreeGenerator{
 			}else if(this.heuristic.equals(DFSTree.HEURISTIC_MINDEGREE))
 			{
 				nextNodeId=this.getMinNeighborsNodeId(this.neighbors.get(curNodeId));
-			}
+			}*/
 			if(nextNodeId==-1)
 			{
 				//遍历结束标志：回溯至根节点且无未遍历邻居节点

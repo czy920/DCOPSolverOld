@@ -53,7 +53,7 @@ public class AcoAgent extends AgentCycle{
 		PublicConstants.Max_tau = Settings.settings.getMax_tau();
 		PublicConstants.Min_tau = Settings.settings.getMin_tau();
 		PublicConstants.dataLength = (int) (treeDepth + 2);
-		PublicConstants.betterAntCount = PublicConstants.countAnt;///3;
+		PublicConstants.betterAntCount = PublicConstants.countAnt/3;
 		
 		//用于记录每一轮信息，对算法无作用
 		PublicConstants.aco_bestCostInCycle = new double[PublicConstants.MaxCycle];
@@ -109,10 +109,10 @@ public class AcoAgent extends AgentCycle{
 			Pheromone pheromone = taus.get(highId);
 			double[][] tau = pheromone.getTau();
 			
-			sum += tau[value][highValueIndex];//信息素之和
+			sum += tau[value][highValueIndex];
 		}
-//		ret = Math.pow(sum, PublicConstants.alpha)*Math.pow(logCompute(localCost), PublicConstants.beta);
-		ret = Math.pow(sum, PublicConstants.alpha);
+		ret = Math.pow(sum, PublicConstants.alpha)*Math.pow(logCompute(localCost), PublicConstants.beta);
+		//ret = Math.pow(sum, PublicConstants.alpha);
 		return ret;
 	}
 	
@@ -193,7 +193,7 @@ public class AcoAgent extends AgentCycle{
 	
 		//为每条信息素边更新信息素
 		if((PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[3]) ||
-				PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[5]))	&& this.currentCycle  < PublicConstants.MaxCycle){//this.currentCycle  < PublicConstants.MaxCycle /3分段作用
+				PublicConstants.ACO_type.equals(PublicConstants.ACO_TYPE[5]))	&& this.currentCycle  < PublicConstants.MaxCycle / 3){
 			tmp.betterDelta = obj.betterDelta;
 			this.updatePheros(cycle);
 		}else{

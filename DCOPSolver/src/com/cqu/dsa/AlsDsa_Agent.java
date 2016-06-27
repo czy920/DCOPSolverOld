@@ -31,7 +31,6 @@ public class AlsDsa_Agent extends AgentCycleAls{
 		super(id, name, level, domain);
 		// TODO 自动生成的构造函数存根
 	}
-
 	
 	protected void initRun() {
 		super.initRun();

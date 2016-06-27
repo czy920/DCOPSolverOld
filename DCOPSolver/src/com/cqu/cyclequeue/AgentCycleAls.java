@@ -70,7 +70,7 @@ public abstract class AgentCycleAls extends AgentCycle{
 		//if(id == 40){
 		//	System.out.println("Agent "+this.id+"~~~costMessage~~~"+cycleCount);
 		//}
-	};
+	}
 	
 	
 	protected void disposeAlsCostMessage(Message msg){

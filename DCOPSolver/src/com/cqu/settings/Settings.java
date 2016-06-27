@@ -26,6 +26,7 @@ public class Settings {
 	//BFSDPOP
 	private int clusterRemovingChoice;
 	
+	//局部搜索算法参数设置
 	private int cycleCountEnd;
 	private double selectProbability;
 	private double selectNewProbability;
@@ -37,7 +38,9 @@ public class Settings {
 	private int selectStepK1;
 	private int selectStepK2;
 	private int selectRound;
-	
+	private int T;
+	private int Tmin;
+	private double r;
 	
 	private boolean displayGraphFrame;
 
@@ -272,6 +275,30 @@ public class Settings {
 
 	public void setSelectRound(int mySelectRound) {
 		selectRound = mySelectRound;
+	}
+	
+	public int getT() {
+		return T;
+	}
+
+	public void setT(int myT) {
+		T = myT;
+	}
+	
+	public int getTmin() {
+		return Tmin;
+	}
+
+	public void setTmin(int myTmin) {
+		Tmin = myTmin;
+	}
+	
+	public double getR() {
+		return r;
+	}
+
+	public void setR(double myR) {
+		r = myR;
 	}
 	
 	public static Settings showSettingsDialog()

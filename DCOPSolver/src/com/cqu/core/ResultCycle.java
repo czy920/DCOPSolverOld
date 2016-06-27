@@ -77,11 +77,11 @@ public class ResultCycle extends Result{
 			totalCostInCycle = new double[((ResultCycle)rs).totalCostInCycle.length];
 			timeCostInCycle = new long[((ResultCycle)rs).timeCostInCycle.length];
 			messageQuantityInCycle = new int[((ResultCycle)rs).messageQuantityInCycle.length];
-			for(int i = 0; i < totalCostInCycle.length; i++){
-				this.totalCostInCycle[i] = 0;
-				this.timeCostInCycle[i] = 0;
-				this.messageQuantityInCycle[i] = 0;
-			}
+//			for(int i = 0; i < totalCostInCycle.length; i++){
+//				this.totalCostInCycle[i] = 0;
+//				this.timeCostInCycle[i] = 0;
+//				this.messageQuantityInCycle[i] = 0;
+//			}
 		}
 		if(totalCostInCycle.length < ((ResultCycle)rs).totalCostInCycle.length){
 			double[] tempCost = new double[((ResultCycle)rs).totalCostInCycle.length];
@@ -131,10 +131,10 @@ public class ResultCycle extends Result{
 		if(this.ant_totalCostInCyle == null){
 			this.ant_totalCostInCyle = new double[((ResultCycle)rs).ant_totalCostInCyle.length];
 			this.ant_bestCostInCycle = new double[((ResultCycle)rs).ant_bestCostInCycle.length];
-			for(int i = 0; i < ant_totalCostInCyle.length; i++){
-				this.ant_totalCostInCyle[i]=0;
-				this.ant_bestCostInCycle[i] = 0;
-			}
+//			for(int i = 0; i < ant_totalCostInCyle.length; i++){
+//				this.ant_totalCostInCyle[i]=0;
+//				this.ant_bestCostInCycle[i] = 0;
+//			}
 		}
 		if(this.ant_totalCostInCyle.length < ((ResultCycle)rs).ant_totalCostInCyle.length){
 			double[] tempAnt_totalCost = new double[((ResultCycle)rs).ant_totalCostInCyle.length];
@@ -186,11 +186,11 @@ public class ResultCycle extends Result{
 			totalCostInCycle = new double[((ResultCycle)rs).totalCostInCycle.length];
 			timeCostInCycle = new long[((ResultCycle)rs).timeCostInCycle.length];
 			messageQuantityInCycle = new int[((ResultCycle)rs).messageQuantityInCycle.length];
-			for(int i = 0; i < totalCostInCycle.length; i++){
-				this.totalCostInCycle[i] = 0;
-				this.timeCostInCycle[i] = 0;
-				this.messageQuantityInCycle[i] = 0;
-			}
+//			for(int i = 0; i < totalCostInCycle.length; i++){
+//				this.totalCostInCycle[i] = 0;
+//				this.timeCostInCycle[i] = 0;
+//				this.messageQuantityInCycle[i] = 0;
+//			}
 		}
 		if(totalCostInCycle.length < ((ResultCycle)rs).totalCostInCycle.length){
 			double[] tempCost = new double[((ResultCycle)rs).totalCostInCycle.length];
@@ -238,10 +238,10 @@ public class ResultCycle extends Result{
 		if(this.ant_totalCostInCyle == null){
 			this.ant_totalCostInCyle = new double[((ResultCycle)rs).ant_totalCostInCyle.length];
 			this.ant_bestCostInCycle = new double[((ResultCycle)rs).ant_bestCostInCycle.length];
-			for(int i = 0; i < ant_totalCostInCyle.length; i++){
-				this.ant_totalCostInCyle[i]=0;
-				this.ant_bestCostInCycle[i] = 0;
-			}
+//			for(int i = 0; i < ant_totalCostInCyle.length; i++){
+//				this.ant_totalCostInCyle[i]=0;
+//				this.ant_bestCostInCycle[i] = 0;
+//			}
 		}
 		if (this.ant_totalCostInCyle.length < ((ResultCycle) rs).ant_totalCostInCyle.length) {
 			double[] tempAnt_totalCost = new double[((ResultCycle) rs).ant_totalCostInCyle.length];
@@ -277,5 +277,72 @@ public class ResultCycle extends Result{
 		}
 		
 		this.nccc-=((ResultCycle)rs).nccc/validCount;
+	}
+	
+	
+	public void addAvg(Result rs){
+		this.messageQuantity+=(rs.messageQuantity);
+		this.lostRatio+=(rs.lostRatio);
+		this.totalTime+=(rs.totalTime);
+		this.totalCost+=(rs.totalCost);
+		
+		if(totalCostInCycle == null){
+			totalCostInCycle = new double[((ResultCycle)rs).totalCostInCycle.length];
+			timeCostInCycle = new long[((ResultCycle)rs).timeCostInCycle.length];
+			messageQuantityInCycle = new int[((ResultCycle)rs).messageQuantityInCycle.length];
+		}
+		if(totalCostInCycle.length < ((ResultCycle)rs).totalCostInCycle.length){
+			double[] tempCost = new double[((ResultCycle)rs).totalCostInCycle.length];
+			long[] tempTime = new long[((ResultCycle)rs).totalCostInCycle.length];
+			int[] tempMQ = new int[((ResultCycle)rs).totalCostInCycle.length];
+			for(int i = 0; i < totalCostInCycle.length; i++){
+				tempCost[i] = totalCostInCycle[i];
+				tempTime[i] = timeCostInCycle[i];
+				tempMQ[i] = messageQuantityInCycle[i];
+			}
+			for(int i = totalCostInCycle.length; i < ((ResultCycle)rs).totalCostInCycle.length; i++){
+				tempCost[i] = tempCost[i-1];
+				tempTime[i] = tempTime[i-1];
+				tempMQ[i] = tempMQ[i-1];
+			}
+			totalCostInCycle = tempCost;
+			timeCostInCycle = tempTime;
+			messageQuantityInCycle = tempMQ;
+		}
+		else if(totalCostInCycle.length > ((ResultCycle)rs).totalCostInCycle.length){
+			double[] tempCost = new double[totalCostInCycle.length];
+			long[] tempTime = new long[totalCostInCycle.length];
+			int[] tempMQ = new int[totalCostInCycle.length];
+			for(int i = 0; i < ((ResultCycle)rs).totalCostInCycle.length; i++){
+				tempCost[i] = ((ResultCycle)rs).totalCostInCycle[i];
+				tempTime[i] = ((ResultCycle)rs).timeCostInCycle[i];
+				tempMQ[i] = ((ResultCycle)rs).messageQuantityInCycle[i];
+			}
+			for(int i = ((ResultCycle)rs).totalCostInCycle.length; i < totalCostInCycle.length; i++){
+				tempCost[i] = tempCost[i-1];
+				tempTime[i] = tempTime[i-1];
+				tempMQ[i] = tempMQ[i-1];
+			}
+			((ResultCycle)rs).totalCostInCycle = tempCost;
+			((ResultCycle)rs).timeCostInCycle = tempTime;
+			((ResultCycle)rs).messageQuantityInCycle = tempMQ;
+		}
+		for(int i = 0; i < totalCostInCycle.length; i++){
+			this.totalCostInCycle[i] += (((ResultCycle)rs).totalCostInCycle[i]);
+			this.timeCostInCycle[i] += (((ResultCycle)rs).timeCostInCycle[i]);
+			this.messageQuantityInCycle[i] += (((ResultCycle)rs).messageQuantityInCycle[i]);
+		}
+	}
+	
+	public void avg(int instanceNumber){
+		this.messageQuantity = (int)((1.0)*this.messageQuantity/instanceNumber);
+		this.lostRatio = (int)((1.0)*this.lostRatio/instanceNumber);
+		this.totalTime = (int)((1.0)*this.totalTime/instanceNumber);
+		this.totalCost = (int)((1.0)*this.totalCost/instanceNumber);
+		for(int i = 0; i < totalCostInCycle.length; i++){
+			this.totalCostInCycle[i] = (totalCostInCycle[i]/instanceNumber);
+			this.timeCostInCycle[i] = (timeCostInCycle[i]/instanceNumber);
+			this.messageQuantityInCycle[i] = (messageQuantityInCycle[i]/instanceNumber);
+		}
 	}
 }

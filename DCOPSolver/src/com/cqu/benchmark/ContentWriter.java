@@ -46,6 +46,11 @@ public class ContentWriter {
         format.setEncoding("UTF-8");
         XMLOutputter outputter = new XMLOutputter(format);
         int base = 0;
+        File f=new File(dirPath);
+		if(f.exists()==false)
+		{
+			f.mkdir();
+		}
         String filenameBase =dirPath + "\\" + problemType + "_" + nbAgent + "_" + domainSize + "_";
         for (String key : extraParameter.keySet()){
             filenameBase += key + "_";
