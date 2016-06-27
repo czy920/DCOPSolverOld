@@ -1,5 +1,7 @@
 package com.cqu.settings;
 
+import com.cqu.maxsum.AbstractLocalRefiner;
+
 import javax.swing.JDialog;
 
 public class Settings {
@@ -13,7 +15,7 @@ public class Settings {
 	private int maxDimensionInMBDPOP;
 	
 	//蚁群算法参数设置
-	private int MaxCycle;
+	//private int MaxCycle;
 	private int countAnt;
 	private int alpha;
 	private int beta;
@@ -38,6 +40,12 @@ public class Settings {
 	
 	
 	private boolean displayGraphFrame;
+
+	//Parameter for local refine
+	private int refineCycle;
+	private boolean enableRefine;
+	private double distributionThreshold;
+	private AbstractLocalRefiner refiner;
 	
 	public Settings() {
 		// TODO Auto-generated constructor stub
@@ -49,7 +57,7 @@ public class Settings {
 		this.maxDimensionInMBDPOP=3;
 		
 		//蚁群算法参数设置
-		this.MaxCycle = 100;
+		//this.MaxCycle = 100;
 		this.countAnt = 2;
 		this.alpha = 2;
 		this.beta = 8;
@@ -67,6 +75,11 @@ public class Settings {
 		this.selectStepK1 = 20;
 		this.selectStepK2 = 20;
 		this.selectRound = 60;
+
+		//local refine
+		this.refineCycle = 30;
+		this.enableRefine = false;
+		this.distributionThreshold = 0.8;
 	}
 	
 	public double getBNBmergeADOPTboundArg() {
@@ -83,16 +96,6 @@ public class Settings {
 
 	public void setADOPT_K(int aDOPT_K) {
 		ADOPT_K = aDOPT_K;
-	}
-	
-	
-
-	public int getMaxCycle() {
-		return MaxCycle;
-	}
-
-	public void setMaxCycle(int maxCycle) {
-		MaxCycle = maxCycle;
 	}
 
 	public int getCountAnt() {
@@ -278,5 +281,37 @@ public class Settings {
 		dialog.setModal(true);
 		dialog.setVisible(true);
 		return settings;
+	}
+
+	public int getRefineCycle() {
+		return refineCycle;
+	}
+
+	public void setRefineCycle(int refineCycle) {
+		this.refineCycle = refineCycle;
+	}
+
+	public void setEnableRefine(boolean enableRefine) {
+		this.enableRefine = enableRefine;
+	}
+
+	public boolean isEnableRefine() {
+		return enableRefine;
+	}
+
+	public double getDistributionThreshold() {
+		return distributionThreshold;
+	}
+
+	public void setDistributionThreshold(double distributionThreshold) {
+		this.distributionThreshold = distributionThreshold;
+	}
+
+	public AbstractLocalRefiner getRefiner() {
+		return refiner;
+	}
+
+	public void setRefiner(AbstractLocalRefiner refiner) {
+		this.refiner = refiner;
 	}
 }

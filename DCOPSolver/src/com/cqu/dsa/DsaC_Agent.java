@@ -87,10 +87,10 @@ public class DsaC_Agent extends AgentCycle {
 					}
 					for(int i=0; i<domain.length; i++){
 						for(int j=0; j<neighbours.length; j++){
-							if(this.id < neighbours[j])
+//							if(this.id < neighbours[j])
 								selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-							else
-								selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];	
+//							else
+//								selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];	
 						}					
 					}
 					int selectValueIndex = 0;
@@ -115,14 +115,24 @@ public class DsaC_Agent extends AgentCycle {
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighbours.length; i++){
-			if(this.id < neighbours[i])
-				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
-			else
-				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex.get(i)][valueIndex];	
+			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
 		}
 		return localCostTemp;
 	}
 	
+	protected void localSearchCheck(){
+		while(msgQueue.size() == 0){
+			try {
+				Thread.sleep(1);
+				System.out.println("!!! sleep(1) !!!!!");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if(msgQueue.isEmpty() == true){
+			System.out.println("!!!!! IsEmpty Judged Wrong !!!!!");
+		}
+	}
 	
 	protected void runFinished(){
 		super.runFinished();

@@ -153,10 +153,7 @@ public class AlsMgm2Agent extends AgentCycleAls {
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighboursQuantity; i++){
-			if(this.id < neighbours[i])
-				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
-			else
-				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex.get(i)][valueIndex];	
+			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
 		}
 		return localCostTemp;
 	}
@@ -252,12 +249,13 @@ public class AlsMgm2Agent extends AgentCycleAls {
 		neighboursValueIndex.put((Integer)senderIndex, (Integer)msg.getValue());
 		
 		if(receivedQuantity==0){
+			localCost=localCost();
+			AlsWork();
 			
 			if(cycleCount>=cycleCountEnd){
+				STOPRUNNING = true;
 				//stopRunning();
 			}else{
-				localCost=localCost();
-				AlsWork();
 				
 				if(cycleCount % r == 0){
 					valueIndex=(int)(Math.random()*(domain.length));
@@ -270,10 +268,7 @@ public class AlsMgm2Agent extends AgentCycleAls {
 					}
 					for(int i=0; i<domain.length; i++){
 						for(int j=0; j<neighboursQuantity; j++){
-							if(this.id < neighbours[j])
 								selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-							else
-								selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];			
 						}					
 					}
 					int newLocalCost=localCost;
@@ -298,12 +293,8 @@ public class AlsMgm2Agent extends AgentCycleAls {
 						int selectGroupCost[] = new int[domain.length];
 						for(int i=0; i<neighbourDomains.get(neighbours[coordinate]).length; i++){
 							for(int j=0; j<domain.length; j++){
-								if(this.id < neighbours[coordinate])
 									selectGroupCost[j]=selectMinCost[j]-constraintCosts.get(neighbours[coordinate])[j][neighboursValueIndex.get(coordinate)]
 											+constraintCosts.get(neighbours[coordinate])[j][i];
-								else
-									selectGroupCost[j]=selectMinCost[j]-constraintCosts.get(neighbours[coordinate])[neighboursValueIndex.get(coordinate)][j]
-											+constraintCosts.get(neighbours[coordinate])[i][j];
 							}
 							int findTheMin=0;
 							for(int j=0; j<domain.length; j++){
@@ -364,17 +355,11 @@ public class AlsMgm2Agent extends AgentCycleAls {
 			
 			for(int i=0; i<tempList.length; i++){
 				tempList[i][2]+=localCost;
-				if(this.id < neighbours[senderIndex])
 					tempList[i][2]-=constraintCosts.get(neighbours[senderIndex])[valueIndex][neighboursValueIndex.get(senderIndex)];
-				else
-					tempList[i][2]-=constraintCosts.get(neighbours[senderIndex])[neighboursValueIndex.get(senderIndex)][valueIndex];
 				
 				for(int j=0; j<neighbours.length; j++){
 					if(j!=senderIndex)
-						if(this.id < neighbours[j])
 							tempList[i][2]-=constraintCosts.get(neighbours[j])[tempList[i][0]][neighboursValueIndex.get(j)];
-						else
-							tempList[i][2]-=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][tempList[i][0]];
 				}
 				increaseNccc();
 			}
@@ -581,6 +566,20 @@ public class AlsMgm2Agent extends AgentCycleAls {
 		//System.out.println("waitagain_end");
 	}
 	
+	protected void localSearchCheck(){
+		while(msgQueue.size() == 0){
+			try {
+				Thread.sleep(1);
+				System.out.println("!!! sleep(1) !!!!!");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if(msgQueue.isEmpty() == true){
+			System.out.println("!!!!! IsEmpty Judged Wrong !!!!!");
+		}
+	}
+	
 	protected void runFinished(){
 		super.runFinished();
 		
@@ -639,7 +638,7 @@ public class AlsMgm2Agent extends AgentCycleAls {
 	@Override
 	public String easyMessageContent(Message msg, AgentCycle sender, AgentCycle receiver) {
 		// TODO 自动生成的方法存根
-		return "from "+sender.getName()+" to "+receiver.getName()+" type "+Mgm2Agent.messageContent(msg);
+		return "from "+sender.getName()+" to "+receiver.getName()+" type "+AlsMgm2Agent.messageContent(msg);
 	}
 	
 	public static String messageContent(Message msg){

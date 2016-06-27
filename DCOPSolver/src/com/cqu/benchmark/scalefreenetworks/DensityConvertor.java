@@ -26,8 +26,6 @@ public class DensityConvertor {
         this.nbAgent = nbAgent;
         this.domainSize = domainSize;
         this.highCost = highCost;
-        m1 = new LinkedList<>();
-        m2 = new LinkedList<>();
         this.epsilon = epsilon;
     }
 
@@ -37,7 +35,7 @@ public class DensityConvertor {
 
     public void generate(){
         int edgeCount = (int) (p1 * nbAgent * (nbAgent - 1) / 2);
-        Map<String,Object> extraParameter = new HashMap<>();
+        Map<String,Object> extraParameter = new HashMap<String, Object>();
         ContentWriter writer = new ContentWriter(1,dirPath,nbAgent,domainSize,1,highCost,ContentWriter.PROBLEM_SCALE_FREE_NETWORK,null);
         for (int i = 1; i <= nbAgent; i++){
            for (int j = 1; j <= i; j++){
@@ -57,7 +55,7 @@ public class DensityConvertor {
     }
 
     public static void main(String[] args){
-        DensityConvertor convertor = new DensityConvertor(0.6,"",12,10,20,5);
+        DensityConvertor convertor = new DensityConvertor(0.6,".\\problems\\scalefree",12,10,20,5);
         convertor.generate();
     }
 }

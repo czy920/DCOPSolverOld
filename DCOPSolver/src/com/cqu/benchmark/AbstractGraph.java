@@ -166,8 +166,8 @@ public abstract class AbstractGraph {
         this.domainSize = domainSize;
         this.minCost = minCost;
         this.maxCost = maxCost;
-        this.source = new ArrayList<>();
-        this.dest = new ArrayList<>();
+        this.source = new ArrayList<Integer>();
+        this.dest = new ArrayList<Integer>();
         this.random = new Random();
     }
 

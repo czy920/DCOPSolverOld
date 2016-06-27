@@ -13,14 +13,16 @@ import com.cqu.hybriddpop.LabelPhaseHybridDPOP;
 import com.cqu.hybridmbdpop.HybridMBDPOP;
 import com.cqu.hybridmbdpop.LabelPhase;
 import com.cqu.hybridmbdpop.LabelPhaseHybridMBDPOP;
-import com.cqu.maxsum.MaxSumADVPAgent;
+//import com.cqu.maxsum.MaxSumADVPAgent;
 import com.cqu.parser.Problem;
 import com.cqu.util.CollectionUtil;
 
 public class AgentManager {
 	
-	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "HybridDPOP", "HybridMBDPOP", "AgileDPOP", "ADOPT", "BNBADOPT","ADOPT_K","BDADOPT","SynAdopt","SynAdopt2",
-		"DSA_A","DSA_B","DSA_C","DSA_D","DSA_E","MGM","MGM2","ALSDSA","ALSMGM","ALSMGM2","ALS_DSA","ALS_H1_DSA","ALS_H2_DSA","ALSLMUS","ALSLMUSDSA","ALSLMUSDSA2","ALSLMUSDSA3","ALSLMUSDSA4", "ACO","MAXSUM","MAXSUM_ADVP","MAXSUMRS"};
+	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "HybridDPOP", "HybridMBDPOP", "AgileDPOP", "ADOPT", "BNBADOPT", "ADOPT_K", "BDADOPT",
+		"SynAdopt", "SynAdopt2", "DSA_A", "DSA_B", "DSA_C", "DSA_D", "DSA_E", "MGM", "MGM2", "ALSDSA", "ALSMGM", "ALSMGM2", "ALS_DSA", "ALS_H1_DSA", "ALS_H2_DSA", 
+		"ALSLMUSDSA4", "ALSMLUDSA", "ALSDSAMGM", "ALSDSAMGMEVO", "PDSALSDSA", "PDSMGM", "PDSMGM2", "MAXSUM", "MAXSUM_ADVP", "ACO", "ACO_tree", "ACO_bf", "ACO_phase", "ACO_line",
+		"ACO_final"};
 	
 	private Map<Integer, Agent> agents;
 	private int treeHeight=0;
@@ -64,7 +66,7 @@ public class AgentManager {
 				agent=new BFSDPOPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)), problem.crossConstraintAllocation.get(agentId));
 			}else if (agentType.equals("MAXSUM_ADVP")) {
-				agent=new MaxSumADVPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), problem.domains.get(problem.agentDomains.get(agentId)));
+				//agent=new MaxSumADVPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), problem.domains.get(problem.agentDomains.get(agentId)));
 			}else
 			{
 				agent=new AdoptAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
@@ -82,10 +84,19 @@ public class AgentManager {
 			String[] neighbourAgentCostNames=problem.agentConstraintCosts.get(agentId);
 			for(int i=0;i<neighbourAgentCostNames.length;i++)
 			{
-				constraintCosts.put(neighbourAgentIds[i], 
-						CollectionUtil.toTwoDimension(problem.costs.get(neighbourAgentCostNames[i]), 
-								problem.domains.get(problem.agentDomains.get(agentId)).length, 
-								problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])).length));
+				if(agentId < neighbourAgentIds[i]){
+					constraintCosts.put(neighbourAgentIds[i], 
+							CollectionUtil.toTwoDimension(problem.costs.get(neighbourAgentCostNames[i]), 
+									problem.domains.get(problem.agentDomains.get(agentId)).length, 
+									problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])).length));
+				}else{
+					int[][] temp = CollectionUtil.toTwoDimension(problem.costs.get(neighbourAgentCostNames[i]), 
+							problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])).length, 
+							problem.domains.get(problem.agentDomains.get(agentId)).length);
+					
+					constraintCosts.put(neighbourAgentIds[i], CollectionUtil.reverse(temp));
+				}
+				
 			}
 			
 			agent.setNeibours(problem.neighbourAgents.get(agentId), problem.parentAgents.get(agentId), 

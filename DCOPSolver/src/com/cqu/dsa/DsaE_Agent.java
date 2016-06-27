@@ -89,10 +89,10 @@ public class DsaE_Agent extends AgentCycle {
 				}
 				for(int i=0; i<domain.length; i++){
 					for(int j=0; j<neighbours.length; j++){
-						if(this.id < neighbours[j])
+//						if(this.id < neighbours[j])
 							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-						else
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
+//						else
+//							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
 					}
 				}
 				
@@ -122,14 +122,24 @@ public class DsaE_Agent extends AgentCycle {
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighbours.length; i++){
-			if(this.id < neighbours[i])
-				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
-			else
-				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex.get(i)][valueIndex];	
+			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];
 		}
 		return localCostTemp;
 	}
 	
+	protected void localSearchCheck(){
+		while(msgQueue.size() == 0){
+			try {
+				Thread.sleep(1);
+				System.out.println("!!! sleep(1) !!!!!");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if(msgQueue.isEmpty() == true){
+			System.out.println("!!!!! IsEmpty Judged Wrong !!!!!");
+		}
+	}
 	
 	private void localMinCost(){
 		localMinCost=localCost;
@@ -138,20 +148,11 @@ public class DsaE_Agent extends AgentCycle {
 			for(int j=0; j<neighboursQuantity; j++){
 				
 				int oneMinCost;
-				if(this.id < neighbours[j])
-					oneMinCost=constraintCosts.get(neighbours[j])[i][0];
-				else
-					oneMinCost=constraintCosts.get(neighbours[j])[0][i];
+				oneMinCost=constraintCosts.get(neighbours[j])[i][0];
 				
 				for(int k=1; k<neighbourDomains.get(neighbours[j]).length; k++){	
-					if(this.id < neighbours[j]){
-						if(oneMinCost>constraintCosts.get(neighbours[j])[i][k])
-							oneMinCost=constraintCosts.get(neighbours[j])[i][k];
-					}
-					else{
-						if(oneMinCost>constraintCosts.get(neighbours[j])[k][i])
-							oneMinCost=constraintCosts.get(neighbours[j])[k][i];						
-					}
+					if(oneMinCost>constraintCosts.get(neighbours[j])[i][k])
+						oneMinCost=constraintCosts.get(neighbours[j])[i][k];
 				}
 				tempLocalCost+=oneMinCost;
 			}

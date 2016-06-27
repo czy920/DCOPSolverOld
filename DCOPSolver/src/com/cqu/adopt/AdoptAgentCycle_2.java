@@ -224,14 +224,7 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 					ret[j]+=0;
 				}else
 				{
-					//保证id小的为行，id大的为列
-					if(this.id<parentId)
-					{
-						ret[j]+=this.constraintCosts.get(parentId)[j][oppositeAgentValueIndex];
-					}else
-					{
-						ret[j]+=this.constraintCosts.get(parentId)[oppositeAgentValueIndex][j];
-					}
+					ret[j]+=this.constraintCosts.get(parentId)[j][oppositeAgentValueIndex];
 				}
 			}
 		}
@@ -259,14 +252,7 @@ public class AdoptAgentCycle_2 extends AgentCycle {
 				ret+=0;
 			}else
 			{
-				//保证id小的为行，id大的为列
-				if(this.id<parentId)
-				{
-					ret+=this.constraintCosts.get(parentId)[di][oppositeAgentValueIndex];
-				}else
-				{
-					ret+=this.constraintCosts.get(parentId)[oppositeAgentValueIndex][di];
-				}
+				ret+=this.constraintCosts.get(parentId)[di][oppositeAgentValueIndex];
 			}
 		}
 		return ret;

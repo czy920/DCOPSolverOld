@@ -4,6 +4,7 @@
 	<classpathentry kind="lib" path="lib/jdom-2.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/jtree_dischoco.jar"/>
 	<classpathentry kind="lib" path="lib/meetingscheduling_frodo.jar"/>
+	<classpathentry kind="lib" path="lib/benchmark_sensornetwork.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/problem_generators_dischoco.jar"/>
 	<classpathentry kind="output" path="bin"/>

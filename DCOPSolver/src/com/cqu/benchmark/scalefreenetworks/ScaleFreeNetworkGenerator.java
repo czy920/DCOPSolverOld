@@ -21,9 +21,9 @@ public class ScaleFreeNetworkGenerator extends AbstractGraph {
             throw new IllegalArgumentException("m2 can't greater than m1");
         this.m1 = m1;
         this.m2 = m2;
-        edgeCounter = new HashMap<>();
+        edgeCounter = new HashMap<Integer,Integer>();
         random = new Random();
-        connected = new LinkedHashSet<>();
+        connected = new HashSet<Integer>();
     }
 
     private void generateInitConnectedGraph(){
@@ -40,9 +40,11 @@ public class ScaleFreeNetworkGenerator extends AbstractGraph {
             agents[index] = agents[agents.length - 1 - i];
         }
 
+     
         for (int i = 0; i < m1 - 1; i++){
-            source.add(Integer.min(sampled[i],sampled[i + 1]));
-            dest.add(Integer.max(sampled[i],sampled[i + 1]));
+        	
+            source.add(sampled[i] < sampled[i + 1] ? sampled[i] :sampled[i + 1]);
+            dest.add(sampled[i] > sampled[i + 1] ? sampled[i] :sampled[i + 1]);
             edgeCounter.put(sampled[i],edgeCounter.get(sampled[i]) + 1);
             edgeCounter.put(sampled[i + 1],edgeCounter.get(sampled[i + 1]) + 1);
             nbConstraint++;
@@ -81,8 +83,8 @@ public class ScaleFreeNetworkGenerator extends AbstractGraph {
                 else {
                     target[0] = sampled[0];
                 }
-                source.add(Integer.min(i,target[j]));
-                dest.add(Integer.max(i,target[j]));
+                source.add(i < target[j] ? i : target[j]);
+                dest.add(i > target[j] ? i : target[j]);
                 connected.remove(target[j]);
             }
             for (int j = 0; j < m2; j++){

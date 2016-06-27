@@ -520,16 +520,7 @@ public class BnBAdoptAgent extends AgentCycle {
 					ret[j]+=0;
 				}else
 				{
-					//保证id小的为行，id大的为列
-					if(this.id<parentId)
-					{
-						//ret[j]+=this.constraintCosts.get(parentId)[this.domain[j]-1][agentDomains.get(parentId)[oppositeAgentValueIndex]-1];
-						ret[j]+=this.constraintCosts.get(parentId)[j][oppositeAgentValueIndex];
-					}else
-					{
-						//ret[j]+=this.constraintCosts.get(parentId)[agentDomains.get(parentId)[oppositeAgentValueIndex]-1][this.domain[j]-1];
-						ret[j]+=this.constraintCosts.get(parentId)[oppositeAgentValueIndex][j];
-					}
+					ret[j]+=this.constraintCosts.get(parentId)[j][oppositeAgentValueIndex];
 				}
 			}
 		}
@@ -557,16 +548,7 @@ public class BnBAdoptAgent extends AgentCycle {
 				ret+=0;
 			}else
 			{
-				//保证id小的为行，id大的为列
-				if(this.id<parentId)
-				{
-					//ret+=this.constraintCosts.get(parentId)[this.domain[di]-1][agentDomains.get(parentId)[oppositeAgentValueIndex]-1];
-					ret+=this.constraintCosts.get(parentId)[di][oppositeAgentValueIndex];
-				}else
-				{
-					//ret+=this.constraintCosts.get(parentId)[agentDomains.get(parentId)[oppositeAgentValueIndex]-1][this.domain[di]-1];
-					ret+=this.constraintCosts.get(parentId)[oppositeAgentValueIndex][di];
-				}
+				ret+=this.constraintCosts.get(parentId)[di][oppositeAgentValueIndex];
 			}
 		}
 		return ret;

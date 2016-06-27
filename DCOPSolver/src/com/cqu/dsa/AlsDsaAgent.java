@@ -131,13 +131,14 @@ public class AlsDsaAgent extends AgentCycleAls {
 		
 		if(receivedQuantity==0){
 			localCost=localCost();
+			//进行ALS框架操作
+			AlsWork();
 			
 			if(cycleCount>=cycleCountEnd){
+				STOPRUNNING = true;
 				//stopRunning();
 				//!!!!!!!!!!!!!!!!!!!!在Als框架下，线程终止操作不在这里进行!!!!!!!!!!!!!!!!!!!!
 			}else{
-				//进行ALS框架操作
-				AlsWork();
 				
 				if(Math.random()<p){
 					int[] selectMinCost=new int[domain.length];
@@ -146,10 +147,7 @@ public class AlsDsaAgent extends AgentCycleAls {
 					}
 					for(int i=0; i<domain.length; i++){
 						for(int j=0; j<neighbours.length; j++){
-							if(this.id < neighbours[j])
-								selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-							else
-								selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];	
+								selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];
 						}					
 					}				
 					int selectValueIndex=0;
@@ -253,7 +251,7 @@ public class AlsDsaAgent extends AgentCycleAls {
 				//System.out.println("cycleCount~~~"+cycleCount+"~~~bestCost~~~"+bestCost);
 			}
 		}
-		if(valueIndexList.isEmpty() == true){
+		if(valueIndexList.isEmpty() == true && STOPRUNNING == true){
 			//bestCost = bestCost/2;
 			stopRunning();
 		}
@@ -334,12 +332,23 @@ public class AlsDsaAgent extends AgentCycleAls {
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighbours.length; i++){
-			if(this.id < neighbours[i])
-				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
-			else
-				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex.get(i)][valueIndex];	
+			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
 		}
 		return localCostTemp;
+	}
+	
+	protected void localSearchCheck(){
+		while(msgQueue.size() == 0){
+			try {
+				Thread.sleep(1);
+				System.out.println("!!! sleep(1) !!!!!");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if(msgQueue.isEmpty() == true){
+			System.out.println("!!!!! IsEmpty Judged Wrong !!!!!");
+		}
 	}
 	
 	protected void runFinished(){

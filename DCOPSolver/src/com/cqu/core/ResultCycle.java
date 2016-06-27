@@ -9,8 +9,8 @@ public class ResultCycle extends Result{
 	public int[] messageQuantityInCycle;
 	public double nccc;
 	
-	public int[] ant_totalCostInCyle;
-	public int[] ant_bestCostInCycle;
+	public double[] ant_totalCostInCyle;
+	public double[] ant_bestCostInCycle;
 		
 	public ResultCycle() {
 		// TODO Auto-generated constructor stub
@@ -44,8 +44,8 @@ public class ResultCycle extends Result{
 			this.messageQuantityInCycle = ((ResultCycle)rs).messageQuantityInCycle;
 			this.timeCostInCycle = ((ResultCycle)rs).timeCostInCycle;
 			
-			//this.ant_totalCostInCyle = ((ResultCycle)rs).ant_totalCostInCyle;
-			//this.ant_bestCostInCycle = ((ResultCycle)rs).ant_bestCostInCycle;
+			this.ant_totalCostInCyle = ((ResultCycle)rs).ant_totalCostInCyle;
+			this.ant_bestCostInCycle = ((ResultCycle)rs).ant_bestCostInCycle;
 		}
 		this.lostRatio=Math.min(this.lostRatio, rs.lostRatio);
 		this.nccc=Math.min(this.nccc, ((ResultCycle)rs).nccc);
@@ -63,8 +63,8 @@ public class ResultCycle extends Result{
 			this.messageQuantityInCycle = ((ResultCycle)rs).messageQuantityInCycle;
 			this.timeCostInCycle = ((ResultCycle)rs).timeCostInCycle;
 			
-			//this.ant_totalCostInCyle = ((ResultCycle)rs).ant_totalCostInCyle;
-			//this.ant_bestCostInCycle = ((ResultCycle)rs).ant_bestCostInCycle;
+			this.ant_totalCostInCyle = ((ResultCycle)rs).ant_totalCostInCyle;
+			this.ant_bestCostInCycle = ((ResultCycle)rs).ant_bestCostInCycle;
 		}
 		this.lostRatio=Math.max(this.lostRatio, rs.lostRatio);
 		this.nccc=Math.max(this.nccc, ((ResultCycle)rs).nccc);
@@ -126,19 +126,19 @@ public class ResultCycle extends Result{
 		}
 		
 		//蚁群算法引入下面数据
-		//目前算法都是以轮数作为终止，批处理的每一次执行的轮数相同，应该没必要做下面处理
+		//（待考证：目前算法都是以轮数作为终止，批处理的每一次执行的轮数相同，应该没必要做下面处理）
 		//蚁群算法引入下面数据
 		if(this.ant_totalCostInCyle == null){
-			this.ant_totalCostInCyle = new int[((ResultCycle)rs).ant_totalCostInCyle.length];
-			this.ant_bestCostInCycle = new int[((ResultCycle)rs).ant_bestCostInCycle.length];
+			this.ant_totalCostInCyle = new double[((ResultCycle)rs).ant_totalCostInCyle.length];
+			this.ant_bestCostInCycle = new double[((ResultCycle)rs).ant_bestCostInCycle.length];
 			for(int i = 0; i < ant_totalCostInCyle.length; i++){
 				this.ant_totalCostInCyle[i]=0;
 				this.ant_bestCostInCycle[i] = 0;
 			}
 		}
-		/*if(this.ant_totalCostInCyle.length < ((ResultCycle)rs).ant_totalCostInCyle.length){
-			int[] tempAnt_totalCost = new int[((ResultCycle)rs).ant_totalCostInCyle.length];
-			int[] tempAnt_tempbestCost = new int[((ResultCycle)rs).ant_bestCostInCycle.length];
+		if(this.ant_totalCostInCyle.length < ((ResultCycle)rs).ant_totalCostInCyle.length){
+			double[] tempAnt_totalCost = new double[((ResultCycle)rs).ant_totalCostInCyle.length];
+			double[] tempAnt_tempbestCost = new double[((ResultCycle)rs).ant_bestCostInCycle.length];
 			for(int i = 0; i < ant_totalCostInCyle.length; i++){
 				tempAnt_totalCost[i] = this.ant_totalCostInCyle[i];
 				tempAnt_tempbestCost[i] = this.ant_bestCostInCycle[i];
@@ -150,8 +150,8 @@ public class ResultCycle extends Result{
 			ant_totalCostInCyle = tempAnt_totalCost;
 			ant_bestCostInCycle = tempAnt_tempbestCost;
 		}else if(this.ant_totalCostInCyle.length > ((ResultCycle)rs).ant_totalCostInCyle.length){
-			int[] tempAnt_totalCost = new int[this.ant_totalCostInCyle.length];
-			int[] tempAnt_tempbestCost = new int[this.ant_bestCostInCycle.length];
+			double[] tempAnt_totalCost = new double[this.ant_totalCostInCyle.length];
+			double[] tempAnt_tempbestCost = new double[this.ant_bestCostInCycle.length];
 			for(int i = 0; i < ((ResultCycle)rs).ant_totalCostInCyle.length; i++){
 				tempAnt_totalCost[i] = ((ResultCycle)rs).ant_totalCostInCyle[i];
 				tempAnt_tempbestCost[i] =((ResultCycle)rs).ant_bestCostInCycle[i];
@@ -162,12 +162,19 @@ public class ResultCycle extends Result{
 			}
 			((ResultCycle)rs).ant_totalCostInCyle = tempAnt_totalCost;
 			((ResultCycle)rs).ant_bestCostInCycle = tempAnt_tempbestCost;
-		}*/
-		//只记录最后一次的，不求平均
+		}
+		
+		//求平均
 		for(int i = 0; i < this.ant_totalCostInCyle.length;i++){
+			this.ant_totalCostInCyle[i] += (((ResultCycle)rs).ant_totalCostInCyle[i]/validCount);
+			this.ant_bestCostInCycle[i] += (((ResultCycle)rs).ant_bestCostInCycle[i]/validCount);
+		}
+		
+		//如果批处理只记录最后一次的，不求平均
+		/*for(int i = 0; i < this.ant_totalCostInCyle.length;i++){
 			this.ant_totalCostInCyle[i] = ((ResultCycle)rs).ant_totalCostInCyle[i];
 			this.ant_bestCostInCycle[i] = ((ResultCycle)rs).ant_bestCostInCycle[i];
-		}
+		}*/
 		
 		this.nccc+=((ResultCycle)rs).nccc/validCount;
 	}
@@ -229,16 +236,16 @@ public class ResultCycle extends Result{
 		
 		// 蚁群算法引入下面数据
 		if(this.ant_totalCostInCyle == null){
-			this.ant_totalCostInCyle = new int[((ResultCycle)rs).ant_totalCostInCyle.length];
-			this.ant_bestCostInCycle = new int[((ResultCycle)rs).ant_bestCostInCycle.length];
+			this.ant_totalCostInCyle = new double[((ResultCycle)rs).ant_totalCostInCyle.length];
+			this.ant_bestCostInCycle = new double[((ResultCycle)rs).ant_bestCostInCycle.length];
 			for(int i = 0; i < ant_totalCostInCyle.length; i++){
 				this.ant_totalCostInCyle[i]=0;
 				this.ant_bestCostInCycle[i] = 0;
 			}
 		}
-		/*if (this.ant_totalCostInCyle.length < ((ResultCycle) rs).ant_totalCostInCyle.length) {
-			int[] tempAnt_totalCost = new int[((ResultCycle) rs).ant_totalCostInCyle.length];
-			int[] tempAnt_tempbestCost = new int[((ResultCycle) rs).ant_bestCostInCycle.length];
+		if (this.ant_totalCostInCyle.length < ((ResultCycle) rs).ant_totalCostInCyle.length) {
+			double[] tempAnt_totalCost = new double[((ResultCycle) rs).ant_totalCostInCyle.length];
+			double[] tempAnt_tempbestCost = new double[((ResultCycle) rs).ant_bestCostInCycle.length];
 			for (int i = 0; i < ant_totalCostInCyle.length; i++) {
 				tempAnt_totalCost[i] = this.ant_totalCostInCyle[i];
 				tempAnt_tempbestCost[i] = this.ant_bestCostInCycle[i];
@@ -250,8 +257,8 @@ public class ResultCycle extends Result{
 			ant_totalCostInCyle = tempAnt_totalCost;
 			ant_bestCostInCycle = tempAnt_tempbestCost;
 		} else if (this.ant_totalCostInCyle.length > ((ResultCycle) rs).ant_totalCostInCyle.length) {
-			int[] tempAnt_totalCost = new int[this.ant_totalCostInCyle.length];
-			int[] tempAnt_tempbestCost = new int[this.ant_bestCostInCycle.length];
+			double[] tempAnt_totalCost = new double[this.ant_totalCostInCyle.length];
+			double[] tempAnt_tempbestCost = new double[this.ant_bestCostInCycle.length];
 			for (int i = 0; i < ((ResultCycle) rs).ant_totalCostInCyle.length; i++) {
 				tempAnt_totalCost[i] = ((ResultCycle) rs).ant_totalCostInCyle[i];
 				tempAnt_tempbestCost[i] = ((ResultCycle) rs).ant_bestCostInCycle[i];
@@ -262,12 +269,12 @@ public class ResultCycle extends Result{
 			}
 			((ResultCycle) rs).ant_totalCostInCyle = tempAnt_totalCost;
 			((ResultCycle) rs).ant_bestCostInCycle = tempAnt_tempbestCost;
-		}*/
-		//只记录最后一次，无去最大、最小操作
-		/*for (int i = 0; i < this.ant_totalCostInCyle.length; i++) {
+		}
+		//如果只记录批处理最后一次，无去最大、最小操作
+		for (int i = 0; i < this.ant_totalCostInCyle.length; i++) {
 			this.ant_totalCostInCyle[i] -= (((ResultCycle) rs).ant_totalCostInCyle[i] / validCount);
 			this.ant_bestCostInCycle[i] -= (((ResultCycle) rs).ant_bestCostInCycle[i] / validCount);
-		}*/
+		}
 		
 		this.nccc-=((ResultCycle)rs).nccc/validCount;
 	}

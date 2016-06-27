@@ -1,208 +1,166 @@
 package com.cqu.maxsum;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.cqu.core.Message;
 import com.cqu.core.ResultCycle;
 import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.settings.Settings;
 
-public class MaxSumAgent extends AgentCycle {
-	private static final int PROCESS_TYPE_VARIABLE = 0;
-	private static final int PROCESS_TYPE_FUNCTION  = 1;
-	
-	private MaxSumFunctionNode functionNode;
-	private MaxSumVariableNode variableNode;
-	private int cycleEnd;
-	private Map<Integer, Integer> lastKnownValueIndex;
-	private boolean isStartMessage = false;
-	private int processType;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-	public MaxSumAgent(int id, String name, int level, int[] domain) {
-		super(id, name, level, domain);
-		variableNode = new MaxSumVariableNode(id, domain.length);
-		cycleEnd = Settings.settings.getCycleCountEnd();
-		lastKnownValueIndex = new HashMap<Integer, Integer>();
-	}
+/**
+ * Created by YanChenDeng on 2016/5/19.
+ */
 
-	@Override
-	public Object printResults(List<Map<String, Object>> results) {
-		// TODO Auto-generated method stub
-		double totalCost=0;
-		for (Map<String, Object> map : results) {
-			StringBuffer stringBuffer=new StringBuffer();
-			stringBuffer.append("id:");
-			stringBuffer.append((Integer)map.get("id"));
-			stringBuffer.append(" optimalVal:");
-			stringBuffer.append((Integer)map.get("val"));  
-			System.out.println(stringBuffer.toString());
-			totalCost+=((double)((Integer)map.get("localCost")))/2;
-		}
-		ResultCycle retResult=new ResultCycle();
-		retResult.totalCost=(int)totalCost;
-		return retResult;
-	}
+public class MaxSumAgent extends AgentCycle implements ParentInfoProvider {
 
-	@Override
-	public String easyMessageContent(Message msg, AgentCycle sender,
-			AgentCycle receiver) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
-	@Override
-	protected void disposeMessage(Message msg) {
-		// TODO Auto-generated method stub
-		//printMessage(msg);
-		if (msg.getIdSender()!=id && msg.getValue() != null) {
-			int i = ((MessageContent)msg.getValue()).getCurrentValueIndex();
-			if (i != -1) {				
-				lastKnownValueIndex.put(msg.getIdSender(),i);
-			}			
-		}
-		int msgType = msg.getType();
-		if ((msgType & AbstractNode.MSG_TYPE_TO_FUNCTION_NODE) != 0) {
-			functionNode.addMessage(msg);			
-		}
-		else if ((msgType & AbstractNode.MSG_TYPE_TO_VARIABLE_NODE) != 0) {
-			variableNode.addMessage(msg);			
-		}				
-		if ((msgType & AbstractNode.MSG_TYPE_START) != 0) {
-			isStartMessage = true;
-		}
-		else {
-			isStartMessage = false;
-		}
-	}
+    private static final int PROCESS_TYPE_VALUE = 1;
+    private static final int PROCESS_TYPE_FUNCTION = 2;
 
-	@Override
-	protected void messageLost(Message msg) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void setNeibours(int[] neighbours, int parent, int[] children,
-			int[] allParents, int[] allChildren,
-			Map<Integer, int[]> neighbourDomains,
-			Map<Integer, int[][]> constraintCosts,
-			Map<Integer, Integer> neighbourLevels) {
-		// TODO Auto-generated method stub
-		super.setNeibours(neighbours, parent, children, allParents, allChildren,
-				neighbourDomains, constraintCosts, neighbourLevels);
-		int[] ids = new int[neighbours.length + 1];
-		for (int i = 0; i < neighbours.length; i++)
-			ids[i] = neighbours[i];
-		ids[neighbours.length] = id;
-		LargerHyperCube localFunction = new LargerHyperCube(ids, id, constraintCosts);
-		localFunction.setDomainSize(domain.length);
-		functionNode = new MaxSumFunctionNode(id, localFunction, domain.length);
-		for (int id : neighbours){
-			functionNode.addNeighbour(new NodeInfo(neighbourDomains.get(id).length, id));
-			variableNode.addNeighbour(new NodeInfo(neighbourDomains.get(id).length, id));
-		}
-	}
-	
-	@Override
-	protected void initRun() {
-		// TODO Auto-generated method stub
-		super.initRun();
-		broadcastMessages(variableNode.init());
-	}
-	
-	private void broadcastMessages(Message[] message) {
-		for (Message msg : message)
-			sendMessage(msg);
-	}
-	
-	@Override
-	protected void allMessageDisposed() {
-		// TODO Auto-generated method stub
-		super.allMessageDisposed();
-		if (isStartMessage) {
-			broadcastMessages(functionNode.handleMessage(null));
-			processType = PROCESS_TYPE_VARIABLE;
-			//System.out.println(id+" start round");
-			return;
-		}
-		if (processType == PROCESS_TYPE_VARIABLE) {
-			broadcastMessages(variableNode.handleMessage(null));
-			processType = PROCESS_TYPE_FUNCTION;
-		}
-		else {
-			broadcastMessages(functionNode.handleMessage(null));
-			processType = PROCESS_TYPE_VARIABLE;
-		}
-		if (--cycleEnd <= 0) {
-			stopRunning();
-		}
-		//System.out.println(id+" iteration decrease:"+cycleEnd);
-	}
-	
-	private int calcuLocalCost(){
-		int cost=0;
-		for(int key:lastKnownValueIndex.keySet()){
-			if (id<key) {
-				cost+=constraintCosts.get(key)[variableNode.getOptimalIndex()][lastKnownValueIndex.get(key)];
-			}
-			else {
-				cost+=constraintCosts.get(key)[lastKnownValueIndex.get(key)][variableNode.getOptimalIndex()];
-			}
-		}
-		return cost;
-	}
-	
-	@Override
-	protected void runFinished() {
-		// TODO Auto-generated method stub
-		super.runFinished();
-		valueIndex=variableNode.getOptimalIndex();
-		Map<String, Object> resultMap=new HashMap<String, Object>();
-		resultMap.put("id", id);
-		resultMap.put("val", domain[valueIndex]);
-		resultMap.put("localCost", calcuLocalCost());
-		msgMailer.setResult(resultMap);
-	}
-	
-private void printMessage(Message message){
-		
-		MessageContent content=null;
-		if (message.getValue()!=null&&message.getValue() instanceof MessageContent) {
-			content=(MessageContent)message.getValue();
-		}		
-		StringBuffer stringBuffer=new StringBuffer();
-		stringBuffer.append("from:");
-		stringBuffer.append(message.getIdSender());
-		stringBuffer.append(" to:");
-		stringBuffer.append(message.getIdReceiver());
-		stringBuffer.append(" type:");
-		if ((message.getType()&AbstractNode.MSG_TYPE_TO_FUNCTION_NODE)!=0) {
-			stringBuffer.append("v2f");
-		}
-		else if((message.getType()&AbstractNode.MSG_TYPE_TO_VARIABLE_NODE)!=0){
-			stringBuffer.append("f2v");
-		}
-		if ((message.getType()&MaxSumADVPNode.MSG_TYPE_CHANGE_ACK)!=0) {
-			stringBuffer.append(",ack");
-		}
-		else if ((message.getType()&AbstractNode.MSG_TYPE_START)!=0) {
-			stringBuffer.append(",start");
-		}
-		else if((message.getType()&MaxSumADVPNode.MSG_TYPE_CHANGE_REQ)!=0) {
-			stringBuffer.append(",req");
-		}		
-		if (content==null) {
-			System.out.println(stringBuffer.toString());
-			return;
-		}
-		stringBuffer.append(" currentIndex:");
-		stringBuffer.append(content.getCurrentValueIndex());
-		if (content.getLargerHyperCube() != null) {
-			stringBuffer.append(" hypercube:" + content.getLargerHyperCube().toString());
-		}		
-		System.out.println(stringBuffer.toString());
-	}
+    private VariableNode variableNode;
+    private FunctionNode functionNode;
+    private HyperCube localFunction;
+    private int processType; // messages to be processed
+    private Map<Integer,Integer> lastKnownIndex;
+    private int iteration;
+    private static Object syncObj = new Object();
 
+    public MaxSumAgent(int id, String name, int level, int[] domain) {
+        super(id, name, level, domain);
+        variableNode = new VariableNode(this,false);
+        functionNode = new FunctionNode(this,false);
+        processType = PROCESS_TYPE_FUNCTION;
+        lastKnownIndex = new HashMap<>();
+        iteration = Settings.settings.getCycleCountEnd();
+    }
+
+    @Override
+    public Object printResults(List<Map<String, Object>> results) {
+        double totalCost = 0;
+        for (Map<String,Object> map : results){
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("id:"+ map.get("id"));
+            stringBuilder.append(" value:" + map.get("value"));
+            stringBuilder.append(" dist:" + map.get("dist"));
+            System.out.println(stringBuilder.toString());
+            totalCost += (int)map.get("cost");
+        }
+        ResultCycle resultCycle = new ResultCycle();
+        resultCycle.totalCost = (int)(totalCost / 2);
+        return resultCycle;
+    }
+
+    @Override
+    public String easyMessageContent(Message msg, AgentCycle sender, AgentCycle receiver) {
+        return null;
+    }
+
+    @Override
+    protected void disposeMessage(Message msg) {
+        synchronized (syncObj){
+           // System.out.println(msg + ":" + ((MessageContent)msg.getValue()).getCube());
+        }
+        lastKnownIndex.put(msg.getIdSender(),((MessageContent)msg.getValue()).getOptimalIndex());
+        if ((msg.getType() & AbstractNode.MSG_TYPE_FUNCTION_TO_VARIABLE) != 0)
+            variableNode.addMessage(msg);
+        else if ((msg.getType() & AbstractNode.MSG_TYPE_VARIABLE_TO_FUNCTION) != 0)
+            functionNode.addMessage(msg);
+    }
+
+    @Override
+    protected void messageLost(Message msg) {
+
+    }
+
+    @Override
+    public int getDomainSize() {
+        return domain.length;
+    }
+
+    @Override
+    public HyperCube getLocalFunction() {
+        return localFunction;
+    }
+
+    @Override
+    public void setNeibours(int[] neighbours, int parent, int[] children, int[] allParents,
+                            int[] allChildren, Map<Integer, int[]> neighbourDomains, Map<Integer,
+            int[][]> constraintCosts, Map<Integer, Integer> neighbourLevels)
+    {
+        super.setNeibours(neighbours,parent,children,allParents,allChildren,neighbourDomains,constraintCosts,neighbourLevels);
+        int[] ids = new int[neighbours.length + 1];
+        for (int i = 0; i < neighbours.length; i++){
+            ids[i] = neighbours[i];
+        }
+        ids[ids.length - 1] = id;
+        localFunction = new HyperCube(id,constraintCosts,ids,domain.length,true);
+        for (int id : neighbours){
+            variableNode.addNeighbours(id,neighbourDomains.get(id).length);
+            functionNode.addNeighbours(id,neighbourDomains.get(id).length);
+        }
+        variableNode.addNeighbours(id,domain.length);
+        functionNode.addNeighbours(id,domain.length);
+    }
+
+    @Override
+    protected void allMessageDisposed() {
+        super.allMessageDisposed();
+        if (processType == PROCESS_TYPE_FUNCTION){
+            broadcastMessages(functionNode.handle());
+            processType = PROCESS_TYPE_VALUE;
+        }
+        else if (processType == PROCESS_TYPE_VALUE){
+            broadcastMessages(variableNode.handle());
+            processType = PROCESS_TYPE_FUNCTION;
+        }
+        if (--iteration <= 0)
+            stopRunning();
+    }
+
+    @Override
+    protected void initRun() {
+        super.initRun();
+        Message[] sendMessages = variableNode.handle();
+        for (Message message : sendMessages){
+            sendMessage(message);
+        }
+    }
+
+    private void broadcastMessages(Message[] messages){
+        for (Message msg : messages){
+            ((MessageContent)msg.getValue()).setOptimalIndex(variableNode.getOptimalIndex());
+            sendMessage(msg);
+        }
+    }
+
+    @Override
+    public int getLocalCost() {
+        int sum = 0;
+        valueIndex = variableNode.getOptimalIndex();
+        for (int id : lastKnownIndex.keySet()){
+            if (id == this.id)
+                continue;
+            sum += constraintCosts.get(id)[valueIndex][lastKnownIndex.get(id)];
+        }
+        localCost = sum;
+        return super.getLocalCost();
+    }
+
+    @Override
+    protected void runFinished() {
+        super.runFinished();
+        Map<String,Object> resultMap = new HashMap<>();
+        resultMap.put("id",id);
+        resultMap.put("value",variableNode.getOptimalIndex());
+        resultMap.put("cost",getLocalCost());
+        resultMap.put("dist",variableNode.getValueDistribution());
+        msgMailer.setResult(resultMap);
+    }
+
+    @Override
+    public HyperCube getLocalFunction(String constraintName) {
+        throw new UnsupportedOperationException();
+    }
 }

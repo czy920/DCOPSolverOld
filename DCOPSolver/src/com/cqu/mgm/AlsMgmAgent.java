@@ -9,10 +9,11 @@ import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.ResultCycle;
 import com.cqu.cyclequeue.AgentCycle;
+import com.cqu.cyclequeue.AgentCycleAls;
 import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
 
-public class AlsMgmAgent extends AgentCycle {
+public class AlsMgmAgent extends AgentCycleAls {
 
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_GAIN_MESSAGE=1;
@@ -80,12 +81,12 @@ public class AlsMgmAgent extends AgentCycle {
 		}
 	}
 
-	private void sendAlsCostMessage(){
+	protected void sendAlsCostMessage(){
 		Message msg=new Message(this.id, this.parent, AlsMgmAgent.TYPE_ALSCOST_MESSAGE, this.accumulativeCost);
 		this.sendMessage(msg);
 	}
 	
-	private void sendAlsBestMessage(){
+	protected void sendAlsBestMessage(){
 		for(int i = 0; i < children.length; i++){
 			Message msg=new Message(this.id, children[i], AlsMgmAgent.TYPE_ALSBEST_MESSAGE, isChanged);
 			this.sendMessage(msg);
@@ -95,10 +96,7 @@ public class AlsMgmAgent extends AgentCycle {
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighboursQuantity; i++){
-			if(this.id < neighbours[i])
-				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
-			else
-				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex.get(i)][valueIndex];	
+			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
 		}
 		return localCostTemp;
 	}
@@ -166,23 +164,20 @@ public class AlsMgmAgent extends AgentCycle {
 			//System.out.println("agent"+this.id+"_______"+this.valueIndex);
 			
 			localCost=localCost();
+			//进行ALS框架操作
+			AlsWork();
 			
 			if(cycleCount>=cycleCountEnd){
+				STOPRUNNING = true;
 				//stopRunning();
 			}else{
-				//进行ALS框架操作
-				AlsWork();
-				
 				int[] selectMinCost=new int[domain.length];
 				for(int i=0; i<domain.length; i++){
 					selectMinCost[i]=0;
 				}
 				for(int i=0; i<domain.length; i++){
 					for(int j=0; j<neighboursQuantity; j++){
-						if(this.id < neighbours[j])
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-						else
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
+							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];	
 					}
 				}
 				int newLocalCost=localCost;
@@ -230,95 +225,20 @@ public class AlsMgmAgent extends AgentCycle {
 		}
 	}
 	
-	private void disposeAlsCostMessage(Message msg){
-		int senderIndex=0;
-		int senderId=msg.getIdSender();
-		for(int i=0; i<children.length; i++){
-			if(children[i]==senderId){
-				senderIndex=i;
-				break;
+	protected void localSearchCheck(){
+		while(msgQueue.size() == 0){
+			try {
+				Thread.sleep(1);
+				System.out.println("!!! sleep(1) !!!!!");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
-		if(childrenMessageList.containsKey(senderIndex) == true){
-			LinkedList<Integer> temp = childrenMessageList.remove(senderIndex);
-			temp.add((Integer) msg.getValue());
-			childrenMessageList.put(senderIndex, temp);
-		}
-		else{
-			LinkedList<Integer> temp = new LinkedList<Integer>();
-			temp.add((Integer) msg.getValue());
-			childrenMessageList.put(senderIndex, temp);
-		}
-		
-		enoughReceived = true;
-		for(int i = 0; i < children.length; i++){
-			if(childrenMessageList.containsKey(i) == false){
-				enoughReceived = false;
-				break;
-			}
-		}
-		
-		if(enoughReceived == true){
-			
-			accumulativeCost = localCostList.removeFirst();
-			
-			for(int i = 0; i < children.length; i++){
-				LinkedList<Integer> temp = childrenMessageList.remove(i);
-				accumulativeCost = accumulativeCost + temp.remove();
-				if(temp.isEmpty() == false)
-					childrenMessageList.put(i, temp);
-			}
-			
-			if(this.isRootAgent() == false)
-				sendAlsCostMessage();
-			else{
-				if(accumulativeCost < bestCost){
-					bestCost = accumulativeCost;
-					bestValue = valueIndexList.removeFirst();
-					isChanged = YES;
-					sendAlsBestMessage();
-				}
-				else{
-					valueIndexList.removeFirst();
-					isChanged = NO;
-					sendAlsBestMessage();
-				}
-				System.out.println("cycleCount~~~"+cycleCount+"~~~bestCost~~~"+bestCost/2);
-			}
-		}
-		if(valueIndexList.isEmpty() == true){
-			bestCost = bestCost/2;
-			stopRunning();
+		if(msgQueue.isEmpty() == true){
+			System.out.println("!!!!! IsEmpty Judged Wrong !!!!!");
 		}
 	}
 	
-	private void disposeAlsBestMessage(Message msg){
-		if((String)msg.getValue() == YES){
-			bestValue = valueIndexList.remove();
-			isChanged = YES;
-		}
-		else{
-			valueIndexList.remove();
-			isChanged = NO;
-		}
-		if(this.isLeafAgent() == false)
-			sendAlsBestMessage();
-		
-		if(valueIndexList.isEmpty() == true)
-			stopRunning();
-	}
-		
-	private void AlsWork(){
-		localCostList.add(localCost);
-		valueIndexList.add(valueIndex);
-		
-		if(this.isLeafAgent() == true){
-			accumulativeCost  = localCost;
-			sendAlsCostMessage();
-		}
-		//System.out.println("Agent "+this.name+"~~~~~"+cycleCount);
-	};
-
 	protected void runFinished(){
 		super.runFinished();
 		

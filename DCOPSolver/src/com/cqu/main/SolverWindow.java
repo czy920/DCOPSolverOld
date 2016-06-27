@@ -29,6 +29,7 @@ import com.cqu.heuristics.DFSHeuristicsManager;
 import com.cqu.problemgenerator.DialogGraphColoring;
 import com.cqu.problemgenerator.DialogMeetingScheduling;
 import com.cqu.problemgenerator.DialogRandomDCOP;
+import com.cqu.problemgenerator.DialogSensorNetwork;
 import com.cqu.settings.DialogSetSettings;
 import com.cqu.settings.Settings;
 import com.cqu.util.DateUtil;
@@ -95,7 +96,7 @@ public class SolverWindow {
 	private LabelSpinnerParameter lspSpinnerSelectRound;
 	
 	//蚁群算法参数设置
-	private LabelSpinnerParameter lspSpinnerMaxCycle;
+	//private LabelSpinnerParameter lspSpinnerMaxCycle;
 	private LabelSpinnerParameter lspSpinnercountAnt;
 	private LabelSpinnerParameter lspSpinneralpha;
 	private LabelSpinnerParameter lspSpinnerbeta;
@@ -272,6 +273,15 @@ public class SolverWindow {
 		mnp.setMnemonic('P');
 		menuBar.add(mnp);
 		
+		JMenuItem miSensorNetwork = new JMenuItem("传感器网络");
+		miSensorNetwork.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DialogSensorNetwork dlg=new DialogSensorNetwork();
+				dlg.setVisible(true);
+			}
+		});
+		mnp.add(miSensorNetwork);
+		
 		JMenuItem miMeetingScheduling = new JMenuItem("会议调度");
 		miMeetingScheduling.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -422,13 +432,13 @@ public class SolverWindow {
 		lspSpinnerADOPT_K=new LabelSpinnerParameter("K值：", new SpinnerNumberModel(0, 0, 10000, 100));
 		
 		//蚁群算法参数设置
-		lspSpinnerMaxCycle = new LabelSpinnerParameter("最大回合数：", new SpinnerNumberModel(100, 20, 150, 10));
-		lspSpinnercountAnt = new LabelSpinnerParameter("蚂蚁数量：", new SpinnerNumberModel(2, 2, 50, 5));
+		//lspSpinnerMaxCycle = new LabelSpinnerParameter("最大回合数：", new SpinnerNumberModel(100, 20, 300, 10));
+		lspSpinnercountAnt = new LabelSpinnerParameter("蚂蚁数量：", new SpinnerNumberModel(10, 2, 50, 5));
 		lspSpinneralpha = new LabelSpinnerParameter("alpha：", new SpinnerNumberModel(2, 1, 10, 1));
 		lspSpinnerbeta = new LabelSpinnerParameter("beta：", new SpinnerNumberModel(8, 1, 10, 1));
 		lspSpinnerrho = new LabelSpinnerParameter("rho：", new SpinnerNumberModel(0.02, 0, 1, 0.01));
-		lspSpinnerMin_tau = new LabelSpinnerParameter("max_tau：", new SpinnerNumberModel(10, 10, 15, 0.5));
-		lspSpinnerMax_tau = new LabelSpinnerParameter("min_tau：", new SpinnerNumberModel(0.1, 0, 5, 0.5));
+		lspSpinnerMax_tau = new LabelSpinnerParameter("max_tau：", new SpinnerNumberModel(10, 10, 15, 0.5));
+		lspSpinnerMin_tau = new LabelSpinnerParameter("min_tau：", new SpinnerNumberModel(0.1, 0, 5, 0.5));
 		
 		//BFSDPOP
 		lspSpinnerClusterRemovingChoice=new LabelSpinnerParameter("移簇方式：", new SpinnerNumberModel(0, 0, 1, 1));
@@ -440,7 +450,7 @@ public class SolverWindow {
 		lspSpinnerSelectProbabilityB=new LabelSpinnerParameter("选择概率B：", new SpinnerNumberModel(0.2, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityC=new LabelSpinnerParameter("选择概率C：", new SpinnerNumberModel(0.05, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityD=new LabelSpinnerParameter("选择概率D：", new SpinnerNumberModel(0.2, 0, 1, 0.1));
-		lspSpinnerSelectInterval=new LabelSpinnerParameter("控制间隔：", new SpinnerNumberModel(10, 0, 500, 1));
+		lspSpinnerSelectInterval=new LabelSpinnerParameter("控制间隔：", new SpinnerNumberModel(15, 0, 500, 1));
 		lspSpinnerSelectStepK1=new LabelSpinnerParameter("步长k：", new SpinnerNumberModel(5, 0, 50, 1));
 		lspSpinnerSelectStepK2=new LabelSpinnerParameter("步长K*：", new SpinnerNumberModel(5, 0, 50, 1));
 		lspSpinnerSelectRound=new LabelSpinnerParameter("重启轮数：", new SpinnerNumberModel(20, 0, 600, 1));
@@ -658,39 +668,47 @@ public class SolverWindow {
 			paramList.add(lspSpinnerSelectProbabilityD);
 			paramList.add(lspSpinnerSelectRound);
 		}
-		else if(algorithmType.equals("ALSLMUS")){
-			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectProbability);
-			paramList.add(lspSpinnerSelectProbabilityA);
-			paramList.add(lspSpinnerSelectProbabilityB);
-		}
-		else if(algorithmType.equals("ALSLMUSDSA")){
-			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectInterval);
-			paramList.add(lspSpinnerSelectProbability);
-			paramList.add(lspSpinnerSelectProbabilityA);
-			paramList.add(lspSpinnerSelectProbabilityB);
-		}
-		else if(algorithmType.equals("ALSLMUSDSA2")){
-			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectInterval);
-			paramList.add(lspSpinnerSelectProbability);
-			paramList.add(lspSpinnerSelectProbabilityA);
-			paramList.add(lspSpinnerSelectProbabilityB);
-		}
-		else if(algorithmType.equals("ALSLMUSDSA3")){
-			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectInterval);
-			paramList.add(lspSpinnerSelectProbability);
-			paramList.add(lspSpinnerSelectProbabilityA);
-			paramList.add(lspSpinnerSelectProbabilityB);
-		}
 		else if(algorithmType.equals("ALSLMUSDSA4")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectInterval);
 			paramList.add(lspSpinnerSelectProbability);
-			//paramList.add(lspSpinnerSelectProbabilityA);
+		}
+		else if(algorithmType.equals("ALSMLUDSA")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectInterval);
+			paramList.add(lspSpinnerSelectProbability);
+		}
+		else if(algorithmType.equals("ALSDSAMGM")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectInterval);
+			paramList.add(lspSpinnerSelectProbability);
+		}
+		else if(algorithmType.equals("ALSDSAMGMEVO")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectInterval);
+			paramList.add(lspSpinnerSelectProbability);
+			paramList.add(lspSpinnerSelectNewProbability);
+		}
+		else if(algorithmType.equals("PDSALSDSA")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectInterval);
+			paramList.add(lspSpinnerSelectProbability);
+			paramList.add(lspSpinnerSelectProbabilityA);
 			paramList.add(lspSpinnerSelectProbabilityB);
+			
+		}
+		else if(algorithmType.equals("PDSMGM")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbabilityA);
+			paramList.add(lspSpinnerSelectProbabilityB);
+			
+		}
+		else if(algorithmType.equals("PDSMGM2")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
+			paramList.add(lspSpinnerSelectProbabilityA);
+			paramList.add(lspSpinnerSelectProbabilityB);
+			
 		}
 		else if(algorithmType.equals("DPOP"))
 		{
@@ -730,8 +748,10 @@ public class SolverWindow {
 		}else if(algorithmType.equals("SynAdopt2"))
 		{
 			paramList.add(lspSpinnerMessageTransmissionNCCC);
-		}else if(algorithmType.equals("ACO")){
-			paramList.add(lspSpinnerMaxCycle);
+		}else if(algorithmType.equals("ACO")||algorithmType.equals("ACO_tree")||algorithmType.equals("ACO_bf")||algorithmType.equals("ACO_phase")||
+				algorithmType.equals("ACO_line")||algorithmType.equals("ACO_final")){
+			//paramList.add(lspSpinnerMaxCycle);
+			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnercountAnt);
 			paramList.add(lspSpinneralpha);
 			paramList.add(lspSpinnerbeta);
@@ -950,7 +970,7 @@ public class SolverWindow {
 		Settings.settings.setADOPT_K((Integer)lspSpinnerADOPT_K.getSpinner().getValue());
 		
 		//蚁群算法参数
-		Settings.settings.setMaxCycle((Integer)lspSpinnerMaxCycle.getSpinner().getValue());
+		//Settings.settings.setMaxCycle((Integer)lspSpinnerMaxCycle.getSpinner().getValue());
 		Settings.settings.setCountAnt((Integer)lspSpinnercountAnt.getSpinner().getValue());
 		Settings.settings.setAlpha((Integer)lspSpinneralpha.getSpinner().getValue());
 		Settings.settings.setBeta((Integer)lspSpinnerbeta.getSpinner().getValue());

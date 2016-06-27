@@ -47,7 +47,7 @@ public class Mgm2Agent extends AgentCycle {
 	private int cycleCount;
 	private int neighboursQuantity;	
 	private int neighboursGain[];
-	private HashMap<Integer, Integer> neighboursValueIndex;			//<neighbour 的 Index, neighbourValue 的  Index>
+	private int[] neighboursValueIndex;	
 	
 	private String isAbleToGo="not";
 	private int coordinate;
@@ -74,15 +74,12 @@ public class Mgm2Agent extends AgentCycle {
 		coordinate=-1;
 		ownType=TYPE_UNKNOW;
 		neighboursQuantity=neighbours.length;
-		
-		neighboursValueIndex=new HashMap<Integer, Integer>();
+
+		neighboursValueIndex = new int[neighboursQuantity];
 		selectValueGroup=new LinkedList<int[]>();
 		selectOfferGroup=new LinkedList<int[]>();
 		neighboursGain=new int[neighboursQuantity];
 		
-		for(int i=0; i<neighbours.length; i++){
-			neighboursValueIndex.put((Integer)i, (Integer)0);
-		}
 		sendValueMessages();
 	}
 	
@@ -148,10 +145,7 @@ public class Mgm2Agent extends AgentCycle {
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighboursQuantity; i++){
-			if(this.id < neighbours[i])
-				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
-			else
-				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex.get(i)][valueIndex];	
+			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex[i]];		
 		}
 		return localCostTemp;
 	}
@@ -233,7 +227,7 @@ public class Mgm2Agent extends AgentCycle {
 				break;
 			}
 		}
-		neighboursValueIndex.put((Integer)senderIndex, (Integer)msg.getValue());
+		neighboursValueIndex[senderIndex] = (Integer)(msg.getValue());
 		
 		if(receivedQuantity==0){
 			localCost=localCost();
@@ -247,10 +241,7 @@ public class Mgm2Agent extends AgentCycle {
 				}
 				for(int i=0; i<domain.length; i++){
 					for(int j=0; j<neighboursQuantity; j++){
-						if(this.id < neighbours[j])
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-						else
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];			
+						selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];		
 					}					
 				}
 				int newLocalCost=localCost;
@@ -275,12 +266,8 @@ public class Mgm2Agent extends AgentCycle {
 					int selectGroupCost[] = new int[domain.length];
 					for(int i=0; i<neighbourDomains.get(neighbours[coordinate]).length; i++){
 						for(int j=0; j<domain.length; j++){
-							if(this.id < neighbours[coordinate])
-								selectGroupCost[j]=selectMinCost[j]-constraintCosts.get(neighbours[coordinate])[j][neighboursValueIndex.get(coordinate)]
-										+constraintCosts.get(neighbours[coordinate])[j][i];
-							else
-								selectGroupCost[j]=selectMinCost[j]-constraintCosts.get(neighbours[coordinate])[neighboursValueIndex.get(coordinate)][j]
-										+constraintCosts.get(neighbours[coordinate])[i][j];
+							selectGroupCost[j]=selectMinCost[j]-constraintCosts.get(neighbours[coordinate])[j][neighboursValueIndex[coordinate]]
+									+constraintCosts.get(neighbours[coordinate])[j][i];
 						}
 						int findTheMin=0;
 						for(int j=0; j<domain.length; j++){
@@ -336,17 +323,11 @@ public class Mgm2Agent extends AgentCycle {
 			
 			for(int i=0; i<tempList.length; i++){
 				tempList[i][2]+=localCost;
-				if(this.id < neighbours[senderIndex])
-					tempList[i][2]-=constraintCosts.get(neighbours[senderIndex])[valueIndex][neighboursValueIndex.get(senderIndex)];
-				else
-					tempList[i][2]-=constraintCosts.get(neighbours[senderIndex])[neighboursValueIndex.get(senderIndex)][valueIndex];
+				tempList[i][2]-=constraintCosts.get(neighbours[senderIndex])[valueIndex][neighboursValueIndex[senderIndex]];
 				
 				for(int j=0; j<neighbours.length; j++){
 					if(j!=senderIndex)
-						if(this.id < neighbours[j])
-							tempList[i][2]-=constraintCosts.get(neighbours[j])[tempList[i][0]][neighboursValueIndex.get(j)];
-						else
-							tempList[i][2]-=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][tempList[i][0]];
+						tempList[i][2]-=constraintCosts.get(neighbours[j])[tempList[i][0]][neighboursValueIndex[j]];
 				}
 				increaseNccc();
 			}
@@ -520,6 +501,20 @@ public class Mgm2Agent extends AgentCycle {
 		//System.out.println("waitagain_end");
 	}
 	
+	protected void localSearchCheck(){
+		while(msgQueue.size() == 0){
+			try {
+				Thread.sleep(1);
+				System.out.println("!!! sleep(1) !!!!!");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if(msgQueue.isEmpty() == true){
+			System.out.println("!!!!! IsEmpty Judged Wrong !!!!!");
+		}
+	}
+	
 	protected void runFinished(){
 		super.runFinished();
 		
@@ -541,9 +536,9 @@ public class Mgm2Agent extends AgentCycle {
 		int ncccTemp = 0;
 		for(Map<String, Object> result : results){
 			
-			int id_=(Integer)result.get(KEY_ID);
-			String name_=(String)result.get(KEY_NAME);
-			int value_=(Integer)result.get(KEY_VALUE);
+//			int id_=(Integer)result.get(KEY_ID);
+//			String name_=(String)result.get(KEY_NAME);
+//			int value_=(Integer)result.get(KEY_VALUE);
 			
 			if(ncccTemp < (Integer)result.get(KEY_NCCC))
 				ncccTemp = (Integer)result.get(KEY_NCCC);

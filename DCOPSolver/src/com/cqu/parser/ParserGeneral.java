@@ -256,6 +256,7 @@ public class ParserGeneral extends ContentParser{
 	private int[] parseConstraintCost(String costStr, Problem problem, String relation)
 	{
 		String[] items=costStr.split("\\|");
+		int rowsize = 0, colsize = 0;
 		String[] costParts=new String[items.length];
 		Map<String, Integer> valuePairParts=new HashMap<String, Integer>();
 		int index=0;
@@ -264,6 +265,13 @@ public class ParserGeneral extends ContentParser{
 			index=items[i].indexOf(':');
 			costParts[i]=items[i].substring(0, index);
 			
+			//从关系中提取行与列的长度
+			int index2 = items[i].indexOf(' ');
+			int temp = Integer.parseInt(items[i].substring(index+1,index2));
+			rowsize = (rowsize > temp ? rowsize : temp);
+			temp = Integer.parseInt(items[i].substring(index2+1));
+			colsize = (colsize > temp ? colsize : temp);
+			
 			//System.out.println("costParts[i]: " + costParts[i]);
 		//	System.out.println("items[i].substring(index+1): " + items[i].substring(index+1) + " i: " + i );
 			
@@ -271,6 +279,7 @@ public class ParserGeneral extends ContentParser{
 		}
 		Object[] valuePairPartsKeyArray=valuePairParts.keySet().toArray();
 		//valuePairPartsKeyArray = 1 1 1 2 1 3 2 1 2 2 2 3 3 1 3 2 3 3 
+		//下面排序在值域有两位数时会出现问题，不会出现上述的1 1 1 2 1 3 2 1 2 2 2 3 3 1 3 2 3 3
 		Arrays.sort(valuePairPartsKeyArray);
 		
 		
@@ -278,12 +287,18 @@ public class ParserGeneral extends ContentParser{
 		int min = 100000 ;
 		String valuePair = "";
 		//min: 2, valuePair: 3 2
-		for(int i=0;i<items.length;i++)
+		for(String valuePairPartsKey:valuePairParts.keySet())
 		{
-			costs[i]=Integer.parseInt(costParts[valuePairParts.get(valuePairPartsKeyArray[i])]);
-			if(min>costs[i]){
-				min=costs[i];
-			    valuePair = (String)valuePairPartsKeyArray[i] ;
+			//求应该存于什么位置
+			int index3 = valuePairPartsKey.indexOf(' ');
+			int row = Integer.parseInt(valuePairPartsKey.substring(0, index3));
+			int col = Integer.parseInt(valuePairPartsKey.substring(index3+1));
+			int pos = (row-1)*colsize + (col-1);
+			
+			costs[pos]=Integer.parseInt(costParts[valuePairParts.get(valuePairPartsKey)]);
+			if(min>costs[pos]){
+				min=costs[pos];
+			    valuePair = valuePairPartsKey ;
 			}		
 		}
 		//System.out.println("min: " + min + ", valuePair: " + valuePair);

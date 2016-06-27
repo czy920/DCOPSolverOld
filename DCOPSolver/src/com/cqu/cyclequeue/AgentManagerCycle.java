@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.cqu.aco.AcoAgent;
+import com.cqu.aco.PublicConstants;
 import com.cqu.adopt.AdoptAgentCycle;
 import com.cqu.adopt.AdoptAgentCycle_2;
 import com.cqu.bnbadopt.ADOPT_K;
@@ -14,10 +15,12 @@ import com.cqu.bnbmergeadopt.AgentModel;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.dsa.*;
+import com.cqu.maxsum.MaxSumADAgent;
 import com.cqu.maxsum.MaxSumAgent;
-import com.cqu.maxsum.MaxSumStructureRefineAgent;
+import com.cqu.maxsum.MaxSumRefineStructureAgent;
 import com.cqu.mgm.*;
 import com.cqu.mus.*;
+import com.cqu.pds.*;
 import com.cqu.parser.Problem;
 import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
@@ -121,33 +124,50 @@ public class AgentManagerCycle {
 				agent=new AlsDsa_H2_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ALSLMUS")){
-				agent=new AlsMusAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
-			else if(agentType.equals("ALSLMUSDSA")){
-				agent=new AlsMusDsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
-			else if(agentType.equals("ALSLMUSDSA2")){
-				agent=new AlsMusDsa2Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
-			else if(agentType.equals("ALSLMUSDSA3")){
-				agent=new AlsMusDsa3Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
 			else if(agentType.equals("ALSLMUSDSA4")){
 				agent=new AlsLmusDsa4Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ACO")){
-				agent=new AcoAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+			else if(agentType.equals("ALSMLUDSA")){
+				agent=new AlsMluDsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if (agentType.equals("MAXSUM")) {
-				agent = new MaxSumAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), problem.domains.get(problem.agentDomains.get(agentId)));
-			}else if (agentType.equals("MAXSUMRS")){
-				agent = new MaxSumStructureRefineAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if(agentType.equals("ALSDSAMGM")){
+				agent=new AlsDsaMgmAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if(agentType.equals("ALSDSAMGMEVO")){
+				agent=new AlsDsaMgmEvoAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if(agentType.equals("PDSALSDSA")){
+				agent=new Pds_AlsDsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if(agentType.equals("PDSMGM")){
+				agent=new Pds_MgmAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if(agentType.equals("PDSMGM2")){
+				agent=new Pds_Mgm2Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if(agentType.equals("ACO")||agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||
+					agentType.equals("ACO_line")||agentType.equals("ACO_final")){
+				agent=new AcoAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+						problem.domains.get(problem.agentDomains.get(agentId)), problem.treeDepth);
+			}
+			else if (agentType.equals("MAXSUM")) {
+				agent=new MaxSumAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if (agentType.equals("MAXSUMAD")) {
+				agent=new MaxSumADAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if (agentType.equals("MAXSUMRS")) {
+				agent=new MaxSumRefineStructureAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else{
 				agent=new AdoptAgentCycle(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
@@ -166,13 +186,22 @@ public class AgentManagerCycle {
 			String[] neighbourAgentCostNames=problem.agentConstraintCosts.get(agentId);
 			for(int i=0;i<neighbourAgentCostNames.length;i++)
 			{
-				constraintCosts.put(neighbourAgentIds[i], 
-						CollectionUtil.toTwoDimension(problem.costs.get(neighbourAgentCostNames[i]), 
-								problem.domains.get(problem.agentDomains.get(agentId)).length, 
-								problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])).length));
+				if(agentId < neighbourAgentIds[i]){
+					constraintCosts.put(neighbourAgentIds[i], 
+							CollectionUtil.toTwoDimension(problem.costs.get(neighbourAgentCostNames[i]), 
+									problem.domains.get(problem.agentDomains.get(agentId)).length, 
+									problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])).length));
+				}else{
+					int[][] temp = CollectionUtil.toTwoDimension(problem.costs.get(neighbourAgentCostNames[i]), 
+							problem.domains.get(problem.agentDomains.get(neighbourAgentIds[i])).length, 
+							problem.domains.get(problem.agentDomains.get(agentId)).length);
+					
+					constraintCosts.put(neighbourAgentIds[i], CollectionUtil.reverse(temp));
+				}
 			}
 			
-			if(agentType.equals("ACO")){
+			if(agentType.equals("ACO")||agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||
+					agentType.equals("ACO_line")||agentType.equals("ACO_final")){
 				agent.setNeibours(problem.neighbourAgents.get(agentId), problem.parentAgents.get(agentId), 
 						problem.childAgents.get(agentId), problem.allParentAgents.get(agentId), 
 						problem.allChildrenAgents.get(agentId), neighbourDomains, constraintCosts, neighbourLevels,

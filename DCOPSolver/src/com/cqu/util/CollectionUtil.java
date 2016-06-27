@@ -212,6 +212,16 @@ public class CollectionUtil {
 		return ret;
 	}
 	
+	public static int[][] reverse(int[][] source){
+		int[][] temp = new int[source[0].length][source.length];
+		for(int i = 0; i< source.length; i++){
+			for(int j =0; j<source[0].length;j++){
+				temp[j][i] = source[i][j];
+			}
+		}
+		return temp;
+	}
+	
 	/**
 	 * Map<Integer, List<Integer>>转换为Map<Integer, int[]>
 	 * @param raw

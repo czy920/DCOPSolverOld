@@ -27,7 +27,7 @@ public class MgmAgent extends AgentCycle {
 	private int cycleCount;
 	private int neighboursQuantity;	
 	private int neighboursGain[];
-	private HashMap<Integer, Integer> neighboursValueIndex;			//<neighbour 的 Index, neighbourValue 的  Index>
+	private int[] neighboursValueIndex;	
 	
 	public MgmAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
@@ -44,11 +44,9 @@ public class MgmAgent extends AgentCycle {
 		selectValueIndex=0;
 		receivedQuantity=0;
 		cycleCount=0;
-		neighboursValueIndex=new HashMap<Integer, Integer>();
 		neighboursQuantity=neighbours.length;
+		neighboursValueIndex = new int[neighboursQuantity];
 		neighboursGain=new int[neighboursQuantity];
-		for(int i=0; i<neighbours.length; i++)
-			neighboursValueIndex.put((Integer)i, (Integer)0);
 		sendValueMessages();
 	}
 	
@@ -69,10 +67,7 @@ public class MgmAgent extends AgentCycle {
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighboursQuantity; i++){
-			if(this.id < neighbours[i])
-				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
-			else
-				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex.get(i)][valueIndex];	
+			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex[i]];		
 		}
 		return localCostTemp;
 	}
@@ -116,8 +111,8 @@ public class MgmAgent extends AgentCycle {
 			}
 		}
 		*/
-		
-		neighboursValueIndex.put((Integer)senderIndex, (Integer)msg.getValue());
+
+		neighboursValueIndex[senderIndex] = (Integer)(msg.getValue());
 		
 		if(receivedQuantity==0){
 			/*
@@ -143,10 +138,10 @@ public class MgmAgent extends AgentCycle {
 				}
 				for(int i=0; i<domain.length; i++){
 					for(int j=0; j<neighboursQuantity; j++){
-						if(this.id < neighbours[j])
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-						else
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
+//						if(this.id < neighbours[j])
+							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];		
+//						else
+//							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
 					}
 				}
 				int newLocalCost=localCost;
@@ -192,6 +187,20 @@ public class MgmAgent extends AgentCycle {
 		}
 	}
 
+	protected void localSearchCheck(){
+		while(msgQueue.size() == 0){
+			try {
+				Thread.sleep(1);
+				System.out.println("!!! sleep(1) !!!!!");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if(msgQueue.isEmpty() == true){
+			System.out.println("!!!!! IsEmpty Judged Wrong !!!!!");
+		}
+	}
+	
 	protected void runFinished(){
 		super.runFinished();
 		
@@ -203,7 +212,7 @@ public class MgmAgent extends AgentCycle {
 		result.put(KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
-		System.out.println("Agent "+this.name+" stopped!");
+//		System.out.println("Agent "+this.name+" stopped!");
 	}
 	
 	@Override
@@ -213,16 +222,16 @@ public class MgmAgent extends AgentCycle {
 		int ncccTemp = 0;
 		for(Map<String, Object> result : results){
 			
-			int id_=(Integer)result.get(KEY_ID);
-			String name_=(String)result.get(KEY_NAME);
-			int value_=(Integer)result.get(KEY_VALUE);
+//			int id_=(Integer)result.get(KEY_ID);
+//			String name_=(String)result.get(KEY_NAME);
+//			int value_=(Integer)result.get(KEY_VALUE);
 			
 			if(ncccTemp < (Integer)result.get(KEY_NCCC))
 				ncccTemp = (Integer)result.get(KEY_NCCC);
 			totalCost+=((double)((Integer)result.get(KEY_LOCALCOST)))/2;
 			
-			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
-			System.out.println(displayStr);
+//			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
+//			System.out.println(displayStr);
 		}
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost)+

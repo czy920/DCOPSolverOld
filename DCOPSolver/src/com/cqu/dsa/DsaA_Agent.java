@@ -109,10 +109,10 @@ public class DsaA_Agent extends AgentCycle {
 					}
 					for(int i=0; i<domain.length; i++){
 						for(int j=0; j<neighbours.length; j++){
-							if(this.id < neighbours[j])
+							//if(this.id < neighbours[j])
 								selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-							else
-								selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];	
+							//else
+							//	selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];	
 						}					
 					}
 					int selectValueIndex=0;
@@ -137,14 +137,24 @@ public class DsaA_Agent extends AgentCycle {
 	private int localCost(){
 		int localCostTemp=0;
 		for(int i=0; i<neighbours.length; i++){
-			if(this.id < neighbours[i])
-				localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
-			else
-				localCostTemp+=constraintCosts.get(neighbours[i])[neighboursValueIndex.get(i)][valueIndex];	
+			localCostTemp+=constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex.get(i)];		
 		}
 		return localCostTemp;
 	}
 	
+	protected void localSearchCheck(){
+		while(msgQueue.size() == 0){
+			try {
+				Thread.sleep(1);
+				System.out.println("!!! sleep(1) !!!!!");
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		if(msgQueue.isEmpty() == true){
+			System.out.println("!!!!! IsEmpty Judged Wrong !!!!!");
+		}
+	}
 	
 	protected void runFinished(){
 		super.runFinished();
@@ -157,7 +167,7 @@ public class DsaA_Agent extends AgentCycle {
 		result.put(KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
-		System.out.println("Agent "+this.name+" stopped!");
+//		System.out.println("Agent "+this.name+" stopped!");
 	}
 	
 	
@@ -169,16 +179,16 @@ public class DsaA_Agent extends AgentCycle {
 		int ncccTemp = 0;
 		for(Map<String, Object> result : results){
 			
-			int id_=(Integer)result.get(KEY_ID);
-			String name_=(String)result.get(KEY_NAME);
-			int value_=(Integer)result.get(KEY_VALUE);
+//			int id_=(Integer)result.get(KEY_ID);
+//			String name_=(String)result.get(KEY_NAME);
+//			int value_=(Integer)result.get(KEY_VALUE);
 			
 			if(ncccTemp < (Integer)result.get(KEY_NCCC))
 				ncccTemp = (Integer)result.get(KEY_NCCC);
 			totalCost+=((double)((Integer)result.get(KEY_LOCALCOST)))/2;
 			
-			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
-			System.out.println(displayStr);
+//			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
+//			System.out.println(displayStr);
 		}
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost)+

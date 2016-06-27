@@ -1,318 +1,226 @@
 package com.cqu.maxsum;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * Created by YanChenDeng on 2016/5/17.
+ */
 public class HyperCube {
 
-	public static final String HYPER_CUBE_OPERATE_SUM_PRODDUCT="add";
-	public static final String HYPER_CUBE_OPERATE_MAX_SUM="multiply";
-	
-	private String[] variableNames;
-	private int[][] domains;
-	private int[] utils;
-	private List<Map<Integer, Integer>> stepMaps=new ArrayList<Map<Integer,Integer>>();
-	private List<HyperCube> cubes=new ArrayList<HyperCube>();
-	private boolean recordMaxAssignment;
-	private Map<Integer, Map<String, Integer>> maxAssignment;
-	
-	public HyperCube(String[] varibleNames,int[][] domains,int[] utils) {
-		this.variableNames=varibleNames.clone();
-		this.domains=domains.clone();
-		this.utils=utils.clone();
-		this.recordMaxAssignment = false;
-		constructStepMap();
-	}
-	
-	public HyperCube(String[] varibleNames,int[][] domains,int[] utils, boolean recordMaxAssignment, Map<Integer, Map<String, Integer>> maxAssignment) {
-		this.variableNames=varibleNames.clone();
-		this.domains=domains.clone();
-		this.utils=utils.clone();
-		if (maxAssignment != null) {
-			this.maxAssignment = new HashMap<Integer, Map<String,Integer>>();
-			for (int val: maxAssignment.keySet()){
-				this.maxAssignment.put(val, maxAssignment.get(val));
-			}
-		}
-		this.recordMaxAssignment = recordMaxAssignment;
-		constructStepMap();
-	}
-	public void setRecordMaxAssignment(boolean recordMaxAssignment) {
-		this.recordMaxAssignment = recordMaxAssignment;
-	}
-	
-	
-	public HyperCube(String[] variableNames,int[] domainLength,int[] utils){
-		this.variableNames=variableNames.clone();
-		this.utils=utils.clone();
-		domains=new int[domainLength.length][];
-		for(int i=0;i<domainLength.length;i++){
-			domains[i]=new int[domainLength[i]];
-			for(int j=0;j<domains[i].length;j++)
-			{
-				domains[i][j]=j;
-			}
-		}
-		constructStepMap();
-	}
-	
-	private void constructStepMap(){
-		stepMaps.clear();
-		for(int i=domains.length-1;i>=0;i--){
-			Map<Integer, Integer> stepMap=new HashMap<Integer, Integer>();
-			int previousBlockSize=calcuBlockCount(i);
-			for(int j=0;j<domains[i].length;j++){
-				stepMap.put(domains[i][j], j*previousBlockSize);
-			}
-			stepMaps.add(0,stepMap);
-		}
-	}
-	
-	private int calcuBlockCount(int current)
-	{
-		int blockSize=0;
-		for(int i=current+1;i<variableNames.length;i++)
-		{
-			blockSize+=stepMaps.get(i-current-1).get(domains[i][domains[i].length-1]);
-		}
-		return blockSize+1;
-	}
-	
-	public int indexUtils(int[] assignment){
-		int index=calcuIndex(assignment);
-		if (index<0) {
-			return Integer.MIN_VALUE;
-		}
-		return utils[index];	
-	}
-	
-	public int indexUtils(Map<String, Integer> assignment){
-		if (assignment.keySet().size()!=variableNames.length) {
-			return Integer.MIN_VALUE;
-		}
-		int[] ass=new int[variableNames.length];
-		for(int i=0;i<variableNames.length;i++){
-			Integer integer=assignment.get(variableNames[i]);
-			if (integer==null) {
-				return Integer.MIN_VALUE;
-			}
-			ass[i]=integer;
-		}
-		return indexUtils(ass);
-	}
-	
-	public int indexUtils(int longIndex){
-		if (longIndex<0||longIndex>=utils.length) {
-			return Integer.MIN_VALUE;
-		}
-		return utils[longIndex];
-	}
-	
-	private int calcuIndex(int[] assignment){
-		if (assignment.length!=variableNames.length) {
-			return -1;
-		}
-		int utilIndex=0;
-		for (int i=assignment.length-1;i>=0;i--){
-			Integer step=stepMaps.get(i).get(assignment[i]);
-			if (step==null) {
-				return -1;
-			}
-			utilIndex+=step;
-		}
-		return utilIndex;
-	}
-	
-	public int getVariableCount(){
-		return variableNames.length;
-	}
-	
-	public String getVariableName(int index){
-		if (index<0||index>=variableNames.length) {
-			return null;
-		}
-		return variableNames[index];
-	}
-	
-	public int[] getDomain(int index){
-		if (index<0||index>=variableNames.length) {
-			return null;
-		}
-		return domains[index];
-	}
-	
-	public int[] getDomain(String variableName){
-		for(int i=0;i<variableNames.length;i++){
-			if (variableNames[i].equals(variableName)) {
-				return domains[i];
-			}
-		}
-		return null;
-	}
-	
-	public int getUtilLength(){
-		return utils.length;
-	}
-	
-	public void join(HyperCube otherCube){
-		cubes.add(otherCube);
-	}
-	
-	public HyperCube resolve(String operate){
-		int[] newUtil=utils.clone();		
-		for(HyperCube cube:cubes){
-			if (cube.getVariableCount()!=1||!cube.getVariableName(0).equals(variableNames[0])||cube.getUtilLength()!=utils.length) {
-				return null;
-			}
-			for(int j=0;j<utils.length;j++){
-				if(operate.equals(HYPER_CUBE_OPERATE_MAX_SUM)){
-					newUtil[j]+=cube.indexUtils(j);
-				}
-				else if (operate.equals(HYPER_CUBE_OPERATE_SUM_PRODDUCT)) {
-					newUtil[j]*=cube.indexUtils(j);
-				}
-				else {
-					return null;
-				}
-			}
-		}
-		cubes.clear();
-		return new HyperCube(variableNames,domains,newUtil);		
-	}
-	
-	public HyperCube resovle(String operate,String targetVariable,Map<Integer, Integer> fixedAssignment){
-		int targetIndex=-1;
-		Map<Integer, Map<String, Integer>> maxAssignment = null;
-		if (recordMaxAssignment) {
-			maxAssignment = new HashMap<Integer, Map<String,Integer>>();
-		}
-		for(int i=0;i<variableNames.length;i++){
-			if (targetVariable.equals(variableNames[i])) {
-				targetIndex=i;
-				break;
-			}
-		}
-		if (targetIndex==-1) {
-			return null;
-		}				
-		int[] targetDomain=domains[targetIndex];		
-		int[] targetUtil=new int[targetDomain.length];
-		if (operate.equals(HYPER_CUBE_OPERATE_MAX_SUM)) {
-			Arrays.fill(targetUtil, Integer.MIN_VALUE);
-		}
-		else if(operate.equals(HYPER_CUBE_OPERATE_SUM_PRODDUCT)) {
-			Arrays.fill(targetUtil, 0);
-		}
-		else {
-			return null;
-		}
-		List<HyperCube> freeCubes;
-		List<HyperCube> fixedCubes=new ArrayList<HyperCube>();
-		if (fixedAssignment==null) {
-			freeCubes=cubes;
-		}
-		else {
-			freeCubes=new ArrayList<HyperCube>();
-			for(HyperCube cube:cubes){
-				if (!fixedAssignment.containsKey(Integer.parseInt(cube.getVariableName(0)))) {
-					freeCubes.add(cube);
-				}				
-				else {
-					fixedCubes.add(cube);
-				}
-			}
-		}
-		int targetUtilIndex=0;
-		for(int targetValue : targetDomain){
-			boolean flag=true;
-			int[] indeies=new int[freeCubes.size()];
-			internal: while (flag) {				
-				int accumulator;
-				if (operate.equals(HYPER_CUBE_OPERATE_MAX_SUM)) {
-					accumulator=0;
-				}
-				else {
-					accumulator=1;
-				}
-				Map<String, Integer> assignMap=new HashMap<String, Integer>();
-				if (freeCubes.size()==0) {
-					flag=false;
-				}
-				for(int i=0;i<freeCubes.size();i++){
-					if (indeies[i]==freeCubes.get(i).getDomain(0).length) {
-						if (i!=0) {
-							indeies[i]=0;
-							indeies[i-1]++;
-							continue internal;
-						}
-						else {
-							flag=false;
-							break internal;
-						}
-						
-					}	
-					assignMap.put(freeCubes.get(i).getVariableName(0), indeies[i]);
-					if (operate.equals(HYPER_CUBE_OPERATE_MAX_SUM)) {
-						accumulator+=freeCubes.get(i).indexUtils(new int[]{indeies[i]});
-					}
-					else {
-						accumulator*=freeCubes.get(i).indexUtils(new int[]{indeies[i]});
-					}
-				}
-				for(HyperCube cube: fixedCubes){
-					int valueIndex=fixedAssignment.get(Integer.parseInt(cube.getVariableName(0)));
-					assignMap.put(cube.getVariableName(0), valueIndex);
-					if (operate.equals(HYPER_CUBE_OPERATE_MAX_SUM)) {
-						accumulator+=cube.indexUtils(new int[]{valueIndex});
-					}
-					else {
-						accumulator*=cube.indexUtils(new int[]{valueIndex});
-					}
-				}
-				assignMap.put(targetVariable, targetValue);
-				int localUtil=indexUtils(assignMap);
-				if (operate.equals(HYPER_CUBE_OPERATE_MAX_SUM)) {
-					accumulator+=localUtil;
-					if (targetUtil[targetUtilIndex]<accumulator) {
-						targetUtil[targetUtilIndex]=accumulator;
-						if (recordMaxAssignment) {
-							maxAssignment.put(targetUtilIndex, assignMap);
-						}						
-					}
-				}
-				else {
-					accumulator*=localUtil;
-					targetUtil[targetUtilIndex]+=accumulator;
-				}
-				if(indeies.length>0)
-					indeies[indeies.length-1]++;
-			}
-			targetUtilIndex++;
-		}
-		cubes.clear();
-		return new HyperCube(new String[]{targetVariable}, new int[][]{targetUtil}, targetUtil,recordMaxAssignment,maxAssignment);
-	}
-	
-	public HyperCube resovle(String operate,String targetVariable){
-		return resovle(operate, targetVariable, null);
-	}
-	
-	public static HyperCube createSimpleHyperCube(String name,int domainSize,int utilValue){
-		int[] util=new int[domainSize];
-		Arrays.fill(util, utilValue);
-		return new HyperCube(new String[]{name}, new int[]{domainSize}, util);
-	}
-	
-	public void printMaxAssignment(int val){
-		if (maxAssignment == null) {
-			return;
-		}
-		Map<String, Integer> map = maxAssignment.get(val);
-		if (map != null) {
-			System.out.println(map);
-		}
-	}
+    private int mainId;
+    private Map<Integer,int[][]> utils;
+    private int[] ids;
+    private List<HyperCube> cubes;
+    private int domainLength;
+    private boolean isSingleConstraint = false;
+
+    public HyperCube(int mainId,Map<Integer,int[][]> utils,int[] ids,int domainLength,boolean isRawUtil){
+        this.mainId = mainId;
+        this.ids = ids.clone();
+        this.cubes = new LinkedList<>();
+        this.domainLength = domainLength;
+        this.utils = new HashMap<>();
+        for (int id : utils.keySet()){
+            int[][] rawUtil = utils.get(id);
+            int[][] util = new int[rawUtil.length][rawUtil[0].length];
+            for (int row = 0; row < rawUtil.length; row++){
+                for (int col = 0; col < rawUtil[0].length; col++){
+                    if (isRawUtil){
+                        util[row][col] = -rawUtil[row][col];
+                    }
+                    else {
+                        util[row][col] = rawUtil[row][col];
+                    }
+                }
+                this.utils.put(id,util);
+            }
+        }
+        if (utils.size() == ids.length)
+            return;
+        int[][] util = new int[domainLength][domainLength];
+        for (int row = 0; row < domainLength; row++){
+            for (int col = 0; col < domainLength; col++){
+                util[row][col] = 0;
+            }
+        }
+        this.utils.put(mainId,util);
+    }
+
+    public void join(HyperCube cube){
+        cubes.add(cube);
+    }
+
+    public void setSingleConstraint(boolean singleConstraint) {
+        isSingleConstraint = singleConstraint;
+    }
+
+    private static int indexUtil(Map<Integer,int[][]> utils, Map<Integer,Integer> assignment, int mainId, boolean skipMainId){
+        assert assignment.get(mainId) != null : "main variable value can't be null!";
+        int sum = 0;
+        int mainAssignment = assignment.get(mainId);
+        for (int id : assignment.keySet()){
+            if (id == mainId && skipMainId)
+                continue;
+            sum += utils.get(id)[mainAssignment][assignment.get(id)];
+        }
+        return sum;
+    }
+
+    public int indexUtil(Map<Integer,Integer> assignment){
+        return indexUtil(utils,assignment,mainId,false);
+    }
+
+    public int indexUtil(int index){
+        return utils.get(mainId)[index][index];
+    }
+
+    public int getVariableCount(){
+        return ids.length;
+    }
+
+    public int getMainId() {
+        return mainId;
+    }
+
+    public int getDomainLength() {
+        return domainLength;
+    }
+
+    public int getDomainLength(int id){
+        return utils.get(id)[0].length;
+    }
+
+    public HyperCube resolveVariable(){
+        int[] tmpUtil = new int[domainLength];
+        for (HyperCube cube : cubes){
+            if (cube.getMainId() != mainId || cube.getDomainLength() != domainLength || cube.getVariableCount() != 1){
+                throw new RuntimeException("cube " + cube + " is invalid!");
+            }
+            for (int i = 0; i < tmpUtil.length; i++){
+                tmpUtil[i] += cube.indexUtil(i);
+            }
+        }
+        cubes.clear();
+        return createSingleHyperCube(mainId,tmpUtil,false);
+    }
+
+    public HyperCube resolveFunctions(int targetId){
+        Map<Integer,int[][]> tmpUtils = sumUpUtils();
+        List<Map<Integer,Integer>> optimalList = calculateOptimalList(targetId,tmpUtils);
+        int[] targetUtil = new int[getDomainLength(targetId)];
+        for (int i = 0; i < targetUtil.length; i++) {
+            targetUtil[i] = calculateMaxUtility(tmpUtils, optimalList, targetId, i);
+        }
+        cubes.clear();
+        return createSingleHyperCube(targetId,targetUtil,false);
+    }
+
+    private Map<Integer,int[][]> sumUpUtils(){
+        Map<Integer,int[][]> newUtil = new HashMap<>();
+        for (HyperCube cube : cubes){
+            if (cube.getVariableCount() != 1){
+                throw new RuntimeException("cube " + cube + " is invalid!");
+            }
+            int[][] targetUtil = utils.get(cube.getMainId());
+            int[][] tmpTargetUtil = new int[targetUtil.length][targetUtil[0].length];
+            for (int row = 0; row < targetUtil.length; row++){
+                for (int col = 0; col < targetUtil[0].length; col++){
+                    tmpTargetUtil[row][col] = targetUtil[row][col] + cube.indexUtil(col);
+                }
+            }
+            newUtil.put(cube.getMainId(),tmpTargetUtil);
+        }
+        for (int id : utils.keySet()){
+            if (!newUtil.containsKey(id))
+                newUtil.put(id,utils.get(id));
+        }
+        return newUtil;
+    }
+
+    private List<Map<Integer,Integer>> calculateOptimalList(int targetId, Map<Integer,int[][]> tmpUtil){
+        List<Map<Integer,Integer>> optimalList = new LinkedList<>();
+        for (int i = 0; i < domainLength; i++){
+            Map<Integer,Integer> optimalMap = new HashMap<>();
+            int totalUtil = 0;
+            for (int id : tmpUtil.keySet()){
+                int[] util = tmpUtil.get(id)[i];
+                if (id == mainId){
+                    optimalMap.put(mainId,i);
+                    totalUtil += util[i];
+                }
+                else if (id == targetId){
+                    continue;
+                }
+                else {
+                    int max = Integer.MIN_VALUE;
+                    int maxIndex = 0;
+                    for (int j = 0; j < util.length; j++){
+                        if (util[j] > max){
+                            max = util[j];
+                            maxIndex = j;
+                        }
+                    }
+                    totalUtil += max;
+                    optimalMap.put(id,maxIndex);
+                }
+            }
+            optimalMap.put(-1,totalUtil);
+            optimalList.add(optimalMap);
+        }
+        return optimalList;
+    }
+
+    public int calculateMaxUtility(Map<Integer,int[][]> tmpUtil,List<Map<Integer,Integer>> optimalList,int targetId,int targetValue){
+        Map<Integer,Integer> assignment = new HashMap<>();
+        if (targetId == mainId){
+            assignment.put(targetId,targetValue);
+            return optimalList.get(targetValue).get(-1) + indexUtil(tmpUtil,assignment,targetId,false);
+        }
+        int maxUtility = Integer.MIN_VALUE;
+        for (int i = 0; i < optimalList.size(); i++){
+            int totalUtil = optimalList.get(i).get(-1);
+            assignment.put(mainId,i);
+            assignment.put(targetId,targetValue);
+            totalUtil += indexUtil(tmpUtil,assignment,mainId,true);
+            if (totalUtil > maxUtility){
+                maxUtility = totalUtil;
+            }
+        }
+        return maxUtility;
+    }
+
+
+    public static HyperCube createSingleHyperCube(int mainId,int[] utils,boolean isRaw){
+        int[][] rectifyUtil = new int[utils.length][utils.length];
+        for (int i = 0; i < utils.length; i++){
+            if (isRaw){
+                rectifyUtil[i][i] = -utils[i];
+            }
+            else {
+                rectifyUtil[i][i] = utils[i];
+            }
+        }
+        Map<Integer,int[][]> util = new HashMap<>();
+        util.put(mainId,rectifyUtil);
+        return new HyperCube(mainId,util,new int[]{mainId},utils.length,false);
+    }
+
+    public static HyperCube createZeroHyperCube(int mainId,int domainLength){
+        int[] utils = new int[domainLength];
+        return createSingleHyperCube(mainId,utils,true);
+    }
+
+    @Override
+    public String toString() {
+        if (ids.length != 1)
+            return super.toString();
+        int[][] util = utils.get(mainId);
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("[ ");
+        for (int i = 0; i < domainLength; i++){
+            stringBuilder.append(util[i][i] + " ");
+        }
+        stringBuilder.append("]");
+        return stringBuilder.toString();
+    }
 }

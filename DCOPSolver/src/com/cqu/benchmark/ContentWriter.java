@@ -15,7 +15,7 @@ import java.util.Map;
  */
 public class ContentWriter {
 
-    public static final String PROBLEM_SCALE_FREE_NETWORK = "scale free network";
+    public static final String PROBLEM_SCALE_FREE_NETWORK = "scalefreenetwork";
 
     private int nbInstance;
     private String dirPath;
@@ -78,10 +78,10 @@ public class ContentWriter {
     }
 
     public static void main(String[] args) throws Exception{
-        Map<String,Object> para = new HashMap<>();
+        Map<String,Object> para = new HashMap<String, Object>();
         para.put("m1",2);
         para.put("m2",1);
-        ContentWriter writer = new ContentWriter(1,"C:\\Users\\YanChenDeng\\Desktop\\新建文件夹",15,9,1,10,PROBLEM_SCALE_FREE_NETWORK,para);
+        ContentWriter writer = new ContentWriter(1,".\\problems\\scalefree",15,9,1,10,PROBLEM_SCALE_FREE_NETWORK,para);
         writer.generate();
     }
 }
