@@ -2,9 +2,7 @@ package com.cqu.maxsum;
 
 import com.cqu.core.Message;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by YanChenDeng on 2016/5/19.
@@ -34,7 +32,7 @@ public class FunctionNode extends AbstractNode {
                 getHyperCube().join(comingMessages.get(componentId));
             }
             MessageContent content = new MessageContent();
-            content.setCube(getHyperCube().resolveFunctions(id));
+            content.setCube(getHyperCube().resolveFunctions(id,getFixAssignment()));
             sendMessages[messageIndex++] = new Message(parent.getId(),id,AbstractNode.MSG_TYPE_FUNCTION_TO_VARIABLE,content);
         }
         targetId = -1;
@@ -43,5 +41,9 @@ public class FunctionNode extends AbstractNode {
 
     protected HyperCube getHyperCube(){
         return parent.getLocalFunction();
+    }
+
+    protected Map<Integer,Integer> getFixAssignment(){
+        return null;
     }
 }

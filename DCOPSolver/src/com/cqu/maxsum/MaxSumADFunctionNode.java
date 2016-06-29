@@ -14,15 +14,16 @@ public class MaxSumADFunctionNode extends FunctionNode {
     private String constraintName;
     private HyperCube localFunction;
     private int receiveCount;
-    private int sendCount;
-    private ReverseController reverseController;
+    private boolean enableVP;
+    private Map<Integer,Integer> fixAssignment;
 
     public MaxSumADFunctionNode(ParentInfoProvider parent, boolean blocking,String constraintName,int iteration) {
         super(parent, blocking);
         this.constraintName = constraintName;
         precursorList = new LinkedList<>();
         successorList = new LinkedList<>();
-        reverseController = new ReverseController(iteration,successorList,precursorList,parent.getId(),AbstractNode.MSG_TYPE_FUNCTION_TO_VARIABLE);
+        enableVP = false;
+        fixAssignment = new HashMap<>();
     }
 
     public void addNeighbours(int id,int domainSize,boolean isPrecursor){
@@ -47,16 +48,15 @@ public class MaxSumADFunctionNode extends FunctionNode {
 
     @Override
     protected boolean evaluateHandleCondition() {
-        return receiveCount == precursorList.size();
+        return receiveCount >= precursorList.size();
     }
 
     public void reverse(){
         List<Integer> tmpList = precursorList;
         precursorList = successorList;
         successorList = tmpList;
-        sendCount = 0;
         receiveCount = 0;
-        reverseController.update(precursorList,successorList);
+        fixAssignment.clear();
         System.out.println(toString() +  "reversed");
     }
 
@@ -68,30 +68,8 @@ public class MaxSumADFunctionNode extends FunctionNode {
         return localFunction;
     }
 
-    public boolean isLeafNode(){
-        return successorList.size() == 0;
-    }
-
-    public boolean isRootNode(){return precursorList.size() == 0;}
-
-    public boolean allMessageReceived(){
-        return evaluateHandleCondition();
-    }
-
-    public boolean allMessageSend(){
-        return sendCount == successorList.size();
-    }
-
-
     @Override
     public Message[] handle() {
-        if (allMessageSend() && allMessageReceived()){
-            Message[] reverseMessages = reverseController.handle();
-            if (reverseController.canReverse()){
-                reverse();
-            }
-            return reverseMessages;
-        }
         Message[] msgs = super.handle();
         if (msgs == null)
             return null;
@@ -105,18 +83,15 @@ public class MaxSumADFunctionNode extends FunctionNode {
                 wrapedMessages[i] = msgs[i];
             }
         }
-        sendCount += msgs == null ? 0 : msgs.length;
         return wrapedMessages;
     }
 
     @Override
     public void addMessage(Message message) {
-        if (message.getType() == AbstractNode.MSG_TYPE_VARIABLE_TO_FUNCTION)
-            receiveCount++;
-        else if ((message.getType() & AbstractNode.MSG_TYPE_AD_REVERSE_ACK) != 0|| (message.getType() & AbstractNode.MSG_TYPE_AD_REVERSE_REQ) != 0){
-            reverseController.addMessage(message);
-            return;
-        }
+        receiveCount++;
+        MessageContent content = (MessageContent) message.getValue();
+        if (content.getOptimalIndex() > 0)
+            fixAssignment.put(message.getIdSender(),content.getOptimalIndex());
         super.addMessage(message);
     }
 
@@ -125,7 +100,19 @@ public class MaxSumADFunctionNode extends FunctionNode {
         return "fn,parent:" + parent.getId() + " pre:" + precursorList + " suc:" + successorList;
     }
 
-    public boolean canTerminate(){
-        return reverseController.canTerminate();
+    @Override
+    protected Map<Integer, Integer> getFixAssignment() {
+        if (!enableVP)
+            return null;
+        Map<Integer,Integer> partialAssignment = new HashMap<>();
+        for (int id : precursorList){
+            if (fixAssignment.containsKey(id))
+                partialAssignment.put(id,fixAssignment.get(id));
+        }
+        return partialAssignment;
+    }
+
+    public void setEnableVP(boolean enableVP) {
+        this.enableVP = enableVP;
     }
 }

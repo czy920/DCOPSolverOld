@@ -19,7 +19,7 @@ public class ReverseController {
     private int invokeCount;
     private int nodeType;
 
-    public ReverseController(int iteration, List<Integer> successorList, List<Integer> precursorList,int id,int nodeType) {
+    public ReverseController(int iteration, List<Integer> successorList, List<Integer> precursorList, int id, int nodeType) {
         this.iteration = iteration;
         this.successorList = successorList;
         this.precursorList = precursorList;

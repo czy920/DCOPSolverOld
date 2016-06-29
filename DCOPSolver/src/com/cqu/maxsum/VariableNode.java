@@ -54,7 +54,7 @@ public class VariableNode extends AbstractNode {
             }
             decisionCount++;
             valueDistribution.put(optimalIndex, valueDistribution.get(optimalIndex) + 1);
-            System.out.println(parent.getId() + " decision:" + optimalCube +",result:" + optimalIndex + ",repeatCount:" + repeatCount);
+            //System.out.println(parent.getId() + " decision:" + optimalCube +",result:" + optimalIndex + ",repeatCount:" + repeatCount);
         }
 
         Message[] sendMessages = new Message[targetList.size()];

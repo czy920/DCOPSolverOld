@@ -29,6 +29,8 @@ public class MaxSumADAgent extends AgentCycle implements ParentInfoProvider,Punc
     private AbstractLocalRefiner refiner;
     private boolean refinerRunning;
     private boolean inited = false;
+    private int stageSize;
+    private int repeatTime;
 
 
     private static final Object obj = new Object();
@@ -47,6 +49,8 @@ public class MaxSumADAgent extends AgentCycle implements ParentInfoProvider,Punc
         punchedDomain = new LinkedList<>();
         punchedNeighbourDomains = new HashMap<>();
         refinerRunning = false;
+        stageSize = Settings.settings.getStageSize();
+        repeatTime = Settings.settings.getRepeatTime();
     }
 
     @Override
@@ -92,7 +96,10 @@ public class MaxSumADAgent extends AgentCycle implements ParentInfoProvider,Punc
         if ((msg.getType() & AbstractNode.MSG_TYPE_START) != 0){
             //system.out.println(msg.getType());
             int otherTag = (int) msg.getValue();
-            //if (randomTag <= otherTag)
+//            if (randomTag < otherTag)
+//                controlledNeighbours.remove((Object)msg.getIdSender());
+//            else if (randomTag == otherTag && id > msg.getIdSender())
+//                controlledNeighbours.remove((Object)msg.getIdSender());
             if (id > msg.getIdSender())
                 controlledNeighbours.remove((Object)msg.getIdSender());
             currentOperation = OPERATION_ALLOCATE_NEIGHBOUR;
@@ -179,11 +186,20 @@ public class MaxSumADAgent extends AgentCycle implements ParentInfoProvider,Punc
         for (int id : functionNodeMap.keySet()){
             broadcastFactorGraphMessages(functionNodeMap.get(id).handle(),false);
         }
-        boolean canTerminate = variableNode.canTerminate();
-        for (int id : functionNodeMap.keySet()){
-            if (!functionNodeMap.get(id).canTerminate()){
-                canTerminate = false;
-                break;
+        boolean canTerminate = false;
+        if (stageSize-- <= 0){
+            canTerminate = repeatTime-- <= 0;
+            if (Settings.settings.getRepeatTime() - repeatTime == 2){
+                for (int id : functionNodeMap.keySet()){
+                    functionNodeMap.get(id).setEnableVP(true);
+                }
+            }
+            if (!canTerminate) {
+                variableNode.reverse();
+                for (int id : functionNodeMap.keySet()) {
+                    functionNodeMap.get(id).reverse();
+                }
+                stageSize = Settings.settings.getStageSize();
             }
         }
         if (canTerminate){

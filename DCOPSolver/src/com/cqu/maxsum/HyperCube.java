@@ -104,9 +104,9 @@ public class HyperCube {
         return createSingleHyperCube(mainId,tmpUtil,false);
     }
 
-    public HyperCube resolveFunctions(int targetId){
+    public HyperCube resolveFunctions(int targetId, Map<Integer,Integer> fixAssignment){
         Map<Integer,int[][]> tmpUtils = sumUpUtils();
-        List<Map<Integer,Integer>> optimalList = calculateOptimalList(targetId,tmpUtils);
+        List<Map<Integer,Integer>> optimalList = calculateOptimalList(targetId,tmpUtils,fixAssignment);
         int[] targetUtil = new int[getDomainLength(targetId)];
         for (int i = 0; i < targetUtil.length; i++) {
             targetUtil[i] = calculateMaxUtility(tmpUtils, optimalList, targetId, i);
@@ -114,6 +114,7 @@ public class HyperCube {
         cubes.clear();
         return createSingleHyperCube(targetId,targetUtil,false);
     }
+
 
     private Map<Integer,int[][]> sumUpUtils(){
         Map<Integer,int[][]> newUtil = new HashMap<>();
@@ -137,19 +138,23 @@ public class HyperCube {
         return newUtil;
     }
 
-    private List<Map<Integer,Integer>> calculateOptimalList(int targetId, Map<Integer,int[][]> tmpUtil){
+    private List<Map<Integer,Integer>> calculateOptimalList(int targetId, Map<Integer,int[][]> tmpUtil, Map<Integer,Integer> fixAssignment){
         List<Map<Integer,Integer>> optimalList = new LinkedList<>();
         for (int i = 0; i < domainLength; i++){
             Map<Integer,Integer> optimalMap = new HashMap<>();
             int totalUtil = 0;
             for (int id : tmpUtil.keySet()){
                 int[] util = tmpUtil.get(id)[i];
-                if (id == mainId){
+                if (id == targetId){
+                    continue;
+                }
+                else if (fixAssignment != null && fixAssignment.containsKey(id)){
+                    optimalMap.put(id,fixAssignment.get(id));
+                    totalUtil += util[fixAssignment.get(id)];
+                }
+                else if (id == mainId){
                     optimalMap.put(mainId,i);
                     totalUtil += util[i];
-                }
-                else if (id == targetId){
-                    continue;
                 }
                 else {
                     int max = Integer.MIN_VALUE;
