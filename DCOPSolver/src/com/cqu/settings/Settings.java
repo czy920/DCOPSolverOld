@@ -341,4 +341,14 @@ public class Settings {
 	public void setRefiner(AbstractLocalRefiner refiner) {
 		this.refiner = refiner;
 	}
+
+	public int getStageSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public int getRepeatTime() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
