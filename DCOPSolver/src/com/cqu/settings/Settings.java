@@ -374,4 +374,14 @@ public class Settings {
 	public boolean isEnableVP() {
 		return enableVP;
 	}
+
+	public int getStageSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public int getRepeatTime() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }

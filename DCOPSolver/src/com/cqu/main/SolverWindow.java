@@ -710,7 +710,15 @@ public class SolverWindow {
 		else if(algorithmType.equals("ALSDGA")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
-			paramList.add(lspSpinnerSelectNewProbability);
+			paramList.add(lspSpinnerSelectProbabilityA);
+			paramList.add(lspSpinnerSelectProbabilityB);
+		}
+		else if(algorithmType.equals("ALSDGAFB")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectInterval);
+			paramList.add(lspSpinnerSelectProbability);
+			paramList.add(lspSpinnerSelectProbabilityA);
+			paramList.add(lspSpinnerSelectProbabilityB);
 		}
 		else if(algorithmType.equals("PDSALSDSA")){
 			paramList.add(lspSpinnerCycleCountEnd);
