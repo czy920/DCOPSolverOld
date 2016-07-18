@@ -57,7 +57,22 @@ public class MaxSumADFunctionNode extends FunctionNode {
         successorList = tmpList;
         receiveCount = 0;
         fixAssignment.clear();
-        System.out.println(toString() +  "reversed");
+       // System.out.println(toString() +  "reversed");
+    }
+
+    public void swap(List<Integer> neighbours){
+        for (int id : neighbours){
+            if (precursorList.contains(id)){
+                precursorList.remove((Object)id);
+                successorList.add(id);
+                receiveFlag.remove(id);
+            }
+            else if (successorList.contains(id)){
+                successorList.remove((Object)id);
+                precursorList.add(id);
+                receiveFlag.put(id,false);
+            }
+        }
     }
 
     @Override

@@ -151,6 +151,11 @@ public class MaxSumRefineStructureAgent extends AgentCycle implements ParentInfo
     }
 
     @Override
+    public void breakTie(List<Integer> tieList) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     protected void initRun() {
         super.initRun();
         StartMessageContent startMessageContent = new StartMessageContent();

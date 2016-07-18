@@ -11,16 +11,20 @@ public class VariableNode extends AbstractNode {
 
     private int optimalIndex;
     private Map<Integer,Integer> valueDistribution;
+    private List<Integer> valueRepeat;
     private int decisionCount;
+    private boolean needNormalize;
 
     public VariableNode(ParentInfoProvider parent, boolean blocking) {
         super(parent, blocking);
         nodeType = NODE_TYPE_VARIABLE_NODE;
         valueDistribution = new HashMap<>();
+        valueRepeat = new LinkedList<>();
         for (int i = 0; i < parent.getDomainSize(); i++){
             valueDistribution.put(i,0);
         }
         decisionCount = 0;
+        needNormalize = true;
     }
 
     @Override
@@ -48,13 +52,22 @@ public class VariableNode extends AbstractNode {
                     maxUtility = util;
                     optimalIndex = i;
                     repeatCount = 0;
+                    valueRepeat.clear();
                 }
-                if (util == maxUtility)
+                if (util == maxUtility) {
                     repeatCount++;
+                    valueRepeat.add(i);
+                }
             }
-            decisionCount++;
-            valueDistribution.put(optimalIndex, valueDistribution.get(optimalIndex) + 1);
-            //System.out.println(parent.getId() + " decision:" + optimalCube +",result:" + optimalIndex + ",repeatCount:" + repeatCount);
+            if (repeatCount == 1) {
+                valueRepeat.clear();
+                decisionCount++;
+                valueDistribution.put(optimalIndex, valueDistribution.get(optimalIndex) + 1);
+            }
+            else {
+                parent.breakTie(valueRepeat);
+            }
+            System.out.println(parent.getId() + " decision:" + optimalCube +",result:" + optimalIndex + ",repeatCount:" + repeatCount);
         }
 
         Message[] sendMessages = new Message[targetList.size()];
@@ -78,7 +91,10 @@ public class VariableNode extends AbstractNode {
     }
 
     private HyperCube normalization(HyperCube cube){
+
         assert cube.getVariableCount() == 1: "multi variables are found!";
+        if (!needNormalize)
+            return cube;
         int sum = 0;
         for (int i = 0; i < cube.getDomainLength(); i++){
             sum += cube.indexUtil(i);
@@ -97,5 +113,13 @@ public class VariableNode extends AbstractNode {
 
     public Map<Integer, Integer> getValueDistribution() {
         return valueDistribution;
+    }
+
+    public List<Integer> getValueRepeat() {
+        return valueRepeat;
+    }
+
+    public void setNeedNormalize(boolean needNormalize) {
+        this.needNormalize = needNormalize;
     }
 }

@@ -15,14 +15,13 @@ import com.cqu.bnbmergeadopt.AgentModel;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.dsa.*;
-import com.cqu.maxsum.MaxSumADAgent;
+import com.cqu.maxsum.*;
 import com.cqu.dsan.*;
-import com.cqu.maxsum.MaxSumAgent;
-import com.cqu.maxsum.MaxSumRefineStructureAgent;
 import com.cqu.mgm.*;
 import com.cqu.mus.*;
 import com.cqu.pds.*;
 import com.cqu.parser.Problem;
+import com.cqu.sbb.SynchBBAgent;
 import com.cqu.settings.Settings;
 import com.cqu.util.CollectionUtil;
 import com.cqu.util.FileUtil;
@@ -186,6 +185,18 @@ public class AgentManagerCycle {
 				agent=new MaxSumRefineStructureAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
+			else if (agentType.equals("MAXSUMSPLITED")) {
+				agent=new SplitedMaxSumAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if (agentType.equals("SBB")) {
+				agent=new SynchBBAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if (agentType.equals("MAXSUMOH")) {
+				agent=new MaxSumOneHotAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
 			else{
 				agent=new AdoptAgentCycle(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
@@ -218,7 +229,7 @@ public class AgentManagerCycle {
 			}
 			
 			if(agentType.equals("ACO")||agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||
-					agentType.equals("ACO_line")||agentType.equals("ACO_final")){
+					agentType.equals("ACO_line")||agentType.equals("ACO_final")||agentType.equals("SBB")){
 				agent.setNeibours(problem.neighbourAgents.get(agentId), problem.parentAgents.get(agentId), 
 						problem.childAgents.get(agentId), problem.allParentAgents.get(agentId), 
 						problem.allChildrenAgents.get(agentId), neighbourDomains, constraintCosts, neighbourLevels,

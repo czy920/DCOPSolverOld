@@ -44,11 +44,16 @@ public class Settings {
 	
 	private boolean displayGraphFrame;
 
+	//parameters for maxsum_ad
+	private int stageSize;
+	private int repeatTime;
+	private boolean enableVP;
+
 	//Parameter for local refine
 	private int refineCycle;
 	private boolean enableRefine;
 	private double distributionThreshold;
-	private AbstractLocalRefiner refiner;
+	private String refineAlgorithm;
 	
 	public Settings() {
 		// TODO Auto-generated constructor stub
@@ -79,10 +84,14 @@ public class Settings {
 		this.selectStepK2 = 20;
 		this.selectRound = 60;
 
+
 		//local refine
 		this.refineCycle = 30;
 		this.enableRefine = false;
 		this.distributionThreshold = 0.8;
+		this.refineAlgorithm = AbstractLocalRefiner.REFINE_ALGORITHM_MGM;
+		enableVP = false;
+		enableRefine = false;
 	}
 	
 	public double getBNBmergeADOPTboundArg() {
@@ -334,11 +343,35 @@ public class Settings {
 		this.distributionThreshold = distributionThreshold;
 	}
 
-	public AbstractLocalRefiner getRefiner() {
-		return refiner;
+	public String getRefineAlgorithm() {
+		return refineAlgorithm;
 	}
 
-	public void setRefiner(AbstractLocalRefiner refiner) {
-		this.refiner = refiner;
+	public void setRefineAlgorithm(String refineAlgorithm) {
+		this.refineAlgorithm = refineAlgorithm;
+	}
+
+	public void setStageSize(int stageSize) {
+		this.stageSize = stageSize;
+	}
+
+	public int getStageSize() {
+		return stageSize;
+	}
+
+	public void setRepeatTime(int repeatTime) {
+		this.repeatTime = repeatTime;
+	}
+
+	public int getRepeatTime() {
+		return repeatTime;
+	}
+
+	public void setEnableVP(boolean enableVP) {
+		this.enableVP = enableVP;
+	}
+
+	public boolean isEnableVP() {
+		return enableVP;
 	}
 }

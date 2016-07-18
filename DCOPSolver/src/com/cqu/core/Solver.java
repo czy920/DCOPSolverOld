@@ -80,7 +80,8 @@ public class Solver {
 				agentType.equals("ALSDSAMGM")||agentType.equals("ALSDSAMGMEVO")||agentType.equals("ALSDSADSAEVO")||agentType.equals("ALSDGA")||agentType.equals("PDSALSDSA")||
 				agentType.equals("PDSDSAN")||agentType.equals("PDSMGM")||agentType.equals("PDSMGM2")||
 				agentType.equals("MAXSUM")||agentType.equals("ACO")||agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||
-				agentType.equals("ACO_line")||agentType.equals("ACO_final")||agentType.equals("MAXSUMAD")||agentType.equals("MAXSUMRS"))
+				agentType.equals("ACO_line")||agentType.equals("ACO_final")||agentType.equals("MAXSUMAD")||agentType.equals("MAXSUMRS")||agentType.equals("MAXSUMSPLITED")||agentType.equals("SBB")
+				||agentType.equals("MAXSUMOH"))
 
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
@@ -548,15 +549,15 @@ public class Solver {
 		//采用同步消息机制的算法
 		if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT_K")||algorithmType.equals("BDADOPT")||algorithmType.equals("SynAdopt1")||algorithmType.equals("SynAdopt2")||
 				algorithmType.equals("DSA_A")||algorithmType.equals("DSA_B")||algorithmType.equals("DSA_C")||algorithmType.equals("DSA_D")||algorithmType.equals("DSA_E")||algorithmType.equals("DSAN")||
-				algorithmType.equals("MGM")||algorithmType.equals("MGM2")||algorithmType.equals("ALSDSA")||algorithmType.equals("ALSMGM")||algorithmType.equals("ALSMGM2")||
+				algorithmType.equals("MGM")||algorithmType.equals("MGM2")||algorithmType.equals("ALS DSA")||algorithmType.equals("ALSMGM")||algorithmType.equals("ALSMGM2")||
 				algorithmType.equals("ALS_DSA")||algorithmType.equals("ALS_H1_DSA")||algorithmType.equals("ALS_H2_DSA")||algorithmType.equals("ALSLMUSDSA4")||algorithmType.equals("ALSMLUDSA")||
 				algorithmType.equals("ALSDSAMGM")||algorithmType.equals("ALSDSAMGMEVO")||algorithmType.equals("ALSDSADSAEVO")||algorithmType.equals("ALSDGA")||algorithmType.equals("PDSALSDSA")||
 				algorithmType.equals("PDSDSAN")||algorithmType.equals("PDSMGM")||
 				algorithmType.equals("PDSMGM2")||algorithmType.equals("ACO")||algorithmType.equals("ACO_tree")||algorithmType.equals("ACO_bf")||algorithmType.equals("ACO_phase")||
-				algorithmType.equals("ACO_line")||algorithmType.equals("ACO_final"))
+				algorithmType.equals("ACO_line")||algorithmType.equals("ACO_final")||
 				algorithmType.equals("ALSDSAMGM")||algorithmType.equals("ALSDSAMGMEVO")||algorithmType.equals("PDSALSDSA")||algorithmType.equals("PDSMGM")||algorithmType.equals("PDSMGM2")||
 				algorithmType.equals("ACO")||algorithmType.equals("ACO_tree")||algorithmType.equals("ACO_bf")||algorithmType.equals("ACO_phase")||
-				algorithmType.equals("ACO_line")||algorithmType.equals("ACO_final") || algorithmType.equals("MAXSUMRS") || algorithmType.equals("MAXSUMAD"))
+				algorithmType.equals("ACO_line")||algorithmType.equals("ACO_final") || algorithmType.equals("MAXSUMRS") || algorithmType.equals("MAXSUMAD")||algorithmType.equals("MAXSUMSPLITED")||algorithmType.equals("MAXSUMOH"))
 		//if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT"))
 		{
 			//construct agents
