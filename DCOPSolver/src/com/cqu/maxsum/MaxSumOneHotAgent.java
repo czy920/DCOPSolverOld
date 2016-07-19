@@ -62,6 +62,38 @@ public class MaxSumOneHotAgent extends AgentCycle implements ParentInfoProvider{
         }
         else if (msg.getType() == MSG_TYPE_MARKER){
             Map<String,Object> data = (Map<String,Object>) msg.getValue();
+            mergeRoute((Map<Integer, RouteInfo>) data.get("route"));
+            IterationMarker marker = (IterationMarker) data.get("marker");
+            changeDirection(msg.getIdSender());
+            if (marker.target != id) {
+                sendMarker(marker, route.get(marker.target).nextHop);
+                return;
+            }
+            marker.visited.add(id);
+            marker.unvisited.remove((Integer) id);
+            int index = -1;
+            for (int otherId : neighbours) {
+                if (marker.visited.contains(otherId))
+                    continue;
+                index = otherId;
+                marker.unvisited.add(otherId);
+            }
+            if (index != -1) {
+                marker.target = index;
+                changeDirection(index);
+                sendMarker(marker, index);
+            } else {
+                if (!marker.allNodeVisited()) {
+                    for (int i : marker.unvisited) {
+                        marker.target = i;
+                        break;
+                    }
+                    changeDirection(route.get(marker.target).nextHop);
+                    sendMarker(marker, route.get(marker.target).nextHop);
+                } else {
+                    System.out.println("end");
+                }
+            }
 
         }
     }
@@ -76,6 +108,7 @@ public class MaxSumOneHotAgent extends AgentCycle implements ParentInfoProvider{
                 route.put(key,hopInfo.get(key));
             }
         }
+        System.out.println("id:" + id + " merge route:" + route);
     }
 
     @Override
@@ -119,15 +152,32 @@ public class MaxSumOneHotAgent extends AgentCycle implements ParentInfoProvider{
                 for (int id : neighbours){
                     marker.unvisited.add(id);
                 }
-                Map<String,Object> data = new HashMap<>();
-                data.put("marker",marker);
-                data.put("route",getRouteInfo());
-                sendMessage(new Message(id,neighbours[0],MSG_TYPE_MARKER,data));
-                precursorList.remove((Object)neighbours[0]);
-                successorList.add(neighbours[0]);
+                marker.target = neighbours[0];
+                System.out.println("id:" + id + " start visit");
+                sendMarker(marker, neighbours[0]);
+                changeDirection(neighbours[0]);
             }
 
         }
+    }
+
+    private void changeDirection(int agent) {
+        System.out.println("id:" + id + " change direction,agent:" + agent);
+        if (precursorList.contains(agent)) {
+            precursorList.remove((Object) agent);
+            successorList.add(agent);
+        } else {
+            successorList.remove((Object) agent);
+            precursorList.add(agent);
+        }
+    }
+
+    private void sendMarker(IterationMarker marker, int target) {
+        System.out.println("id:" + id + " sendMark,target:" + marker.target + ",nextHop:" + target);
+        Map<String, Object> data = new HashMap<>();
+        data.put("marker", marker);
+        data.put("route", getRouteInfo());
+        sendMessage(new Message(id, target, MSG_TYPE_MARKER, data));
     }
 
     private void sendRoute() {
@@ -194,6 +244,7 @@ public class MaxSumOneHotAgent extends AgentCycle implements ParentInfoProvider{
         Set<Integer> visited;
         Set<Integer> unvisited;
         int iteration;
+        int target;
         public IterationMarker(){
             visited = new HashSet<>();
             unvisited = new HashSet<>();
