@@ -6,6 +6,8 @@ import com.cqu.core.ResultCycle;
 import com.cqu.core.Solver;
 import com.cqu.settings.Settings;
 
+import java.util.*;
+
 public class Test {
 
 	public Test() {
@@ -13,45 +15,53 @@ public class Test {
 		
 	}
 	public static void main(String[] args) {
-		Solver solver = new Solver();
-		Settings.settings.setDisplayGraphFrame(false);
-		Settings.settings.setCycleCount(30);
-//		solver.batSolve("C:\\Users\\YanChenDeng\\git\\DCOPSolver\\problems\\150_0.3\\30", "MAXSUMRS", 1, new EventListener() {
-//			@Override
-//			public void onStarted() {
-//
-//			}
-//
-//			@Override
-//			public void onFinished(Object result) {
-//				System.out.println("finisihed");
-//			}
-//		}, new Solver.BatSolveListener() {
-//			@Override
-//			public void progressChanged(int problemTotalCount, int problemIndex, int timeIndex) {
-//				System.out.println("problem count " + problemTotalCount +" current problem index " + problemIndex + "time index " + timeIndex);
-//			}
-//		});problems/150_0.05/5/RandomDCOP_150_10_2.xml
-		Settings.settings.setDisplayGraphFrame(true);
-		solver.solve("C:\\Users\\YanChenDeng\\Desktop\\新建文件夹\\scale free network_15_9_0_2_10.xml", "MAXSUMRS", false, false, new EventListener() {
-
-			@Override
-			public void onStarted() {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void onFinished(Object result) {
-				// TODO Auto-generated method stub
-				ResultCycle resultCycle = (ResultCycle) result;
-				System.out.println("cost\tmessage");
-				for (int i = 0; i < resultCycle.messageQuantityInCycle.length; i++){
-					System.out.println(resultCycle.totalCostInCycle[i] + "\t" + resultCycle.messageQuantityInCycle[i]);
+		Random random1 = new Random();
+		for (int i = 0; i < 9; i++)
+			System.out.println(random1.nextInt(100));
+		if (true)
+			return;
+		int domain = 3;
+		int neighbour = 2;
+		Random random = new Random();
+		Map<Integer,int[][]> costs = new HashMap<>();
+		for (int i = 1; i <= neighbour; i++){
+			int[][] cost = new int[domain][domain];
+			for (int j = 0; j < domain; j++){
+				for (int k = 0; k < domain; k++){
+					cost[j][k] = random.nextInt(100);
 				}
-				System.out.println(resultCycle.totalCost);
 			}
-		});
+			costs.put(i,cost);
+		}
+		Map<String,Integer> sumUpCost = new HashMap<>();
+		List<Map<Integer,Integer>> maxCost = new ArrayList<>();
+		for (int i = 0 ; i < neighbour; i++){
+
+		}
+		int[] index = new int[neighbour + 1];
+		int current = neighbour;
+		while (true){
+			if (index[0] == domain)
+				break;
+			if (index[current] == domain){
+				index[current--] = 0;
+				index[current]++;
+				continue;
+			}
+			current = neighbour;
+			StringBuffer stringBuffer = new StringBuffer();
+			int cost = 0;
+
+			for (int i = 0; i < neighbour + 1; i++){
+				stringBuffer.append(index[i] + " ");
+				if (i == 0)
+					continue;
+				cost += costs.get(i)[index[0]][index[i]];
+			}
+			sumUpCost.put(stringBuffer.toString(),cost);
+			index[current] ++;
+		}
+		System.out.println(sumUpCost);
 	}
 
 }

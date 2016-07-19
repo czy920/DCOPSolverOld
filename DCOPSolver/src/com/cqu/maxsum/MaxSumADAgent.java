@@ -61,7 +61,8 @@ public class MaxSumADAgent extends AgentCycle implements ParentInfoProvider,Punc
             stringBuilder.append("id:"+ map.get("id"));
             stringBuilder.append(" value:" + map.get("value"));
             stringBuilder.append(" dist:" + map.get("dist"));
-            //system.out.println(stringBuilder.toString());
+            stringBuilder.append(" repeat:" + map.get("repeat"));
+            System.out.println(stringBuilder.toString());
             totalCost += (int)map.get("cost");
         }
         ResultCycle resultCycle = new ResultCycle();
@@ -100,7 +101,7 @@ public class MaxSumADAgent extends AgentCycle implements ParentInfoProvider,Punc
 //                controlledNeighbours.remove((Object)msg.getIdSender());
 //            else if (randomTag == otherTag && id > msg.getIdSender())
 //                controlledNeighbours.remove((Object)msg.getIdSender());
-            if (id > msg.getIdSender())
+            if (id < msg.getIdSender())
                 controlledNeighbours.remove((Object)msg.getIdSender());
             currentOperation = OPERATION_ALLOCATE_NEIGHBOUR;
         }
@@ -113,17 +114,17 @@ public class MaxSumADAgent extends AgentCycle implements ParentInfoProvider,Punc
                     functionNodeMap.get(msg.getIdSender()).addMessage(msg);
                 else
                     functionNodeMap.get(((MessageContent)msg.getValue()).getFakeIndex()).addMessage(msg);
-//                synchronized (obj) {
-//                    if (((MessageContent)msg.getValue()).getCube() != null)
-//                        //system.out.println(msg + " v2f,fakeId:" + ((MessageContent) msg.getValue()).getFakeIndex() + ((MessageContent) msg.getValue()).getCube());
-//                }
+                synchronized (obj) {
+                    if (((MessageContent)msg.getValue()).getCube() != null)
+                        System.out.println(msg + " v2f,fakeId:" + ((MessageContent) msg.getValue()).getFakeIndex() + ((MessageContent) msg.getValue()).getCube());
+                }
 
             }
             else if ((msg.getType() & AbstractNode.MSG_TYPE_FUNCTION_TO_VARIABLE) != 0){
-//                synchronized (obj) {
-//                    if (((MessageContent)msg.getValue()).getCube() != null)
-//                        //system.out.println(msg + " f2v," + ((MessageContent) msg.getValue()).getCube());
-//                }
+                synchronized (obj) {
+                    if (((MessageContent)msg.getValue()).getCube() != null)
+                        System.out.println(msg + " f2v," + ((MessageContent) msg.getValue()).getCube());
+                }
                 variableNode.addMessage(msg);
             }
             else if (msg.getType() == AbstractNode.MSG_TYPE_PUNCH_DOMAIN){
@@ -138,6 +139,12 @@ public class MaxSumADAgent extends AgentCycle implements ParentInfoProvider,Punc
             }
         }
     }
+
+    @Override
+    public void breakTie(List<Integer> tieList) {
+
+    }
+
     @Override
     protected void messageLost(Message msg) {
 
@@ -165,11 +172,12 @@ public class MaxSumADAgent extends AgentCycle implements ParentInfoProvider,Punc
         if (currentOperation == OPERATION_ALLOCATE_NEIGHBOUR){
             currentOperation = OPERATION_MESSAGE_PASSING;
             variableNode = new MaxSumADVariableNode(this,false,Settings.settings.getCycleCountEnd());
+            variableNode.setNeedNormalize(false);
             for (int id : controlledNeighbours){
                 MaxSumADFunctionNode functionNode = new MaxSumADFunctionNode(this,false,String.valueOf(id),Settings.settings.getCycleCountEnd());
-                functionNode.addNeighbours(id,neighbourDomains.get(id).length,this.id > id);
+                functionNode.addNeighbours(id,neighbourDomains.get(id).length,this.id < id);
                 functionNode.addNeighbours(this.id,domain.length,true);
-                //system.out.println(functionNode);
+                System.out.println(functionNode);
                 functionNodeMap.put(id,functionNode);
             }
             for (int id : neighbours){
@@ -177,10 +185,10 @@ public class MaxSumADAgent extends AgentCycle implements ParentInfoProvider,Punc
                     variableNode.addNeighbours(id,neighbourDomains.get(id).length,false);
                 }
                 else {
-                    variableNode.addNeighbours(id,neighbourDomains.get(id).length,this.id > id);
+                    variableNode.addNeighbours(id,neighbourDomains.get(id).length,this.id < id);
                 }
             }
-            //system.out.println(variableNode);
+            System.out.println(variableNode);
         }
         broadcastFactorGraphMessages(variableNode.handle(),true);
         for (int id : functionNodeMap.keySet()){
@@ -191,7 +199,7 @@ public class MaxSumADAgent extends AgentCycle implements ParentInfoProvider,Punc
             canTerminate = repeatTime-- <= 0;
             if (Settings.settings.getRepeatTime() - repeatTime == 2){
                 for (int id : functionNodeMap.keySet()){
-                    functionNodeMap.get(id).setEnableVP(true);
+                    functionNodeMap.get(id).setEnableVP(Settings.settings.isEnableVP());
                 }
             }
             if (!canTerminate) {
@@ -225,8 +233,12 @@ public class MaxSumADAgent extends AgentCycle implements ParentInfoProvider,Punc
                     count += entry.getValue();
                     punchedDomain.add(entry.getKey());
                 }
-                //system.out.println("id:" + getId() + " domain punched:" + punchedDomain);
-                refiner = new MgmRefiner(this,valueIndex);
+                //system.out.println("id:" + getId() + " domain pnched:" + punchedDomain);
+                if (Settings.settings.getRefineAlgorithm().equals(AbstractLocalRefiner.REFINE_ALGORITHM_MGM))
+                    refiner = new MgmRefiner(this,valueIndex);
+                else {
+                    refiner = new DsaRefiner(this,valueIndex);
+                }
                 broadcastMessage(AbstractNode.MSG_TYPE_PUNCH_DOMAIN,punchedDomain);
             }
         }
@@ -310,6 +322,7 @@ public class MaxSumADAgent extends AgentCycle implements ParentInfoProvider,Punc
         map.put("value",Settings.settings.isEnableRefine()?refiner.getValueIndex():variableNode.getOptimalIndex());
         map.put("cost",getLocalCost());
         map.put("dist",variableNode.getValueDistribution());
+        map.put("repeat",variableNode.getValueRepeat());
         msgMailer.setResult(map);
     }
 

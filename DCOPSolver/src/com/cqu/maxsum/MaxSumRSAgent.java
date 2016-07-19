@@ -49,4 +49,9 @@ public class MaxSumRSAgent extends AgentCycle implements ParentInfoProvider {
     public HyperCube getLocalFunction(String constraintName) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void breakTie(List<Integer> tieList) {
+        throw new UnsupportedOperationException();
+    }
 }

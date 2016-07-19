@@ -11,7 +11,7 @@ public class MaxSumADVariableNode extends VariableNode {
 
     private List<Integer> precursorList;
     private List<Integer> successorList;
-    private int receiveCount;
+    private boolean decisionFlag = false;
 
     public MaxSumADVariableNode(ParentInfoProvider parent, boolean blocking,int iteration) {
         super(parent, blocking);
@@ -41,31 +41,50 @@ public class MaxSumADVariableNode extends VariableNode {
 
     @Override
     protected boolean evaluateHandleCondition() {
-       return receiveCount >= precursorList.size();
+        for (int id : precursorList){
+            if (!receiveFlag.containsKey(id)  || !receiveFlag.get(id)){
+                return false;
+            }
+        }
+       return true;
     }
 
     public void reverse(){
         List<Integer> tmpList = precursorList;
         precursorList = successorList;
         successorList = tmpList;
-        receiveCount = 0;
-        System.out.println(toString() +  "reversed");
+        receiveFlag.clear();
+        decisionFlag = false;
+        //System.out.println(toString() +  "reversed");
     }
 
-    public boolean allMessageReceived(){
-        return evaluateHandleCondition();
+    public void swap(List<Integer> neighbours){
+        for (int id : neighbours){
+            if (precursorList.contains(id)){
+                precursorList.remove((Object)id);
+                successorList.add(id);
+                receiveFlag.remove(id);
+            }
+            else if (successorList.contains(id)){
+                successorList.remove((Object)id);
+                precursorList.add(id);
+                receiveFlag.put(id,false);
+            }
+        }
+        decisionFlag = false;
     }
-
-
 
     @Override
     public void addMessage(Message message) {
-        receiveCount++;
         MessageContent content = (MessageContent)message.getValue();
-        if (content.getFakeIndex() != -1)
-            comingMessages.put(content.getFakeIndex(),content.getCube());
-        else
+        if (content.getFakeIndex() != -1) {
+            comingMessages.put(content.getFakeIndex(), content.getCube());
+            receiveFlag.put(content.getFakeIndex(),true);
+        }
+        else{
             comingMessages.put(message.getIdSender(),content.getCube());
+            receiveFlag.put(message.getIdSender(),true);
+        }
     }
 
     @Override
@@ -79,6 +98,14 @@ public class MaxSumADVariableNode extends VariableNode {
         return "vn,parent:" + parent.getId() + " pre:" + precursorList + " suc:" + successorList;
     }
 
+    @Override
+    protected boolean evaluateFindOptimalCondition() {
+        if (!decisionFlag && evaluateHandleCondition()){
+            decisionFlag = true;
+            return true;
+        }
+        return false;
+    }
 
 
 }

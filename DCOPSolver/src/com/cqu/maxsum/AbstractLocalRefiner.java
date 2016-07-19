@@ -6,6 +6,9 @@ import com.cqu.core.Message;
  * Created by YanChenDeng on 2016/6/21.
  */
 public abstract class AbstractLocalRefiner {
+    public static final String REFINE_ALGORITHM_MGM = "MGM";
+    public static final String REFINE_ALGORITHM_DSA = "DSA";
+
     protected PunchedAgentInfoProvider punchedParent;
     protected int valueIndex;
     public AbstractLocalRefiner(PunchedAgentInfoProvider punchedParent,int initValue){
