@@ -355,17 +355,11 @@ public class Settings {
 		this.stageSize = stageSize;
 	}
 
-	public int getStageSize() {
-		return stageSize;
-	}
 
 	public void setRepeatTime(int repeatTime) {
 		this.repeatTime = repeatTime;
 	}
 
-	public int getRepeatTime() {
-		return repeatTime;
-	}
 
 	public void setEnableVP(boolean enableVP) {
 		this.enableVP = enableVP;
