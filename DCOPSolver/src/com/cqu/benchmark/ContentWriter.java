@@ -39,6 +39,7 @@ public class ContentWriter {
 
     public void setExtraParameter(Map<String, Object> extraParameter) {
         this.extraParameter = extraParameter;
+
     }
 
     public void generate() throws Exception{
