@@ -191,7 +191,13 @@ public class MessageMailerCycle extends MailerCycleQueueMessager{
 	 */
 	public void initWait(){
 		while(!initFinished){
-			
+			try {
+				System.out.println("--- sleep 200 ---");
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	

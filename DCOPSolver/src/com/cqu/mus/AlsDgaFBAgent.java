@@ -270,12 +270,12 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 						}
 					}
 					else{
-						if(crossTag == true){
-							for(int i = 0; i < population; i++){
-								valueIndexGA[i] = bestValue;
-							}
-						}
-//						resetTag = true;
+//						if(crossTag == true){
+//							for(int i = 0; i < population; i++){
+//								valueIndexGA[i] = bestValue;
+//							}
+//						}
+						resetTag = true;
 						
 						prepareToReset = 2147483647;
 						resetLock = false;

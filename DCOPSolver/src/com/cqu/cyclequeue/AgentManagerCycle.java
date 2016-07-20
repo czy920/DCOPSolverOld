@@ -189,10 +189,10 @@ public class AgentManagerCycle {
 				agent=new MaxSumRefineStructureAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if (agentType.equals("MAXSUMSPLITED")) {
-				agent=new SplitedMaxSumAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
+//			else if (agentType.equals("MAXSUMSPLITED")) {
+//				agent=new SplitedMaxSumAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+//						problem.domains.get(problem.agentDomains.get(agentId)));
+//			}
 			else if (agentType.equals("SBB")) {
 				agent=new SynchBBAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
 						problem.domains.get(problem.agentDomains.get(agentId)));
