@@ -75,10 +75,6 @@ public class AlsDsa_Agent extends AgentCycleAls{
 
 	
 	private void disposeValueMessage(Message msg){
-		
-		if(receivedQuantity==0)
-			cycleCount++;
-		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighbours.length; i++){
@@ -90,41 +86,44 @@ public class AlsDsa_Agent extends AgentCycleAls{
 		neighboursValueIndex.put((Integer)senderIndex, (Integer)msg.getValue());
 		
 		if(receivedQuantity==0){
-			localCost=localCost();
-			//!!!!!!!!!!!!!!!!!!!!进行ALS框架操作，调用父类方法!!!!!!!!!!!!!!!!!!!!
-			//!!!!!!!要获取localCost的值，该方法必须要位于localCost()方法之后，!!!!!!!!
-			AlsWork();
-			if(cycleCount <= cycleCountEnd){
-				if(Math.random()<p){
-					int[] selectMinCost=new int[domain.length];
-					for(int i=0; i<domain.length; i++){
-						selectMinCost[i]=0;
-					}
-					for(int i=0; i<domain.length; i++){
-						for(int j=0; j<neighbours.length; j++){
-								selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];
-						}					
-					}				
-					int selectValueIndex=0;
-					int selectOneMinCost=selectMinCost[0];
-					for(int i = 1; i < domain.length; i++){
-						if(selectOneMinCost > selectMinCost[i]){
-							selectOneMinCost = selectMinCost[i];
-							selectValueIndex = i;
-						}
-					}
-					if(selectOneMinCost < localCost){
-						valueIndex = selectValueIndex;
-					}
-					nccc++;
-				}
-				sendValueMessages();
-			}
-			else
-				STOPRUNNING = true;
+			
 		}
 	}
 	
+	protected void allMessageDisposed() {
+		if(cycleCount <= cycleCountEnd){
+			cycleCount++;
+			localCost=localCost();
+			AlsWork();			//---进行ALS框架操作，调用父类方法---要获取localCost的值，该方法必须要位于localCost()方法之后，
+			
+			if(Math.random()<p){
+				int[] selectMinCost=new int[domain.length];
+				for(int i=0; i<domain.length; i++){
+					selectMinCost[i]=0;
+				}
+				for(int i=0; i<domain.length; i++){
+					for(int j=0; j<neighbours.length; j++){
+							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];
+					}					
+				}				
+				int selectValueIndex=0;
+				int selectOneMinCost=selectMinCost[0];
+				for(int i = 1; i < domain.length; i++){
+					if(selectOneMinCost > selectMinCost[i]){
+						selectOneMinCost = selectMinCost[i];
+						selectValueIndex = i;
+					}
+				}
+				if(selectOneMinCost < localCost){
+					valueIndex = selectValueIndex;
+					sendValueMessages();
+				}
+				nccc++;
+			}
+		}
+		else
+			STOPRUNNING = true;
+	}
 	
 	private int localCost(){
 		int localCostTemp=0;

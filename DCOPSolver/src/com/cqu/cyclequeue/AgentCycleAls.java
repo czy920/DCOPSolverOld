@@ -25,7 +25,7 @@ public abstract class AgentCycleAls extends AgentCycle{
 	protected LinkedList<Integer> localCostList = new LinkedList<Integer>();
 	protected LinkedList<Integer> valueIndexList = new LinkedList<Integer>();
 	protected HashMap<Integer, LinkedList<Integer>> childrenMessageList = new HashMap<Integer, LinkedList<Integer>>();
-	protected boolean STOPRUNNING = false;
+	protected boolean STOPRUNNING = false;			//用于避免出现只有生成树只有两层时出现的异常终止情况
 	
 	protected int warning = 0;
 	

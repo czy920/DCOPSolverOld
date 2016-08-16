@@ -104,32 +104,16 @@ public class AgentManagerCycle {
 				agent=new Mgm2Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ALSDSA")){
-				agent=new AlsDsaAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
-			else if(agentType.equals("ALSMGM")){
-				agent=new AlsMgmAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
-			else if(agentType.equals("ALSMGM2")){
-				agent=new AlsMgm2Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
 			else if(agentType.equals("ALS_DSA")){
 				agent=new AlsDsa_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ALS_H1_DSA")){
-				agent=new AlsDsa_H1_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+			else if(agentType.equals("DSA_PPIRA")){
+				agent=new DsaPPIRA_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if(agentType.equals("ALS_H2_DSA")){
-				agent=new AlsDsa_H2_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
-			else if(agentType.equals("ALSLMUSDSA4")){
-				agent=new AlsLmusDsa4Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+			else if(agentType.equals("DSA_SDP")){
+				agent=new DsaSDP_Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else if(agentType.equals("ALSMLUDSA")){

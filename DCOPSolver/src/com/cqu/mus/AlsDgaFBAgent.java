@@ -226,9 +226,10 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 				}
 			}
 		}
-		
-		
-		if(receivedQuantity==0){
+	}
+	
+	protected void allMessageDisposed(){
+		if(cycleCount <= cycleCountEnd){
 			if(prepareToStart == 0){
 				crossTag0 = true;
 				for(int i = 0; i < neighboursQuantity;i++){
@@ -238,59 +239,61 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 					}
 				}
 			}
-			
 			localCost();
 			AlsWork();
 			cycleCount++;
-			
-			if(cycleCount <= cycleCountEnd){
 
-				if(prepareToStart > 0)
-					prepareToStart--;
-				if(prepareToStart == 0){
-					
-					prepareToReset--;
-					if(prepareToReset > 0){
-						if(resetTag == false){
-							if(crossTag == true){
-								int temp = valueIndexGA[0];
-								for(int i = 0; i < population-1; i++){
-									valueIndexGA[i] = valueIndexGA[i+1];
-								}
-								valueIndexGA[population-1] = temp;
+			if(prepareToStart > 0)
+				prepareToStart--;
+			if(prepareToStart == 0){
+				
+				prepareToReset--;
+				if(prepareToReset > 0){
+					if(resetTag == false){
+						if(crossTag == true){
+							int temp = valueIndexGA[0];
+							for(int i = 0; i < population-1; i++){
+								valueIndexGA[i] = valueIndexGA[i+1];
 							}
-						}
-						else{
-							for(int i = 0; i < population; i++){
-								if(resetTagPopulation[i] == true){
-									valueIndexGA[i] = bestValue;
-								}
-							}
-							resetTag = false;
+							valueIndexGA[population-1] = temp;
 						}
 					}
 					else{
-//						if(crossTag == true){
-//							for(int i = 0; i < population; i++){
-//								valueIndexGA[i] = bestValue;
-//							}
-//						}
-						resetTag = true;
+						for(int i = 0; i < population; i++){
+							if(resetTagPopulation[i] == true){
+								valueIndexGA[i] = bestValue;
+							}
+						}
+						resetTag = false;
 						
-						prepareToReset = 2147483647;
-						resetLock = false;
+//						for(int i = 0; i < population; i++){
+//							valueIndexGA[i] = (int)(domain.length*Math.random());
+//						}
+//						resetTag = false;
+						
 					}
 				}
-				
-				DsaWork();
-				mutate();
-				
-				crossTag = false;
-				sendValueCostMessages();
+				else{
+//					if(crossTag == true){
+//						for(int i = 0; i < population; i++){
+//							valueIndexGA[i] = bestValue;
+//						}
+//					}
+					resetTag = true;
+					
+					prepareToReset = 2147483647;
+					resetLock = false;
+				}
 			}
-			else{
-				STOPRUNNING = true;
-			}
+			
+			mutate();
+			DsaWork();
+			
+			crossTag = false;
+			sendValueCostMessages();
+		}
+		else{
+			STOPRUNNING = true;
 		}
 	}
 	

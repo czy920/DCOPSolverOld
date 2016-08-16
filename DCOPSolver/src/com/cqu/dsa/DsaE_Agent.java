@@ -64,9 +64,6 @@ public class DsaE_Agent extends AgentCycle {
 	@Override
 	protected void disposeMessage(Message msg) {
 		// TODO Auto-generated method stub
-		if(receivedQuantity==0)
-			cycleCount++;
-		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighbours.length; i++){
@@ -76,48 +73,50 @@ public class DsaE_Agent extends AgentCycle {
 			}
 		}
 		neighboursValueIndex.put((Integer)senderIndex, (Integer)msg.getValue());
-		
-		if(receivedQuantity==0){
-			localCost=localCost();
-			
-			if(cycleCount>=cycleCountEnd){
-				stopRunning();
-			}else{
-				int[] selectMinCost=new int[domain.length];
-				for(int i=0; i<domain.length; i++){
-					selectMinCost[i]=0;
-				}
-				for(int i=0; i<domain.length; i++){
-					for(int j=0; j<neighbours.length; j++){
-//						if(this.id < neighbours[j])
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-//						else
-//							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
-					}
-				}
-				
-				int selectOneMinCost = selectMinCost[0];
-				int selectValueIndex = 0;
-				for(int i = 1; i < domain.length; i++){
-					if(selectOneMinCost >= selectMinCost[i] || selectValueIndex != valueIndex){
-						selectOneMinCost = selectMinCost[i];
-						selectValueIndex = i;
-					}
-				}
-					
-				if(selectOneMinCost < localCost){
-					valueIndex = selectValueIndex;
-				}else if(selectOneMinCost == localCost){
-					if(Math.random() < p){
-						valueIndex = selectValueIndex;
-					}
-				}
-				nccc++;
-				sendValueMessages();
-			}
-		}
 	}
 	
+	protected void allMessageDisposed() {
+		if(cycleCount>=cycleCountEnd){
+			stopRunning();
+		}
+		else{
+			cycleCount++;
+			localCost=localCost();
+			
+			int[] selectMinCost=new int[domain.length];
+			for(int i=0; i<domain.length; i++){
+				selectMinCost[i]=0;
+			}
+			for(int i=0; i<domain.length; i++){
+				for(int j=0; j<neighbours.length; j++){
+//						if(this.id < neighbours[j])
+						selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
+//						else
+//							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
+				}
+			}
+			
+			int selectOneMinCost = selectMinCost[0];
+			int selectValueIndex = 0;
+			for(int i = 1; i < domain.length; i++){
+				if(selectOneMinCost >= selectMinCost[i] && selectValueIndex != valueIndex){
+					selectOneMinCost = selectMinCost[i];
+					selectValueIndex = i;
+				}
+			}
+				
+			if(selectOneMinCost < localCost){
+				valueIndex = selectValueIndex;
+				sendValueMessages();
+			}else if(selectOneMinCost == localCost){
+				if(Math.random() < p){
+					valueIndex = selectValueIndex;
+					sendValueMessages();
+				}
+			}
+			nccc++;
+		}
+	}
 	
 	private int localCost(){
 		int localCostTemp=0;

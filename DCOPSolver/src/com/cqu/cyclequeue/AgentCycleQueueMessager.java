@@ -81,8 +81,8 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 			if(cycleBegin.get()==true)
 			{
 				//添加work()方法，确保如果本轮没有收到message也能执行操作
-				work(msgQueue.size());
-				localSearchCheck();
+				preWork(msgQueue.size());
+//				localSearchCheck();
 								
 				while(msgQueue.isEmpty()==false)
 				{
@@ -190,14 +190,10 @@ public abstract class AgentCycleQueueMessager extends ProcessThread{
 	
 	protected void runFinished(){}
 	
-	/*
-	 * 添加work()方法，确保如果本轮没有收到message也能执行操作
+	/**
+	 * 添加PreWork()方法，接收消息前的预处理
 	 */
-	protected void work(int i){}
-	/*
-	 * 添加localSearchCheck()方法，用于局部搜索算法中避免错误
-	 */
-	protected void localSearchCheck(){};
+	protected void preWork(int i){}
 	
 	protected abstract void disposeMessage(Message msg);
 	

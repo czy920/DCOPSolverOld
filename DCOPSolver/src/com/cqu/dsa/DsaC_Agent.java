@@ -60,9 +60,6 @@ public class DsaC_Agent extends AgentCycle {
 	@Override
 	protected void disposeMessage(Message msg) {
 		// TODO Auto-generated method stub
-		if(receivedQuantity==0)
-			cycleCount++;
-		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighbours.length; i++){
@@ -72,41 +69,43 @@ public class DsaC_Agent extends AgentCycle {
 			}
 		}
 		neighboursValueIndex.put((Integer)senderIndex, (Integer)msg.getValue());
-		
-		if(receivedQuantity==0){
+	}
+	
+	protected void allMessageDisposed(){
+		if(cycleCount>=cycleCountEnd){
+			stopRunning();
+		}
+		else{
+			cycleCount++;
 			localCost=localCost();
 			
-			if(cycleCount>=cycleCountEnd){
-				stopRunning();
-			}else{
-				if(Math.random()<p){
-					int[] selectMinCost=new int[domain.length];
-					for(int i=0; i<domain.length; i++){
-						selectMinCost[i]=0;
+			if(Math.random()<p){
+				int[] selectMinCost=new int[domain.length];
+				for(int i=0; i<domain.length; i++){
+					selectMinCost[i]=0;
+				}
+				for(int i=0; i<domain.length; i++){
+					for(int j=0; j<neighbours.length; j++){
+//						if(this.id < neighbours[j])
+							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
+//						else
+//							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];	
+					}					
+				}
+				int selectValueIndex = 0;
+				int selectOneMinCost = selectMinCost[0];
+				for(int i = 1; i < domain.length; i++){
+					if(selectOneMinCost >= selectMinCost[i] && selectMinCost[i] != valueIndex){
+						selectOneMinCost = selectMinCost[i];
+						selectValueIndex = i;
 					}
-					for(int i=0; i<domain.length; i++){
-						for(int j=0; j<neighbours.length; j++){
-//							if(this.id < neighbours[j])
-								selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-//							else
-//								selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];	
-						}					
-					}
-					int selectValueIndex = 0;
-					int selectOneMinCost = selectMinCost[0];
-					for(int i = 1; i < domain.length; i++){
-						if(selectOneMinCost >= selectMinCost[i] && selectMinCost[i] != valueIndex){
-							selectOneMinCost = selectMinCost[i];
-							selectValueIndex = i;
-						}
-					}
-					if(selectOneMinCost <= localCost){
-						valueIndex = selectValueIndex;
-					}
-					nccc++;
-				}		
-				sendValueMessages();
-			}
+				}
+				if(selectOneMinCost <= localCost){
+					valueIndex = selectValueIndex;
+					sendValueMessages();
+				}
+				nccc++;
+			}		
 		}
 	}
 	
@@ -144,7 +143,7 @@ public class DsaC_Agent extends AgentCycle {
 		result.put(KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
-		System.out.println("Agent "+this.name+" stopped!");
+//		System.out.println("Agent "+this.name+" stopped!");
 	}
 	
 	
@@ -156,16 +155,16 @@ public class DsaC_Agent extends AgentCycle {
 		int ncccTemp = 0;
 		for(Map<String, Object> result : results){
 			
-			int id_=(Integer)result.get(KEY_ID);
-			String name_=(String)result.get(KEY_NAME);
-			int value_=(Integer)result.get(KEY_VALUE);
+//			int id_=(Integer)result.get(KEY_ID);
+//			String name_=(String)result.get(KEY_NAME);
+//			int value_=(Integer)result.get(KEY_VALUE);
 			
 			if(ncccTemp < (Integer)result.get(KEY_NCCC))
 				ncccTemp = (Integer)result.get(KEY_NCCC);
 			totalCost+=((double)((Integer)result.get(KEY_LOCALCOST)))/2;
 			
-			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
-			System.out.println(displayStr);
+//			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
+//			System.out.println(displayStr);
 		}
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost)+

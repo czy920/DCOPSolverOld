@@ -23,7 +23,6 @@ public class AlsDgaAgent extends AgentCycleAls {
 	private static double pCross;
 	private static double pMutate;
 	
-	
 	private int neighboursQuantity;
 	private int receivedQuantity = 0;
 	private int cycleCount = 0;
@@ -181,7 +180,6 @@ public class AlsDgaAgent extends AgentCycleAls {
 	}
 	
 	private void disposeValueCostMessage(Message msg){
-		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighbours.length; i++){
@@ -200,9 +198,10 @@ public class AlsDgaAgent extends AgentCycleAls {
 //			crossIndividuals[0] = ((int[])(msg.getValue()))[population+2];
 //			crossIndividuals[1] = ((int[])(msg.getValue()))[population+3];
 		}
-		
-		
-		if(receivedQuantity==0){
+	}
+	
+	protected void allMessageDisposed(){
+		if(cycleCount <= cycleCountEnd){
 			if(prepareToStart == 0){
 				crossTag0 = true;
 				for(int i = 0; i < neighboursQuantity;i++){
@@ -212,39 +211,34 @@ public class AlsDgaAgent extends AgentCycleAls {
 					}
 				}
 			}
-			
 			localCost();
 			AlsWork();
 			cycleCount++;
 			
-			if(cycleCount <= cycleCountEnd){
-				if(prepareToStart > 0)
-					prepareToStart--;
-				if(prepareToStart == 0){
-					if(crossTag == true){
-						
-						int temp = valueIndexGA[0];
-						for(int i = 0; i < population-1; i++){
-							valueIndexGA[i] = valueIndexGA[i+1];
-						}
-						valueIndexGA[population-1] = temp;
-						
-//						int temp = valueIndexGA[crossIndividuals[0]];
-//						valueIndexGA[crossIndividuals[0]] = valueIndexGA[crossIndividuals[1]];
-//						valueIndexGA[crossIndividuals[1]] = temp;
-						
+			if(prepareToStart > 0)
+				prepareToStart--;
+			if(prepareToStart == 0){
+				if(crossTag == true){
+					
+					int temp = valueIndexGA[0];
+					for(int i = 0; i < population-1; i++){
+						valueIndexGA[i] = valueIndexGA[i+1];
 					}
+					valueIndexGA[population-1] = temp;
+					
+//					int temp = valueIndexGA[crossIndividuals[0]];
+//					valueIndexGA[crossIndividuals[0]] = valueIndexGA[crossIndividuals[1]];
+//					valueIndexGA[crossIndividuals[1]] = temp;
 				}
-				
-				DsaWork();
-				mutate();
-				
-				crossTag = false;
-				sendValueCostMessages();
 			}
-			else{
-				STOPRUNNING = true;
-			}
+			mutate();
+			DsaWork();
+			
+			crossTag = false;
+			sendValueCostMessages();
+		}
+		else{
+			STOPRUNNING = true;
 		}
 	}
 	
@@ -274,22 +268,23 @@ public class AlsDgaAgent extends AgentCycleAls {
 	private void mutate(){
 		for(int ip = 0; ip < population; ip++){
 			if(Math.random()<pMutate){
-				int randomValueIndex = (int)(Math.random()*(domain.length));
-				int newLocalCost = 0;
+//				int randomValueIndex = (int)(Math.random()*(domain.length));
+//				int newLocalCost = 0;
+//				
+//				for (int neighbourindex=1; neighbourindex < neighboursQuantity; neighbourindex++){
+//					newLocalCost+=constraintCosts.get(neighbours[neighbourindex])[randomValueIndex][neighboursValueIndexGA[ip][neighbourindex]];		
+//				}
+//				
+//				if (newLocalCost <= localCostGA[ip]){
+//					valueIndexGA[ip] = randomValueIndex;
+//				}
+//				else{
+//					if(Math.random() < Math.exp(((localCost - newLocalCost)*(cycleCount^2))/1000)){
+//						valueIndexGA[ip] = randomValueIndex;
+//					}
+//				}
 				
-				for (int neighbourindex=1; neighbourindex < neighboursQuantity; neighbourindex++){
-					newLocalCost+=constraintCosts.get(neighbours[neighbourindex])[randomValueIndex][neighboursValueIndexGA[ip][neighbourindex]];		
-				}
-				
-				if (newLocalCost <= localCostGA[ip]){
-					valueIndexGA[ip] = randomValueIndex;
-				}
-				else{
-					if(Math.random() < Math.exp(((localCost - newLocalCost)*(cycleCount^2))/1000)){
-						valueIndexGA[ip] = randomValueIndex;
-					}
-				}
-//				valueIndexGA[ip] = (int)(Math.random()*(domain.length));
+				valueIndexGA[ip] = (int)(Math.random()*(domain.length));
 			}
 		}
 	}

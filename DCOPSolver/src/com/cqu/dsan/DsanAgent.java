@@ -56,10 +56,6 @@ public class DsanAgent extends AgentCycle{
 	}
 	
 	protected void disposeMessage(Message msg){
-		if (receivedQuantity==0)
-			cycleCount++;
-		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
-		
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for (int neighbourindex=0; neighbourindex<neighbours.length;neighbourindex++){
@@ -68,60 +64,65 @@ public class DsanAgent extends AgentCycle{
 				break;
 			}
 		}
-
 		neighboursValueIndex[senderIndex] = (Integer)(msg.getValue());
 		
         if (receivedQuantity == 0){
-        	if (cycleCount <= cycleCountEnd){
-                localCost = localCost();
-                
-//                int[] selectMinCost=new int[domain.length];
-//    			for(int i=0; i<domain.length; i++){
-//    				selectMinCost[i]=0;
-//    			}
-//    			for(int i=0; i<domain.length; i++){
-//    				for(int j=0; j<neighbours.length; j++){
-//    					selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];	
-//    				}
-//    			}
-//    			int selectValueIndex=0;
-//    			int selectOneMinCost=selectMinCost[0];
-//    			for(int i = 1; i < domain.length; i++){
-//    				if(selectOneMinCost > selectMinCost[i]){
-//    					selectOneMinCost = selectMinCost[i];
-//    					selectValueIndex = i;
-//    				}
-//    			}
-//    			if(selectOneMinCost < localCost ){
-//    				if(Math.random() < 0.3){
-//    					valueIndex = selectValueIndex;
-//    					sendValueMessages();
-//    					return;
-//    				}
-//    			}
-    			
-				int randomValueIndex = (int)(Math.random()*(domain.length));
-				int newLocalCost = 0;
-				
-				for (int neighbourindex=1;neighbourindex<neighboursQuantity;neighbourindex++){
-					newLocalCost+=constraintCosts.get(neighbours[neighbourindex])[randomValueIndex][neighboursValueIndex[neighbourindex]];		
-				}
-				
-				if (newLocalCost <= localCost){
-//					if(Math.random() < 0.3)
-						valueIndex = randomValueIndex;
-				}else if (newLocalCost > localCost){
-					if(Math.random() < Math.exp(((localCost - newLocalCost)*(cycleCount^2))/CONST)){
-						valueIndex = randomValueIndex;
-					}
-				}
-				
-				sendValueMessages();
-        	}else{
-        		stopRunning();
-        	}
+        	
         }
-
+	}
+	
+	protected void allMessageDisposed() {
+		if (cycleCount <= cycleCountEnd){
+			cycleCount++;
+            localCost = localCost();
+            
+//            int[] selectMinCost=new int[domain.length];
+//			for(int i=0; i<domain.length; i++){
+//				selectMinCost[i]=0;
+//			}
+//			for(int i=0; i<domain.length; i++){
+//				for(int j=0; j<neighbours.length; j++){
+//					selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];	
+//				}
+//			}
+//			int selectValueIndex=0;
+//			int selectOneMinCost=selectMinCost[0];
+//			for(int i = 1; i < domain.length; i++){
+//				if(selectOneMinCost > selectMinCost[i]){
+//					selectOneMinCost = selectMinCost[i];
+//					selectValueIndex = i;
+//				}
+//			}
+//			if(selectOneMinCost < localCost ){
+//				if(Math.random() < 0.3){
+//					valueIndex = selectValueIndex;
+//					sendValueMessages();
+//					return;
+//				}
+//			}
+			
+			int randomValueIndex = (int)(Math.random()*(domain.length));
+			int newLocalCost = 0;
+			
+			for (int neighbourindex=0;neighbourindex<neighboursQuantity;neighbourindex++){
+				newLocalCost+=constraintCosts.get(neighbours[neighbourindex])[randomValueIndex][neighboursValueIndex[neighbourindex]];		
+			}
+			
+			if (newLocalCost <= localCost){
+//				if(Math.random() < 0.3)
+					valueIndex = randomValueIndex;
+					sendValueMessages();
+			}
+			else if (newLocalCost > localCost){
+				if(Math.random() < Math.exp(((localCost - newLocalCost)*(cycleCount*cycleCount))/CONST)){
+					valueIndex = randomValueIndex;
+					sendValueMessages();
+				}
+			}
+    	}
+		else{
+    		stopRunning();
+    	}
 	}
 	
 	private int localCost(){

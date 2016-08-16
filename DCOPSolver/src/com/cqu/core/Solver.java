@@ -34,9 +34,10 @@ public class Solver {
 		if(agentType.startsWith("ACO")){
 			PublicConstants.ACO_type = agentType;
 		}
-		if(agentType.equals("BFSDPOP")||agentType.equals("ALSDSA")||agentType.equals("ALSMGM")||agentType.equals("ALSMGM2")||agentType.equals("ALS_DSA")||
-				agentType.equals("ALS_H1_DSA")||agentType.equals("ALS_H2_DSA")||agentType.equals("ALSLMUSDSA4")||agentType.equals("ALSMLUDSA")||agentType.equals("ALSDSAMGM")||
-				agentType.equals("ALSDSAMGMEVO")||agentType.equals("ALSDSADSAEVO")||agentType.equals("ALSDGA")||agentType.equals("ALSDGAFB")||agentType.equals("PDSALSDSA")||agentType.equals("PDSMGM")||agentType.equals("PDSMGM2"))
+		if(agentType.equals("BFSDPOP")||agentType.equals("ALS_DSA")||
+				agentType.equals("DSA_PPIRA")||agentType.equals("DSA_SDP")||agentType.equals("ALSMLUDSA")||agentType.equals("ALSDSAMGM")||
+				agentType.equals("ALSDSAMGMEVO")||agentType.equals("ALSDSADSAEVO")||agentType.equals("ALSDGA")||agentType.equals("ALSDGAFB")||
+				agentType.equals("PDSALSDSA")||agentType.equals("PDSMGM")||agentType.equals("PDSMGM2"))
 		{
 			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
@@ -75,13 +76,13 @@ public class Solver {
 		//采用同步消息机制的算法
 		if(agentType.equals("BNBADOPT")||agentType.equals("BDADOPT")||agentType.equals("ADOPT_K")||agentType.equals("SynAdopt1")||agentType.equals("SynAdopt2")||									
 				agentType.equals("DSA_A")||agentType.equals("DSA_B")||agentType.equals("DSA_C")||agentType.equals("DSA_D")||agentType.equals("DSA_E")||agentType.equals("DSAN")||
-				agentType.equals("MGM")||agentType.equals("MGM2")||agentType.equals("ALSDSA")||agentType.equals("ALSMGM")||agentType.equals("ALSMGM2")||
-				agentType.equals("ALS_DSA")||agentType.equals("ALS_H1_DSA")||agentType.equals("ALS_H2_DSA")||agentType.equals("ALSLMUSDSA4")||agentType.equals("ALSMLUDSA")||
+				agentType.equals("MGM")||agentType.equals("MGM2")||
+				agentType.equals("ALS_DSA")||agentType.equals("DSA_PPIRA")||agentType.equals("DSA_SDP")||agentType.equals("ALSMLUDSA")||
 				agentType.equals("ALSDSAMGM")||agentType.equals("ALSDSAMGMEVO")||agentType.equals("ALSDSADSAEVO")||agentType.equals("ALSDGA")||agentType.equals("ALSDGAFB")||
 				agentType.equals("PDSALSDSA")||agentType.equals("PDSDSAN")||agentType.equals("PDSMGM")||agentType.equals("PDSMGM2")||
 				agentType.equals("MAXSUM")||agentType.equals("ACO")||agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||
-				agentType.equals("ACO_line")||agentType.equals("ACO_final")||agentType.equals("MAXSUMAD")||agentType.equals("MAXSUMRS")||agentType.equals("MAXSUMSPLITED")||agentType.equals("SBB")
-				||agentType.equals("MAXSUMOH"))
+				agentType.equals("ACO_line")||agentType.equals("ACO_final")||agentType.equals("MAXSUMAD")||agentType.equals("MAXSUMRS")||agentType.equals("MAXSUMSPLITED")||agentType.equals("SBB")||
+				agentType.equals("MAXSUMOH"))
 
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
@@ -478,17 +479,26 @@ public class Solver {
 			max=new Result(rs);
 			avg=new Result();
 		}
-		avg.add(rs, repeatTimes-2);
+//		avg.add(rs, repeatTimes-2);
+//		
+//		for(int i=1;i<resultsRepeated.size();i++)
+//		{
+//			Result result=resultsRepeated.get(i);
+//			min.min(result);
+//			max.max(result);
+//			avg.add(result, repeatTimes-2);
+//		}
+//		avg.minus(min, repeatTimes-2);
+//		avg.minus(max, repeatTimes-2);
+//		return avg;
+		
+		avg.add(rs, repeatTimes);
 		
 		for(int i=1;i<resultsRepeated.size();i++)
 		{
 			Result result=resultsRepeated.get(i);
-			min.min(result);
-			max.max(result);
-			avg.add(result, repeatTimes-2);
+			avg.add(result, repeatTimes);
 		}
-		avg.minus(min, repeatTimes-2);
-		avg.minus(max, repeatTimes-2);
 		return avg;
 	}
 	
@@ -499,8 +509,8 @@ public class Solver {
 		if(algorithmType.startsWith("ACO")){
 			PublicConstants.ACO_type = algorithmType;
 		}
-		if(algorithmType.equals("BFSDPOP") || algorithmType.equals("ALSDSA") || algorithmType.equals("ALSMGM")  || algorithmType.equals("ALSMGM2") 
-				|| algorithmType.equals("ALS_DSA") || algorithmType.equals("ALS_H1_DSA") || algorithmType.equals("ALS_H2_DSA") || algorithmType.equals("ALSLMUSDSA4") 
+		if(algorithmType.equals("BFSDPOP")
+				|| algorithmType.equals("ALS_DSA") || algorithmType.equals("DSA_PPIRA") || algorithmType.equals("DSA_SDP")
 				|| algorithmType.equals("ALSMLUDSA") || algorithmType.equals("ALSDSAMGM") || algorithmType.equals("ALSDSAMGMEVO") || algorithmType.equals("ALSDSADSAEVO")
 				|| algorithmType.equals("ALSDGA") || algorithmType.equals("ALSDGAFB") || algorithmType.equals("PDSALSDSA") || algorithmType.equals("PDSMGM") || algorithmType.equals("PDSMGM2"))
 		{
@@ -549,8 +559,8 @@ public class Solver {
 		//采用同步消息机制的算法
 		if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT_K")||algorithmType.equals("BDADOPT")||algorithmType.equals("SynAdopt1")||algorithmType.equals("SynAdopt2")||
 				algorithmType.equals("DSA_A")||algorithmType.equals("DSA_B")||algorithmType.equals("DSA_C")||algorithmType.equals("DSA_D")||algorithmType.equals("DSA_E")||algorithmType.equals("DSAN")||
-				algorithmType.equals("MGM")||algorithmType.equals("MGM2")||algorithmType.equals("ALSDSA")||algorithmType.equals("ALSMGM")||algorithmType.equals("ALSMGM2")||
-				algorithmType.equals("ALS_DSA")||algorithmType.equals("ALS_H1_DSA")||algorithmType.equals("ALS_H2_DSA")||algorithmType.equals("ALSLMUSDSA4")||algorithmType.equals("ALSMLUDSA")||
+				algorithmType.equals("MGM")||algorithmType.equals("MGM2")||
+				algorithmType.equals("ALS_DSA")||algorithmType.equals("DSA_PPIRA")||algorithmType.equals("DSA_SDP")||algorithmType.equals("ALSMLUDSA")||
 				algorithmType.equals("ALSDSAMGM")||algorithmType.equals("ALSDSAMGMEVO")||algorithmType.equals("ALSDSADSAEVO")||algorithmType.equals("ALSDGA")||algorithmType.equals("ALSDGAFB")||
 				algorithmType.equals("PDSALSDSA")||algorithmType.equals("PDSDSAN")||algorithmType.equals("PDSMGM")||algorithmType.equals("PDSMGM2")||
 				algorithmType.equals("ACO")||algorithmType.equals("ACO_tree")||algorithmType.equals("ACO_bf")||algorithmType.equals("ACO_phase")||

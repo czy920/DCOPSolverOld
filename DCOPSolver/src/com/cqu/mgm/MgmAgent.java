@@ -20,6 +20,9 @@ public class MgmAgent extends AgentCycle {
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
 	public final static String KEY_NCCC="KEY_NCCC";
 	
+	public final static int CYCLE_VALUE=567;
+	public final static int CYCLE_GAIN=568;
+	private int cycleTag = CYCLE_VALUE;
 	private int nccc = 0;
 	private int gainValue;
 	private int selectValueIndex;
@@ -27,7 +30,7 @@ public class MgmAgent extends AgentCycle {
 	private int cycleCount;
 	private int neighboursQuantity;	
 	private int neighboursGain[];
-	private int[] neighboursValueIndex;	
+	private int[] neighboursValueIndex;
 	
 	public MgmAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
@@ -90,11 +93,7 @@ public class MgmAgent extends AgentCycle {
 	}
 	
 	private void disposeValueMessage(Message msg) {
-		// TODO 自动生成的方法存根
-		if(receivedQuantity==0)
-			cycleCount++;
-		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
-		
+		// TODO 自动生成的方法存根	
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighboursQuantity; i++){
@@ -115,53 +114,46 @@ public class MgmAgent extends AgentCycle {
 		neighboursValueIndex[senderIndex] = (Integer)(msg.getValue());
 		
 		if(receivedQuantity==0){
-			/*
-			if(cycleCount == 10){
-				if(localCost < localCost()){
-					System.out.println("agent"+this.id+"_______"+"Lost"+"________"+(localCost()-localCost));
-				}
-				else{
-					System.out.println("agent"+this.id+"_______"+"Gain"+"________"+(localCost-localCost()));
-				}
-			}
-			*/
-			//System.out.println("agent"+this.id+"_______"+this.valueIndex);
 			
+		}
+	}
+	
+	private void cycleValue(){
+		if(cycleCount>=cycleCountEnd){
+			stopRunning();
+		}
+		else{
+			cycleCount++;	
 			localCost=localCost();
 			
-			if(cycleCount>=cycleCountEnd){
-				stopRunning();
-			}else{				
-				int[] selectMinCost=new int[domain.length];
-				for(int i=0; i<domain.length; i++){
-					selectMinCost[i]=0;
-				}
-				for(int i=0; i<domain.length; i++){
-					for(int j=0; j<neighboursQuantity; j++){
-//						if(this.id < neighbours[j])
-							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];		
-//						else
-//							selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
-					}
-				}
-				int newLocalCost=localCost;
-				for(int i=0; i<domain.length; i++){
-					if(selectMinCost[i]<newLocalCost){
-						newLocalCost=selectMinCost[i];
-						selectValueIndex=i;
-					}
-				}
-				gainValue=localCost-newLocalCost;
-				increaseNccc();
-				//System.out.println("agent"+this.id+"_______"+cycleCount+"_______"+gainValue+"________");
-				sendGainMessages();
+			int[] selectMinCost=new int[domain.length];
+			for(int i=0; i<domain.length; i++){
+				selectMinCost[i]=0;
 			}
+			for(int i=0; i<domain.length; i++){
+				for(int j=0; j<neighboursQuantity; j++){
+//					if(this.id < neighbours[j])
+						selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];		
+//					else
+//						selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
+				}
+			}
+			int newLocalCost=localCost;
+			for(int i=0; i<domain.length; i++){
+				if(selectMinCost[i]<newLocalCost){
+					newLocalCost=selectMinCost[i];
+					selectValueIndex=i;
+				}
+			}
+			gainValue=localCost-newLocalCost;
+			increaseNccc();
+			//System.out.println("agent"+this.id+"_______"+cycleCount+"_______"+gainValue+"________");
+			sendGainMessages();
 		}
 	}
 	
 	private void disposeGainMessage(Message msg) {
 		// TODO 自动生成的方法存根
-		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighboursQuantity; i++){
@@ -173,20 +165,35 @@ public class MgmAgent extends AgentCycle {
 		neighboursGain[senderIndex]=(Integer)msg.getValue();
 		
 		if(receivedQuantity==0){
-			for(int i=0; i<neighboursQuantity; i++){
-				if(neighboursGain[i]>=gainValue){
-					sendValueMessages();
-					return;
-				}
-			}
-			valueIndex=selectValueIndex;
-			//if(cycleCount == 9){
-			//	System.out.println("agent"+this.id+"_______"+"Gain_ready"+"________"+gainValue);
-			//}
-			sendValueMessages();
+			
 		}
 	}
+	
+	private void cycleGain(){
+		for(int i=0; i<neighboursQuantity; i++){
+			if(neighboursGain[i]>=gainValue){
+//				sendValueMessages();
+				return;
+			}
+		}
+		valueIndex=selectValueIndex;
+		//if(cycleCount == 9){
+		//	System.out.println("agent"+this.id+"_______"+"Gain_ready"+"________"+gainValue);
+		//}
+		sendValueMessages();
+	}
 
+	protected void allMessageDisposed(){
+		if(cycleTag == CYCLE_VALUE){
+			cycleTag = CYCLE_GAIN;
+			cycleValue();
+		}
+		else{
+			cycleTag = CYCLE_VALUE;
+			cycleGain();
+		}
+	}
+	
 	protected void localSearchCheck(){
 		while(msgQueue.size() == 0){
 			try {

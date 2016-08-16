@@ -70,22 +70,7 @@ public class DsaA_Agent extends AgentCycle {
 	
 	@Override
 	protected void disposeMessage(Message msg) {
-		// TODO Auto-generated method stub		
-		if(receivedQuantity==0)
-			cycleCount++;
-		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
-		
-		//纠错部分，找到message未收全的Agent
-		if(wrong == 1){
-			receivedWrongNumber++;
-			System.out.println("Agent "+this.id+"____"+"cycleCount "+cycleCount+"____"+"neighbour数 "+neighboursQuantity+"____"+"邻居"+msg.getIdSender()+"____"+"收到 "+wrongNumber+"____"+
-					"第 "+receivedQuantity+"____");
-			if(receivedWrongNumber == wrongNumber){
-				int ii = 1;
-				ii = ii/0;
-			}
-		}
-		
+		// TODO Auto-generated method stub
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighbours.length; i++){
@@ -95,44 +80,45 @@ public class DsaA_Agent extends AgentCycle {
 			}
 		}
 		neighboursValueIndex.put((Integer)senderIndex, (Integer)msg.getValue());
-		
-		if(receivedQuantity==0){
+	}
+	
+	protected void allMessageDisposed(){
+		if(cycleCount>=cycleCountEnd){
+			stopRunning();
+		}
+		else{
+			cycleCount++;
 			localCost=localCost();
 			
-			if(cycleCount>=cycleCountEnd){
-				stopRunning();
-			}else{
-				if(Math.random()<p){
-					int[] selectMinCost=new int[domain.length];
-					for(int i=0; i<domain.length; i++){
-						selectMinCost[i]=0;
-					}
-					for(int i=0; i<domain.length; i++){
-						for(int j=0; j<neighbours.length; j++){
-							//if(this.id < neighbours[j])
-								selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
-							//else
-							//	selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];	
-						}					
-					}
-					int selectValueIndex=0;
-					int selectOneMinCost=selectMinCost[0];
-					for(int i = 1; i < domain.length; i++){
-						if(selectOneMinCost > selectMinCost[i]){
-							selectOneMinCost = selectMinCost[i];
-							selectValueIndex = i;
-						}
-					}
-					if(selectOneMinCost < localCost){
-						valueIndex = selectValueIndex;
-					}
-					nccc++;
+			if(Math.random()<p){
+				int[] selectMinCost=new int[domain.length];
+				for(int i=0; i<domain.length; i++){
+					selectMinCost[i]=0;
 				}
-				sendValueMessages();
+				for(int i=0; i<domain.length; i++){
+					for(int j=0; j<neighbours.length; j++){
+						//if(this.id < neighbours[j])
+							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
+						//else
+						//	selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];	
+					}					
+				}
+				int selectValueIndex=0;
+				int selectOneMinCost=selectMinCost[0];
+				for(int i = 1; i < domain.length; i++){
+					if(selectOneMinCost > selectMinCost[i]  && selectMinCost[i] != valueIndex){
+						selectOneMinCost = selectMinCost[i];
+						selectValueIndex = i;
+					}
+				}
+				if(selectOneMinCost < localCost){
+					valueIndex = selectValueIndex;
+					sendValueMessages();
+				}
+				nccc++;
 			}
 		}
 	}
-	
 	
 	private int localCost(){
 		int localCostTemp=0;

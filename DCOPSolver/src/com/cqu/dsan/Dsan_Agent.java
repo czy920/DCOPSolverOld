@@ -64,10 +64,6 @@ public class Dsan_Agent extends AgentCycle{
 	}
 	
 	protected void disposeMessage(Message msg){
-		if (receivedQuantity==0)
-			cycleCount++;
-		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
-		
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		
@@ -81,46 +77,50 @@ public class Dsan_Agent extends AgentCycle{
 		neighboursValueIndex.put((Integer)senderIndex, (Integer)msg.getValue());
 		
         if (receivedQuantity == 0){
-        	if (t >Tmin){
-        		
-                localCost = localCost();
-				
-				int saved_localCost = 0;
-				for (int neighbourindex=1;neighbourindex<neighboursQuantity;neighbourindex++){
-//					if(this.id < neighbours[neighbourindex])      
-						saved_localCost+=constraintCosts.get(neighbours[neighbourindex])[selectValueIndex][neighboursValueIndex.get(neighbourindex)];		
-//					else
-//						saved_localCost+=constraintCosts.get(neighbours[neighbourindex])[neighboursValueIndex.get(neighbourindex)][selectValueIndex];	
-				}
-				
-				int randomValueIndex = (int)(Math.random()*(domain.length));
-				int newLocalCost = 0;
-				
-				for (int neighbourindex=1;neighbourindex<neighboursQuantity;neighbourindex++){
-//					if(this.id < neighbours[neighbourindex])      
-						newLocalCost+=constraintCosts.get(neighbours[neighbourindex])[randomValueIndex][neighboursValueIndex.get(neighbourindex)];		
-//					else
-//						newLocalCost+=constraintCosts.get(neighbours[neighbourindex])[neighboursValueIndex.get(neighbourindex)][randomValueIndex];	
-				}
-				
-				if (newLocalCost < localCost){
+        	
+        }
+	}
+	
+	protected void allMessageDisposed() {
+		if (t >Tmin){
+			cycleCount++;
+            localCost = localCost();
+			
+			int saved_localCost = 0;
+			for (int neighbourindex=1;neighbourindex<neighboursQuantity;neighbourindex++){
+//				if(this.id < neighbours[neighbourindex])      
+					saved_localCost+=constraintCosts.get(neighbours[neighbourindex])[selectValueIndex][neighboursValueIndex.get(neighbourindex)];		
+//				else
+//					saved_localCost+=constraintCosts.get(neighbours[neighbourindex])[neighboursValueIndex.get(neighbourindex)][selectValueIndex];	
+			}
+			
+			int randomValueIndex = (int)(Math.random()*(domain.length));
+			int newLocalCost = 0;
+			
+			for (int neighbourindex=1;neighbourindex<neighboursQuantity;neighbourindex++){
+//				if(this.id < neighbours[neighbourindex])      
+					newLocalCost+=constraintCosts.get(neighbours[neighbourindex])[randomValueIndex][neighboursValueIndex.get(neighbourindex)];		
+//				else
+//					newLocalCost+=constraintCosts.get(neighbours[neighbourindex])[neighboursValueIndex.get(neighbourindex)][randomValueIndex];	
+			}
+			
+			if (newLocalCost < localCost){
+				selectValueIndex = randomValueIndex;
+				valueIndex = selectValueIndex;
+				sendValueMessages();
+			}else if (newLocalCost > localCost){
+				if(Math.random() < Math.exp(-(newLocalCost - localCost)/t)){
 					selectValueIndex = randomValueIndex;
 					valueIndex = selectValueIndex;
-				}else if (newLocalCost > localCost){
-					if(Math.random() < Math.exp(-(newLocalCost - localCost)/t)){
-						selectValueIndex = randomValueIndex;
-						valueIndex = selectValueIndex;
-					}
+					sendValueMessages();
 				}
-				
-				t=t*r;
-				sendValueMessages();	
-				
-        	}else{
-        		stopRunning();
-        	}
-        }
-
+			}
+			
+			t=t*r;	
+			
+    	}else{
+    		stopRunning();
+    	}
 	}
 	
 	private int localCost(){
