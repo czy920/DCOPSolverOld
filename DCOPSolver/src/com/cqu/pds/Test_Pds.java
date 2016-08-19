@@ -15,12 +15,15 @@ public class Test_Pds {
         Settings.settings.setSelectInterval(1000);
         
         Settings.settings.setSelectProbability(0.3);
-        Settings.settings.setSelectProbabilityA(0.3);
-        Settings.settings.setSelectProbabilityB(0.01);
+        Settings.settings.setSelectProbabilityA(0.6);
+        Settings.settings.setSelectProbabilityB(0.2);
+        Settings.settings.setSelectProbabilityC(0.4);
+        Settings.settings.setSelectProbabilityD(0.8);
+        Settings.settings.setSelectRound(100);
         
         Settings.settings.setDisplayGraphFrame(false); 
         
-            solver.solve("problems/RandomDCOP_150_10_5.xml", "PDSMGM", false, false, new EventListener() {
+            solver.solve("problems/MS_100_20_20_1.xml", "PDSALSDSA", false, false, new EventListener() {
             @Override
             public void onStarted() {
 

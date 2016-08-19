@@ -120,6 +120,12 @@ public class AlsDsaDsaEvoAgent extends AgentCycleAls{
 		neighboursValueIndex[senderIndex] = (int)((Integer)msg.getValue());
 		
 		if(receivedDsaValueQuantity==0){
+			
+		}
+	}
+	
+	protected void allMessageDisposed() {
+		if(cycleCount < cycleCountEnd){
 			dsaCycle++;
 			prepareToReset--;
 			localCost=localCost();
@@ -128,10 +134,6 @@ public class AlsDsaDsaEvoAgent extends AgentCycleAls{
 			if(NEWCYCLE == YES){
 				NEWCYCLE = NO;
 				cycleCount++;
-				if(cycleCount > cycleCountEnd){
-					STOPRUNNING = true;
-					return;
-				}
 				STEP = DSASTEP1;
 				p = pH;
 			}
@@ -165,7 +167,7 @@ public class AlsDsaDsaEvoAgent extends AgentCycleAls{
 				prepareToReset = 2147483647;
 				resetLock = false;
 				
-//				NEWCYCLE = YES;
+	//			NEWCYCLE = YES;
 				if(STEP == DSASTEP1){
 					STEP = DSASTEP2;
 					p = pL;
@@ -188,7 +190,9 @@ public class AlsDsaDsaEvoAgent extends AgentCycleAls{
 				}
 				sendDsaValueMessages();
 			}
-			
+		}
+		else{
+			AlsStopRunning();
 		}
 	}
 	
@@ -328,18 +332,6 @@ public class AlsDsaDsaEvoAgent extends AgentCycleAls{
 				//}
 			}
 		}
-		if(valueIndexList.isEmpty() == true && STOPRUNNING == true){
-			if(level == 0){
-				double temp[] = new double[AlsCycleCount];
-				for(int i = 0; i < AlsCycleCount; i++){
-					temp[i] = bestCostInCycle[i];
-				}
-				bestCostInCycle = temp;
-			}
-			valueIndex = bestValue;
-			stopRunning();
-		}
-		//System.out.println("Agent "+this.name+"~~~~~~"+AlsCycleCount);
 	}
 	
 	protected void disposeAlsBestMessage(Message msg){
@@ -377,15 +369,6 @@ public class AlsDsaDsaEvoAgent extends AgentCycleAls{
 		//		cycleCount++;
 		//	}
 		//}
-		
-		if(valueIndexList.isEmpty() == true){
-			valueIndex = bestValue;
-			stopRunning();
-			
-			//if(id == 40 && cycleCount != 19){
-			//	System.out.println("~~~"+cycleCount+"~~~wrong!!!!!!!!");
-			//}
-		}
 	}
 	
 	protected void AlsWork(){

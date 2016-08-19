@@ -293,7 +293,7 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 			sendValueCostMessages();
 		}
 		else{
-			STOPRUNNING = true;
+			AlsStopRunning();
 		}
 	}
 	
@@ -459,18 +459,6 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 				
 			}
 		}
-		if(valueIndexList.isEmpty() == true && STOPRUNNING == true){
-			if(level == 0){
-				double temp[] = new double[AlsCycleCount];
-				for(int i = 0; i < AlsCycleCount; i++){
-					temp[i] = bestCostInCycle[i];
-				}
-				bestCostInCycle = temp;						//更正数组长度
-			}
-			valueIndex = bestValue;
-			stopRunning();
-		}
-		//System.out.println("Agent "+this.name+"~~~~~~"+AlsCycleCount);
 	}
 	
 	
@@ -495,15 +483,6 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 		//		cycleCount++;
 		//	}
 		//}
-		
-		if(valueIndexList.isEmpty() == true){
-			valueIndex = bestValue;
-			stopRunning();
-			
-			//if(id == 40 && cycleCount != 19){
-			//	System.out.println("~~~"+cycleCount+"~~~wrong!!!!!!!!");
-			//}
-		}
 	}
 	
 	private void disposeStartMessage(Message msg){

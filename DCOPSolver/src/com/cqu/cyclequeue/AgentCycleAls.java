@@ -25,7 +25,6 @@ public abstract class AgentCycleAls extends AgentCycle{
 	protected LinkedList<Integer> localCostList = new LinkedList<Integer>();
 	protected LinkedList<Integer> valueIndexList = new LinkedList<Integer>();
 	protected HashMap<Integer, LinkedList<Integer>> childrenMessageList = new HashMap<Integer, LinkedList<Integer>>();
-	protected boolean STOPRUNNING = false;			//用于避免出现只有生成树只有两层时出现的异常终止情况
 	
 	protected int warning = 0;
 	
@@ -105,6 +104,25 @@ public abstract class AgentCycleAls extends AgentCycle{
 			
 			warning++;
 			
+			boolean source = false;
+			while(source == false){
+				try {
+					localCostList.getFirst();
+					source = true;
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					System.out.println("~~~ source not found ~~~");
+					source = false;
+					e.printStackTrace();
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+			
 			accumulativeCost = localCostList.removeFirst();
 			
 			for(int i = 0; i < children.length; i++){
@@ -149,18 +167,6 @@ public abstract class AgentCycleAls extends AgentCycle{
 				//}
 			}
 		}
-		if(valueIndexList.isEmpty() == true && STOPRUNNING == true){
-			if(level == 0){
-				double temp[] = new double[AlsCycleCount];
-				for(int i = 0; i < AlsCycleCount; i++){
-					temp[i] = bestCostInCycle[i];
-				}
-				bestCostInCycle = temp;						//更正数组长度
-			}
-			valueIndex = bestValue;
-			stopRunning();
-		}
-		//System.out.println("Agent "+this.name+"~~~~~~"+AlsCycleCount);
 	}
 	
 	
@@ -195,4 +201,18 @@ public abstract class AgentCycleAls extends AgentCycle{
 		}
 	}
 	
+	protected void AlsStopRunning(){
+		if(valueIndexList.isEmpty() == true){
+			if(level == 0){
+				double temp[] = new double[AlsCycleCount];
+				for(int i = 0; i < AlsCycleCount; i++){
+					temp[i] = bestCostInCycle[i];
+				}
+				bestCostInCycle = temp;						//更正数组长度
+			}
+			valueIndex = bestValue;
+			stopRunning();
+		}
+		//System.out.println("Agent "+this.name+"~~~~~~"+AlsCycleCount);
+	}
 }

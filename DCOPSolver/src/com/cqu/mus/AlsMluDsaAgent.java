@@ -303,7 +303,7 @@ public class AlsMluDsaAgent extends AgentCycleAls{
 					sendStep2Messages();
 			}
 			else
-				STOPRUNNING = true;
+				AlsStopRunning();
 			bestCostTemp = 2147483647;
 		}
 	}
@@ -525,18 +525,6 @@ public class AlsMluDsaAgent extends AgentCycleAls{
 				//}
 			}
 		}
-		if(valueIndexList.isEmpty() == true && STOPRUNNING == true){
-			if(level == 0){
-				double temp[] = new double[AlsCycleCount];
-				for(int i = 0; i < AlsCycleCount; i++){
-					temp[i] = bestCostInCycle[i];
-				}
-				bestCostInCycle = temp;
-			}
-			valueIndex = bestValue;
-			stopRunning();
-		}
-		//System.out.println("Agent "+this.name+"~~~~~~"+AlsCycleCount);
 	}
 	
 	

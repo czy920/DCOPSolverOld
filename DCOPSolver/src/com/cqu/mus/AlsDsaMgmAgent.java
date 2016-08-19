@@ -139,6 +139,12 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 		neighboursValueIndex[senderIndex] = (int)((Integer)msg.getValue());
 		
 		if(receivedDsaValueQuantity==0){
+			
+		}
+	}
+	
+	protected void allMessageDisposed() {
+		if(cycleCount < cycleCountEnd){
 			dsaCycle++;
 			prepareToReset--;
 			localCost=localCost();
@@ -146,15 +152,11 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 			
 			if(STEP == MGM){
 				cycleCount++;
-				if(cycleCount > cycleCountEnd){
-					STOPRUNNING = true;
-					return;
-				}
 				STEP = DSA;
 			}
 			
 			if(prepareToReset > 0){
-
+	
 				if(Math.random()<p){
 					int[] selectMinCost=new int[domain.length];
 					for(int i=0; i<domain.length; i++){
@@ -185,6 +187,9 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 				resetLock = false;
 				sendMgmValueMessages();
 			}
+		}
+		else{
+			AlsStopRunning();
 		}
 	}
 	
@@ -403,18 +408,6 @@ public class AlsDsaMgmAgent extends AgentCycleAls{
 				//}
 			}
 		}
-		if(valueIndexList.isEmpty() == true && STOPRUNNING == true){
-			if(level == 0){
-				double temp[] = new double[AlsCycleCount];
-				for(int i = 0; i < AlsCycleCount; i++){
-					temp[i] = bestCostInCycle[i];
-				}
-				bestCostInCycle = temp;
-			}
-			valueIndex = bestValue;
-			stopRunning();
-		}
-		//System.out.println("Agent "+this.name+"~~~~~~"+AlsCycleCount);
 	}
 	
 	protected void AlsWork(){

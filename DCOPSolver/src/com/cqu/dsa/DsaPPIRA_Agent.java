@@ -143,7 +143,7 @@ public class DsaPPIRA_Agent  extends AgentCycleAls{
 			}
 		}
 		else
-			STOPRUNNING = true;
+			AlsStopRunning();
 	}
 	
 	private int localCost(){
