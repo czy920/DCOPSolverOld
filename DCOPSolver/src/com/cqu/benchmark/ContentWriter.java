@@ -85,9 +85,9 @@ public class ContentWriter {
 
     public static void main(String[] args) throws Exception{
         Map<String,Object> para = new HashMap<String, Object>();
-        para.put("m1",4);
-        para.put("m2",1);
-        ContentWriter writer = new ContentWriter(1,".\\problems\\scalefree",150,10,1,100,PROBLEM_SCALE_FREE_NETWORK,para);
+        para.put("m1",20);
+        para.put("m2",3);
+        ContentWriter writer = new ContentWriter(50,".\\problems\\scalefree",150,10,1,100,PROBLEM_SCALE_FREE_NETWORK,para);
         writer.generate();
     }
 }

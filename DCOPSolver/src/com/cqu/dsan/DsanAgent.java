@@ -15,7 +15,6 @@ public class DsanAgent extends AgentCycle{
 	public final static int TYPE_VALUE_MESSAGE=1;
 	
 	private static int cycleCountEnd;
-	private static int CONST;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
 	public final static String KEY_NCCC="KEY_NCCC";
@@ -36,7 +35,6 @@ public class DsanAgent extends AgentCycle{
 		super.initRun();
 
 		cycleCountEnd = Settings.settings.getCycleCountEnd();
-		CONST = Settings.settings.getSelectInterval();
 		
 		localCost=2147483647;
 		valueIndex=(int)(Math.random()*(domain.length));
@@ -114,7 +112,7 @@ public class DsanAgent extends AgentCycle{
 					sendValueMessages();
 			}
 			else if (newLocalCost > localCost){
-				if(Math.random() < Math.exp(((localCost - newLocalCost)*(cycleCount*cycleCount))/CONST)){
+				if(Math.random() < Math.exp(((localCost - newLocalCost)*(cycleCount*cycleCount))/cycleCountEnd)){
 					valueIndex = randomValueIndex;
 					sendValueMessages();
 				}

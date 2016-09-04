@@ -17,13 +17,13 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 	
 	public final static int TYPE_VALUE_MESSAGE = 1;
 	public final static int TYPE_SUGGEST_MESSAGE = 2;
+	public final static int TYPE_DENSITY_MESSAGE = 3;
+	
 //	public final static int TYPE_RESET_MESSAGE = 5;
 	
-	private static int cycleCountEnd;
-	private static int stayDsaCountInterval;						//设置DSA操作若干轮无优化效果及重启
 	private static double p;
-	private static double utilityPercentage;
-	private static double abandonProbability;
+	private static int cycleCountEnd;
+//	private static int stayDsaCountInterval;						//设置DSA操作若干轮无优化效果及重启
 	
 	private int receivedQuantity=0;
 	private int cycleCount=0;
@@ -36,6 +36,7 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 	private int[][] myNeighboursSuggestTable;						//给邻居的建议值
 	private int myMaxCost = 0;
 	private int myMinCost = 2147483647;
+//	double[] mp = new double[1000];
 	
 	/**  自适应重置部分  */
 //	private boolean resetLock = false;
@@ -43,14 +44,23 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 //	private int prepareToReset = 2147483647;
 //	private boolean newCycle = true;
 	
-	private int[] neighbourPercentage;
-	private double myPercentage;
+	public final static int higherP = 0;
+	public final static int lowerP = 1;
+	private double myPercentage=1;
+	private double myBestPercentage=1;
+	private int selectP = higherP;
+	private int myPercentageUnchanged = 0;
+//	private double myThreshold = 0.5;
+//	private int[] neighbourThreshold;
 	private int[] abandonSuggestGain;
 	private int suggestValue;
 	private int suggestGain;
 	private int wait = 0;
 	private int suggestTag = 0;
 	private int suggester;
+	
+	private int neighborsOfNeighbors = 0;
+	private int density;
 	
 	private int context = 0;
 	private int lastValueChoice = 0;
@@ -65,10 +75,8 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 		super.initRun();
 		
 		cycleCountEnd = Settings.settings.getCycleCountEnd();
-		stayDsaCountInterval = Settings.settings.getSelectInterval();
+//		stayDsaCountInterval = Settings.settings.getSelectInterval();
 		p = Settings.settings.getSelectProbability();
-		utilityPercentage = Settings.settings.getSelectProbabilityA();
-		abandonProbability = Settings.settings.getSelectProbabilityB();
 		
 		localCost = 2147483647;
 		valueIndex = (int)(Math.random()*(domain.length));
@@ -80,78 +88,83 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 		mySuggestValue = new int[domain.length];
 		myNeighboursSuggestTable = new int[domain.length][neighboursQuantity];
 		abandonSuggestGain = new int[2];
-//		buildMyTable();
-		myPercentage = 1;
-		neighbourPercentage = new int[neighboursQuantity];
+		buildMyTable();
+//		neighbourThreshold = new int[neighboursQuantity];
 		//valueIndex = mySuggestValue[0];
+//		sendDensityMessages(1, id, 0);
 		sendValueMessages();
 	}
 	
 	private void buildMyTable(){
-//		int localMaxCost = 0;
-//		int[] localMinCost = new int[domain.length];
-//		int[][] localMinTable = new int[domain.length][neighboursQuantity];
-//		for(int i = 0; i < domain.length; i++)
-//			localMinCost[i] = 2147483647;
-//		
-//		for(int i = 0; i < domain.length; i++){
-//			int tempLocalMaxCost = 0;
-//			int tempLocalCost = 0;
-//			int[] tempLocalMinTable = new int[neighboursQuantity];
-//			for(int j = 0; j < neighboursQuantity; j++){
-//				
-//				int oneMinCost,oneMaxCost;
-//				oneMinCost = constraintCosts.get(neighbours[j])[i][0];
-//				oneMaxCost = constraintCosts.get(neighbours[j])[i][0];
-//				tempLocalMinTable[j] = 0;
-//				
-//				for(int k = 1; k < neighbourDomains.get(neighbours[j]).length; k++){
-//					if(oneMinCost > constraintCosts.get(neighbours[j])[i][k]){
-//						oneMinCost = constraintCosts.get(neighbours[j])[i][k];
-//						tempLocalMinTable[j] = k;
-//					}
-//					
-//					if(oneMaxCost < constraintCosts.get(neighbours[j])[i][k]){
-//						oneMaxCost = constraintCosts.get(neighbours[j])[i][k];
-//					}
-//				}
-//				tempLocalCost += oneMinCost;
-//				tempLocalMaxCost += oneMaxCost;
-//			}
-//			
-//			if(localMaxCost < tempLocalMaxCost)
-//				localMaxCost = tempLocalMaxCost;
-//			
-//			localMinCost[i] = tempLocalCost;
-//			for(int j = 0; j < neighboursQuantity; j++){
-//				localMinTable[i][j] = tempLocalMinTable[j];
-//			}
-//		}
-//		myMaxCost = localMaxCost;
-//		
-//		for(int i = 0; i < domain.length; i++){
-//			int minId = 0, minCost = 2147483647;
-//			for(int j = 0; j < domain.length; j++){
-//				if(localMinCost[j] <= minCost && localMinCost[j] != 2147483647){
-//					minId = j;
-//					minCost = localMinCost[j];
-//				}
-//			}
-//			mySuggestValue[i] = minId;
-//			if(i == 0)
-//				myMinCost = localMinCost[minId];
-//			for(int j = 0; j < neighboursQuantity; j++)
-//				myNeighboursSuggestTable[i][j] = localMinTable[minId][j];
-//			localMinCost[minId] = 2147483647;
-//		}
+		int localMaxCost = 0;
+		int[] localMinCost = new int[domain.length];
+		int[][] localMinTable = new int[domain.length][neighboursQuantity];
+		for(int i = 0; i < domain.length; i++)
+			localMinCost[i] = 2147483647;
+		
+		for(int i = 0; i < domain.length; i++){
+			int tempLocalMaxCost = 0;
+			int tempLocalCost = 0;
+			int[] tempLocalMinTable = new int[neighboursQuantity];
+			for(int j = 0; j < neighboursQuantity; j++){
+				
+				int oneMinCost,oneMaxCost;
+				oneMinCost = constraintCosts.get(neighbours[j])[i][0];
+				oneMaxCost = constraintCosts.get(neighbours[j])[i][0];
+				tempLocalMinTable[j] = 0;
+				
+				for(int k = 1; k < neighbourDomains.get(neighbours[j]).length; k++){
+					if(oneMinCost > constraintCosts.get(neighbours[j])[i][k]){
+						oneMinCost = constraintCosts.get(neighbours[j])[i][k];
+						tempLocalMinTable[j] = k;
+					}
+					
+					if(oneMaxCost < constraintCosts.get(neighbours[j])[i][k]){
+						oneMaxCost = constraintCosts.get(neighbours[j])[i][k];
+					}
+				}
+				tempLocalCost += oneMinCost;
+				tempLocalMaxCost += oneMaxCost;
+			}
+			
+			if(localMaxCost < tempLocalMaxCost)
+				localMaxCost = tempLocalMaxCost;
+			
+			localMinCost[i] = tempLocalCost;
+			for(int j = 0; j < neighboursQuantity; j++){
+				localMinTable[i][j] = tempLocalMinTable[j];
+			}
+		}
+		myMaxCost = localMaxCost;
+		
+		for(int i = 0; i < domain.length; i++){
+			int minId = 0, minCost = 2147483647;
+			for(int j = 0; j < domain.length; j++){
+				if(localMinCost[j] <= minCost && localMinCost[j] != 2147483647){
+					minId = j;
+					minCost = localMinCost[j];
+				}
+			}
+			mySuggestValue[i] = minId;
+			if(i == 0)
+				myMinCost = localMinCost[minId];
+			for(int j = 0; j < neighboursQuantity; j++)
+				myNeighboursSuggestTable[i][j] = localMinTable[minId][j];
+			localMinCost[minId] = 2147483647;
+		}
 	}
 	
 	private void sendValueMessages(){
-		int[] valueBox = new int[2];
-		valueBox[0] = valueIndex;
-		valueBox[1] = (int)(myPercentage*1000);
+//		int[] valueBox = new int[2];
+//		valueBox[0] = valueIndex;
+//		valueBox[1] = (int)(myThreshold*1000);
+//		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
+//			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_VALUE_MESSAGE, valueBox);
+//			this.sendMessage(msg);
+//		}
+		
 		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
-			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_VALUE_MESSAGE, valueBox);
+			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_VALUE_MESSAGE, valueIndex);
 			this.sendMessage(msg);
 		}
 	}
@@ -179,12 +192,16 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 //		else if(msg.getType() == TYPE_RESET_MESSAGE){
 //			disposeAlsResetMessage(msg);
 //		}
-		else if(msg.getType() == AlsDsa_Agent.TYPE_ALSCOST_MESSAGE){
+		else if(msg.getType() == TYPE_ALSCOST_MESSAGE){
 			disposeAlsCostMessage(msg);
 		}
-		else if(msg.getType() == AlsDsa_Agent.TYPE_ALSBEST_MESSAGE){
+		else if(msg.getType() == TYPE_ALSBEST_MESSAGE){
 			disposeAlsBestMessage(msg);
-		}else
+		}
+		else if(msg.getType() == TYPE_DENSITY_MESSAGE){
+			dispooseDensityMessage(msg);
+		}
+		else
 			System.out.println("wrong!!!!!!!!");
 	}
 	
@@ -198,8 +215,9 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 			}
 		}
 		neighboursValueIndexEx[senderIndex] = neighboursValueIndex[senderIndex];
-		neighboursValueIndex[senderIndex] = ((int[])(msg.getValue()))[0];
-		neighbourPercentage[senderIndex] = ((int[])(msg.getValue()))[1];
+		neighboursValueIndex[senderIndex] = ((int)(msg.getValue()));
+//		neighboursValueIndex[senderIndex] = ((int[])(msg.getValue()))[0];
+//		neighbourThreshold[senderIndex] = ((int[])(msg.getValue()))[1];
 		
 		if(receivedQuantity==0){
 			
@@ -207,7 +225,8 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 	}
 	
 	protected void allMessageDisposed(){
-		if(cycleCount <= cycleCountEnd){
+		if(cycleCount < cycleCountEnd){
+//			mp[cycleCount] = ((int)(myPercentage*1000))/1000.0;
 //			prepareToReset--;
 			localCost=localCost();
 			AlsWork();
@@ -217,6 +236,12 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 //			}
 		
 //			if(prepareToReset > 0){
+				
+//				int sum = (int)(myThreshold*1000); 
+//				for(int i = 0; i < neighboursQuantity; i++){
+//					sum+=neighbourThreshold[i];
+//				}
+//				myThreshold = sum/((neighboursQuantity+1)*1000.0);
 				
 				if(wait == 0 && suggestTag == 0)
 					DsaWork();
@@ -232,7 +257,7 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 						}
 					}
 					compareTemp += suggestGain;
-					myPercentage = ((double)(localCostTemp-myMinCost))/((double)(myMaxCost-myMinCost));
+//					myPercentage = ((double)(localCostTemp-myMinCost))/((double)(myMaxCost-myMinCost));
 //					if(localCostTemp < localCost || myPercentage < utilityPercentage || compareTemp > 0){
 					if(localCostTemp < localCost || compareTemp > 0){
 						valueIndex = suggestValue;
@@ -246,6 +271,8 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 				}
 				else
 					wait = 0;
+//				sendValueMessages();
+				
 //			}
 //			else{
 //				prepareToReset = 2147483647;
@@ -287,48 +314,61 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 			}
 		}
 		
+		/** */
+		checkMyPercentage();
 		if(done == 0){
-			myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
-//			if(myPercentage > utilityPercentage){
-				abandon(localCost);
-//			}
-			
-//			double cp = msgMailer.getCycleCount();
-//			cp = cp*cp/262500-2/250*cp+1;
-//			if(myPercentage > cp){
-//				abandon(localCost);
-//			}
+			abandon(localCost);
 		}
-		
-//		if(done == 0){
-//			myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
-//			if(prepareToReset > 2 && suggestTag == 0){
-//				if(myPercentage > utilityPercentage){
-//					utilityPercentage = utilityPercentage*1.02;
-//					abandon(localCost);
-//				}
-//				else
-//					utilityPercentage = utilityPercentage*0.99;
-//			}
-//		}
+	}
+	
+	private void checkMyPercentage(){
+		myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
+		if(selectP == higherP){
+			if(myBestPercentage > myPercentage){
+				myBestPercentage = myPercentage;
+				myPercentageUnchanged = 0;
+			}
+			else{
+				myPercentageUnchanged++;
+				if(myPercentageUnchanged > 0.1*cycleCountEnd){
+					selectP = lowerP;
+//					System.out.println(cycleCount);
+				}
+			}
+		}
 	}
 	
 	private double getAbandonP(){
-			return Math.exp(-(cycleCount)/(neighboursQuantity));
+//		if(myPercentage > myThreshold){
+//			myThreshold = myThreshold*(1+(neighboursQuantity/100.0));
+//			return Math.exp(-(cycleCount)/(Math.pow(neighboursQuantity, 2.5)));
+//		}
+//		else{
+//			myThreshold = myThreshold*(0.99);
+//			return Math.exp(-(cycleCount)/(Math.pow(neighboursQuantity, 1.5)));
+//		}
+		
+//		if(cycleCount < 0.25*cycleCountEnd)
+//			return Math.sqrt(myPercentage)*(cycleCountEnd-cycleCount)/cycleCountEnd;
+//		else if(cycleCount < 0.5*cycleCountEnd)
+//			return myPercentage;
+//		else
+//			return myPercentage*(cycleCountEnd-cycleCount)/cycleCountEnd;
+		
+//		if(selectP == higherP)
+//			return Math.sqrt(myPercentage)*(cycleCountEnd-cycleCount)/cycleCountEnd;
+//		else
+//			return myPercentage*(cycleCountEnd-cycleCount)/cycleCountEnd;
+		
+		if(selectP == higherP)
+			return Math.sqrt(myPercentage)*(1-Math.sqrt(cycleCount/(double)cycleCountEnd));
+		else
+			return myPercentage*(1-Math.sqrt(cycleCount/(double)cycleCountEnd));
 	}
 	
 	private void abandon(int nature) {
-//		if(Math.random() > abandonProbability)
-//			return;
-
-//		if(Math.random() > 0.8*Math.exp(-(Math.abs(msgMailer.getCycleCount()-100))/(neighboursQuantity*50)))
-//			return;
-		
 		if(Math.random() > getAbandonP())
 			return;
-		
-//		if(Math.random() > 1/(1.0*msgMailer.getCycleCount()))
-//			return;
 		
 		int[] abandonValueIndex = new int[neighboursQuantity];
 		int[][] abandonNeighbourIndex = new int[neighboursQuantity][domain.length];
@@ -371,10 +411,26 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 //			if(abandonCost[i] < abandonCost[abandonIndex])
 //				abandonIndex = i;										//找到差值最小的邻居，选作舍弃
 //		}
+//		
+//		if(abandonCost[abandonIndex] < nature){
+//			valueIndex = abandonValueIndex[abandonIndex];
+//			
+//			abandonSuggestGain[0] = abandonNeighbourIndex[abandonIndex][valueIndex];
+//			abandonSuggestGain[1] = nature - abandonCost[abandonIndex];
+//			sendSuggestMessages(abandonIndex);
+//			wait = 1;
+//			//System.out.println(nature - abandonCost[abandonIndex]+"~~~~~");
+//		}
 		
 		/**
 		 * 2.次优决策，避免重复
 		 */
+//		int abandonIndex = 0;
+//		for(int i = 1; i < neighboursQuantity; i++){
+//			if(abandonCost[i] < abandonCost[abandonIndex])
+//				abandonIndex = i;										//找到差值最小的邻居，选作舍弃
+//		}
+//		
 //		int[] choiceNeighborQueneTag = new int[neighboursQuantity];
 //		int tag = 0;
 //		int[] temp = abandonCost.clone();
@@ -397,11 +453,20 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 //			choiceNeighborQuene = choiceNeighborQueneTag.clone();
 //			choiceNeighbor = 0;
 //		}
+//			
+//		if(abandonCost[abandonIndex] < nature){
+//			valueIndex = abandonValueIndex[abandonIndex];
+//			
+//			abandonSuggestGain[0] = abandonNeighbourIndex[abandonIndex][valueIndex];
+//			abandonSuggestGain[1] = nature - abandonCost[abandonIndex];
+//			sendSuggestMessages(abandonIndex);
+//			wait = 1;
+//			//System.out.println(nature - abandonCost[abandonIndex]+"~~~~~");
+//		}
 		
 		/**
 		 * 3.随机选择一个进行忽略
 		 */
-//		int abandonIndex = (int)(neighboursQuantity*Math.random());
 		int abandonIndex = h;
 		
 		if(abandonCost[abandonIndex] < nature){
@@ -458,21 +523,6 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 		/**
 		 * 5.随机忽略，多重
 		 */
-//		int abandonQuantitiy = (int)(neighboursQuantity*0.2);
-//		int temp = 0;
-//		int[] tag = new int[neighboursQuantity];
-//		int[] abandonID = new int[abandonQuantitiy];
-//		for(int i = 0; i < abandonQuantitiy; i++){
-//			int tempID = (int)(neighboursQuantity*Math.random());
-//			if(tag[tempID] == 1){
-//				i--;
-//			}
-//			else{
-//				tag[tempID] = 1;
-//				abandonID[temp] = tempID;
-//				temp++;
-//			}
-//		}
 		
 	}
 	
@@ -575,6 +625,26 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 		
 		if(enoughReceived == true){
 			warning++;
+			
+			boolean source = false;
+			while(source == false){
+				try {
+					localCostList.getFirst();
+					source = true;
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					System.out.println("~~~ source not found ~~~");
+					source = false;
+					e.printStackTrace();
+					try {
+						Thread.sleep(100);
+					System.out.println("~~~ sleep 100 ~~~");
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
 			
 			accumulativeCost = localCostList.removeFirst();
 			for(int i = 0; i < children.length; i++){
@@ -707,6 +777,62 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 
 		ret.totalCost=(int)totalCost;
 		return ret;
+	}
+	
+	public void sendDensityMessages(int Tag, int Id, int Rcv){
+		int[] box = new int[3];
+		box[0] = Tag;
+		box[1] = Id;
+		box[2] = Rcv;
+		switch(Tag){
+		case 1:
+			for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
+				Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_DENSITY_MESSAGE, box);
+				this.sendMessage(msg);
+			}
+			return;
+		case 2:
+			for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
+				if(Id != neighbours[neighbourIndex]){
+					Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_DENSITY_MESSAGE, box);
+					this.sendMessage(msg);
+				}
+			}
+			return;
+		case 3:
+			Message msg=new Message(this.id, Rcv, TYPE_DENSITY_MESSAGE, box);
+			this.sendMessage(msg);
+			return;
+		case 4:
+			Message msg4=new Message(this.id, Id, TYPE_DENSITY_MESSAGE, box);
+			this.sendMessage(msg4);
+			return;
+		}
+	}
+	
+	public void dispooseDensityMessage(Message msg){
+		int Tag = ((int[])msg.getValue())[0];
+		int Id = ((int[])msg.getValue())[1];
+		int Rcv = ((int[])msg.getValue())[2];
+		switch(Tag){
+		case 1:
+			sendDensityMessages(Tag+1, Id, Rcv);
+			return;
+		case 2:
+			for(int i = 0; i < neighboursQuantity; i++){
+				if(neighbours[i] == Id)
+					return;
+			}
+			sendDensityMessages(Tag+1, Id, msg.getIdSender());
+			return;
+		case 3:
+			sendDensityMessages(Tag+1, Id, 0);
+			return;
+		case 4:
+			neighborsOfNeighbors++;
+			density = (int)(neighborsOfNeighbors+neighboursQuantity+1.0)/(neighboursQuantity+1);
+			return;
+		}
 	}
 
 	public String easyMessageContent(Message msg, AgentCycle sender, AgentCycle receiver) {

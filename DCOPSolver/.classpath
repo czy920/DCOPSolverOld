@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="lib/jdom-2.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/jtree_dischoco.jar"/>
-	<classpathentry kind="lib" path="lib/meetingscheduling_frodo.jar"/>
+	<classpathentry kind="lib" path="lib/meetingscheduling_frodo.jar" sourcepath="lib/meetingscheduling_frodo.jar"/>
 	<classpathentry kind="lib" path="lib/benchmark_sensornetwork.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="lib" path="lib/problem_generators_dischoco.jar"/>

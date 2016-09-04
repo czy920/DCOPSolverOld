@@ -11,20 +11,21 @@ public class Test_Pds {
     public static void main(String[] args){
         Solver solver = new Solver();
         
-        Settings.settings.setCycleCount(500);
-        Settings.settings.setSelectInterval(1000);
+        Settings.settings.setCycleCount(1000);
         
-        Settings.settings.setSelectProbability(0.3);
+        Settings.settings.setSelectProbability(0.4);
         Settings.settings.setSelectProbabilityA(0.6);
         Settings.settings.setSelectProbabilityB(0.2);
         Settings.settings.setSelectProbabilityC(0.4);
         Settings.settings.setSelectProbabilityD(0.8);
+        Settings.settings.setSelectInterval(1000);
         Settings.settings.setSelectRound(100);
         
-        Settings.settings.setDisplayGraphFrame(false); 
+        Settings.settings.setDisplayGraphFrame(false);
         
-            solver.solve("problems/MS_100_20_20_1.xml", "PDSALSDSA", false, false, new EventListener() {
-            @Override
+            solver.solve("problems/scalefreenetwork_150_10_m1_20_m2_10_0.xml", "PDSALSDSA", false, false, new EventListener() {
+//            solver.solve("problems/MS_100_20_20_1.xml", "PDSDSAN", false, false, new EventListener() {
+                     @Override
             public void onStarted() {
 
             }

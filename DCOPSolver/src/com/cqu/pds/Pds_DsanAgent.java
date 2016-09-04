@@ -17,9 +17,6 @@ public class Pds_DsanAgent extends AgentCycle {
 	public final static int TYPE_SUGGEST_MESSAGE = 2;
 	
 	private static int cycleCountEnd;
-	private static int CONST;
-//	private static double utilityPercentage;
-//	private static double abandonProbability;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
 	public final static String KEY_NCCC="KEY_NCCC";
@@ -30,10 +27,16 @@ public class Pds_DsanAgent extends AgentCycle {
 	private int cycleCount;
 	private int neighboursQuantity;
 	private int[] neighboursValueIndex;
-	private int[] neighboursValueIndexEx;	
-
-//	private int[] neighbourPercentage;
-	private double myPercentage;
+	private int[] neighboursValueIndexEx;
+	
+	public final static int higherP = 0;
+	public final static int lowerP = 1;
+	private double myPercentage=1;
+	private double myBestPercentage=1;
+	private int selectP = higherP;
+	private int myPercentageUnchanged = 0;
+//	private double myThreshold = 0.1;
+//	private int[] neighbourThreshold;
 	private int[] abandonSuggestGain;
 	private int suggestValue;
 	private int suggestGain;
@@ -53,7 +56,6 @@ public class Pds_DsanAgent extends AgentCycle {
 		super.initRun();
 		
 		cycleCountEnd = Settings.settings.getCycleCountEnd();
-		CONST = Settings.settings.getSelectInterval();
 //		utilityPercentage = Settings.settings.getSelectProbabilityA();
 //		abandonProbability = Settings.settings.getSelectProbabilityB();
 		
@@ -68,9 +70,8 @@ public class Pds_DsanAgent extends AgentCycle {
 		mySuggestValue = new int[domain.length];
 		myNeighboursSuggestTable = new int[domain.length][neighboursQuantity];
 		abandonSuggestGain = new int[3];
-//		buildMyTable();
-		myPercentage = 1;
-//		neighbourPercentage = new int[neighboursQuantity];
+		buildMyTable();
+//		neighbourThreshold = new int[neighboursQuantity];
 		sendValueMessages();
 	}
 	
@@ -134,6 +135,14 @@ public class Pds_DsanAgent extends AgentCycle {
 	}
 	
 	private void sendValueMessages(){
+//		int[] valueBox = new int[2];
+//		valueBox[0] = valueIndex;
+//		valueBox[1] = (int)(myThreshold*100000);
+//		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
+//			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_VALUE_MESSAGE, valueBox);
+//			this.sendMessage(msg);
+//		}
+		
 		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
 			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_VALUE_MESSAGE, valueIndex);
 			this.sendMessage(msg);
@@ -182,16 +191,25 @@ public class Pds_DsanAgent extends AgentCycle {
 		}
 		
 		neighboursValueIndexEx[senderIndex] = neighboursValueIndex[senderIndex];
-		neighboursValueIndex[senderIndex] = (Integer)(msg.getValue());
+		neighboursValueIndex[senderIndex] = ((int)(msg.getValue()));
+//		neighboursValueIndex[senderIndex] = ((int[])(msg.getValue()))[0];
+//		neighbourThreshold[senderIndex] = ((int[])(msg.getValue()))[1];
 	}
 	
 	protected void allMessageDisposed(){
 		if(cycleCount>=cycleCountEnd){
 			stopRunning();
+//			System.out.println(myThreshold);
 		}
 		else{
 			cycleCount++;
 			localCost=localCost();
+			
+//			int sum = (int)(myThreshold*100000); 
+//			for(int i = 0; i < neighboursQuantity; i++){
+//				sum+=neighbourThreshold[i];
+//			}
+//			myThreshold = sum/((neighboursQuantity+1)*100000.0);
 			
 			if(wait == 1){
 //				System.out.println("cycle "+cycleCount+"   Agent "+id+" wait 1 cycle");
@@ -210,7 +228,7 @@ public class Pds_DsanAgent extends AgentCycle {
 					}
 				}
 				compareTemp += suggestGain;
-				myPercentage = ((double)(localCostTemp-myMinCost))/((double)(myMaxCost-myMinCost));
+//				myPercentage = ((double)(localCostTemp-myMinCost))/((double)(myMaxCost-myMinCost));
 //				if(localCostTemp < localCost || myPercentage < utilityPercentage || compareTemp > 0){
 				if(localCostTemp < localCost || compareTemp > 0){
 					valueIndex = suggestValue;
@@ -222,6 +240,7 @@ public class Pds_DsanAgent extends AgentCycle {
 				else{
 					//System.out.println("reject!!!!!!!!");
 					boolean tag = abandonChain();
+//					sendValueMessages();
 					if(tag == true){
 						return;
 					}
@@ -235,6 +254,8 @@ public class Pds_DsanAgent extends AgentCycle {
 				newLocalCost+=constraintCosts.get(neighbours[neighbourindex])[randomValueIndex][neighboursValueIndex[neighbourindex]];
 			}
 			
+			/** */
+			checkMyPercentage();
 			if (newLocalCost <= localCost){
 //				if(Math.random() < 0.3){
 					valueIndex = randomValueIndex;
@@ -243,34 +264,69 @@ public class Pds_DsanAgent extends AgentCycle {
 			}
 			else if (newLocalCost > localCost){
 				boolean tag = false;
-//				myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
-//				if(myPercentage > utilityPercentage){
-					tag = abandon(localCost);
-//					increaseNccc();
-//				}
-				
+				tag = abandon(localCost);
 				
 				if(tag == false){
-					if(Math.random() < Math.exp(((localCost - newLocalCost)*(cycleCount*cycleCount))/CONST)){
+					if(Math.random() < Math.exp(((localCost - newLocalCost)*(cycleCount*cycleCount))*1.0/cycleCountEnd)){
 						valueIndex = randomValueIndex;
 						sendValueMessages();
 					}
 				}
 			}
+//			sendValueMessages();
 			//System.out.println("agent"+this.id+"_______"+cycleCount+"_______"+gainValue+"________");
 		}
-		
-		
+	}
+	
+	private void checkMyPercentage(){
+		myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
+		if(selectP == higherP){
+			if(myBestPercentage > myPercentage){
+				myBestPercentage = myPercentage;
+				myPercentageUnchanged = 0;
+			}
+			else{
+				myPercentageUnchanged++;
+				if(myPercentageUnchanged > 0.1*cycleCountEnd){
+					selectP = lowerP;
+//					System.out.println(cycleCount);
+				}
+			}
+		}
 	}
 	
 	private double getAbandonP(){
-		return Math.exp(-(cycleCount)/(neighboursQuantity*neighboursQuantity));
+//		if(myPercentage > myThreshold){
+//			myThreshold = myThreshold*(1+(neighboursQuantity/100.0));
+//			return Math.exp(-(cycleCount)/(Math.pow(neighboursQuantity, 1.5)));
+//		}
+//		else{
+//			myThreshold = myThreshold*(0.99);
+//			return Math.exp(-(cycleCount)/(Math.pow(neighboursQuantity, 1)));
+//		}
+		
+//		return myPercentage*(cycleCountEnd-cycleCount)/cycleCountEnd;
+		
+//		if(cycleCount < 0.25*cycleCountEnd)
+//			return Math.sqrt(myPercentage);
+//		else if(cycleCount < 0.5*cycleCountEnd)
+//			return myPercentage;
+//		else
+//			return myPercentage*(cycleCountEnd-cycleCount)/cycleCountEnd;
+		
+		if(selectP == higherP)
+			return Math.sqrt(myPercentage)*(cycleCountEnd-cycleCount)/cycleCountEnd;
+		else
+			return myPercentage*(cycleCountEnd-cycleCount)/cycleCountEnd;
+		
+//		if(selectP == higherP)
+//			return Math.sqrt(myPercentage)*(1-Math.sqrt(cycleCount/(double)cycleCountEnd));
+//		else
+//			return myPercentage*(1-Math.sqrt(cycleCount/(double)cycleCountEnd));
+		
 	}
 	
 	private boolean abandon(int nature) {
-//		if(Math.random() > abandonProbability)
-//			return false;
-		
 		if(Math.random() > getAbandonP())
 			return false;
 		

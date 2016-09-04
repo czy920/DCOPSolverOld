@@ -26,6 +26,7 @@ public class Pds_Mgm2Agent extends AgentCycle {
 	public final static int TYPE_DECIDEGO_MESSAGE=8;
 //	public final static int TYPE_WAITAGAIN_MESSAGE=9;
 	public final static int TYPE_SUGGEST_MESSAGE = 123;
+	
 	private static double p;
 	private static int cycleCountEnd;
 	
@@ -54,7 +55,8 @@ public class Pds_Mgm2Agent extends AgentCycle {
 	private int cycleCount;
 	private int neighboursQuantity;	
 	private int neighboursGain[];
-	private int[] neighboursValueIndex;	
+	private int[] neighboursValueIndex;
+	private int[] neighboursValueIndexEx;
 	
 	public final static int go=111;
 	public final static int not=222;
@@ -64,8 +66,14 @@ public class Pds_Mgm2Agent extends AgentCycle {
 	private LinkedList<int[]> selectOfferGroup;
 	private String ownType;
 	
-	private int[] neighboursValueIndexEx;
-	private double myPercentage;
+	public final static int higherP = 0;
+	public final static int lowerP = 1;
+	private double myPercentage=1;
+	private double myBestPercentage=1;
+	private int selectP = higherP;
+	private int myPercentageUnchanged = 0;
+//	private double myThreshold = 0.1;
+//	private int[] neighbourThreshold;
 	private int[] abandonSuggestGain;
 	private int suggestValue;
 	private int suggestGain;
@@ -75,9 +83,13 @@ public class Pds_Mgm2Agent extends AgentCycle {
 	private int[] abandenByOffer;
 	private int[] assumeByOffer;
 	
+	private int myMaxCost = 0;
+	private int myMinCost = 2147483647;
+	private int[] mySuggestValue;									//给自己的建议值
+	private int[][] myNeighboursSuggestTable;						//给邻居的建议值
+	
 	public Pds_Mgm2Agent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
-		// TODO Auto-generated constructor stub
 	}
 	
 	protected void initRun() {
@@ -106,13 +118,83 @@ public class Pds_Mgm2Agent extends AgentCycle {
 		assumeByOffer = new int[neighboursQuantity];
 		for(int i = 0; i < neighboursQuantity; i++)
 			abandenByOffer[i] = -1;
-		
+		mySuggestValue = new int[domain.length];
+		myNeighboursSuggestTable = new int[domain.length][neighboursQuantity];
+//		neighbourThreshold = new int[neighboursQuantity];
+		buildMyTable();
 		sendValueMessages();
 	}
 	
+	private void buildMyTable(){
+		int localMaxCost = 0;
+		int[] localMinCost = new int[domain.length];
+		int[][] localMinTable = new int[domain.length][neighboursQuantity];
+		for(int i = 0; i < domain.length; i++)
+			localMinCost[i] = 2147483647;
+		
+		for(int i = 0; i < domain.length; i++){
+			int tempLocalMaxCost = 0;
+			int tempLocalCost = 0;
+			int[] tempLocalMinTable = new int[neighboursQuantity];
+			for(int j = 0; j < neighboursQuantity; j++){
+				
+				int oneMinCost,oneMaxCost;
+				oneMinCost = constraintCosts.get(neighbours[j])[i][0];
+				oneMaxCost = constraintCosts.get(neighbours[j])[i][0];
+				tempLocalMinTable[j] = 0;
+				
+				for(int k = 1; k < neighbourDomains.get(neighbours[j]).length; k++){
+					if(oneMinCost > constraintCosts.get(neighbours[j])[i][k]){
+						oneMinCost = constraintCosts.get(neighbours[j])[i][k];
+						tempLocalMinTable[j] = k;
+					}
+					
+					if(oneMaxCost < constraintCosts.get(neighbours[j])[i][k]){
+						oneMaxCost = constraintCosts.get(neighbours[j])[i][k];
+					}
+				}
+				tempLocalCost += oneMinCost;
+				tempLocalMaxCost += oneMaxCost;
+			}
+			
+			if(localMaxCost < tempLocalMaxCost)
+				localMaxCost = tempLocalMaxCost;
+			
+			localMinCost[i] = tempLocalCost;
+			for(int j = 0; j < neighboursQuantity; j++){
+				localMinTable[i][j] = tempLocalMinTable[j];
+			}
+		}
+		myMaxCost = localMaxCost;
+		
+		for(int i = 0; i < domain.length; i++){
+			int minId = 0, minCost = 2147483647;
+			for(int j = 0; j < domain.length; j++){
+				if(localMinCost[j] <= minCost && localMinCost[j] != 2147483647){
+					minId = j;
+					minCost = localMinCost[j];
+				}
+			}
+			mySuggestValue[i] = minId;
+			if(i == 0)
+				myMinCost = localMinCost[minId];
+			for(int j = 0; j < neighboursQuantity; j++)
+				myNeighboursSuggestTable[i][j] = localMinTable[minId][j];
+			localMinCost[minId] = 2147483647;
+		}
+	}
+	
 	private void sendValueMessages(){
+//		int[] valueBox = new int[2];
+//		valueBox[0] = valueIndex;
+//		valueBox[1] = (int)(myThreshold*100000);
+//		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
+//			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_VALUE_MESSAGE, valueBox);
+//			this.sendMessage(msg);
+//		}
+		
 		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
-			Message msg=new Message(this.id, neighbours[neighbourIndex], Pds_Mgm2Agent.TYPE_VALUE_MESSAGE, valueIndex);
+			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_VALUE_MESSAGE, valueIndex);
 			this.sendMessage(msg);
 		}
 	}
@@ -192,9 +274,7 @@ public class Pds_Mgm2Agent extends AgentCycle {
 //		}
 //	}
 	
-	@Override
 	protected void disposeMessage(Message msg) {
-		// TODO 自动生成的方法存根
 		
 //		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
 		
@@ -270,7 +350,9 @@ public class Pds_Mgm2Agent extends AgentCycle {
 			}
 		}
 		neighboursValueIndexEx[senderIndex] = neighboursValueIndex[senderIndex];
-		neighboursValueIndex[senderIndex] = (Integer)(msg.getValue());
+		neighboursValueIndex[senderIndex] = ((int)(msg.getValue()));
+//		neighboursValueIndex[senderIndex] = ((int[])(msg.getValue()))[0];
+//		neighbourThreshold[senderIndex] = ((int[])(msg.getValue()))[1];
 		
 		if(receivedQuantity==0){
 			
@@ -285,6 +367,12 @@ public class Pds_Mgm2Agent extends AgentCycle {
 		else{
 			cycleCount++;
 			localCost=localCost();
+			
+//			int sum = (int)(myThreshold*100000); 
+//			for(int i = 0; i < neighboursQuantity; i++){
+//				sum+=neighbourThreshold[i];
+//			}
+//			myThreshold = sum/((neighboursQuantity+1)*100000.0);
 			
 			int[] selectMinCost=new int[domain.length];
 			for(int i=0; i<domain.length; i++){
@@ -340,114 +428,21 @@ public class Pds_Mgm2Agent extends AgentCycle {
 					ownType=TYPE_UNKNOW;						
 				}
 			}
-			else{
-				if(gainValue == 0){
-//					myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
-					if(suggestTag == 0){
-//						if(myPercentage > utilityPercentage){
-							abandon(localCost);
-//						}
-					}
-				}
-			}
+//			else{
+//				if(gainValue == 0){
+//					if(suggestTag == 0){
+//						myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
+//						abandon(localCost);
+//					}
+//				}
+//			}
+			
 //			for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++){
 //				if(neighbourIndex!=coordinate){
 //					sendWaitMessages(neighbourIndex);
 //				}
 //			}
 		}
-	}
-	
-	private double getAbandonP(){
-		return Math.exp(-(cycleCount)/(neighboursQuantity*neighboursQuantity));
-	}
-	
-	private void abandon(int nature) {
-//		if(Math.random() > abandonProbability)
-//			return;
-
-//		if(Math.random() > 0.8*Math.exp(-(Math.abs(msgMailer.getCycleCount()-100))/(neighboursQuantity*50)))
-//			return;
-	
-		if(Math.random() > getAbandonP())
-			return;
-		
-//		if(Math.random() > Math.exp(-cycleCount/(neighboursQuantity*10)))
-//			return;
-		
-		int[] abandonValueIndex = new int[neighboursQuantity];
-		int[][] abandonNeighbourIndex = new int[neighboursQuantity][domain.length];
-		int[] abandonCost = new int[neighboursQuantity];
-		
-		int h = (int)(neighboursQuantity*Math.random());
-//		for(int h = 0; h < neighbours.length; h++){						//遍历邻居
-			int[] selectMinCost=new int[domain.length];
-			for(int i=0; i<domain.length; i++){							//遍历值域
-				for(int j=0; j<neighbours.length; j++)
-					if(j != h)
-						selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];
-																		//累计邻居以外的cost值
-				int tempIndex = 0;
-				int tempCost = constraintCosts.get(neighbours[h])[i][tempIndex];
-				for(int hValue = 0; hValue < constraintCosts.get(neighbours[h])[i].length; hValue++){
-					if(constraintCosts.get(neighbours[h])[i][hValue] < tempCost){
-						tempCost = constraintCosts.get(neighbours[h])[i][hValue];
-						tempIndex = hValue;								//找到选定的最小值，记录value和cost
-					}
-				}
-				selectMinCost[i] += tempCost;							//做累计
-				abandonNeighbourIndex[h][i] = tempIndex;				//记录对应的邻居号和自己value对应的邻居的value建议
-			}
-			int selectOneMinCost=selectMinCost[0];
-			for(int i = 1; i < domain.length; i++){
-				if(selectOneMinCost > selectMinCost[i]){
-					selectOneMinCost = selectMinCost[i];
-					abandonValueIndex[h] = i;
-				}
-			}
-			abandonCost[h] = selectOneMinCost;							//找到每一个邻居对应的自己最小的value
-//		}
-//		int abandonIndex = 0;
-//		for(int i = 1; i < neighboursQuantity; i++){
-//			if(abandonCost[i] < abandonCost[abandonIndex])
-//				abandonIndex = i;										//找到差值最小的邻居，选作舍弃
-//		}
-		int abandonIndex = h;
-		
-		if(abandonCost[abandonIndex] < nature){
-			valueIndex = abandonValueIndex[abandonIndex];
-			
-			abandonSuggestGain[0] = abandonNeighbourIndex[abandonIndex][valueIndex];
-			abandonSuggestGain[1] = nature - abandonCost[abandonIndex];
-			abandonSuggestGain[2] = valueIndex;
-			sendSuggestMessages(abandonIndex);
-			wait = 1;
-			//System.out.println(nature - abandonCost[abandonIndex]+"~~~~~");
-//			System.out.println("cycle "+cycleCount+"   Agent "+id+" ignore Agent "+neighbours[abandonIndex]+" values "+valueIndex+" suggest "+abandonSuggestGain[0]);
-			return;
-		}
-//		System.out.println("cycle "+cycleCount+"   Agent "+id+" ignore false");
-	}
-	
-	private void disposeSuggestMessage(Message msg) {
-		if(wait != 1 && suggestTag !=1 && neighboursQuantity > 1){
-			int senderIndex=0;
-			int senderId=msg.getIdSender();
-			for(int i=0; i<neighbours.length; i++){
-				if(neighbours[i]==senderId){
-					senderIndex=i;
-					break;
-				}
-			}
-			suggester = senderIndex;
-			suggestValue = ((int[])msg.getValue())[0];
-			suggestGain = ((int[])msg.getValue())[1];
-			neighboursValueIndex[suggester] = ((int[])msg.getValue())[2];
-			suggestTag = 1;
-//			System.out.println("cycle "+cycleCount+"   Agent "+id+" received Agent "+msg.getIdSender());
-			return;
-		}
-//		System.out.println("cycle "+cycleCount+"   Agent "+id+" reject Agent "+msg.getIdSender());
 	}
 	
 	private void disposeOfferMessage(Message msg) {
@@ -472,114 +467,114 @@ public class Pds_Mgm2Agent extends AgentCycle {
 				tempList[i][3]=senderIndex;
 			}
 			
-//			for(int i=0; i<tempList.length; i++){
-//				tempList[i][2]+=localCost;
-//				tempList[i][2]-=constraintCosts.get(neighbours[senderIndex])[valueIndex][neighboursValueIndex[senderIndex]];
-//				
-//				for(int j=0; j<neighbours.length; j++){
-//					if(j!=senderIndex)
-//						tempList[i][2]-=constraintCosts.get(neighbours[j])[tempList[i][0]][neighboursValueIndex[j]];
-//				}
-//				increaseNccc();
-//			}
-//			int selectTemp=0;
-//			for(int i=1; i<tempList.length; i++){
-//				if(tempList[selectTemp][2] < tempList[i][2])
-//					selectTemp=i;
-//			}
-//			if(tempList[selectTemp][2] > 0){
-//				selectOfferGroup.add(tempList[selectTemp]);
-//			}
-//			else
-//				sendRejectMessages(senderIndex);
-			
-			int[] tempCoGain = new int[tempMap.size()];
-			for(int i = 0; i < tempMap.size(); i++)
-				tempCoGain[i] = tempList[i][2];
 			for(int i=0; i<tempList.length; i++){
-				tempCoGain[i]+=localCost;
-				tempCoGain[i]-=constraintCosts.get(neighbours[senderIndex])[valueIndex][neighboursValueIndex[senderIndex]];
+				tempList[i][2]+=localCost;
+				tempList[i][2]-=constraintCosts.get(neighbours[senderIndex])[valueIndex][neighboursValueIndex[senderIndex]];
 				
 				for(int j=0; j<neighbours.length; j++){
 					if(j!=senderIndex)
-						tempCoGain[i]-=constraintCosts.get(neighbours[j])[tempList[i][0]][neighboursValueIndex[j]];
+						tempList[i][2]-=constraintCosts.get(neighbours[j])[tempList[i][0]][neighboursValueIndex[j]];
 				}
 				increaseNccc();
 			}
 			int selectTemp=0;
 			for(int i=1; i<tempList.length; i++){
-				if(tempCoGain[selectTemp] < tempCoGain[i])
+				if(tempList[selectTemp][2] < tempList[i][2])
 					selectTemp=i;
 			}
-			if(tempCoGain[selectTemp] > 0){
-				tempList[selectTemp][2] = tempCoGain[selectTemp];
+			if(tempList[selectTemp][2] > 0){
 				selectOfferGroup.add(tempList[selectTemp]);
 			}
-			else{
-				
+			else
+				sendRejectMessages(senderIndex);
+			
+//			int[] tempCoGain = new int[tempMap.size()];
+//			for(int i = 0; i < tempMap.size(); i++)
+//				tempCoGain[i] = tempList[i][2];
+//			for(int i=0; i<tempList.length; i++){
+//				tempCoGain[i]+=localCost;
+//				tempCoGain[i]-=constraintCosts.get(neighbours[senderIndex])[valueIndex][neighboursValueIndex[senderIndex]];
+//				
+//				for(int j=0; j<neighbours.length; j++){
+//					if(j!=senderIndex)
+//						tempCoGain[i]-=constraintCosts.get(neighbours[j])[tempList[i][0]][neighboursValueIndex[j]];
+//				}
+//				increaseNccc();
+//			}
+//			int selectTemp=0;
+//			for(int i=1; i<tempList.length; i++){
+//				if(tempCoGain[selectTemp] < tempCoGain[i])
+//					selectTemp=i;
+//			}
+//			if(tempCoGain[selectTemp] > 0){
+//				tempList[selectTemp][2] = tempCoGain[selectTemp];
+//				selectOfferGroup.add(tempList[selectTemp]);
+//			}
+//			else{
+//				
 //				myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
-//				if(Math.random() < abandonProbability && myPercentage > utilityPercentage){
-				if(Math.random() < getAbandonP()){
-					int[] abandonValueIndex = new int[neighboursQuantity];
-					int[][] abandonNeighbourIndex = new int[neighboursQuantity][domain.length];
-					int[] abandonGain = new int[neighboursQuantity];
-					int h = (int)(neighboursQuantity*Math.random());
-//					for(int h = 0; h < neighboursQuantity; h++){							//遍历邻居
-						if(h != senderIndex){
-							//int[] selectMinCost=new int[domain.length];
-							for(int i = 0; i < tempMap.size(); i++)
-								tempCoGain[i] = tempList[i][2];
-							
-							for(int i=0; i<tempList.length; i++){						//遍历可取域，i为可取值得编号，
-								tempCoGain[i]+=localCost;
-								tempCoGain[i]-=constraintCosts.get(neighbours[senderIndex])[valueIndex][neighboursValueIndex[senderIndex]];
-								for(int j=0; j<neighbours.length; j++)
-									if(j != h && j != senderIndex)
-										tempCoGain[i]-=constraintCosts.get(neighbours[j])[tempList[i][0]][neighboursValueIndex[j]];
-								
-								int tempIndex = 0;
-								int tempCost = constraintCosts.get(neighbours[h])[tempList[i][0]][tempIndex];
-								for(int hValue = 0; hValue < neighbourDomains.get(neighbours[h]).length; hValue++){
-									if(constraintCosts.get(neighbours[h])[tempList[i][0]][hValue] < tempCost){
-										tempCost = constraintCosts.get(neighbours[h])[tempList[i][0]][hValue];
-										tempIndex = hValue;								//找到选定的最小值，记录value和cost
-									}
-								}
-								tempCoGain[i] -= tempCost;								//做累计
-								abandonNeighbourIndex[h][i] = tempIndex;				//记录对应的邻居号和自己value对应的邻居的value建议
-							}
-							int selectMaxGain=tempCoGain[0];
-							for(int i = 1; i < tempCoGain.length; i++){
-								if(selectMaxGain < tempCoGain[i]){
-									selectMaxGain = tempCoGain[i];
-									abandonValueIndex[h] = i;
-								}
-							}
-							abandonGain[h] = selectMaxGain;								//找到每一个邻居对应的自己最小的value
-						}
+////				if(Math.random() < abandonProbability && myPercentage > utilityPercentage){
+//				if(Math.random() < getAbandonP()){
+//					int[] abandonValueIndex = new int[neighboursQuantity];
+//					int[][] abandonNeighbourIndex = new int[neighboursQuantity][domain.length];
+//					int[] abandonGain = new int[neighboursQuantity];
+//					int h = (int)(neighboursQuantity*Math.random());
+////					for(int h = 0; h < neighboursQuantity; h++){							//遍历邻居
+//						if(h != senderIndex){
+//							//int[] selectMinCost=new int[domain.length];
+//							for(int i = 0; i < tempMap.size(); i++)
+//								tempCoGain[i] = tempList[i][2];
+//							
+//							for(int i=0; i<tempList.length; i++){						//遍历可取域，i为可取值得编号，
+//								tempCoGain[i]+=localCost;
+//								tempCoGain[i]-=constraintCosts.get(neighbours[senderIndex])[valueIndex][neighboursValueIndex[senderIndex]];
+//								for(int j=0; j<neighbours.length; j++)
+//									if(j != h && j != senderIndex)
+//										tempCoGain[i]-=constraintCosts.get(neighbours[j])[tempList[i][0]][neighboursValueIndex[j]];
+//								
+//								int tempIndex = 0;
+//								int tempCost = constraintCosts.get(neighbours[h])[tempList[i][0]][tempIndex];
+//								for(int hValue = 0; hValue < neighbourDomains.get(neighbours[h]).length; hValue++){
+//									if(constraintCosts.get(neighbours[h])[tempList[i][0]][hValue] < tempCost){
+//										tempCost = constraintCosts.get(neighbours[h])[tempList[i][0]][hValue];
+//										tempIndex = hValue;								//找到选定的最小值，记录value和cost
+//									}
+//								}
+//								tempCoGain[i] -= tempCost;								//做累计
+//								abandonNeighbourIndex[h][i] = tempIndex;				//记录对应的邻居号和自己value对应的邻居的value建议
+//							}
+//							int selectMaxGain=tempCoGain[0];
+//							for(int i = 1; i < tempCoGain.length; i++){
+//								if(selectMaxGain < tempCoGain[i]){
+//									selectMaxGain = tempCoGain[i];
+//									abandonValueIndex[h] = i;
+//								}
+//							}
+//							abandonGain[h] = selectMaxGain;								//找到每一个邻居对应的自己最小的value
+//						}
+////					}
+////					int abandonIndex = 0;
+////					for(int i = 1; i < neighboursQuantity; i++){
+////						if(i != senderIndex)
+////							if(abandonGain[i] > abandonGain[abandonIndex])
+////								abandonIndex = i;										//找到差值最小的邻居，选作舍弃
+////					}
+//					int abandonIndex = h;
+//					
+//					if(abandonGain[abandonIndex] > 0){
+//						tempList[abandonValueIndex[abandonIndex]][2] = abandonGain[abandonIndex];
+//						selectOfferGroup.add(tempList[abandonValueIndex[abandonIndex]]);
+//						abandenByOffer[senderIndex] = abandonIndex;
+//						assumeByOffer[senderIndex] = abandonNeighbourIndex[abandonIndex][abandonValueIndex[abandonIndex]];
 //					}
-//					int abandonIndex = 0;
-//					for(int i = 1; i < neighboursQuantity; i++){
-//						if(i != senderIndex)
-//							if(abandonGain[i] > abandonGain[abandonIndex])
-//								abandonIndex = i;										//找到差值最小的邻居，选作舍弃
+//					else{
+//						sendRejectMessages(senderIndex);
 //					}
-					int abandonIndex = h;
-					
-					if(abandonGain[abandonIndex] > 0){
-						tempList[abandonValueIndex[abandonIndex]][2] = abandonGain[abandonIndex];
-						selectOfferGroup.add(tempList[abandonValueIndex[abandonIndex]]);
-						abandenByOffer[senderIndex] = abandonIndex;
-						assumeByOffer[senderIndex] = abandonNeighbourIndex[abandonIndex][abandonValueIndex[abandonIndex]];
-					}
-					else{
-						sendRejectMessages(senderIndex);
-					}
-				}
-				else{
-					sendRejectMessages(senderIndex);
-				}
-			}	
+//				}
+//				else{
+//					sendRejectMessages(senderIndex);
+//				}
+//			}	
 			
 		}else
 			sendRejectMessages(senderIndex);
@@ -608,26 +603,6 @@ public class Pds_Mgm2Agent extends AgentCycle {
 		}
 	}
 	
-//	private void gather() {
-//		//System.out.println("gather");
-//		int temp[]=selectOfferGroup.get(0);
-//		for(int i=1; i<selectOfferGroup.size(); i++){
-//			if(temp[2]<selectOfferGroup.get(i)[2]){
-//				sendRejectMessages(temp[3]);
-//				temp=selectOfferGroup.get(i);
-//			}
-//			else{
-//				sendRejectMessages(selectOfferGroup.get(i)[3]);
-//			}
-//		}
-//		ownType=TYPE_RECEIVER;
-//		selectValueIndex=temp[0];
-//		gainValue=temp[2];
-//		coordinate=temp[3];
-//		sendAcceptMessages(temp);
-//		//System.out.println("gather_end");
-//	}
-	
 	private void gather() {
 		//System.out.println("gather");
 		int temp[]=selectOfferGroup.get(0);
@@ -644,19 +619,39 @@ public class Pds_Mgm2Agent extends AgentCycle {
 		selectValueIndex=temp[0];
 		gainValue=temp[2];
 		coordinate=temp[3];
-		
-		if(abandenByOffer[coordinate] != -1){
-			abandonSuggestGain[0] = assumeByOffer[coordinate];
-			abandonSuggestGain[1] = temp[2];
-			sendSuggestMessages(abandenByOffer[coordinate]);
-//			mustGo = true;
-//			valueIndex = selectValueIndex;						/** 这里直接改变自值，未考虑offer  */
-		}
-		for(int i = 0; i < neighboursQuantity; i++)
-			abandenByOffer[i] = -1;
 		sendAcceptMessages(temp);
 		//System.out.println("gather_end");
 	}
+	
+//	private void gather() {
+//		//System.out.println("gather");
+//		int temp[]=selectOfferGroup.get(0);
+//		for(int i=1; i<selectOfferGroup.size(); i++){
+//			if(temp[2]<selectOfferGroup.get(i)[2]){
+//				sendRejectMessages(temp[3]);
+//				temp=selectOfferGroup.get(i);
+//			}
+//			else{
+//				sendRejectMessages(selectOfferGroup.get(i)[3]);
+//			}
+//		}
+//		ownType=TYPE_RECEIVER;
+//		selectValueIndex=temp[0];
+//		gainValue=temp[2];
+//		coordinate=temp[3];
+//		
+//		if(abandenByOffer[coordinate] != -1){
+//			abandonSuggestGain[0] = assumeByOffer[coordinate];
+//			abandonSuggestGain[1] = temp[2];
+//			sendSuggestMessages(abandenByOffer[coordinate]);
+////			mustGo = true;
+////			valueIndex = selectValueIndex;						/** 这里直接改变自值，未考虑offer  */
+//		}
+//		for(int i = 0; i < neighboursQuantity; i++)
+//			abandenByOffer[i] = -1;
+//		sendAcceptMessages(temp);
+//		//System.out.println("gather_end");
+//	}
 	
 	private void disposeAcceptMessage(Message msg) {
 		//System.out.println("accept");
@@ -709,6 +704,8 @@ public class Pds_Mgm2Agent extends AgentCycle {
 //	}
 	
 	private void cycleForGain(){
+		/** */
+		checkMyPercentage();
 		for(int i=0; i<neighboursQuantity; i++){
 			if(i!=coordinate){
 				if(neighboursGain[i]>=gainValue){
@@ -716,6 +713,7 @@ public class Pds_Mgm2Agent extends AgentCycle {
 					if(coordinate!=-1){	
 						sendDecideGoMessages();
 					}
+					abandon(localCost);
 //					sendWaitAgainMessages();
 					return;
 				}
@@ -748,7 +746,7 @@ public class Pds_Mgm2Agent extends AgentCycle {
 		if(wait == 1){
 //			System.out.println("cycle "+cycleCount+"   Agent "+id+" wait 1 cycle");
 			wait = 0;
-			sendValueMessages();
+//			sendValueMessages();
 			return;
 		}
 		else if(suggestTag == 1){
@@ -775,7 +773,7 @@ public class Pds_Mgm2Agent extends AgentCycle {
 				//System.out.println("reject!!!!!!!!");
 				boolean tag = abandonChain();
 				if(tag == true){
-					sendValueMessages();
+//					sendValueMessages();
 					return;
 				}
 			}
@@ -788,6 +786,7 @@ public class Pds_Mgm2Agent extends AgentCycle {
 	}
 	
 	protected void allMessageDisposed(){
+		
 		if(cycleTag == CYCLE_VALUE){
 			cycleTag = CYCLE_OFFER;
 			cycleForValue();
@@ -808,6 +807,121 @@ public class Pds_Mgm2Agent extends AgentCycle {
 			cycleTag = CYCLE_VALUE;
 			cycleForGo();
 		}
+	}
+	
+	private void checkMyPercentage(){
+		myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
+		if(selectP == higherP){
+			if(myBestPercentage > myPercentage){
+				myBestPercentage = myPercentage;
+				myPercentageUnchanged = 0;
+			}
+			else{
+				myPercentageUnchanged++;
+				if(myPercentageUnchanged > 0.1*cycleCountEnd){
+					selectP = lowerP;
+//					System.out.println(cycleCount);
+				}
+			}
+		}
+	}
+	
+	private double getAbandonP(){
+//		if(myPercentage > myThreshold){
+//			myThreshold = myThreshold*(1+(neighboursQuantity/100.0));
+//			return Math.exp(-(cycleCount)/(Math.pow(neighboursQuantity, 1.5)));
+//		}
+//		else{
+//			myThreshold = myThreshold*(0.99);
+//			return Math.exp(-(cycleCount)/(Math.pow(neighboursQuantity, 1)));
+//		}
+		
+//		return myPercentage*(cycleCountEnd-cycleCount)/cycleCountEnd;
+		
+		if(selectP == higherP)
+			return Math.sqrt(myPercentage)*(cycleCountEnd-cycleCount)/cycleCountEnd;
+		else
+			return myPercentage*(cycleCountEnd-cycleCount)/cycleCountEnd;
+	}
+	
+	private void abandon(int nature) {
+		if(Math.random() > getAbandonP())
+			return;
+		
+		int[] abandonValueIndex = new int[neighboursQuantity];
+		int[][] abandonNeighbourIndex = new int[neighboursQuantity][domain.length];
+		int[] abandonCost = new int[neighboursQuantity];
+		
+		int h = (int)(neighboursQuantity*Math.random());
+//		for(int h = 0; h < neighbours.length; h++){						//遍历邻居
+			int[] selectMinCost=new int[domain.length];
+			for(int i=0; i<domain.length; i++){							//遍历值域
+				for(int j=0; j<neighbours.length; j++)
+					if(j != h)
+						selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];
+																		//累计邻居以外的cost值
+				int tempIndex = 0;
+				int tempCost = constraintCosts.get(neighbours[h])[i][tempIndex];
+				for(int hValue = 0; hValue < constraintCosts.get(neighbours[h])[i].length; hValue++){
+					if(constraintCosts.get(neighbours[h])[i][hValue] < tempCost){
+						tempCost = constraintCosts.get(neighbours[h])[i][hValue];
+						tempIndex = hValue;								//找到选定的最小值，记录value和cost
+					}
+				}
+				selectMinCost[i] += tempCost;							//做累计
+				abandonNeighbourIndex[h][i] = tempIndex;				//记录对应的邻居号和自己value对应的邻居的value建议
+			}
+			int selectOneMinCost=selectMinCost[0];
+			for(int i = 1; i < domain.length; i++){
+				if(selectOneMinCost > selectMinCost[i]){
+					selectOneMinCost = selectMinCost[i];
+					abandonValueIndex[h] = i;
+				}
+			}
+			abandonCost[h] = selectOneMinCost;							//找到每一个邻居对应的自己最小的value
+//		}
+//		int abandonIndex = 0;
+//		for(int i = 1; i < neighboursQuantity; i++){
+//			if(abandonCost[i] < abandonCost[abandonIndex])
+//				abandonIndex = i;										//找到差值最小的邻居，选作舍弃
+//		}
+		int abandonIndex = h;
+		
+		if(abandonCost[abandonIndex] < nature){
+			valueIndex = abandonValueIndex[abandonIndex];
+			sendValueMessages();
+			
+			abandonSuggestGain[0] = abandonNeighbourIndex[abandonIndex][valueIndex];
+			abandonSuggestGain[1] = nature - abandonCost[abandonIndex];
+			abandonSuggestGain[2] = valueIndex;
+			sendSuggestMessages(abandonIndex);
+			wait = 1;
+			//System.out.println(nature - abandonCost[abandonIndex]+"~~~~~");
+//			System.out.println("cycle "+cycleCount+"   Agent "+id+" ignore Agent "+neighbours[abandonIndex]+" values "+valueIndex+" suggest "+abandonSuggestGain[0]);
+			return;
+		}
+//		System.out.println("cycle "+cycleCount+"   Agent "+id+" ignore false");
+	}
+	
+	private void disposeSuggestMessage(Message msg) {
+		if(wait != 1 && suggestTag !=1 && neighboursQuantity > 1 ){
+			int senderIndex=0;
+			int senderId=msg.getIdSender();
+			for(int i=0; i<neighbours.length; i++){
+				if(neighbours[i]==senderId){
+					senderIndex=i;
+					break;
+				}
+			}
+			suggester = senderIndex;
+			suggestValue = ((int[])msg.getValue())[0];
+			suggestGain = ((int[])msg.getValue())[1];
+			neighboursValueIndex[suggester] = ((int[])msg.getValue())[2];
+			suggestTag = 1;
+//			System.out.println("cycle "+cycleCount+"   Agent "+id+" received Agent "+msg.getIdSender());
+			return;
+		}
+//		System.out.println("cycle "+cycleCount+"   Agent "+id+" reject Agent "+msg.getIdSender());
 	}
 	
 	private boolean abandonChain(){
@@ -847,6 +961,8 @@ public class Pds_Mgm2Agent extends AgentCycle {
 		if(abandonCost[abandonIndex] < localCost){
 			//System.out.println("yes!!!!!!!!");
 			valueIndex = suggestValue;
+			sendValueMessages();
+			
 			abandonSuggestGain[0] = abandonNeighbourIndex[abandonIndex];
 			abandonSuggestGain[1] = localCost - abandonCost[abandonIndex];
 			abandonSuggestGain[2] = valueIndex;

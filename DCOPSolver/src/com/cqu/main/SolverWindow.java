@@ -447,8 +447,8 @@ public class SolverWindow {
 		lspSpinnerClusterRemovingChoice=new LabelSpinnerParameter("移簇方式：", new SpinnerNumberModel(0, 0, 1, 1));
 		
 		//局部搜索算法参数设置
-		lspSpinnerCycleCountEnd=new LabelSpinnerParameter("迭代次数：", new SpinnerNumberModel(20, 0, 1000, 1));
-		lspSpinnerSelectProbability=new LabelSpinnerParameter("选择概率p：", new SpinnerNumberModel(0.3, 0, 1, 0.1));
+		lspSpinnerCycleCountEnd=new LabelSpinnerParameter("迭代次数：", new SpinnerNumberModel(1000, 0, 1000, 1));
+		lspSpinnerSelectProbability=new LabelSpinnerParameter("选择概率p：", new SpinnerNumberModel(0.4, 0, 1, 0.1));
 		lspSpinnerSelectNewProbability=new LabelSpinnerParameter("选择概率p*：", new SpinnerNumberModel(0.5, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityA=new LabelSpinnerParameter("选择概率A：", new SpinnerNumberModel(0.1, 0, 1, 0.1));
 		lspSpinnerSelectProbabilityB=new LabelSpinnerParameter("选择概率B：", new SpinnerNumberModel(0.2, 0, 1, 0.1));
@@ -638,7 +638,6 @@ public class SolverWindow {
 		}
 		else if(algorithmType.equals("DSAN")){
 			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectInterval);
 		}
 		else if(algorithmType.equals("MGM")){
 			paramList.add(lspSpinnerCycleCountEnd);
@@ -705,30 +704,18 @@ public class SolverWindow {
 		}
 		else if(algorithmType.equals("PDSALSDSA")){
 			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectInterval);
 			paramList.add(lspSpinnerSelectProbability);
-			paramList.add(lspSpinnerSelectProbabilityA);
-			paramList.add(lspSpinnerSelectProbabilityB);
-			
+			paramList.add(lspSpinnerSelectInterval);
 		}
 		else if(algorithmType.equals("PDSDSAN")){
 			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectInterval);
-			paramList.add(lspSpinnerSelectProbabilityA);
-			paramList.add(lspSpinnerSelectProbabilityB);
 		}
 		else if(algorithmType.equals("PDSMGM")){
 			paramList.add(lspSpinnerCycleCountEnd);
-			paramList.add(lspSpinnerSelectProbabilityA);
-			paramList.add(lspSpinnerSelectProbabilityB);
-			
 		}
 		else if(algorithmType.equals("PDSMGM2")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectProbability);
-			paramList.add(lspSpinnerSelectProbabilityA);
-			paramList.add(lspSpinnerSelectProbabilityB);
-			
 		}
 		else if(algorithmType.equals("DPOP"))
 		{
