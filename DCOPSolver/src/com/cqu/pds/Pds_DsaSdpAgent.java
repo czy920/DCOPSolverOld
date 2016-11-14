@@ -10,10 +10,9 @@ import com.cqu.core.Message;
 import com.cqu.core.ResultCycleAls;
 import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.cyclequeue.AgentCycleAls;
-import com.cqu.dsa.AlsDsa_Agent;
 import com.cqu.settings.Settings;
 
-public class Pds_AlsDsaAgent extends AgentCycleAls{
+public class Pds_DsaSdpAgent extends AgentCycleAls{
 	
 	public final static int TYPE_VALUE_MESSAGE = 1;
 	public final static int TYPE_SUGGEST_MESSAGE = 2;
@@ -21,8 +20,12 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 	
 //	public final static int TYPE_RESET_MESSAGE = 5;
 	
-	private static double p;
 	private static int cycleCountEnd;
+	private static int r;
+	private static double pA;
+	private static double pB;
+	private static double pC;
+	private static double pD;
 //	private static int stayDsaCountInterval;						//设置DSA操作若干轮无优化效果及重启
 	
 	private int receivedQuantity=0;
@@ -46,7 +49,7 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 	
 	public final static int higherP = 0;
 	public final static int lowerP = 1;
-	private boolean isNeighborsChanged = false;
+//	private boolean isNeighborsChanged = false;
 	private double myPercentage=1;
 	private double myBestPercentage=1;
 	private int selectP = higherP;
@@ -68,7 +71,7 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 	private int[] choiceNeighborQuene;
 	private int choiceNeighbor = 0;
 	
-	public Pds_AlsDsaAgent(int id, String name, int level, int[] domain) {
+	public Pds_DsaSdpAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 	}
 	
@@ -76,8 +79,12 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 		super.initRun();
 		
 		cycleCountEnd = Settings.settings.getCycleCountEnd();
+		pA = Settings.settings.getSelectProbabilityA();
+		pB = Settings.settings.getSelectProbabilityB();
+		pC = Settings.settings.getSelectProbabilityC();
+		pD = Settings.settings.getSelectProbabilityD();
+		r = Settings.settings.getSelectRound();
 //		stayDsaCountInterval = Settings.settings.getSelectInterval();
-		p = Settings.settings.getSelectProbability();
 		
 		localCost = 2147483647;
 		valueIndex = (int)(Math.random()*(domain.length));
@@ -220,7 +227,7 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 //		neighboursValueIndex[senderIndex] = ((int[])(msg.getValue()))[0];
 //		neighbourThreshold[senderIndex] = ((int[])(msg.getValue()))[1];
 		
-		isNeighborsChanged = true;
+//		isNeighborsChanged = true;
 		if(receivedQuantity==0){
 			
 		}
@@ -244,7 +251,7 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 //					sum+=neighbourThreshold[i];
 //				}
 //				myThreshold = sum/((neighboursQuantity+1)*1000.0);
-				
+			if(cycleCount % r != 0){	
 				if(wait == 0 && suggestTag == 0)
 					DsaWork();
 				else if(suggestTag == 1){
@@ -261,7 +268,7 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 					compareTemp += suggestGain;
 //					myPercentage = ((double)(localCostTemp-myMinCost))/((double)(myMaxCost-myMinCost));
 //					if(localCostTemp < localCost || myPercentage < utilityPercentage || compareTemp > 0){
-					if(localCostTemp < localCost || compareTemp > 0){		//
+					if(localCostTemp < localCost || compareTemp > 0){
 						valueIndex = suggestValue;
 						sendValueMessages();
 						//System.out.println("accept!!!!!!!!");
@@ -271,10 +278,9 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 						abandonChain();
 					}
 				}
-				else{
+				else
 					wait = 0;
-					sendValueMessages();
-				}
+//				sendValueMessages();
 				
 //			}
 //			else{
@@ -284,6 +290,11 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 //				valueIndex = (int)(Math.random()*(domain.length));
 //				sendValueMessages();
 //			}
+			}
+			else{
+				valueIndex = (int) (Math.random() * domain.length);
+				sendValueMessages();
+			}
 		}
 		else
 			AlsStopRunning();
@@ -311,18 +322,31 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 		
 		if(selectOneMinCost < localCost){
 			done = 1;
-			if(Math.random()<p){
+			double p = pA + Math.min(pB, pA + (localCost - selectOneMinCost)/(localCost+0.01));
+			if(Math.random() < p){
+				//System.out.println("p~~~"+p);
 				valueIndex = selectValueIndex;
 				sendValueMessages();
+			}
+		}
+		else{
+			double q = 0;
+			if((selectOneMinCost - localCost)/(localCost+0.01) <= 1){
+				q = Math.max(pC, pD - (selectOneMinCost - localCost)/(localCost+0.01));
+				if(Math.random() < q){
+					//System.out.println("q~~~"+q);
+					valueIndex = selectValueIndex;
+					sendValueMessages();
+				}
 			}
 		}
 		
 		/** */
 		checkMyPercentage();
-		if(done == 0 && isNeighborsChanged == false){					//	
+		if(done == 0 ){							//	&& isNeighborsChanged == false
 			abandon(localCost);
 		}
-		isNeighborsChanged = false;
+//		isNeighborsChanged = false;
 	}
 	
 	private void checkMyPercentage(){
@@ -359,10 +383,10 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 //		else
 //			return myPercentage*(cycleCountEnd-cycleCount)/cycleCountEnd;
 		
-		if(selectP == higherP)
-			return Math.sqrt(myPercentage)*(cycleCountEnd-cycleCount)/cycleCountEnd;
-		else
-			return myPercentage*(cycleCountEnd-cycleCount)/cycleCountEnd;
+//		if(selectP == higherP)
+//			return Math.sqrt(myPercentage)*(cycleCountEnd-cycleCount)/cycleCountEnd;
+//		else
+//			return myPercentage*(cycleCountEnd-cycleCount)/cycleCountEnd;
 		
 //		if(cycleCount < (0.8)*cycleCountEnd){
 //			if(selectP == higherP)
@@ -377,6 +401,11 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 //			return Math.sqrt(myPercentage)*(1-Math.sqrt(cycleCount/(double)cycleCountEnd));
 //		else
 //			return myPercentage*(1-Math.sqrt(cycleCount/(double)cycleCountEnd));
+		
+		if(selectP == higherP)
+			return Math.sqrt(myPercentage)*(cycleCountEnd-cycleCount)/cycleCountEnd;
+		else
+			return myPercentage*(cycleCountEnd-cycleCount)/cycleCountEnd;
 	}
 	
 	private void abandon(int nature) {
@@ -527,8 +556,7 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 //			int  i =0;
 //		}
 //		valueIndex = max;
-//		sendValueMessages();
-//		
+////		sendValueMessages();
 //		if(sum > neighboursQuantity*0.7){
 //			sum = (int)(neighboursQuantity*0.2);
 //		}
@@ -537,8 +565,8 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 //			abandonSuggestGain[1] = nature - abandonCost[abandonID[i]];
 //			abandonSuggestGain[2] = valueIndex;
 //			sendSuggestMessages(abandonID[i]);
-//			wait = 1;
 //		}
+//		wait = 1;
 //		//System.out.println(nature - abandonCost[abandonIndex]+"~~~~~");
 		
 		/**

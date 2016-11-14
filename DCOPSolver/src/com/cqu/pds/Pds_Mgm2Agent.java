@@ -41,7 +41,7 @@ public class Pds_Mgm2Agent extends AgentCycle {
 	public final static int CYCLE_OFFER=562;
 	public final static int CYCLE_ACCEPT=563;
 	public final static int CYCLE_GAIN=564;
-	public final static int CYCLE_Go=565;
+	public final static int CYCLE_GO=565;
 	
 	private int cycleTag = CYCLE_VALUE;
 	private int wrong;
@@ -743,6 +743,11 @@ public class Pds_Mgm2Agent extends AgentCycle {
 //	}
 	
 	private void cycleForGo(){
+		if(isAbleToGo==go && coordinate == -1){
+			valueIndex=selectValueIndex;
+			sendValueMessages();
+		}
+		
 		if(wait == 1){
 //			System.out.println("cycle "+cycleCount+"   Agent "+id+" wait 1 cycle");
 			wait = 0;
@@ -779,10 +784,6 @@ public class Pds_Mgm2Agent extends AgentCycle {
 			}
 		}
 		
-		if(isAbleToGo==go && coordinate == -1){
-			valueIndex=selectValueIndex;
-			sendValueMessages();
-		}
 	}
 	
 	protected void allMessageDisposed(){
@@ -800,10 +801,10 @@ public class Pds_Mgm2Agent extends AgentCycle {
 			cycleForAccept();
 		}
 		else if(cycleTag == CYCLE_GAIN){
-			cycleTag = CYCLE_Go;
+			cycleTag = CYCLE_GO;
 			cycleForGain();
 		}
-		else if(cycleTag == CYCLE_Go){
+		else if(cycleTag == CYCLE_GO){
 			cycleTag = CYCLE_VALUE;
 			cycleForGo();
 		}
@@ -903,8 +904,33 @@ public class Pds_Mgm2Agent extends AgentCycle {
 //		System.out.println("cycle "+cycleCount+"   Agent "+id+" ignore false");
 	}
 	
+//	private void disposeSuggestMessage(Message msg) {
+//		if(wait != 1 && suggestTag !=1 && neighboursQuantity > 1 ){
+//			int senderIndex=0;
+//			int senderId=msg.getIdSender();
+//			for(int i=0; i<neighbours.length; i++){
+//				if(neighbours[i]==senderId){
+//					senderIndex=i;
+//					break;
+//				}
+//			}
+//			suggester = senderIndex;
+//			suggestValue = ((int[])msg.getValue())[0];
+//			suggestGain = ((int[])msg.getValue())[1];
+//			neighboursValueIndex[suggester] = ((int[])msg.getValue())[2];
+//			suggestTag = 1;
+////			System.out.println("cycle "+cycleCount+"   Agent "+id+" received Agent "+msg.getIdSender());
+//			return;
+//		}
+////		System.out.println("cycle "+cycleCount+"   Agent "+id+" reject Agent "+msg.getIdSender());
+//	}
+	
+	/**
+	 * 打乱MGM周期节奏的消息处理模式
+	 */
 	private void disposeSuggestMessage(Message msg) {
-		if(wait != 1 && suggestTag !=1 && neighboursQuantity > 1 ){
+		if(wait != 1 && neighboursQuantity > 1 ){
+			
 			int senderIndex=0;
 			int senderId=msg.getIdSender();
 			for(int i=0; i<neighbours.length; i++){
@@ -917,12 +943,30 @@ public class Pds_Mgm2Agent extends AgentCycle {
 			suggestValue = ((int[])msg.getValue())[0];
 			suggestGain = ((int[])msg.getValue())[1];
 			neighboursValueIndex[suggester] = ((int[])msg.getValue())[2];
-			suggestTag = 1;
-//			System.out.println("cycle "+cycleCount+"   Agent "+id+" received Agent "+msg.getIdSender());
-			return;
+			
+			int localCostTemp = 0, compareTemp = 0;
+			for(int i=0; i<neighbours.length; i++){
+				localCostTemp+=constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
+				if(i != suggester){
+					compareTemp += constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndexEx[i]];
+					compareTemp -= constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
+				}
+			}
+			compareTemp += suggestGain;
+			if(localCostTemp < localCost || compareTemp > 0){
+				valueIndex = suggestValue;
+				sendValueMessages();
+				return;
+			}
+			else{
+				boolean tag = abandonChain();
+				if(tag == true){
+					return;
+				}
+			}
 		}
-//		System.out.println("cycle "+cycleCount+"   Agent "+id+" reject Agent "+msg.getIdSender());
 	}
+	
 	
 	private boolean abandonChain(){
 //		if(Math.random() > abandonProbability)

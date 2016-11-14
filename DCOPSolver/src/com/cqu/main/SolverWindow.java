@@ -447,13 +447,13 @@ public class SolverWindow {
 		lspSpinnerClusterRemovingChoice=new LabelSpinnerParameter("移簇方式：", new SpinnerNumberModel(0, 0, 1, 1));
 		
 		//局部搜索算法参数设置
-		lspSpinnerCycleCountEnd=new LabelSpinnerParameter("迭代次数：", new SpinnerNumberModel(1000, 0, 1000, 1));
+		lspSpinnerCycleCountEnd=new LabelSpinnerParameter("迭代次数：", new SpinnerNumberModel(800, 0, 5000, 1));
 		lspSpinnerSelectProbability=new LabelSpinnerParameter("选择概率p：", new SpinnerNumberModel(0.4, 0, 1, 0.1));
 		lspSpinnerSelectNewProbability=new LabelSpinnerParameter("选择概率p*：", new SpinnerNumberModel(0.5, 0, 1, 0.1));
-		lspSpinnerSelectProbabilityA=new LabelSpinnerParameter("选择概率A：", new SpinnerNumberModel(0.1, 0, 1, 0.1));
-		lspSpinnerSelectProbabilityB=new LabelSpinnerParameter("选择概率B：", new SpinnerNumberModel(0.2, 0, 1, 0.1));
-		lspSpinnerSelectProbabilityC=new LabelSpinnerParameter("选择概率C：", new SpinnerNumberModel(0.05, 0, 1, 0.1));
-		lspSpinnerSelectProbabilityD=new LabelSpinnerParameter("选择概率D：", new SpinnerNumberModel(0.2, 0, 1, 0.1));
+		lspSpinnerSelectProbabilityA=new LabelSpinnerParameter("选择概率A：", new SpinnerNumberModel(0.6, 0, 1, 0.1));
+		lspSpinnerSelectProbabilityB=new LabelSpinnerParameter("选择概率B：", new SpinnerNumberModel(0.15, 0, 1, 0.1));
+		lspSpinnerSelectProbabilityC=new LabelSpinnerParameter("选择概率C：", new SpinnerNumberModel(0.4, 0, 1, 0.1));
+		lspSpinnerSelectProbabilityD=new LabelSpinnerParameter("选择概率D：", new SpinnerNumberModel(0.8, 0, 1, 0.1));
 		lspSpinnerSelectInterval=new LabelSpinnerParameter("持续控制：", new SpinnerNumberModel(15, 0, 10000, 1));
 		lspSpinnerSelectStepK1=new LabelSpinnerParameter("步长k：", new SpinnerNumberModel(5, 0, 50, 1));
 		lspSpinnerSelectStepK2=new LabelSpinnerParameter("步长K*：", new SpinnerNumberModel(5, 0, 50, 1));

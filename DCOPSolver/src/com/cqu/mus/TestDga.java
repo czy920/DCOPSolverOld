@@ -1,4 +1,4 @@
-package com.cqu.pds;
+package com.cqu.mus;
 
 import com.cqu.core.EventListener;
 import com.cqu.core.Result;
@@ -7,24 +7,24 @@ import com.cqu.core.ResultCycleAls;
 import com.cqu.core.Solver;
 import com.cqu.settings.Settings;
 
-public class Test_Pds {
+public class TestDga {
     public static void main(String[] args){
         Solver solver = new Solver();
         
         Settings.settings.setCycleCount(800);
         
-        Settings.settings.setSelectProbability(0.4);
-        Settings.settings.setSelectProbabilityA(0.6);
-        Settings.settings.setSelectProbabilityB(0.2);
+        Settings.settings.setSelectProbability(0.8);
+        Settings.settings.setSelectProbabilityA(0.1);
+        Settings.settings.setSelectProbabilityB(0.01);
+        Settings.settings.setSelectInterval(100);
+        
         Settings.settings.setSelectProbabilityC(0.4);
         Settings.settings.setSelectProbabilityD(0.8);
-        
-        Settings.settings.setSelectInterval(1000);
         Settings.settings.setSelectRound(100);
         
         Settings.settings.setDisplayGraphFrame(false);
         
-            solver.solve("problems/RandomDCOP_120_10_10.xml", "PDSALSDSA", false, false, new EventListener() {
+            solver.solve("problems/RandomDCOP_120_10_60.xml", "ALSDGA", false, false, new EventListener() {
 //            solver.solve("problems/MS_100_20_20_1.xml", "PDSDSAN", false, false, new EventListener() {
                      @Override
             public void onStarted() {

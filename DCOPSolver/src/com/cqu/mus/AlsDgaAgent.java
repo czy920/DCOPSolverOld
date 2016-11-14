@@ -411,6 +411,21 @@ public class AlsDgaAgent extends AgentCycleAls {
 		//}
 	}
 	
+	protected void AlsStopRunning(){
+		if(valueIndexList.isEmpty() == true){
+			if(level == 0){
+				double temp[] = new double[AlsCycleCount];
+				for(int i = 0; i < AlsCycleCount; i++){
+					temp[i] = bestCostInCycle[i];
+				}
+				bestCostInCycle = temp;						//更正数组长度
+			}
+			valueIndex = bestValue;
+			stopRunning();
+		}
+		//System.out.println("Agent "+this.name+"~~~~~~"+AlsCycleCount);
+	}
+	
 	private void disposeStartMessage(Message msg){
 		prepareToStart = (Integer)msg.getValue();
 		sendStartMessages();
@@ -451,6 +466,7 @@ public class AlsDgaAgent extends AgentCycleAls {
 			//String name_=(String)result.get(KEY_NAME);
 			//int value_=(Integer)result.get(KEY_VALUE);
 			
+//			if(((Integer)result.get(KEY_ID)) == 1){
 			if(tag == 0){
 				totalCost = ((Integer)result.get(KEY_BESTCOST));
 				ret.bestCostInCycle=(double[])result.get(KEY_BESTCOSTINCYCLE);

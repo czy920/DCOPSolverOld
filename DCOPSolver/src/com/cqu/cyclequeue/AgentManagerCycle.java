@@ -148,6 +148,10 @@ public class AgentManagerCycle {
 				agent=new Pds_DsanAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
+			else if(agentType.equals("PDSDSASDP")){
+				agent=new Pds_DsaSdpAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
 			else if(agentType.equals("PDSMGM")){
 				agent=new Pds_MgmAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));

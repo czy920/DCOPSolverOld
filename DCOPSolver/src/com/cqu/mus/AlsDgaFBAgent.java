@@ -485,6 +485,21 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 		//}
 	}
 	
+	protected void AlsStopRunning(){
+		if(valueIndexList.isEmpty() == true){
+			if(level == 0){
+				double temp[] = new double[AlsCycleCount];
+				for(int i = 0; i < AlsCycleCount; i++){
+					temp[i] = bestCostInCycle[i];
+				}
+				bestCostInCycle = temp;						//更正数组长度
+			}
+			valueIndex = bestValue;
+			stopRunning();
+		}
+		//System.out.println("Agent "+this.name+"~~~~~~"+AlsCycleCount);
+	}
+	
 	private void disposeStartMessage(Message msg){
 		prepareToStart = (Integer)msg.getValue();
 		sendStartMessages();

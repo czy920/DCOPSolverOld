@@ -279,7 +279,7 @@ public class Pds_MgmAgent extends AgentCycle {
 		if(wait == 1){
 //			System.out.println("cycle "+cycleCount+"   Agent "+id+" wait 1 cycle");
 			wait = 0;
-//			sendValueMessages();
+			sendValueMessages();
 			return;
 		}
 		else if(suggestTag == 1){
@@ -424,7 +424,7 @@ public class Pds_MgmAgent extends AgentCycle {
 		
 		if(abandonCost[abandonIndex] < nature){
 			valueIndex = abandonValueIndex[abandonIndex];
-			sendValueMessages();
+//			sendValueMessages();
 			
 			abandonSuggestGain[0] = abandonNeighbourIndex[abandonIndex][valueIndex];
 			abandonSuggestGain[1] = nature - abandonCost[abandonIndex];
@@ -496,7 +496,7 @@ public class Pds_MgmAgent extends AgentCycle {
 		if(abandonCost[abandonIndex] < localCost){
 			//System.out.println("yes!!!!!!!!");
 			valueIndex = suggestValue;
-			sendValueMessages();
+//			sendValueMessages();
 			
 			abandonSuggestGain[0] = abandonNeighbourIndex[abandonIndex];
 			abandonSuggestGain[1] = localCost - abandonCost[abandonIndex];
