@@ -14,6 +14,7 @@ import com.cqu.bnbadopt.BnBAdoptAgent;
 import com.cqu.bnbmergeadopt.AgentModel;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
+import com.cqu.dgibbs.DGibbsAgent;
 import com.cqu.dsa.*;
 import com.cqu.maxsum.*;
 import com.cqu.dsan.*;
@@ -187,6 +188,10 @@ public class AgentManagerCycle {
 			}
 			else if (agentType.equals("MAXSUMOH")) {
 				agent=new MaxSumOneHotAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if (agentType.equals("DGIBBS")){
+				agent=new DGibbsAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else{
