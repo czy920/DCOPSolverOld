@@ -84,7 +84,7 @@ public class Solver {
 				agentType.equals("PDSDSAN")||agentType.equals("PDSMGM")||agentType.equals("PDSMGM2")||agentType.equals("PDSDSASDP")||
 				agentType.equals("MAXSUM")||agentType.equals("ACO")||agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||
 				agentType.equals("ACO_line")||agentType.equals("ACO_final")||agentType.equals("MAXSUMAD")||agentType.equals("MAXSUMRS")||agentType.equals("MAXSUMSPLITED")||agentType.equals("SBB")||
-				agentType.equals("MAXSUMOH"))
+				agentType.equals("MAXSUMOH")||agentType.equals("DGIBBS"))
 
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
@@ -734,7 +734,7 @@ public class Solver {
 				algorithmType.equals("PDSDSAN")||algorithmType.equals("PDSMGM")||algorithmType.equals("PDSMGM2")||algorithmType.equals("PDSDSASDP")||
 				algorithmType.equals("ACO")||algorithmType.equals("ACO_tree")||algorithmType.equals("ACO_bf")||algorithmType.equals("ACO_phase")||
 				algorithmType.equals("ACO_line")||algorithmType.equals("ACO_final")||algorithmType.equals("ACO")||algorithmType.equals("ACO_tree")||algorithmType.equals("ACO_bf")||
-				algorithmType.equals("ACO_phase")||algorithmType.equals("ACO_line")||algorithmType.equals("ACO_final") || algorithmType.equals("MAXSUMRS") || algorithmType.equals("MAXSUMAD"))
+				algorithmType.equals("ACO_phase")||algorithmType.equals("ACO_line")||algorithmType.equals("ACO_final") || algorithmType.equals("MAXSUMRS") || algorithmType.equals("MAXSUMAD")||algorithmType.equals("DGIBBS"))
 		//if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT"))
 		{
 			//construct agents
