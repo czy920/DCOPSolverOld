@@ -392,11 +392,11 @@ public class Settings {
 
 	public int getStageSize() {
 		// TODO Auto-generated method stub
-		return 0;
+		return stageSize;
 	}
 
 	public int getRepeatTime() {
 		// TODO Auto-generated method stub
-		return 0;
+		return repeatTime;
 	}
 }
