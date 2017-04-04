@@ -3,6 +3,7 @@ package com.cqu.dsa;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
@@ -29,7 +30,7 @@ public class AlsDsa_Agent extends AgentCycleAls{
 	
 	public AlsDsa_Agent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
-		// TODO 自动生成的构造函数存根
+		//  
 	}
 	
 	protected void initRun() {
@@ -58,15 +59,15 @@ public class AlsDsa_Agent extends AgentCycleAls{
 	
 	@Override
 	protected void disposeMessage(Message msg) {
-		// TODO 自动生成的方法存根
+		// 
 		if(msg.getType() == AlsDsa_Agent.TYPE_VALUE_MESSAGE){
 			disposeValueMessage(msg);
 		}
-		//!!!!!!!!!!!!!!!!!!!!要添加disposeAlsCostMessage(msg)的处理模块!!!!!!!!!!!!!!!!!!!!
+		// TODO !!!!!!!!!!!!!!!!!!!!要添加disposeAlsCostMessage(msg)的处理模块!!!!!!!!!!!!!!!!!!!!
 		else if(msg.getType() == AlsDsa_Agent.TYPE_ALSCOST_MESSAGE){
 			disposeAlsCostMessage(msg);
 		}
-		//!!!!!!!!!!!!!!!!!!!!要添加disposeAlsBestMessage(msg)的处理模块!!!!!!!!!!!!!!!!!!!!
+		// TODO !!!!!!!!!!!!!!!!!!!!要添加disposeAlsBestMessage(msg)的处理模块!!!!!!!!!!!!!!!!!!!!
 		else if(msg.getType() == AlsDsa_Agent.TYPE_ALSBEST_MESSAGE){
 			disposeAlsBestMessage(msg);
 		}else
@@ -94,13 +95,15 @@ public class AlsDsa_Agent extends AgentCycleAls{
 		if(cycleCount <= cycleCountEnd){
 			cycleCount++;
 			localCost=localCost();
-			AlsWork();			//---进行ALS框架操作，调用父类方法---要获取localCost的值，该方法必须要位于localCost()方法之后，
+			AlsWork();			// TODO ---进行ALS框架操作，调用父类方法---要获取localCost的值，该方法必须要位于localCost()方法之后，
+			
+			//加入扰动
+			if(Math.random() < 0.01){
+				valueIndex = (int)(Math.random()*(domain.length));
+			}
 			
 			if(Math.random()<p){
 				int[] selectMinCost=new int[domain.length];
-				for(int i=0; i<domain.length; i++){
-					selectMinCost[i]=0;
-				}
 				for(int i=0; i<domain.length; i++){
 					for(int j=0; j<neighbours.length; j++){
 							selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];
@@ -118,6 +121,7 @@ public class AlsDsa_Agent extends AgentCycleAls{
 					valueIndex = selectValueIndex;
 					sendValueMessages();
 				}
+//				sendValueMessages();
 				nccc++;
 			}
 		}
@@ -165,7 +169,6 @@ public class AlsDsa_Agent extends AgentCycleAls{
 	
 	@Override
 	public Object printResults(List<Map<String, Object>> results) {
-		// TODO 自动生成的方法存根
 
 		ResultCycleAls ret=new ResultCycleAls();
 		int tag = 0;
@@ -200,7 +203,7 @@ public class AlsDsa_Agent extends AgentCycleAls{
 	@Override
 	public String easyMessageContent(Message msg, AgentCycle sender,
 			AgentCycle receiver) {
-		// TODO 自动生成的方法存根
+		
 		return "from "+sender.getName()+" to "+receiver.getName()+" type "+AlsDsa_Agent.messageContent(msg);
 	}
 	
@@ -228,7 +231,7 @@ public class AlsDsa_Agent extends AgentCycleAls{
 	
 	@Override
 	protected void messageLost(Message msg) {
-		// TODO 自动生成的方法存根
+		// 
 		if(Debugger.debugOn==true)
 		{
 			System.out.println(Thread.currentThread().getName()+": message lost in agent "+

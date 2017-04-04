@@ -12,7 +12,7 @@ import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.cyclequeue.AgentCycleAls;
 import com.cqu.settings.Settings;
 
-//双个体的分布式遗传算法
+//分布式遗传算法
 public class AlsDgaAgent extends AgentCycleAls {
 	
 	public final static int TYPE_VALUE_COST_MESSAGE=0;
@@ -24,20 +24,20 @@ public class AlsDgaAgent extends AgentCycleAls {
 	private static double pMutate;
 	
 	private int neighboursQuantity;
-	private int receivedQuantity = 0;
 	private int cycleCount = 0;
+//	private int receivedQuantity = 0;
 //	private boolean crossoverLock = true;
 //	private boolean crossoverMessage = false;
 //	private int completeTag = 0;
 	
 	private int bestIndividual;
-	private final static int NONE = 99999;
+	private final static int NONE = 999999;
 	private int[] accumulativeCost;
 	protected LinkedList<int[]> localCostList = new LinkedList<int[]>();
 	protected LinkedList<int[]> valueIndexList = new LinkedList<int[]>();
 	protected HashMap<Integer, LinkedList<int[]>> childrenMessageList = new HashMap<Integer, LinkedList<int[]>>();
 	
-	private int population = 10;
+	private int population = 8;
 	private int[] valueIndexGA;
 	private int[] localCostGA;
 	private int[] neighboursLocalCostGA;
@@ -46,8 +46,8 @@ public class AlsDgaAgent extends AgentCycleAls {
 	private int[][] neighboursValueIndexGA;
 	private int prepareToStart = 2147483647;
 	
-	private boolean crossTag0 = false;
-	private boolean crossTag = false;
+	private boolean crossTagCpt = false;
+	private boolean crossTagGo = false;
 	private int[] crossIndividuals = new int[2];
 	private int min = 0;
 //	private boolean wait = false;
@@ -113,18 +113,18 @@ public class AlsDgaAgent extends AgentCycleAls {
 //		box[population+3] = crossIndividuals[1];
 		
 		//标记
-		if(crossTag0 == true){
+		if(crossTagCpt == true){
 			if(Math.random() < pCross){
-				crossTag = true;
+				crossTagGo = true;
 				box[population+1] = 1;
 			}
 			else{
-				crossTag = false;
+				crossTagGo = false;
 				box[population+1] = 0;
 			}
 		}
 		else{
-			crossTag = false;
+			crossTagGo = false;
 			box[population+1] = 0;
 		}
 		
@@ -194,7 +194,7 @@ public class AlsDgaAgent extends AgentCycleAls {
 		}
 		neighboursLocalCostGA[senderIndex] =  ((int[])(msg.getValue()))[population];
 		if(((int[])(msg.getValue()))[population+1] == 1){
-			crossTag = true;
+			crossTagGo = true;
 //			crossIndividuals[0] = ((int[])(msg.getValue()))[population+2];
 //			crossIndividuals[1] = ((int[])(msg.getValue()))[population+3];
 		}
@@ -202,39 +202,14 @@ public class AlsDgaAgent extends AgentCycleAls {
 	
 	protected void allMessageDisposed(){
 		if(cycleCount <= cycleCountEnd){
-			if(prepareToStart == 0){
-				crossTag0 = true;
-				for(int i = 0; i < neighboursQuantity;i++){
-					if(localCostGA[min]*1000/neighboursQuantity > neighboursLocalCostGA[i]){
-						crossTag0 = false;
-						break;
-					}
-				}
-			}
 			localCost();
 			AlsWork();
 			cycleCount++;
 			
-			if(prepareToStart > 0)
-				prepareToStart--;
-			if(prepareToStart == 0){
-				if(crossTag == true){
-					
-					int temp = valueIndexGA[0];
-					for(int i = 0; i < population-1; i++){
-						valueIndexGA[i] = valueIndexGA[i+1];
-					}
-					valueIndexGA[population-1] = temp;
-					
-//					int temp = valueIndexGA[crossIndividuals[0]];
-//					valueIndexGA[crossIndividuals[0]] = valueIndexGA[crossIndividuals[1]];
-//					valueIndexGA[crossIndividuals[1]] = temp;
-				}
-			}
+			cross();
 			mutate();
 			DsaWork();
 			
-			crossTag = false;
 			sendValueCostMessages();
 		}
 		else{
@@ -242,25 +217,27 @@ public class AlsDgaAgent extends AgentCycleAls {
 		}
 	}
 	
-	private void DsaWork(){
-		if(Math.random()<p){
-			int[][] selectMinCost=new int[population][domain.length];
-			for(int ip = 0; ip < population; ip++){
-				for(int i=0; i<domain.length; i++){
-					for(int j=0; j<neighbours.length; j++){
-						selectMinCost[ip][i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndexGA[ip][j]];	
-					}
+	private void cross(){
+		if(prepareToStart > 0)
+			prepareToStart--;
+		if(prepareToStart == 0){
+			crossTagCpt = true;
+			for(int i = 0; i < neighboursQuantity;i++){
+				if(localCostGA[min]*1000/neighboursQuantity > neighboursLocalCostGA[i]){
+					crossTagCpt = false;
+					break;
 				}
-				int selectValueIndex=0;
-				for(int i = 1; i < domain.length; i++){
-					if(selectMinCost[ip][selectValueIndex] > selectMinCost[ip][i]){
-						selectValueIndex = i;
-					}
-				}
+			}
+			
+			if(crossTagGo == true && cycleCount%10 == 0){	//
 				
-				if(selectMinCost[ip][selectValueIndex] < localCostGA[ip]){
-					valueIndexGA[ip] = selectValueIndex;
+				int temp = valueIndexGA[0];
+				for(int i = 0; i < population-1; i++){
+					valueIndexGA[i] = valueIndexGA[i+1];
 				}
+				valueIndexGA[population-1] = temp;
+				valueIndexGA[population-cycleCount%population-1] = bestValue;			//此行代码决定种群中是否常驻一个最优个体
+				crossTagGo = false;
 			}
 		}
 	}
@@ -285,6 +262,29 @@ public class AlsDgaAgent extends AgentCycleAls {
 //				}
 				
 				valueIndexGA[ip] = (int)(Math.random()*(domain.length));
+			}
+		}
+	}
+	
+	private void DsaWork(){
+		if(Math.random()<p){
+			int[][] selectMinCost=new int[population][domain.length];
+			for(int ip = 0; ip < population; ip++){
+				for(int i=0; i<domain.length; i++){
+					for(int j=0; j<neighbours.length; j++){
+						selectMinCost[ip][i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndexGA[ip][j]];	
+					}
+				}
+				int selectValueIndex=0;
+				for(int i = 1; i < domain.length; i++){
+					if(selectMinCost[ip][selectValueIndex] > selectMinCost[ip][i]){
+						selectValueIndex = i;
+					}
+				}
+				
+				if(selectMinCost[ip][selectValueIndex] < localCostGA[ip]){
+					valueIndexGA[ip] = selectValueIndex;
+				}
 			}
 		}
 	}

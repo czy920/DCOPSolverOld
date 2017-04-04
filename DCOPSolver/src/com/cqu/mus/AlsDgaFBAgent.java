@@ -12,12 +12,12 @@ import com.cqu.cyclequeue.AgentCycle;
 import com.cqu.cyclequeue.AgentCycleAls;
 import com.cqu.settings.Settings;
 
-//双个体的分布式遗传算法
+//分布式遗传算法
 public class AlsDgaFBAgent extends AgentCycleAls {
 	
 	public final static int TYPE_VALUE_COST_MESSAGE=0;
 	public final static int TYPE_START_MESSAGE=111;
-	public final static int TYPE_RESET_MESSAGE = 112;
+	public final static int TYPE_CROSS_MESSAGE = 112;
 	
 	private static int cycleCountEnd;
 	private static int stayCountInterval;
@@ -27,8 +27,8 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 	
 	
 	private int neighboursQuantity;
-	private int receivedQuantity = 0;
 	private int cycleCount = 0;
+//	private int receivedQuantity = 0;
 //	private boolean crossoverLock = true;
 //	private boolean crossoverMessage = false;
 //	private int completeTag = 0;
@@ -49,16 +49,18 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 	private int[][] neighboursValueIndexGA;
 	private int prepareToStart = 2147483647;
 	
-	private boolean crossTag0 = false;
-	private boolean crossTag = false;
-	private boolean[] resetTagPopulation;
+	private boolean crossTagCpt = false;	//crossTagCaptain
+	private boolean crossTagGo = false;
+	private int[] fatherValueGA;
+	private int[] fatherCostGA;
+	private int[] currentGlobalCostGA;
+	private int[] lastGlobalCostGA;
 	private int min = 0;
-	private boolean wait = false;
-	private boolean resetLock = false;
-	private boolean resetTag = false;
+	private boolean crossLock = false;
 	private int stayUnchanged = 0;
-	private int prepareToReset = 2147483647;
+	private int prepareToCross = 2147483647;
 	private int bestCostTemp = 2147483647;
+	private int timeAfterTree = 0;
 
 	public AlsDgaFBAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
@@ -73,79 +75,57 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 		pCross = Settings.settings.getSelectProbabilityA();
 		pMutate = Settings.settings.getSelectProbabilityB();
 		
+		
 		neighboursQuantity=neighbours.length;
 		valueIndexGA = new int[population];
 		localCostGA = new int[population];
 		neighboursLocalCostGA = new int[neighboursQuantity];
+		fatherValueGA = new int[population];
+		fatherCostGA = new int[population];
+		currentGlobalCostGA = new int[population];
+		lastGlobalCostGA = new int[population];
 //		areaCostGA = 2147483647;
 //		neighboursAreaCostGA = new int[neighboursQuantity];
 		neighboursValueIndexGA = new int[population][neighboursQuantity];
-		resetTagPopulation = new boolean[population];
 		for(int i = 0; i < population; i++){
 			localCostGA[i] = 2147483647;
 			valueIndexGA[i] = (int)(Math.random()*(domain.length));
-			resetTagPopulation[i] = false;
+			fatherCostGA[i] = 2147483647;
 		}
-		
 		sendValueCostMessages();
 	}
 	
 	private void sendValueCostMessages(){
 		int[] box;
-		if(resetTag == false){
-			box = new int[population+2];
-			
-			//value。。。
-			for(int i = 0; i< population; i++){
-				box[i] = valueIndexGA[i];
-			}
-			
-			//竞争
-			min = 0;
-			for(int i = 0; i < population; i++){
-				if(localCostGA[i] < localCostGA[min])
-					min = i;
-			}
-			box[population] = (localCostGA[min]*1000/neighboursQuantity);
-			//标记
-			
-			if(crossTag0 == true){
-				if(Math.random() < pCross){
-					crossTag = true;
-					box[population+1] = 1;
-				}
-				else{
-					crossTag = false;
-					box[population+1] = 0;
-				}
+		box = new int[population+2];
+		
+		//value。。。
+		for(int i = 0; i< population; i++){
+			box[i] = valueIndexGA[i];
+		}
+		
+		//竞争
+		min = 0;
+		for(int i = 0; i < population; i++){
+			if(localCostGA[i] < localCostGA[min])
+				min = i;
+		}
+		box[population] = (localCostGA[min]*1000/neighboursQuantity);
+		
+		//标记
+		if(crossTagCpt == true){
+			if(Math.random() < pCross){
+				crossTagGo = true;
+				box[population+1] = 1;
 			}
 			else{
-					crossTag = false;
-					box[population+1] = 0;
+				crossTagGo = false;
+				box[population+1] = 0;
 			}
-			
-	//		if(Math.random() < pCross){
-	//			crossTag = true;
-	//			box[1] = 1;
-	//		}
-	//		else{
-	//			crossTag = false;
-	//			box[1] = 0;
-	//		}
-			
 		}
 		else{
-			box = new int[population*2];
-			for(int i = 0; i < population; i++){
-				box[i] = valueIndexGA[i];
-				if(Math.random() < 0.01){
-					resetTagPopulation[i] = true;
-					box[i+population] = 1;
-				}
-				else{
-					resetTagPopulation[i] = false;
-				}
-			}
+			crossTagGo = false;
+			box[population+1] = 0;
 		}
 		
 		for(int neighbourIndex = 0; neighbourIndex < neighboursQuantity; neighbourIndex++){
@@ -160,8 +140,13 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 	}
 	
 	protected void sendAlsBestMessage(){
+		int[] box = new int[population+1];
+		box[0] = bestIndividual;
+		for(int i = 0; i < population; i++){
+			box[i+1] = currentGlobalCostGA[i];
+		}
 		for(int i = 0; i < children.length; i++){
-			Message msg=new Message(this.id, children[i], AgentCycleAls.TYPE_ALSBEST_MESSAGE, bestIndividual);
+			Message msg=new Message(this.id, children[i], AgentCycleAls.TYPE_ALSBEST_MESSAGE, box);
 			this.sendMessage(msg);
 		}
 	}
@@ -173,9 +158,9 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 		}
 	}
 	
-	private void sendResetMessages(){
+	private void sendCrossMessages(){
 		for(int i = 0; i < children.length; i++){
-			Message msg = new Message(this.id, children[i], TYPE_RESET_MESSAGE, prepareToReset - 1);
+			Message msg = new Message(this.id, children[i], TYPE_CROSS_MESSAGE, prepareToCross - 1);
 			this.sendMessage(msg);
 		}
 	}
@@ -187,8 +172,8 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 		else if(msg.getType() == TYPE_START_MESSAGE){
 			disposeStartMessage(msg);
 		}
-		else if(msg.getType() == TYPE_RESET_MESSAGE){
-			disposeResetMessage(msg);
+		else if(msg.getType() == TYPE_CROSS_MESSAGE){
+			disposeCrossMessage(msg);
 		}
 		else if(msg.getType() == TYPE_ALSCOST_MESSAGE){
 			disposeAlsCostMessage(msg);
@@ -201,7 +186,6 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 	}
 	
 	private void disposeValueCostMessage(Message msg){
-		receivedQuantity=(receivedQuantity+1)%neighboursQuantity;
 		int senderIndex=0;
 		int senderId=msg.getIdSender();
 		for(int i=0; i<neighbours.length; i++){
@@ -214,86 +198,79 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 		for(int i = 0; i < population; i++){
 			neighboursValueIndexGA[i][senderIndex] = ((int[])(msg.getValue()))[i];
 		}
-		neighboursLocalCostGA[senderIndex] =  ((int[])(msg.getValue()))[population];
-		if(resetTag == false){
-			if(((int[])(msg.getValue()))[population+1] == 1)
-				crossTag = true;
+		neighboursLocalCostGA[senderIndex] = ((int[])(msg.getValue()))[population];
+		if(((int[])(msg.getValue()))[population+1] == 1){
+			crossTagGo = true;
 		}
-		else{
-			for(int i = 0; i < population; i++){
-				if(((int[])(msg.getValue()))[population+i] == 1){
-					resetTagPopulation[i] = true;
-				}
-			}
-		}
+		else
+			crossTagGo = false;
 	}
 	
 	protected void allMessageDisposed(){
 		if(cycleCount <= cycleCountEnd){
-			if(prepareToStart == 0){
-				crossTag0 = true;
-				for(int i = 0; i < neighboursQuantity;i++){
-					if(localCostGA[min]*1000/neighboursQuantity > neighboursLocalCostGA[i]){
-						crossTag0 = false;
-						break;
-					}
-				}
-			}
 			localCost();
 			AlsWork();
 			cycleCount++;
 
-			if(prepareToStart > 0)
-				prepareToStart--;
-			if(prepareToStart == 0){
-				
-				prepareToReset--;
-				if(prepareToReset > 0){
-					if(resetTag == false){
-						if(crossTag == true){
-							int temp = valueIndexGA[0];
-							for(int i = 0; i < population-1; i++){
-								valueIndexGA[i] = valueIndexGA[i+1];
-							}
-							valueIndexGA[population-1] = temp;
-						}
-					}
-					else{
-						for(int i = 0; i < population; i++){
-							if(resetTagPopulation[i] == true){
-								valueIndexGA[i] = bestValue;
-							}
-						}
-						resetTag = false;
-						
-//						for(int i = 0; i < population; i++){
-//							valueIndexGA[i] = (int)(domain.length*Math.random());
-//						}
-//						resetTag = false;
-						
-					}
-				}
-				else{
-//					if(crossTag == true){
-//						for(int i = 0; i < population; i++){
-//							valueIndexGA[i] = bestValue;
-//						}
-//					}
-					resetTag = true;
-					
-					prepareToReset = 2147483647;
-					resetLock = false;
-				}
-			}
-			
+			cross();
 			mutate();
 			DsaWork();
 			
-			crossTag = false;
 			sendValueCostMessages();
 		}
 		else{
 			AlsStopRunning();
+		}
+	}
+	
+	private void cross(){
+		
+		if(prepareToStart > 0)
+			prepareToStart--;
+		if(prepareToStart == 0){
+			
+			crossTagCpt = true;
+			for(int i = 0; i < neighboursQuantity;i++){
+				if(localCostGA[min]*1000/neighboursQuantity > neighboursLocalCostGA[i]){
+					crossTagCpt = false;
+					break;
+				}
+			}
+			
+			prepareToCross--;
+			if(prepareToCross <= 0){
+				for(int i = 0; i < population; i++){
+					if(fatherCostGA[i] < lastGlobalCostGA[i]){
+						valueIndexGA[i] = fatherValueGA[i];
+						lastGlobalCostGA[i] = fatherCostGA[i];
+					}
+					fatherCostGA[i] = lastGlobalCostGA[i];
+					fatherValueGA[i] = valueIndexGA[i];
+				}
+				if(crossTagGo  == true){
+					int temp = valueIndexGA[0];
+					for(int i = 0; i < population-1; i++){
+						valueIndexGA[i] = valueIndexGA[i+1];
+					}
+					valueIndexGA[population-1] = temp;
+//					valueIndexGA[0] = bestValue;			//此行代码决定种群中是否常驻一个最优个体
+					crossTagGo = false;
+				}
+				if(level == 0){
+					timeAfterTree = cycleCount + totalHeight;
+				}
+				
+				prepareToCross = 2147483647;
+				crossLock = false;
+			}
+		}
+	}
+	
+	private void mutate(){
+		for(int ip = 0; ip < population; ip++){
+			if(Math.random()<pMutate){
+				valueIndexGA[ip] = (int)(Math.random()*(domain.length));
+			}
 		}
 	}
 	
@@ -315,28 +292,6 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 				
 				if(selectMinCost[ip][selectValueIndex] < localCostGA[ip]){
 					valueIndexGA[ip] = selectValueIndex;
-				}
-			}
-		}
-	}
-	
-	private void mutate(){
-		for(int ip = 0; ip < population; ip++){
-			if(Math.random()<pMutate){
-				int randomValueIndex = (int)(Math.random()*(domain.length));
-				int newLocalCost = 0;
-				
-				for (int neighbourindex=1; neighbourindex < neighboursQuantity; neighbourindex++){
-					newLocalCost+=constraintCosts.get(neighbours[neighbourindex])[randomValueIndex][neighboursValueIndexGA[ip][neighbourindex]];		
-				}
-				
-				if (newLocalCost <= localCostGA[ip]){
-					valueIndexGA[ip] = randomValueIndex;
-				}
-				else{
-					if(Math.random() < Math.exp(((localCost - newLocalCost)*(cycleCount^2))/1000)){
-						valueIndexGA[ip] = randomValueIndex;
-					}
 				}
 			}
 		}
@@ -405,33 +360,15 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 				int min = 0;
 				for(int i = 0; i < population; i++){
 					accumulativeCost[i] = accumulativeCost[i]/2;
+					currentGlobalCostGA[i] = accumulativeCost[i];
 					if(accumulativeCost[min] > accumulativeCost[i])
 						min = i;
 				}
-				
-				if(resetLock == false){
-					if(accumulativeCost[min] < bestCostTemp){
-						bestCostTemp = accumulativeCost[min];
-						stayUnchanged = 0;
-						//System.out.println("stayUnchanged   "+stayUnchanged+"   !!!!!!!!");
-					}
-					else{
-						stayUnchanged++;
-						//System.out.println("stayUnchanged   "+stayUnchanged+"   !!!!!!!!");
-						if(stayUnchanged >= stayCountInterval){
-							bestCostTemp = 2147483647;
-							stayUnchanged = 0;
-							prepareToReset = totalHeight + 1;
-							resetLock = true;
-							sendResetMessages();
-						}
-					}
-				}
-				
 				if(accumulativeCost[min] < bestCost){
 					bestValue = valueIndexList.removeFirst()[min];
 					bestCost = accumulativeCost[min];
 					bestIndividual = min;
+//					System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 				}
 				else{
 					valueIndexList.removeFirst();
@@ -457,13 +394,37 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 				AlsCycleCount++;
 				sendAlsBestMessage();
 				
+				if(cycleCount >= timeAfterTree){
+					if(crossLock == false){
+						if(accumulativeCost[min] < bestCostTemp){
+							bestCostTemp = accumulativeCost[min];
+							stayUnchanged = 0;
+							//System.out.println("stayUnchanged   "+stayUnchanged+"   !!!!!!!!");
+						}
+						else{
+							stayUnchanged++;
+							//System.out.println("stayUnchanged   "+stayUnchanged+"   !!!!!!!!");
+							if(stayUnchanged >= stayCountInterval){
+								bestCostTemp = 2147483647;
+								stayUnchanged = 0;
+								prepareToCross = totalHeight + 1;
+								crossLock = true;
+								sendCrossMessages();
+							}
+						}
+					}
+				}
 			}
 		}
 	}
 	
 	
 	protected void disposeAlsBestMessage(Message msg){
-		int tempBestIndividual = (Integer)msg.getValue();
+		int[] temp = (int[])msg.getValue();
+		int tempBestIndividual = temp[0];
+		for(int i = 0; i < population; i++){
+			currentGlobalCostGA[i] = temp[i+1];
+		}
 		if(tempBestIndividual != NONE){
 			bestValue = valueIndexList.remove()[tempBestIndividual];
 			bestIndividual = tempBestIndividual;
@@ -474,15 +435,6 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 		}
 		if(this.isLeafAgent() == false)
 			sendAlsBestMessage();
-		
-		//System.out.println("Agent "+this.name+"~~~best~~~"+AlsCycleCount);
-		
-		//if(id == 40){
-		//	System.out.println("Agent "+this.id+"~~~~bestMessage~~~"+cycleCount);
-		//	if(cycleCount > 10){
-		//		cycleCount++;
-		//	}
-		//}
 	}
 	
 	protected void AlsStopRunning(){
@@ -505,9 +457,12 @@ public class AlsDgaFBAgent extends AgentCycleAls {
 		sendStartMessages();
 	}
 	
-	private void disposeResetMessage(Message msg){
-		prepareToReset = (Integer)msg.getValue();
-		sendResetMessages();
+	private void disposeCrossMessage(Message msg){
+		prepareToCross = (Integer)msg.getValue();
+		for(int i = 0; i < population; i++){
+			lastGlobalCostGA[i] = currentGlobalCostGA[i];
+		}
+		sendCrossMessages();
 	}
 	
 	private void localCost(){

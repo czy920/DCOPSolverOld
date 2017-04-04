@@ -3,6 +3,7 @@ package com.cqu.dsa;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.lang.Math;
 
 import com.cqu.core.Infinity;
@@ -79,11 +80,13 @@ public class DsaC_Agent extends AgentCycle {
 			cycleCount++;
 			localCost=localCost();
 			
+//			加入扰动
+//			if(Math.random() < 0.01){
+//				valueIndex = (int)(domain.length*Math.random());
+//			}
+			
 			if(Math.random()<p){
 				int[] selectMinCost=new int[domain.length];
-				for(int i=0; i<domain.length; i++){
-					selectMinCost[i]=0;
-				}
 				for(int i=0; i<domain.length; i++){
 					for(int j=0; j<neighbours.length; j++){
 //						if(this.id < neighbours[j])
@@ -105,6 +108,7 @@ public class DsaC_Agent extends AgentCycle {
 					sendValueMessages();
 				}
 				nccc++;
+//				sendValueMessages();
 			}		
 		}
 	}

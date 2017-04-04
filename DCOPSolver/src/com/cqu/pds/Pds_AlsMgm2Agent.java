@@ -9,11 +9,13 @@ import java.lang.Math;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.ResultCycle;
+import com.cqu.core.ResultCycleAls;
 import com.cqu.cyclequeue.AgentCycle;
+import com.cqu.cyclequeue.AgentCycleAls;
 import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
 
-public class Pds_Mgm2Agent extends AgentCycle {
+public class Pds_AlsMgm2Agent extends AgentCycleAls {
 
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_OFFER_MESSAGE=1;
@@ -88,7 +90,7 @@ public class Pds_Mgm2Agent extends AgentCycle {
 	private int[] mySuggestValue;									//给自己的建议值
 	private int[][] myNeighboursSuggestTable;						//给邻居的建议值
 	
-	public Pds_Mgm2Agent(int id, String name, int level, int[] domain) {
+	public Pds_AlsMgm2Agent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 	}
 	
@@ -337,6 +339,14 @@ public class Pds_Mgm2Agent extends AgentCycle {
 		else if(msg.getType() == TYPE_SUGGEST_MESSAGE){
 			disposeSuggestMessage(msg);
 		}
+		else if(msg.getType() == TYPE_ALSCOST_MESSAGE){
+			disposeAlsCostMessage(msg);
+		}
+		else if(msg.getType() == TYPE_ALSBEST_MESSAGE){
+			disposeAlsBestMessage(msg);
+		}
+		else
+			System.out.println("wrong!!!!!!!!");
 	}
 	
 	private void disposeValueMessage(Message msg) {
@@ -361,12 +371,10 @@ public class Pds_Mgm2Agent extends AgentCycle {
 	}
 	
 	private void cycleForValue(){
-		if(cycleCount>=cycleCountEnd){
-			stopRunning();
-		}
-		else{
+
 			cycleCount++;
 			localCost=localCost();
+			AlsWork();
 			
 //			int sum = (int)(myThreshold*100000); 
 //			for(int i = 0; i < neighboursQuantity; i++){
@@ -439,7 +447,7 @@ public class Pds_Mgm2Agent extends AgentCycle {
 //					sendWaitMessages(neighbourIndex);
 //				}
 //			}
-		}
+		
 	}
 	
 	private void disposeOfferMessage(Message msg) {
@@ -784,26 +792,34 @@ public class Pds_Mgm2Agent extends AgentCycle {
 	}
 	
 	protected void allMessageDisposed(){
-		
-		if(cycleTag == CYCLE_VALUE){
-			cycleTag = CYCLE_OFFER;
-			cycleForValue();
+		if(cycleCount>=cycleCountEnd){
+			AlsStopRunning();
 		}
-		else if(cycleTag == CYCLE_OFFER){
-			cycleTag = CYCLE_ACCEPT;
-			cycleForOffer();
-		}
-		else if(cycleTag == CYCLE_ACCEPT){
-			cycleTag = CYCLE_GAIN;
-			cycleForAccept();
-		}
-		else if(cycleTag == CYCLE_GAIN){
-			cycleTag = CYCLE_GO;
-			cycleForGain();
-		}
-		else if(cycleTag == CYCLE_GO){
-			cycleTag = CYCLE_VALUE;
-			cycleForGo();
+		else{
+			if(cycleTag == CYCLE_VALUE){
+				cycleTag = CYCLE_OFFER;
+				cycleForValue();
+			}
+			else if(cycleTag == CYCLE_OFFER){
+				AlsWork();
+				cycleTag = CYCLE_ACCEPT;
+				cycleForOffer();
+			}
+			else if(cycleTag == CYCLE_ACCEPT){
+				AlsWork();
+				cycleTag = CYCLE_GAIN;
+				cycleForAccept();
+			}
+			else if(cycleTag == CYCLE_GAIN){
+				AlsWork();
+				cycleTag = CYCLE_GO;
+				cycleForGain();
+			}
+			else if(cycleTag == CYCLE_GO){
+				AlsWork();
+				cycleTag = CYCLE_VALUE;
+				cycleForGo();
+			}
 		}
 	}
 	
@@ -1041,38 +1057,40 @@ public class Pds_Mgm2Agent extends AgentCycle {
 		result.put(KEY_ID, this.id);
 		result.put(KEY_NAME, this.name);
 		result.put(KEY_VALUE, this.domain[valueIndex]);
-		result.put(KEY_LOCALCOST, this.localCost);
+		result.put(KEY_BESTCOST, this.bestCost);
+		result.put(KEY_BESTCOSTINCYCLE, bestCostInCycle);
 		result.put(KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
-		//System.out.println("Agent "+this.name+" stopped!");
+//		System.out.println("Agent "+this.name+" stopped!");
 	}
 	
 	@Override
 	public Object printResults(List<Map<String, Object>> results) {
-		// TODO Auto-generated method stub
-		double totalCost=0;
+		ResultCycleAls ret=new ResultCycleAls();
+		int tag = 0;
+		int totalCost = 0;
 		int ncccTemp = 0;
 		for(Map<String, Object> result : results){
 			
-//			int id_=(Integer)result.get(KEY_ID);
-//			String name_=(String)result.get(KEY_NAME);
-//			int value_=(Integer)result.get(KEY_VALUE);
-			
+			//int id_=(Integer)result.get(KEY_ID);
+			//String name_=(String)result.get(KEY_NAME);
+			//int value_=(Integer)result.get(KEY_VALUE);
 			if(ncccTemp < (Integer)result.get(KEY_NCCC))
 				ncccTemp = (Integer)result.get(KEY_NCCC);
-			totalCost+=((double)((Integer)result.get(KEY_LOCALCOST)))/2;
-			
+			if(tag == 0){
+				totalCost = ((Integer)result.get(KEY_BESTCOST));
+				ret.bestCostInCycle=(double[])result.get(KEY_BESTCOSTINCYCLE);
+				tag = 1;
+			}
 			//String displayStr="Agent "+name_+": id="+id_+" value="+value_;
 			//System.out.println(displayStr);
 		}
 		
-		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost)+
-				" nccc: "+Infinity.infinityEasy((int)ncccTemp));
-		
-		ResultCycle ret=new ResultCycle();
-		ret.nccc=(int)ncccTemp;
+		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost));
+
 		ret.totalCost=(int)totalCost;
+		ret.nccc=(int)ncccTemp;
 		return ret;
 	}
 	

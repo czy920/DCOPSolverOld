@@ -1,4 +1,4 @@
-package com.cqu.mgm;
+package com.cqu.mus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -7,11 +7,14 @@ import java.util.Map;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.ResultCycle;
+import com.cqu.core.ResultCycleAls;
 import com.cqu.cyclequeue.AgentCycle;
+import com.cqu.cyclequeue.AgentCycleAls;
+import com.cqu.dsa.AlsDsa_Agent;
 import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
 
-public class MgmAgent extends AgentCycle {
+public class AlsGdbaAgent extends AgentCycleAls {
 
 	public final static int TYPE_VALUE_MESSAGE=0;
 	public final static int TYPE_GAIN_MESSAGE=1;
@@ -32,7 +35,11 @@ public class MgmAgent extends AgentCycle {
 	private int neighboursGain[];
 	private int[] neighboursValueIndex;
 	
-	public MgmAgent(int id, String name, int level, int[] domain) {
+	private int effCost = 0;
+	private Map<Integer, int[][]> modifier;
+	private boolean isNeighborsChanged = false;
+	
+	public AlsGdbaAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 		// TODO Auto-generated constructor stub
 	}
@@ -50,7 +57,16 @@ public class MgmAgent extends AgentCycle {
 		neighboursQuantity=neighbours.length;
 		neighboursValueIndex = new int[neighboursQuantity];
 		neighboursGain=new int[neighboursQuantity];
+		
+		effInit();
 		sendValueMessages();
+	}
+	
+	private void effInit(){
+		modifier = new HashMap<Integer, int[][]>();
+		for(int i = 0; i < neighboursQuantity; i++){
+			modifier.put(neighbours[i], new int[domain.length][neighbourDomains.get(neighbours[i]).length]);
+		}
 	}
 	
 	private void sendValueMessages(){
@@ -74,6 +90,15 @@ public class MgmAgent extends AgentCycle {
 		}
 		return localCostTemp;
 	}
+	
+	private int effCost(){
+		int effCostTemp = 0;
+		for(int i = 0; i < neighboursQuantity; i++){
+			effCostTemp += constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex[i]] *
+					(modifier.get(neighbours[i])[valueIndex][neighboursValueIndex[i]] +1);
+		}
+		return effCostTemp;
+	}
 
 	@Override
 	protected void disposeMessage(Message msg) {
@@ -90,6 +115,14 @@ public class MgmAgent extends AgentCycle {
 		{
 			disposeGainMessage(msg);
 		}
+		else if(msg.getType() == AlsDsa_Agent.TYPE_ALSCOST_MESSAGE){
+			disposeAlsCostMessage(msg);
+		}
+		else if(msg.getType() == AlsDsa_Agent.TYPE_ALSBEST_MESSAGE){
+			disposeAlsBestMessage(msg);
+		}
+		else
+			System.out.println("wrong!!!!!!!!");
 	}
 	
 	private void disposeValueMessage(Message msg) {
@@ -113,6 +146,7 @@ public class MgmAgent extends AgentCycle {
 
 		neighboursValueIndex[senderIndex] = (Integer)(msg.getValue());
 		
+		isNeighborsChanged = true;
 		if(receivedQuantity==0){
 			
 		}
@@ -120,29 +154,29 @@ public class MgmAgent extends AgentCycle {
 	
 	private void cycleValue(){
 		if(cycleCount>=cycleCountEnd){
-			stopRunning();
+			AlsStopRunning();
 		}
 		else{
 			cycleCount++;	
-			localCost=localCost();
+			localCost = localCost();
+			effCost = effCost();
+			AlsWork();
 			
 			int[] selectMinCost=new int[domain.length];
 			for(int i=0; i<domain.length; i++){
 				for(int j=0; j<neighboursQuantity; j++){
-//					if(this.id < neighbours[j])
-						selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];		
-//					else
-//						selectMinCost[i]+=constraintCosts.get(neighbours[j])[neighboursValueIndex.get(j)][i];		
+					selectMinCost[i] += constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]] *
+							(modifier.get(neighbours[i])[valueIndex][neighboursValueIndex[i]] +1);	
 				}
 			}
-			int newLocalCost=localCost;
+			int newLocalCost=effCost;
 			for(int i=0; i<domain.length; i++){
 				if(selectMinCost[i]<newLocalCost){
 					newLocalCost=selectMinCost[i];
 					selectValueIndex=i;
 				}
 			}
-			gainValue=localCost-newLocalCost;
+			gainValue=effCost-newLocalCost;
 			increaseNccc();
 			//System.out.println("agent"+this.id+"_______"+cycleCount+"_______"+gainValue+"________");
 			sendGainMessages();
@@ -167,17 +201,30 @@ public class MgmAgent extends AgentCycle {
 	}
 	
 	private void cycleGain(){
-		for(int i=0; i<neighboursQuantity; i++){
-			if(neighboursGain[i]>=gainValue){
-//				sendValueMessages();
-				return;
-			}
+		if(cycleCount>=cycleCountEnd){
+			AlsStopRunning();
 		}
-		valueIndex=selectValueIndex;
-		//if(cycleCount == 9){
-		//	System.out.println("agent"+this.id+"_______"+"Gain_ready"+"________"+gainValue);
-		//}
-		sendValueMessages();
+		else{
+			AlsWork();
+			boolean go = true;
+			for(int i=0; i<neighboursQuantity; i++){
+				if(neighboursGain[i]>=gainValue){
+					go = false;
+				}
+			}
+			if(go == true){
+				valueIndex=selectValueIndex;
+				sendValueMessages();
+			}
+			else{
+				
+				
+				
+				
+			}
+			
+			
+		}
 	}
 
 	protected void allMessageDisposed(){
@@ -212,8 +259,9 @@ public class MgmAgent extends AgentCycle {
 		result.put(KEY_ID, this.id);
 		result.put(KEY_NAME, this.name);
 		result.put(KEY_VALUE, this.domain[valueIndex]);
-		result.put(KEY_LOCALCOST, this.localCost);
 		result.put(KEY_NCCC, this.nccc);
+		result.put(KEY_BESTCOST, this.bestCost);
+		result.put(KEY_BESTCOSTINCYCLE, bestCostInCycle);
 		
 		this.msgMailer.setResult(result);
 //		System.out.println("Agent "+this.name+" stopped!");
@@ -221,27 +269,31 @@ public class MgmAgent extends AgentCycle {
 	
 	@Override
 	public Object printResults(List<Map<String, Object>> results) {
-		// TODO Auto-generated method stub
-		double totalCost=0;
+
+		ResultCycleAls ret=new ResultCycleAls();
+		int tag = 0;
+		int totalCost = 0;
 		int ncccTemp = 0;
 		for(Map<String, Object> result : results){
 			
-//			int id_=(Integer)result.get(KEY_ID);
-//			String name_=(String)result.get(KEY_NAME);
-//			int value_=(Integer)result.get(KEY_VALUE);
+			//int id_=(Integer)result.get(KEY_ID);
+			//String name_=(String)result.get(KEY_NAME);
+			//int value_=(Integer)result.get(KEY_VALUE);
 			
 			if(ncccTemp < (Integer)result.get(KEY_NCCC))
 				ncccTemp = (Integer)result.get(KEY_NCCC);
-			totalCost+=((double)((Integer)result.get(KEY_LOCALCOST)))/2;
-			
-//			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
-//			System.out.println(displayStr);
+			if(tag == 0){
+				totalCost = ((Integer)result.get(KEY_BESTCOST));
+				ret.bestCostInCycle=(double[])result.get(KEY_BESTCOSTINCYCLE);
+				tag = 1;
+			}
+			//String displayStr="Agent "+name_+": id="+id_+" value="+value_;
+			//System.out.println(displayStr);
 		}
 		
 		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost)+
 				" nccc: "+Infinity.infinityEasy((int)ncccTemp));
 		
-		ResultCycle ret=new ResultCycle();
 		ret.nccc=(int)ncccTemp;
 		ret.totalCost=(int)totalCost;
 		return ret;

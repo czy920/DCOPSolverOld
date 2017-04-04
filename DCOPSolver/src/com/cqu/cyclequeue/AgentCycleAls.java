@@ -37,13 +37,13 @@ public abstract class AgentCycleAls extends AgentCycle{
 		bestCostInCycle = new double[9999];
 	}
 
-	//!!!!!!!!!!!!!!!!!!!!该类的核心方法，子类必须调用才能使ALS框架起作用!!!!!!!!!!!!!!!!!!!!
+	// TODO !!!!!!!!!!!!!!!!!!!!该类的核心方法，子类必须调用才能使ALS框架起作用!!!!!!!!!!!!!!!!!!!!
 	protected void sendAlsCostMessage(){
 		Message msg=new Message(this.id, this.parent, AgentCycleAls.TYPE_ALSCOST_MESSAGE, this.accumulativeCost);
 		this.sendMessage(msg);
 	}
 	
-	//!!!!!!!!!!!!!!!!!!!!该类的核心方法，子类必须调用才能使ALS框架起作用!!!!!!!!!!!!!!!!!!!!
+	// TODO !!!!!!!!!!!!!!!!!!!!该类的核心方法，子类必须调用才能使ALS框架起作用!!!!!!!!!!!!!!!!!!!!
 	protected void sendAlsBestMessage(){
 		for(int i = 0; i < children.length; i++){
 			Message msg=new Message(this.id, children[i], AgentCycleAls.TYPE_ALSBEST_MESSAGE, isChanged);
@@ -51,7 +51,7 @@ public abstract class AgentCycleAls extends AgentCycle{
 		}
 	}
 	
-	//!!!!!!!!!!!!!!!!!!!!该类的核心方法，子类必须调用才能使ALS框架起作用!!!!!!!!!!!!!!!!!!!!
+	// TODO !!!!!!!!!!!!!!!!!!!!该类的核心方法，子类必须调用才能使ALS框架起作用!!!!!!!!!!!!!!!!!!!!
 	//!!!!!!!!!!!!!!!!!调用位置应该位于算法获取局部COST之后，改变value之前 !!!!!!!!!!!!!!!!!!
 	protected void AlsWork(){
 		
@@ -201,7 +201,8 @@ public abstract class AgentCycleAls extends AgentCycle{
 			//}
 		}
 	}
-	
+
+	// TODO !!!!!!!!!!!!!!!!!!!!该类的核心方法，子类必须在迭代结束调用 并替代 stopRunning() 使ALS框架停止!!!!!!!!!!!!!!!!!!!!
 	protected void AlsStopRunning(){
 		if(valueIndexList.isEmpty() == true){
 			if(level == 0){

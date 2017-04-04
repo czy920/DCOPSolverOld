@@ -34,10 +34,11 @@ public class Solver {
 		if(agentType.startsWith("ACO")){
 			PublicConstants.ACO_type = agentType;
 		}
-		if(agentType.equals("BFSDPOP")||agentType.equals("ALS_DSA")||
+		if(agentType.equals("BFSDPOP")||agentType.equals("ALSDSA")||agentType.equals("ALS_DSA")||
 				agentType.equals("DSA_PPIRA")||agentType.equals("DSA_SDP")||agentType.equals("ALSMLUDSA")||agentType.equals("ALSDSAMGM")||
 				agentType.equals("ALSDSAMGMEVO")||agentType.equals("ALSDSADSAEVO")||agentType.equals("ALSDGA")||agentType.equals("ALSDGAFB")||
-				agentType.equals("PDSALSDSA")||agentType.equals("PDSDSASDP"))
+				agentType.equals("PDSALSDSA")||agentType.equals("PDSALSDSAN")||agentType.equals("PDSALSMGM")||agentType.equals("PDSALSMGM2")||
+				agentType.equals("PDSDSASDP")||agentType.equals("ALS_GDBA"))
 		{
 			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
@@ -76,10 +77,11 @@ public class Solver {
 		//采用同步消息机制的算法
 		if(agentType.equals("BNBADOPT")||agentType.equals("BDADOPT")||agentType.equals("ADOPT_K")||agentType.equals("SynAdopt1")||agentType.equals("SynAdopt2")||									
 				agentType.equals("DSA_A")||agentType.equals("DSA_B")||agentType.equals("DSA_C")||agentType.equals("DSA_D")||agentType.equals("DSA_E")||agentType.equals("DSAN")||
-				agentType.equals("MGM")||agentType.equals("MGM2")||
-				agentType.equals("ALS_DSA")||agentType.equals("DSA_PPIRA")||agentType.equals("DSA_SDP")||agentType.equals("ALSMLUDSA")||
+				agentType.equals("MGM")||agentType.equals("MGM2")||agentType.equals("ALSDSA")||
+				agentType.equals("ALS_DSA")||agentType.equals("DSA_PPIRA")||agentType.equals("DSA_SDP")||agentType.equals("ALS_GDBA")||agentType.equals("ALSMLUDSA")||
 				agentType.equals("ALSDSAMGM")||agentType.equals("ALSDSAMGMEVO")||agentType.equals("ALSDSADSAEVO")||agentType.equals("ALSDGA")||agentType.equals("ALSDGAFB")||
-				agentType.equals("PDSALSDSA")||agentType.equals("PDSDSAN")||agentType.equals("PDSDSASDP")||agentType.equals("PDSMGM")||agentType.equals("PDSMGM2")||
+				agentType.equals("PDSALSDSA")||agentType.equals("PDSALSDSAN")||agentType.equals("PDSALSMGM")||agentType.equals("PDSALSMGM2")||
+				agentType.equals("PDSDSAN")||agentType.equals("PDSMGM")||agentType.equals("PDSMGM2")||agentType.equals("PDSDSASDP")||
 				agentType.equals("MAXSUM")||agentType.equals("ACO")||agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||
 				agentType.equals("ACO_line")||agentType.equals("ACO_final")||agentType.equals("MAXSUMAD")||agentType.equals("MAXSUMRS")||agentType.equals("MAXSUMSPLITED")||agentType.equals("SBB")||
 				agentType.equals("MAXSUMOH"))
@@ -479,8 +481,8 @@ public class Solver {
 			max=new Result(rs);
 			avg=new Result();
 		}
+		
 //		avg.add(rs, repeatTimes-2);
-//		
 //		for(int i=1;i<resultsRepeated.size();i++)
 //		{
 //			Result result=resultsRepeated.get(i);
@@ -492,8 +494,9 @@ public class Solver {
 //		avg.minus(max, repeatTimes-2);
 //		return avg;
 		
-		avg.add(rs, repeatTimes);
+//		writeTemp(resultsRepeated);
 		
+		avg.add(rs, repeatTimes);
 		for(int i=1;i<resultsRepeated.size();i++)
 		{
 			Result result=resultsRepeated.get(i);
@@ -501,6 +504,170 @@ public class Solver {
 		}
 		return avg;
 	}
+	
+	private void writeTemp(List<Result> results)
+	{
+		String problemDir = "C:\\Users\\余浙鹏\\Desktop\\Result";
+		String path;
+		if(problemDir.endsWith("\\"))
+		{
+			path=problemDir+"result";
+		}else
+		{
+			path=problemDir+"\\result";
+		}
+		File f=new File(path);
+		if(f.exists()==false)
+		{
+			f.mkdir();
+		}
+		
+		Result rs=results.get(0);
+		if(rs instanceof ResultCycleAls){
+			String totalTime="";
+			String messageQuantity="";
+			String totalCost="";
+			String nccc="";
+			String myTotalCostInCycle = "";
+			String myBestCostInCycle = "";
+			String myTimeCostInCycle = "";
+			String myMessageQuantityInCycle = "";
+
+			ResultCycleAls resultAvg = new ResultCycleAls();
+			String totalTimeAvg="";
+			String messageQuantityAvg="";
+			String totalCostAvg="";
+			String ncccAvg="";
+			String myTotalCostInCycleAvg = "";
+			String myTimeCostInCycleAvg = "";
+			String myMessageQuantityInCycleAvg = "";
+			String myBestCostInCycleAvg = "";
+
+			for(int i=0;i<results.size();i++)
+			{
+				ResultCycleAls result=(ResultCycleAls) results.get(i);
+				totalTime+=result.totalTime+"\n";
+				messageQuantity+=result.messageQuantity+"\n";
+				totalCost+=result.totalCost+"\n";
+				nccc+=result.nccc+"\n";
+				myTotalCostInCycle = "";
+				myBestCostInCycle = "";
+				myTimeCostInCycle = "";
+				myMessageQuantityInCycle = "";
+				for(int j=0; j < result.totalCostInCycle.length; j++){
+					myTotalCostInCycle += result.totalCostInCycle[j] + "\n";
+					myTimeCostInCycle +=result.timeCostInCycle[j] + "\n";
+					myMessageQuantityInCycle +=result.messageQuantityInCycle[j] + "\n";
+				}
+				for(int j = 0; j < result.bestCostInCycle.length; j++)
+					myBestCostInCycle += result.bestCostInCycle[j] + "\n";
+				FileUtil.writeString(myTotalCostInCycle, path+"\\totalCostInCycle_"+i+".txt");
+				FileUtil.writeString(myBestCostInCycle, path+"\\bestCostInCycle_"+i+".txt");
+				FileUtil.writeString(myTimeCostInCycle, path+"\\timeCostInCycle_"+i+".txt");
+				FileUtil.writeString(myMessageQuantityInCycle, path+"\\messageQuantityInCycle_"+i+".txt");
+
+				resultAvg.addAvg(result);
+			}
+			FileUtil.writeString(totalTime, path+"\\totalTime.txt");
+			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
+			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
+			FileUtil.writeString(nccc, path+"\\nccc.txt");
+
+			resultAvg.avg(results.size());
+			totalTimeAvg+=resultAvg.totalTime+"\n";
+			messageQuantityAvg+=resultAvg.messageQuantity+"\n";
+			totalCostAvg+=resultAvg.totalCost+"\n";
+			ncccAvg+=resultAvg.nccc+"\n";
+			myTotalCostInCycleAvg = "";
+			myTimeCostInCycleAvg = "";
+			myMessageQuantityInCycleAvg = "";
+			for(int j=0; j < resultAvg.totalCostInCycle.length; j++){
+				myTotalCostInCycleAvg += resultAvg.totalCostInCycle[j] + "\n";
+				myTimeCostInCycleAvg +=resultAvg.timeCostInCycle[j] + "\n";
+				myMessageQuantityInCycleAvg +=resultAvg.messageQuantityInCycle[j] + "\n";
+			}
+			for(int j = 0; j < resultAvg.bestCostInCycle.length; j++)
+				myBestCostInCycleAvg += resultAvg.bestCostInCycle[j] + "\n";
+			FileUtil.writeString(totalTimeAvg, path+"\\totalTime_AVG.txt");
+			FileUtil.writeString(messageQuantityAvg, path+"\\messageQuantity_AVG.txt");
+			FileUtil.writeString(totalCostAvg, path+"\\totalCost_AVG.txt");
+			FileUtil.writeString(ncccAvg, path+"\\nccc_AVG.txt");
+			FileUtil.writeString(myTotalCostInCycleAvg, path+"\\totalCostInCycle_"+"AVG"+".txt");
+			FileUtil.writeString(myTimeCostInCycleAvg, path+"\\timeCostInCycle_"+"AVG"+".txt");
+			FileUtil.writeString(myMessageQuantityInCycleAvg, path+"\\messageQuantityInCycle_"+"AVG"+".txt");
+			FileUtil.writeString(myBestCostInCycleAvg, path+"\\bestCostInCycle_"+"AVG"+".txt");
+		}
+		else if(rs instanceof ResultCycle && !this.algorithmType.startsWith("ACO")){
+			String totalTime="";
+			String messageQuantity="";
+			String totalCost="";
+			String nccc="";
+			String myTotalCostInCycle = "";
+			String myTimeCostInCycle = "";
+			String myMessageQuantityInCycle = "";
+
+			ResultCycle resultAvg = new ResultCycle();
+			String totalTimeAvg="";
+			String messageQuantityAvg="";
+			String totalCostAvg="";
+			String ncccAvg="";
+			String myTotalCostInCycleAvg = "";
+			String myTimeCostInCycleAvg = "";
+			String myMessageQuantityInCycleAvg = "";
+
+			for(int i=0;i<results.size();i++)
+			{
+				ResultCycle result=(ResultCycle) results.get(i);
+				totalTime+=result.totalTime+"\n";
+				messageQuantity+=result.messageQuantity+"\n";
+				totalCost+=result.totalCost+"\n";
+				nccc+=result.nccc+"\n";
+				myTotalCostInCycle = "";
+				myTimeCostInCycle = "";
+				myMessageQuantityInCycle = "";
+				for(int j=0; j < result.totalCostInCycle.length; j++){
+					myTotalCostInCycle += result.totalCostInCycle[j] + "\n";
+					myTimeCostInCycle +=result.timeCostInCycle[j] + "\n";
+					myMessageQuantityInCycle +=result.messageQuantityInCycle[j] + "\n";
+				}
+				FileUtil.writeString(myTotalCostInCycle, path+"\\totalCostInCycle_"+i+".txt");
+				FileUtil.writeString(myTimeCostInCycle, path+"\\timeCostInCycle_"+i+".txt");
+				FileUtil.writeString(myMessageQuantityInCycle, path+"\\messageQuantityInCycle_"+i+".txt");
+
+				resultAvg.addAvg(result);
+			}
+			FileUtil.writeString(totalTime, path+"\\totalTime.txt");
+			FileUtil.writeString(messageQuantity, path+"\\messageQuantity.txt");
+			FileUtil.writeString(totalCost, path+"\\totalCost.txt");
+			FileUtil.writeString(nccc, path+"\\nccc.txt");
+
+			resultAvg.avg(results.size());
+			totalTimeAvg+=resultAvg.totalTime+"\n";
+			messageQuantityAvg+=resultAvg.messageQuantity+"\n";
+			totalCostAvg+=resultAvg.totalCost+"\n";
+			ncccAvg+=resultAvg.nccc+"\n";
+			myTotalCostInCycleAvg = "";
+			myTimeCostInCycleAvg = "";
+			myMessageQuantityInCycleAvg = "";
+			for(int j=0; j < resultAvg.totalCostInCycle.length; j++){
+				myTotalCostInCycleAvg += resultAvg.totalCostInCycle[j] + "\n";
+				myTimeCostInCycleAvg +=resultAvg.timeCostInCycle[j] + "\n";
+				myMessageQuantityInCycleAvg +=resultAvg.messageQuantityInCycle[j] + "\n";
+			}
+			FileUtil.writeString(totalTimeAvg, path+"\\totalTime_AVG.txt");
+			FileUtil.writeString(messageQuantityAvg, path+"\\messageQuantity_AVG.txt");
+			FileUtil.writeString(totalCostAvg, path+"\\totalCost_AVG.txt");
+			FileUtil.writeString(ncccAvg, path+"\\nccc_AVG.txt");
+			FileUtil.writeString(myTotalCostInCycleAvg, path+"\\totalCostInCycle_"+"AVG"+".txt");
+			FileUtil.writeString(myTimeCostInCycleAvg, path+"\\timeCostInCycle_"+"AVG"+".txt");
+			FileUtil.writeString(myMessageQuantityInCycleAvg, path+"\\messageQuantityInCycle_"+"AVG"+".txt");
+
+		}
+	}
+	
+	
+	
+	
 	
 	private void batSolveEach(String problemPath, String algorithmType, final AtomicBoolean problemSolved)
 	{
@@ -510,9 +677,10 @@ public class Solver {
 			PublicConstants.ACO_type = algorithmType;
 		}
 		if(algorithmType.equals("BFSDPOP")
-				|| algorithmType.equals("ALS_DSA") || algorithmType.equals("DSA_PPIRA") || algorithmType.equals("DSA_SDP")
+				|| algorithmType.equals("ALS_DSA") || algorithmType.equals("DSA_PPIRA") || algorithmType.equals("DSA_SDP") || algorithmType.equals("ALS_GDBA")
 				|| algorithmType.equals("ALSMLUDSA") || algorithmType.equals("ALSDSAMGM") || algorithmType.equals("ALSDSAMGMEVO") || algorithmType.equals("ALSDSADSAEVO")
-				|| algorithmType.equals("ALSDGA") || algorithmType.equals("ALSDGAFB") || algorithmType.equals("PDSALSDSA") || algorithmType.equals("PDSDSASDP"))
+				|| algorithmType.equals("ALSDGA") || algorithmType.equals("ALSDGAFB") || algorithmType.equals("PDSALSDSA") || algorithmType.equals("PDSALSDSAN") 
+				|| algorithmType.equals("PDSALSMGM") || algorithmType.equals("PDSALSMGM2") || algorithmType.equals("PDSDSASDP"))
 		{
 			treeGeneratorType=TreeGenerator.TREE_GENERATOR_TYPE_BFS;
 		}else
@@ -560,9 +728,10 @@ public class Solver {
 		if(algorithmType.equals("BNBADOPT")||algorithmType.equals("ADOPT_K")||algorithmType.equals("BDADOPT")||algorithmType.equals("SynAdopt1")||algorithmType.equals("SynAdopt2")||
 				algorithmType.equals("DSA_A")||algorithmType.equals("DSA_B")||algorithmType.equals("DSA_C")||algorithmType.equals("DSA_D")||algorithmType.equals("DSA_E")||algorithmType.equals("DSAN")||
 				algorithmType.equals("MGM")||algorithmType.equals("MGM2")||
-				algorithmType.equals("ALS_DSA")||algorithmType.equals("DSA_PPIRA")||algorithmType.equals("DSA_SDP")||algorithmType.equals("ALSMLUDSA")||
+				algorithmType.equals("ALS_DSA")||algorithmType.equals("DSA_PPIRA")||algorithmType.equals("DSA_SDP")||algorithmType.equals("ALS_GDBA")||algorithmType.equals("ALSMLUDSA")||
 				algorithmType.equals("ALSDSAMGM")||algorithmType.equals("ALSDSAMGMEVO")||algorithmType.equals("ALSDSADSAEVO")||algorithmType.equals("ALSDGA")||algorithmType.equals("ALSDGAFB")||
-				algorithmType.equals("PDSALSDSA")||algorithmType.equals("PDSDSAN")||algorithmType.equals("PDSDSASDP")||algorithmType.equals("PDSMGM")||algorithmType.equals("PDSMGM2")||
+				algorithmType.equals("PDSALSDSA")||algorithmType.equals("PDSALSDSAN")||algorithmType.equals("PDSALSMGM")||algorithmType.equals("PDSALSMGM2")||
+				algorithmType.equals("PDSDSAN")||algorithmType.equals("PDSMGM")||algorithmType.equals("PDSMGM2")||algorithmType.equals("PDSDSASDP")||
 				algorithmType.equals("ACO")||algorithmType.equals("ACO_tree")||algorithmType.equals("ACO_bf")||algorithmType.equals("ACO_phase")||
 				algorithmType.equals("ACO_line")||algorithmType.equals("ACO_final")||algorithmType.equals("ACO")||algorithmType.equals("ACO_tree")||algorithmType.equals("ACO_bf")||
 				algorithmType.equals("ACO_phase")||algorithmType.equals("ACO_line")||algorithmType.equals("ACO_final") || algorithmType.equals("MAXSUMRS") || algorithmType.equals("MAXSUMAD"))

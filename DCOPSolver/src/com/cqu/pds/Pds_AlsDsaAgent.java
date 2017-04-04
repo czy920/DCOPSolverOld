@@ -268,7 +268,9 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 					}
 					else{
 						//System.out.println("reject!!!!!!!!");
-						abandonChain();
+						int deta = constraintCosts.get(neighbours[suggester])[valueIndex][neighboursValueIndexEx[suggester]] - 
+								constraintCosts.get(neighbours[suggester])[valueIndex][neighboursValueIndex[suggester]] + suggestGain;
+						abandonChain(deta);
 					}
 				}
 				else{
@@ -292,9 +294,6 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 	private void DsaWork(){
 		int done = 0;
 		int[] selectMinCost=new int[domain.length];
-		for(int i=0; i<domain.length; i++){
-			selectMinCost[i]=0;
-		}
 		for(int i=0; i<domain.length; i++){
 			for(int j=0; j<neighbours.length; j++){
 				selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];	
@@ -377,6 +376,11 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 //			return Math.sqrt(myPercentage)*(1-Math.sqrt(cycleCount/(double)cycleCountEnd));
 //		else
 //			return myPercentage*(1-Math.sqrt(cycleCount/(double)cycleCountEnd));
+
+//		if(selectP == higherP)
+//			return Math.sqrt(myPercentage)*(1-(3*cycleCount*cycleCount-2*cycleCount*cycleCount*cycleCount));
+//		else
+//			return myPercentage*(1-(3*cycleCount*cycleCount-2*cycleCount*cycleCount*cycleCount));
 	}
 	
 	private void abandon(int nature) {
@@ -565,7 +569,7 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 		}
 	}
 	
-	private void abandonChain(){
+	private void abandonChain(int deta){
 //		if(Math.random() > abandonProbability)
 //			return;
 		
@@ -777,7 +781,6 @@ public class Pds_AlsDsaAgent extends AgentCycleAls{
 	}
 	
 	public Object printResults(List<Map<String, Object>> results) {
-
 		ResultCycleAls ret=new ResultCycleAls();
 		int tag = 0;
 		int totalCost = 0;

@@ -20,8 +20,8 @@ import com.cqu.util.CollectionUtil;
 public class AgentManager {
 	
 	public static final String[] AGENT_TYPES=new String[]{"DPOP", "BFSDPOP", "HybridDPOP", "HybridMBDPOP", "AgileDPOP", "ADOPT", "BNBADOPT", "ADOPT_K", "BDADOPT",
-		"SynAdopt", "SynAdopt2", "DSA_A", "DSA_B", "DSA_C", "DSA_D", "DSA_E" ,"DSAN" , "MGM", "MGM2", "ALS_DSA", "DSA_PPIRA", "DSA_SDP",
-		"ALSMLUDSA", "ALSDGA", "ALSDGAFB", "PDSALSDSA","PDSDSAN", "PDSMGM", "PDSMGM2", "MAXSUM", "MAXSUM_ADVP", "ACO", "ACO_tree",
+		"SynAdopt", "SynAdopt2", "DSA_A", "DSA_B", "DSA_C", "DSA_D", "DSA_E", "DSAN" , "MGM", "MGM2", "ALSDSA", "ALS_DSA", "DSA_PPIRA", "DSA_SDP", "ALS_GDBA",
+		"ALSMLUDSA", "ALSDGA", "ALSDGAFB", "PDSALSDSA","PDSALSDSAN", "PDSALSMGM", "PDSALSMGM2","PDSDSAN", "PDSMGM", "PDSMGM2", "MAXSUM", "MAXSUM_ADVP", "ACO", "ACO_tree",
 		"ACO_bf", "ACO_phase", "ACO_line", "ACO_final"};
 	
 	private Map<Integer, Agent> agents;

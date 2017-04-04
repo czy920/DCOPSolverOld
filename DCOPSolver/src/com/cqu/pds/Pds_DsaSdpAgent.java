@@ -304,9 +304,6 @@ public class Pds_DsaSdpAgent extends AgentCycleAls{
 		int done = 0;
 		int[] selectMinCost=new int[domain.length];
 		for(int i=0; i<domain.length; i++){
-			selectMinCost[i]=0;
-		}
-		for(int i=0; i<domain.length; i++){
 			for(int j=0; j<neighbours.length; j++){
 				selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];	
 			}

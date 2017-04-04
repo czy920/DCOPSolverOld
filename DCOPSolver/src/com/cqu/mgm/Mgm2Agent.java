@@ -257,9 +257,6 @@ public class Mgm2Agent extends AgentCycle {
 			
 			int[] selectMinCost=new int[domain.length];
 			for(int i=0; i<domain.length; i++){
-				selectMinCost[i]=0;
-			}
-			for(int i=0; i<domain.length; i++){
 				for(int j=0; j<neighboursQuantity; j++){
 					selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];		
 				}					

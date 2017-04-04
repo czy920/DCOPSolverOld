@@ -115,9 +115,6 @@ public class DsaPPIRA_Agent  extends AgentCycleAls{
 				if(Math.random() < selectProbablity){
 					int[] selectMinCost=new int[domain.length];
 					for(int i=0; i<domain.length; i++){
-						selectMinCost[i]=0;
-					}
-					for(int i=0; i<domain.length; i++){
 						for(int j=0; j<neighbours.length; j++){
 								selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];
 						}					
@@ -136,6 +133,10 @@ public class DsaPPIRA_Agent  extends AgentCycleAls{
 					}
 					nccc++;
 				}
+				//随机扰动
+//				if(Math.random()<0.01){
+//					valueIndex = (int)(Math.random()*(domain.length));
+//				}
 			}
 			else{
 				valueIndex = (int) (Math.random() * domain.length);

@@ -7,36 +7,33 @@ import java.util.Map;
 import com.cqu.core.Infinity;
 import com.cqu.core.Message;
 import com.cqu.core.ResultCycle;
+import com.cqu.core.ResultCycleAls;
 import com.cqu.cyclequeue.AgentCycle;
+import com.cqu.cyclequeue.AgentCycleAls;
 import com.cqu.main.Debugger;
 import com.cqu.settings.Settings;
 
-public class Pds_MgmAgent extends AgentCycle {
+public class Pds_AlsDsanAgent extends AgentCycleAls {
 
 	public final static int TYPE_VALUE_MESSAGE=0;
-	public final static int TYPE_GAIN_MESSAGE=1;
 	public final static int TYPE_SUGGEST_MESSAGE = 2;
 	
 	private static int cycleCountEnd;
 	
 	public final static String KEY_LOCALCOST="KEY_LOCALCOST";
 	public final static String KEY_NCCC="KEY_NCCC";
-
-	public final static int CYCLE_VALUE=567;
-	public final static int CYCLE_GAIN=568;
-	private int cycleTag = CYCLE_VALUE;
+	
 	private int nccc = 0;
 	private int gainValue;
-	private int selectValueIndex;
 	private int receivedQuantity;
 	private int cycleCount;
-	private int neighboursQuantity;	
-	private int neighboursGain[];
-	private int[] neighboursValueIndex;	
-	private int[] neighboursValueIndexEx;	
-
+	private int neighboursQuantity;
+	private int[] neighboursValueIndex;
+	private int[] neighboursValueIndexEx;
+	
 	public final static int higherP = 0;
 	public final static int lowerP = 1;
+//	private boolean isNeighborsChanged = false;
 	private double myPercentage=1;
 	private double myBestPercentage=1;
 	private int selectP = higherP;
@@ -54,8 +51,7 @@ public class Pds_MgmAgent extends AgentCycle {
 	private int[] mySuggestValue;									//给自己的建议值
 	private int[][] myNeighboursSuggestTable;						//给邻居的建议值
 	
-	
-	public Pds_MgmAgent(int id, String name, int level, int[] domain) {
+	public Pds_AlsDsanAgent(int id, String name, int level, int[] domain) {
 		super(id, name, level, domain);
 	}
 	
@@ -63,22 +59,22 @@ public class Pds_MgmAgent extends AgentCycle {
 		super.initRun();
 		
 		cycleCountEnd = Settings.settings.getCycleCountEnd();
+//		utilityPercentage = Settings.settings.getSelectProbabilityA();
+//		abandonProbability = Settings.settings.getSelectProbabilityB();
 		
 		localCost=2147483647;
 		valueIndex=(int)(Math.random()*(domain.length));
-		selectValueIndex=0;
 		receivedQuantity=0;
 		cycleCount=0;
 		neighboursQuantity=neighbours.length;
 		neighboursValueIndex = new int[neighboursQuantity];
 		neighboursValueIndexEx = new int[neighboursQuantity];
-		neighboursGain=new int[neighboursQuantity];
 		
 		mySuggestValue = new int[domain.length];
 		myNeighboursSuggestTable = new int[domain.length][neighboursQuantity];
 		abandonSuggestGain = new int[3];
-//		neighbourThreshold = new int[neighboursQuantity];
 		buildMyTable();
+//		neighbourThreshold = new int[neighboursQuantity];
 		sendValueMessages();
 	}
 	
@@ -141,7 +137,6 @@ public class Pds_MgmAgent extends AgentCycle {
 		}
 	}
 	
-	
 	private void sendValueMessages(){
 //		int[] valueBox = new int[2];
 //		valueBox[0] = valueIndex;
@@ -153,13 +148,6 @@ public class Pds_MgmAgent extends AgentCycle {
 		
 		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
 			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_VALUE_MESSAGE, valueIndex);
-			this.sendMessage(msg);
-		}
-	}
-	
-	private void sendGainMessages(){
-		for(int neighbourIndex=0; neighbourIndex<neighboursQuantity; neighbourIndex++){
-			Message msg=new Message(this.id, neighbours[neighbourIndex], TYPE_GAIN_MESSAGE, gainValue);
 			this.sendMessage(msg);
 		}
 	}
@@ -190,13 +178,17 @@ public class Pds_MgmAgent extends AgentCycle {
 		{
 			disposeValueMessage(msg);
 		}
-		else if(msg.getType()==TYPE_GAIN_MESSAGE)
-		{
-			disposeGainMessage(msg);
-		}
 		else if(msg.getType() == TYPE_SUGGEST_MESSAGE){
 			disposeSuggestMessage(msg);
 		}
+		else if(msg.getType() == TYPE_ALSCOST_MESSAGE){
+			disposeAlsCostMessage(msg);
+		}
+		else if(msg.getType() == TYPE_ALSBEST_MESSAGE){
+			disposeAlsBestMessage(msg);
+		}
+		else
+			System.out.println("wrong!!!!!!!!");
 	}
 	
 	private void disposeValueMessage(Message msg) {
@@ -213,13 +205,18 @@ public class Pds_MgmAgent extends AgentCycle {
 		neighboursValueIndex[senderIndex] = ((int)(msg.getValue()));
 //		neighboursValueIndex[senderIndex] = ((int[])(msg.getValue()))[0];
 //		neighbourThreshold[senderIndex] = ((int[])(msg.getValue()))[1];
+//		isNeighborsChanged = true;
 	}
 	
-	private void cycleValue(){
-//		System.out.println("cycle "+cycleCount+"   Agent "+id+" values " + valueIndex);
-
+	protected void allMessageDisposed(){
+		if(cycleCount>=cycleCountEnd){
+			AlsStopRunning();
+//			System.out.println(myThreshold);
+		}
+		else{
 			cycleCount++;
 			localCost=localCost();
+			AlsWork();
 			
 //			int sum = (int)(myThreshold*100000); 
 //			for(int i = 0; i < neighboursQuantity; i++){
@@ -227,113 +224,74 @@ public class Pds_MgmAgent extends AgentCycle {
 //			}
 //			myThreshold = sum/((neighboursQuantity+1)*100000.0);
 			
-			int[] selectMinCost=new int[domain.length];
-			for(int i=0; i<domain.length; i++){
-				for(int j=0; j<neighboursQuantity; j++){
-						selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]];		
-				}
-			}
-			int newLocalCost=localCost;
-			for(int i=0; i<domain.length; i++){
-				if(selectMinCost[i]<newLocalCost){
-					newLocalCost=selectMinCost[i];
-					selectValueIndex=i;
-				}
-			}
-			gainValue=localCost-newLocalCost;
-			
-//			if(gainValue == 0 && suggestTag != 1){
-//				if(suggestTag == 0){
-//					myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
-//					abandon(localCost);
-//				}
-//			}
-			
-			increaseNccc();
-			//System.out.println("agent"+this.id+"_______"+cycleCount+"_______"+gainValue+"________");
-			sendGainMessages();
-		
-	}
-	
-	private void disposeGainMessage(Message msg) {
-		int senderIndex=0;
-		int senderId=msg.getIdSender();
-		for(int i=0; i<neighboursQuantity; i++){
-			if(neighbours[i]==senderId){
-				senderIndex=i;
-				break;
-			}
-		}
-		neighboursGain[senderIndex]=(Integer)msg.getValue();
-	}
-	
-	private void cycleGain(){
-		/** */
-		checkMyPercentage();
-		if(wait == 1){
-//			System.out.println("cycle "+cycleCount+"   Agent "+id+" wait 1 cycle");
-			wait = 0;
-			sendValueMessages();
-			return;
-		}
-		else if(suggestTag == 1){
-			suggestTag = 0;
-			int localCostTemp = 0, compareTemp = 0;
-			for(int i=0; i<neighbours.length; i++){
-				localCostTemp+=constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
-				if(i != suggester){
-					compareTemp += constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndexEx[i]];
-					compareTemp -= constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
-				}
-			}
-			compareTemp += suggestGain;
-//			myPercentage = ((double)(localCostTemp-myMinCost))/((double)(myMaxCost-myMinCost));
-//			if(localCostTemp < localCost || myPercentage < utilityPercentage || compareTemp > 0){
-			if(localCostTemp < localCost || compareTemp > 0){
-				valueIndex = suggestValue;
+			if(wait == 1){
+//				System.out.println("cycle "+cycleCount+"   Agent "+id+" wait 1 cycle");
+				wait = 0;
 				sendValueMessages();
-//				System.out.println("cycle "+cycleCount+"   Agent "+id+" accept Agent "+neighbours[suggester]+ " with gain "+compareTemp);
 				return;
-				//System.out.println("accept!!!!!!!!");
 			}
-			else{
-				//System.out.println("reject!!!!!!!!");
-				boolean tag = abandonChain();
-				if(tag == true){
-//					sendValueMessages();
+			else if(suggestTag == 1){
+				suggestTag = 0;
+				int localCostTemp = 0, compareTemp = 0;
+				for(int i=0; i<neighbours.length; i++){
+					localCostTemp+=constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
+					if(i != suggester){
+						compareTemp += constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndexEx[i]];
+						compareTemp -= constraintCosts.get(neighbours[i])[suggestValue][neighboursValueIndex[i]];
+					}
+				}
+				compareTemp += suggestGain;
+//				myPercentage = ((double)(localCostTemp-myMinCost))/((double)(myMaxCost-myMinCost));
+//				if(localCostTemp < localCost || myPercentage < utilityPercentage || compareTemp > 0){
+				if(localCostTemp < localCost || compareTemp > 0){
+					valueIndex = suggestValue;
+					sendValueMessages();
+//					System.out.println("cycle "+cycleCount+"   Agent "+id+" accept Agent "+neighbours[suggester]+ " with gain "+compareTemp);
 					return;
+					//System.out.println("accept!!!!!!!!");
+				}
+				else{
+					//System.out.println("reject!!!!!!!!");
+					boolean tag = abandonChain();
+//					sendValueMessages();
+					if(tag == true){
+						return;
+					}
 				}
 			}
-		}
-		
-		for(int i=0; i<neighboursQuantity; i++){
-			if(neighboursGain[i]>=gainValue){
-				
-				abandon(localCost);
-					
-				return;
+			
+			int randomValueIndex = (int)(Math.random()*(domain.length));
+			int newLocalCost = 0;
+			
+			for (int neighbourindex=0;neighbourindex<neighboursQuantity;neighbourindex++){
+				newLocalCost+=constraintCosts.get(neighbours[neighbourindex])[randomValueIndex][neighboursValueIndex[neighbourindex]];
 			}
+			
+			/** */
+			checkMyPercentage();
+			if (newLocalCost <= localCost){
+//				if(Math.random() < 0.3){
+					valueIndex = randomValueIndex;
+					sendValueMessages();
+//				}
+			}
+			else if (newLocalCost > localCost){		//		 && isNeighborsChanged == false
+				boolean tag = false;
+				tag = abandon(localCost);
+				
+				if(tag == false){
+					if(Math.random() < Math.exp(((localCost - newLocalCost)*(cycleCount*cycleCount))*1.0/cycleCountEnd)){
+						valueIndex = randomValueIndex;
+						sendValueMessages();
+					}
+				}
+			}
+//			isNeighborsChanged = false;
+//			sendValueMessages();
+			//System.out.println("agent"+this.id+"_______"+cycleCount+"_______"+gainValue+"________");
 		}
-		valueIndex=selectValueIndex;
-		sendValueMessages();
 	}
 	
-	protected void allMessageDisposed(){
-		if(cycleCount>=cycleCountEnd){
-			stopRunning();
-		}
-		else{
-			if(cycleTag == CYCLE_VALUE){
-				cycleTag = CYCLE_GAIN;
-				cycleValue();
-			}
-			else{
-				cycleTag = CYCLE_VALUE;
-				cycleGain();
-			}
-		}
-	}
-
 	private void checkMyPercentage(){
 		myPercentage = ((double)(localCost-myMinCost))/((double)(myMaxCost-myMinCost));
 		if(selectP == higherP){
@@ -367,20 +325,24 @@ public class Pds_MgmAgent extends AgentCycle {
 //			return Math.sqrt(myPercentage);
 //		else if(cycleCount < 0.5*cycleCountEnd)
 //			return myPercentage;
-//		else if(cycleCount < 0.75*cycleCountEnd)
-//			return myPercentage*0.5;
 //		else
 //			return myPercentage*(cycleCountEnd-cycleCount)/cycleCountEnd;
+		
+//		if(selectP == higherP)
+//			return Math.sqrt(myPercentage)*(1-Math.sqrt(cycleCount/(double)cycleCountEnd));
+//		else
+//			return myPercentage*(1-Math.sqrt(cycleCount/(double)cycleCountEnd));
 		
 		if(selectP == higherP)
 			return Math.sqrt(myPercentage)*(cycleCountEnd-cycleCount)/cycleCountEnd;
 		else
 			return myPercentage*(cycleCountEnd-cycleCount)/cycleCountEnd;
+		
 	}
 	
-	private void abandon(int nature) {
+	private boolean abandon(int nature) {
 		if(Math.random() > getAbandonP())
-			return;
+			return false;
 		
 		int[] abandonValueIndex = new int[neighboursQuantity];
 		int[][] abandonNeighbourIndex = new int[neighboursQuantity][domain.length];
@@ -430,10 +392,11 @@ public class Pds_MgmAgent extends AgentCycle {
 			abandonSuggestGain[2] = valueIndex;
 			sendSuggestMessages(abandonIndex);
 			wait = 1;
-			//System.out.println(nature - abandonCost[abandonIndex]+"~~~~~");
 //			System.out.println("cycle "+cycleCount+"   Agent "+id+" ignore Agent "+neighbours[abandonIndex]+" values "+valueIndex+" suggest "+abandonSuggestGain[0]);
-			return;
+			return true;
 		}
+		else
+			return false;
 //		System.out.println("cycle "+cycleCount+"   Agent "+id+" ignore false");
 	}
 	
@@ -533,7 +496,8 @@ public class Pds_MgmAgent extends AgentCycle {
 		result.put(KEY_ID, this.id);
 		result.put(KEY_NAME, this.name);
 		result.put(KEY_VALUE, this.domain[valueIndex]);
-		result.put(KEY_LOCALCOST, this.localCost);
+		result.put(KEY_BESTCOST, this.bestCost);
+		result.put(KEY_BESTCOSTINCYCLE, bestCostInCycle);
 		result.put(KEY_NCCC, this.nccc);
 		
 		this.msgMailer.setResult(result);
@@ -542,28 +506,30 @@ public class Pds_MgmAgent extends AgentCycle {
 	
 	@Override
 	public Object printResults(List<Map<String, Object>> results) {
-		double totalCost=0;
+		ResultCycleAls ret=new ResultCycleAls();
+		int tag = 0;
+		int totalCost = 0;
 		int ncccTemp = 0;
 		for(Map<String, Object> result : results){
 			
-//			int id_=(Integer)result.get(KEY_ID);
-//			String name_=(String)result.get(KEY_NAME);
-//			int value_=(Integer)result.get(KEY_VALUE);
-			
+			//int id_=(Integer)result.get(KEY_ID);
+			//String name_=(String)result.get(KEY_NAME);
+			//int value_=(Integer)result.get(KEY_VALUE);
 			if(ncccTemp < (Integer)result.get(KEY_NCCC))
 				ncccTemp = (Integer)result.get(KEY_NCCC);
-			totalCost+=((double)((Integer)result.get(KEY_LOCALCOST)))/2;
-			
-//			String displayStr="Agent "+name_+": id="+id_+" value="+value_;
-//			System.out.println(displayStr);
+			if(tag == 0){
+				totalCost = ((Integer)result.get(KEY_BESTCOST));
+				ret.bestCostInCycle=(double[])result.get(KEY_BESTCOSTINCYCLE);
+				tag = 1;
+			}
+			//String displayStr="Agent "+name_+": id="+id_+" value="+value_;
+			//System.out.println(displayStr);
 		}
 		
-		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost)+
-				" nccc: "+Infinity.infinityEasy((int)ncccTemp));
-		
-		ResultCycle ret=new ResultCycle();
-		ret.nccc=(int)ncccTemp;
+		System.out.println("totalCost: "+Infinity.infinityEasy((int)totalCost));
+
 		ret.totalCost=(int)totalCost;
+		ret.nccc=(int)ncccTemp;
 		return ret;
 	}
 

@@ -707,6 +707,16 @@ public class SolverWindow {
 			paramList.add(lspSpinnerSelectProbability);
 			paramList.add(lspSpinnerSelectInterval);
 		}
+		else if(algorithmType.equals("PDSALSDSAN")){
+			paramList.add(lspSpinnerCycleCountEnd);
+		}
+		else if(algorithmType.equals("PDSALSMGM")){
+			paramList.add(lspSpinnerCycleCountEnd);
+		}
+		else if(algorithmType.equals("PDSALSMGM2")){
+			paramList.add(lspSpinnerCycleCountEnd);
+			paramList.add(lspSpinnerSelectProbability);
+		}
 		else if(algorithmType.equals("PDSDSAN")){
 			paramList.add(lspSpinnerCycleCountEnd);
 		}

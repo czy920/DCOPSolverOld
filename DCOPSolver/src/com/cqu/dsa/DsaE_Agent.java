@@ -85,9 +85,6 @@ public class DsaE_Agent extends AgentCycle {
 			
 			int[] selectMinCost=new int[domain.length];
 			for(int i=0; i<domain.length; i++){
-				selectMinCost[i]=0;
-			}
-			for(int i=0; i<domain.length; i++){
 				for(int j=0; j<neighbours.length; j++){
 //						if(this.id < neighbours[j])
 						selectMinCost[i]+=constraintCosts.get(neighbours[j])[i][neighboursValueIndex.get(j)];		
