@@ -190,28 +190,29 @@ public class AgentManagerCycle {
 				agent=new MaxSumAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if (agentType.equals("MAXSUMAD")) {
-				agent=new MaxSumADAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
-			else if (agentType.equals("MAXSUMRS")) {
-				agent=new MaxSumRefineStructureAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
-//			else if (agentType.equals("MAXSUMSPLITED")) {
-//				agent=new SplitedMaxSumAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
-//						problem.domains.get(problem.agentDomains.get(agentId)));
-//			}
+
 			else if (agentType.equals("SBB")) {
 				agent=new SynchBBAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
-			else if (agentType.equals("MAXSUMOH")) {
-				agent=new MaxSumOneHotAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
-						problem.domains.get(problem.agentDomains.get(agentId)));
-			}
 			else if (agentType.equals("DGIBBS")){
 				agent=new DGibbsAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if (agentType.equals("MAXSUMADSSVP")){
+				agent = new MaxSumADSSVPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if (agentType.equals("MAXSUMCONVP")){
+				agent=new MaxSumADConcurrentVPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if (agentType.equals("MAXSUMADPVP")){
+				agent=new MaxSumProbabilisticVPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if (agentType.equals("MAXSUMADVP")) {
+				agent=new MaxSumADVPAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId),
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else{
