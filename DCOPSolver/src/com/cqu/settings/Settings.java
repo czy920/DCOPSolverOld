@@ -1,6 +1,6 @@
 package com.cqu.settings;
 
-import com.cqu.maxsum.AbstractLocalRefiner;
+import com.cqu.maxsum.AbstractRefiner;
 
 import javax.swing.JDialog;
 
@@ -48,12 +48,16 @@ public class Settings {
 	private int stageSize;
 	private int repeatTime;
 	private boolean enableVP;
+	private int vpTiming;
 
 	//Parameter for local refine
 	private int refineCycle;
 	private boolean enableRefine;
-	private double distributionThreshold;
 	private String refineAlgorithm;
+
+	//Parameters for Max-sum Probabilistic Value Propagation
+	private int granularity;
+	private double valuePropagationProbability;
 	
 	public Settings() {
 		// TODO Auto-generated constructor stub
@@ -88,10 +92,10 @@ public class Settings {
 		//local refine
 		this.refineCycle = 30;
 		this.enableRefine = false;
-		this.distributionThreshold = 0.8;
-		this.refineAlgorithm = AbstractLocalRefiner.REFINE_ALGORITHM_MGM;
+		this.refineAlgorithm = AbstractRefiner.REFINER_MGM;
 		enableVP = false;
 		enableRefine = false;
+		valuePropagationProbability = 0.4;
 	}
 	
 	public double getBNBmergeADOPTboundArg() {
@@ -335,12 +339,28 @@ public class Settings {
 		return enableRefine;
 	}
 
-	public double getDistributionThreshold() {
-		return distributionThreshold;
+	public void setGranularity(int granularity) {
+		this.granularity = granularity;
 	}
 
-	public void setDistributionThreshold(double distributionThreshold) {
-		this.distributionThreshold = distributionThreshold;
+	public int getGranularity() {
+		return granularity;
+	}
+
+	public void setVpTiming(int vpTiming) {
+		this.vpTiming = vpTiming;
+	}
+
+	public int getVpTiming() {
+		return vpTiming;
+	}
+
+	public void setValuePropagationProbability(double valuePropagationProbability) {
+		this.valuePropagationProbability = valuePropagationProbability;
+	}
+
+	public double getValuePropagationProbability() {
+		return valuePropagationProbability;
 	}
 
 	public String getRefineAlgorithm() {
@@ -354,6 +374,7 @@ public class Settings {
 	public void setStageSize(int stageSize) {
 		this.stageSize = stageSize;
 	}
+
 
 
 	public void setRepeatTime(int repeatTime) {
