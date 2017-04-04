@@ -83,8 +83,8 @@ public class Solver {
 				agentType.equals("PDSALSDSA")||agentType.equals("PDSALSDSAN")||agentType.equals("PDSALSMGM")||agentType.equals("PDSALSMGM2")||
 				agentType.equals("PDSDSAN")||agentType.equals("PDSMGM")||agentType.equals("PDSMGM2")||agentType.equals("PDSDSASDP")||
 				agentType.equals("MAXSUM")||agentType.equals("ACO")||agentType.equals("ACO_tree")||agentType.equals("ACO_bf")||agentType.equals("ACO_phase")||
-				agentType.equals("ACO_line")||agentType.equals("ACO_final")||agentType.equals("MAXSUMAD")||agentType.equals("MAXSUMRS")||agentType.equals("MAXSUMSPLITED")||agentType.equals("SBB")||
-				agentType.equals("MAXSUMOH")||agentType.equals("DGIBBS"))
+				agentType.equals("ACO_line")||agentType.equals("ACO_final")||agentType.equals("MAXSUMADVP")||agentType.equals("SBB")||agentType.equals("DGIBBS")
+				||agentType.equals("MAXSUMCONVP")||agentType.equals("MAXSUMADSSVP")||agentType.equals("MAXSUMADPVP"))
 
 		//if(agentType.equals("BNBADOPT")||agentType.equals("ADOPT"))
 		{
