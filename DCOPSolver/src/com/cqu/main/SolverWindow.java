@@ -666,6 +666,9 @@ public class SolverWindow {
 			paramList.add(lspSpinnerSelectProbabilityD);
 			paramList.add(lspSpinnerSelectRound);
 		}
+		else if(algorithmType.equals("ALS_GDBA")){
+			paramList.add(lspSpinnerCycleCountEnd);
+		}
 		else if(algorithmType.equals("ALSMLUDSA")){
 			paramList.add(lspSpinnerCycleCountEnd);
 			paramList.add(lspSpinnerSelectInterval);

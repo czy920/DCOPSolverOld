@@ -37,7 +37,7 @@ public class AlsDgaAgent extends AgentCycleAls {
 	protected LinkedList<int[]> valueIndexList = new LinkedList<int[]>();
 	protected HashMap<Integer, LinkedList<int[]>> childrenMessageList = new HashMap<Integer, LinkedList<int[]>>();
 	
-	private int population = 8;
+	private int population = 3;
 	private int[] valueIndexGA;
 	private int[] localCostGA;
 	private int[] neighboursLocalCostGA;
@@ -48,7 +48,6 @@ public class AlsDgaAgent extends AgentCycleAls {
 	
 	private boolean crossTagCpt = false;
 	private boolean crossTagGo = false;
-	private int[] crossIndividuals = new int[2];
 	private int min = 0;
 //	private boolean wait = false;
 
@@ -206,8 +205,8 @@ public class AlsDgaAgent extends AgentCycleAls {
 			AlsWork();
 			cycleCount++;
 			
-			cross();
-			mutate();
+//			cross();
+//			mutate();
 			DsaWork();
 			
 			sendValueCostMessages();

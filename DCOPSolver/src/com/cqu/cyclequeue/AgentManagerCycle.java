@@ -21,6 +21,7 @@ import com.cqu.dsan.*;
 import com.cqu.mgm.*;
 import com.cqu.mus.*;
 import com.cqu.pds.*;
+import com.cqu.kopt.*;
 import com.cqu.parser.Problem;
 import com.cqu.sbb.SynchBBAgent;
 import com.cqu.settings.Settings;
@@ -103,6 +104,10 @@ public class AgentManagerCycle {
 			}
 			else if(agentType.equals("MGM2")){
 				agent=new Mgm2Agent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
+						problem.domains.get(problem.agentDomains.get(agentId)));
+			}
+			else if(agentType.equals("KOPT")){
+				agent=new KOPTAgent(agentId, problem.agentNames.get(agentId), problem.agentLevels.get(agentId), 
 						problem.domains.get(problem.agentDomains.get(agentId)));
 			}
 			else if(agentType.equals("ALSDSA")){

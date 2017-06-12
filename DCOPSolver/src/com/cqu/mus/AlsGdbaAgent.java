@@ -35,6 +35,7 @@ public class AlsGdbaAgent extends AgentCycleAls {
 	private int neighboursGain[];
 	private int[] neighboursValueIndex;
 	
+	private int[] minimumCost;
 	private int effCost = 0;
 	private Map<Integer, int[][]> modifier;
 	private boolean isNeighborsChanged = false;
@@ -57,9 +58,24 @@ public class AlsGdbaAgent extends AgentCycleAls {
 		neighboursQuantity=neighbours.length;
 		neighboursValueIndex = new int[neighboursQuantity];
 		neighboursGain=new int[neighboursQuantity];
+		minimumCost = new int[neighboursQuantity];
 		
 		effInit();
+		getMinimumCost();
 		sendValueMessages();
+	}
+	
+	private void getMinimumCost(){
+		for(int i = 0; i < neighboursQuantity; i++){
+			int minCostTemp = constraintCosts.get(neighbours[i])[0][0];
+			for(int indexI = 0; indexI < domain.length; indexI++){
+				for(int indexJ = 0; indexJ < neighbourDomains.get(neighbours[i]).length; indexJ++){
+					if(minCostTemp > constraintCosts.get(neighbours[i])[indexI][indexJ])
+						minCostTemp = constraintCosts.get(neighbours[i])[indexI][indexJ];
+				}
+			}
+			minimumCost[i] = minCostTemp;
+		}
 	}
 	
 	private void effInit(){
@@ -95,7 +111,7 @@ public class AlsGdbaAgent extends AgentCycleAls {
 		int effCostTemp = 0;
 		for(int i = 0; i < neighboursQuantity; i++){
 			effCostTemp += constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex[i]] *
-					(modifier.get(neighbours[i])[valueIndex][neighboursValueIndex[i]] +1);
+					(modifier.get(neighbours[i])[valueIndex][neighboursValueIndex[i]] + 1);
 		}
 		return effCostTemp;
 	}
@@ -108,11 +124,10 @@ public class AlsGdbaAgent extends AgentCycleAls {
 			System.out.println(Thread.currentThread().getName()+": message got in agent "+
 					this.name+" "+this.msgMailer.easyMessageContent(msg)+" | VALUE="+this.domain[valueIndex]+" gainValue="+Infinity.infinityEasy(this.gainValue));
 		}
-		if(msg.getType()==TYPE_VALUE_MESSAGE)
-		{
+		if(msg.getType()==TYPE_VALUE_MESSAGE){
 			disposeValueMessage(msg);
-		}else if(msg.getType()==TYPE_GAIN_MESSAGE)
-		{
+		}
+		else if(msg.getType()==TYPE_GAIN_MESSAGE){
 			disposeGainMessage(msg);
 		}
 		else if(msg.getType() == AlsDsa_Agent.TYPE_ALSCOST_MESSAGE){
@@ -165,8 +180,9 @@ public class AlsGdbaAgent extends AgentCycleAls {
 			int[] selectMinCost=new int[domain.length];
 			for(int i=0; i<domain.length; i++){
 				for(int j=0; j<neighboursQuantity; j++){
-					selectMinCost[i] += constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]] *
-							(modifier.get(neighbours[i])[valueIndex][neighboursValueIndex[i]] +1);	
+					selectMinCost[i] += constraintCosts.get(neighbours[j])[i][neighboursValueIndex[j]]
+							* (modifier.get(neighbours[j])[valueIndex][neighboursValueIndex[j]] + 1)
+							;
 				}
 			}
 			int newLocalCost=effCost;
@@ -177,9 +193,23 @@ public class AlsGdbaAgent extends AgentCycleAls {
 				}
 			}
 			gainValue=effCost-newLocalCost;
+			
+			if(gainValue <= 0 && isNeighborsChanged == false){
+				for(int i = 0; i < neighboursQuantity; i++){
+					if(constraintCosts.get(neighbours[i])[valueIndex][neighboursValueIndex[i]] > minimumCost[i])
+						increaseMode(i);
+				}
+			}
+			isNeighborsChanged = false;
 			increaseNccc();
 			//System.out.println("agent"+this.id+"_______"+cycleCount+"_______"+gainValue+"________");
 			sendGainMessages();
+			
+//			if(gainValue >= 0 && Math.random() < 0.8){
+//				valueIndex = selectValueIndex;
+//				sendValueMessages();
+//			}
+			
 		}
 	}
 	
@@ -208,7 +238,7 @@ public class AlsGdbaAgent extends AgentCycleAls {
 			AlsWork();
 			boolean go = true;
 			for(int i=0; i<neighboursQuantity; i++){
-				if(neighboursGain[i]>=gainValue){
+				if(neighboursGain[i] > gainValue){
 					go = false;
 				}
 			}
@@ -216,18 +246,11 @@ public class AlsGdbaAgent extends AgentCycleAls {
 				valueIndex=selectValueIndex;
 				sendValueMessages();
 			}
-			else{
-				
-				
-				
-				
-			}
-			
 			
 		}
 	}
 
-	protected void allMessageDisposed(){
+	protected void allMessageDisposed(){		
 		if(cycleTag == CYCLE_VALUE){
 			cycleTag = CYCLE_GAIN;
 			cycleValue();
@@ -236,6 +259,18 @@ public class AlsGdbaAgent extends AgentCycleAls {
 			cycleTag = CYCLE_VALUE;
 			cycleGain();
 		}
+		
+//		cycleValue();
+	}
+	
+	private void increaseMode(int neighborIndex){
+		int[][] tempMod = modifier.get(neighbours[neighborIndex]);
+		for(int i = 0; i < domain.length; i++){
+			for(int j = 0; j < neighbourDomains.get(neighbours[neighborIndex]).length; j++){
+				tempMod[i][j]++;
+			}
+		}
+		modifier.put(neighbours[neighborIndex], tempMod);
 	}
 	
 	protected void localSearchCheck(){

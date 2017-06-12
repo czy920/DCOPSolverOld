@@ -77,7 +77,7 @@ public class Solver {
 		//采用同步消息机制的算法
 		if(agentType.equals("BNBADOPT")||agentType.equals("BDADOPT")||agentType.equals("ADOPT_K")||agentType.equals("SynAdopt1")||agentType.equals("SynAdopt2")||									
 				agentType.equals("DSA_A")||agentType.equals("DSA_B")||agentType.equals("DSA_C")||agentType.equals("DSA_D")||agentType.equals("DSA_E")||agentType.equals("DSAN")||
-				agentType.equals("MGM")||agentType.equals("MGM2")||agentType.equals("ALSDSA")||
+				agentType.equals("MGM")||agentType.equals("MGM2")||agentType.equals("KOPT")||agentType.equals("ALSDSA")||
 				agentType.equals("ALS_DSA")||agentType.equals("DSA_PPIRA")||agentType.equals("DSA_SDP")||agentType.equals("ALS_GDBA")||agentType.equals("ALSMLUDSA")||
 				agentType.equals("ALSDSAMGM")||agentType.equals("ALSDSAMGMEVO")||agentType.equals("ALSDSADSAEVO")||agentType.equals("ALSDGA")||agentType.equals("ALSDGAFB")||
 				agentType.equals("PDSALSDSA")||agentType.equals("PDSALSDSAN")||agentType.equals("PDSALSMGM")||agentType.equals("PDSALSMGM2")||
